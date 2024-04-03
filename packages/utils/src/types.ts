@@ -4,6 +4,6 @@
  * has a value equal to a union of `TValue` and the contract itself (being
  * `DeepContract<TValue>`).
  */
-export type DeepContract<TValue = any> = {
-  [key: PropertyKey]: TValue | DeepContract<TValue>;
+export type DeepRecord<TValue = any> = {
+  [key: PropertyKey]: TValue | DeepRecord<TValue>;
 };

@@ -1,2 +1,3 @@
+export type * from "./contract";
 export * from "./vars.css";
-export * from "./contract";
+export * from "./sprinkles.css";
