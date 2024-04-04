@@ -1,27 +1,26 @@
-import type { DeepRecord } from "@repo/utils";
+import type { DeepRecord, RGBA } from "@repo/utils";
 
 export type SpaceUnit = "3xl" | "2xl" | "xl" | "lg" | "md" | "sm" | "xs";
 
-type Color = `rgba(${number}, ${number}, ${number}, ${number})`;
 type Emphasis = "low" | "medium" | "high";
 
-interface ColorTonePalette extends DeepRecord<Color> {
-  base: Color;
-  darker: Color;
-  lighter: Color;
+interface ColorTonePalette extends DeepRecord<RGBA> {
+  base: RGBA;
+  darker: RGBA;
+  lighter: RGBA;
 }
 
-interface Colors extends DeepRecord<Color> {
+interface Colors extends DeepRecord<RGBA> {
   primary: ColorTonePalette;
   secondary: ColorTonePalette;
-  foreground: Color;
-  scrim: Color;
-  overlay: Color;
-  accents: Record<0 | 1 | 2 | 3, Color>;
-  outline: Record<"card", Color>;
+  foreground: RGBA;
+  scrim: RGBA;
+  overlay: RGBA;
+  accents: Record<0 | 1 | 2 | 3, RGBA>;
+  outline: Record<"card", RGBA>;
   warning: ColorTonePalette;
   destructive: ColorTonePalette;
-  emphasis: Record<Emphasis, Color>;
+  emphasis: Record<Emphasis, RGBA>;
 }
 
 export interface Theme extends DeepRecord<string> {

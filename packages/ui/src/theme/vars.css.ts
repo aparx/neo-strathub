@@ -32,9 +32,9 @@ export const [themeClass, vars] = createTheme<Theme>({
       lighter: "rgba(0, 0, 0, 0)",
     },
     emphasis: {
-      low: `rgba(0, 0, 0, 0)`,
-      medium: `rgba(0, 0, 0, 0)`,
-      high: `rgba(0, 0, 0, 0)`,
+      low: "rgba(0, 0, 0, 0)",
+      medium: "rgba(0, 0, 0, 0)",
+      high: "rgba(0, 0, 0, 0)",
     },
     accents: {
       0: "rgba(0, 0, 0, 0)",

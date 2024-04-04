@@ -7,3 +7,10 @@
 export type DeepRecord<TValue = any> = {
   [key: PropertyKey]: TValue | DeepRecord<TValue>;
 };
+
+/** Deeply ensures all properties of `T` to be partial. */
+export type DeepPartial<T> = T extends object
+  ? { [P in keyof T]?: DeepPartial<T[P]> }
+  : T;
+
+export type Numberish = number | `${number}`;
