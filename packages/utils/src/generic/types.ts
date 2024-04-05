@@ -14,3 +14,5 @@ export type DeepPartial<T> = T extends object
   : T;
 
 export type Numberish = number | `${number}`;
+
+export type Nullish<T = never> = T | null | undefined;

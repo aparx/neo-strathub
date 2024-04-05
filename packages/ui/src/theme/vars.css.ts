@@ -1,5 +1,5 @@
-import { createTheme } from "@vanilla-extract/css";
 import type { Theme } from "@/theme/contract";
+import { createTheme } from "@vanilla-extract/css";
 
 export const [themeClass, vars] = createTheme<Theme>({
   emphasis: {
@@ -9,41 +9,48 @@ export const [themeClass, vars] = createTheme<Theme>({
   },
   colors: {
     primary: {
-      base: "rgba(0, 0, 0, 0)",
-      darker: "rgba(0, 0, 0, 0)",
-      lighter: "rgba(0, 0, 0, 0)",
+      base: "rgba(107, 185, 242, 1)",
+      darker: "rgba(10, 85, 142, 1)",
+      lighter: "rgba(107, 185, 242, 1)",
     },
     secondary: {
-      base: "rgba(0, 0, 0, 0)",
+      base: "rgba(144, 106, 226, 1)",
       darker: "rgba(0, 0, 0, 0)",
       lighter: "rgba(0, 0, 0, 0)",
     },
-    foreground: "rgba(0, 0, 0, 0)",
-    scrim: "rgba(0, 0, 0, 0)",
-    overlay: "rgba(0, 0, 0, 0)",
+    foreground: "rgba(245, 245, 245, 1)",
+    scrim: "rgba(0, 0, 0, 0.7)",
+    overlay: "rgba(245, 245, 245, 0.05)",
     warning: {
-      base: "rgba(0, 0, 0, 0)",
-      darker: "rgba(0, 0, 0, 0)",
-      lighter: "rgba(0, 0, 0, 0)",
+      base: "rgba(211, 164, 45, 1)",
+      darker: "rgba(255, 187, 12, 1)",
+      lighter: "rgba(255, 241, 190, 1)",
     },
     destructive: {
-      base: "rgba(0, 0, 0, 0)",
-      darker: "rgba(0, 0, 0, 0)",
+      base: "rgba(224, 76, 85, 1)",
+      darker: "rgba(122, 51, 55, 1)",
       lighter: "rgba(0, 0, 0, 0)",
     },
     emphasis: {
-      low: "rgba(0, 0, 0, 0)",
-      medium: "rgba(0, 0, 0, 0)",
-      high: "rgba(0, 0, 0, 0)",
+      low: "rgba(245, 245, 245, .38)",
+      medium: "rgba(245, 245, 245, .7)",
+      high: "rgba(245, 245, 245, 1)",
     },
     accents: {
-      0: "rgba(0, 0, 0, 0)",
-      1: "rgba(0, 0, 0, 0)",
-      2: "rgba(0, 0, 0, 0)",
-      3: "rgba(0, 0, 0, 0)",
+      0: "rgba(0, 0, 0, 1)",
+      1: "rgba(8, 8, 8, 1)",
+      2: "rgba(13, 13, 13, 1)",
+      3: "rgba(17, 17, 17, 1)",
     },
     outline: {
-      card: "rgba(0, 0, 0, 0)",
+      card: "rgba(245, 245, 245, 0.15)",
+    },
+    state: {
+      hover: {
+        base: "rgb(245, 245, 245)",
+        color: "rgba(245, 245, 245, .07)",
+        opacity: "7%",
+      },
     },
   },
   spacing: {
