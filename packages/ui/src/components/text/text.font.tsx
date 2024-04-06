@@ -1,8 +1,8 @@
 import { FontSize, FontType, vars } from "@repo/theme";
 import { DeepReadonly } from "@repo/utils";
-import { calc } from "@vanilla-extract/css-utils";
 import { GeistSans } from "geist/font/sans";
 import type { NextFont } from "next/dist/compiled/@next/font";
+import { createLetterSpace, createLineHeight } from "./text.utils";
 
 export interface TextFontData {
   level?: number;
@@ -25,9 +25,6 @@ const FontData = function (size, font, weight = 400, level) {
   const lineHeight = createLineHeight(size);
   return { size, font, weight, letterSpacing, lineHeight, level } as const;
 } as FontDataConstructor<DeepReadonly<TextFontData>>;
-
-export const createLetterSpace = (size: string) => calc.multiply(size, 0.01);
-export const createLineHeight = (size: string) => calc.multiply(size, 1.2);
 
 export const FONT_DATA_MAP: DeepReadonly<
   Record<FontType, Record<FontSize, TextFontData>>

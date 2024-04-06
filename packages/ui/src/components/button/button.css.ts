@@ -2,11 +2,17 @@ import { sprinkles, vars } from "@repo/theme";
 import { calc } from "@vanilla-extract/css-utils";
 import { RecipeVariants, recipe } from "@vanilla-extract/recipes";
 import { blendState } from "../../utils";
+import { createLineHeight } from "../text/text.utils";
 
 const hoverOrFocusSelector = `
   &:not([aria-disabled='true']):hover,
   &:not([aria-disabled='true']):focus-visible
 ` as const;
+
+const iconSize = calc.add(
+  calc.multiply(2, vars.spacing.md),
+  createLineHeight(vars.fontSizes.body.md),
+);
 
 export const button = recipe({
   base: [
@@ -32,10 +38,11 @@ export const button = recipe({
     color: {
       default: {
         background: "transparent",
-        color: vars.colors.emphasis.medium,
+        opacity: vars.emphasis.medium,
+        color: vars.colors.emphasis.high,
         selectors: {
           [hoverOrFocusSelector]: {
-            color: vars.colors.emphasis.high,
+            opacity: vars.emphasis.high,
             background: vars.colors.state.hover.color,
           },
         },
@@ -66,8 +73,12 @@ export const button = recipe({
         borderRadius: `${vars.roundness.full} !important`,
       },
       icon: {
-        padding: `${vars.spacing.md} !important`,
-        aspectRatio: "1.75 / 1", // TODO
+        padding: `0 !important`,
+        minWidth: iconSize,
+        minHeight: iconSize,
+        justifyContent: "center",
+        alignItems: "center",
+        fontSize: `${createLineHeight(vars.fontSizes.body.lg)} !important`,
       },
     },
   },
