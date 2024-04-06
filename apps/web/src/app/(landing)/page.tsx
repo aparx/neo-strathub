@@ -1,11 +1,13 @@
 import { vars } from "@repo/theme";
 import "@repo/theme/css";
-import { Flexbox } from "@repo/ui/components";
+import { Flexbox, Text } from "@repo/ui/components";
 
 export default function Page() {
   return (
     <div>
-      Strathub Demo
+      <Text type={"title"} size={"sm"}>
+        Strathub Demo
+      </Text>
       <Flexbox
         dir={"vertical"}
         style={{
