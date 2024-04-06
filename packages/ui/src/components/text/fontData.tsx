@@ -1,9 +1,8 @@
+import { FontSize, FontType, vars } from "@repo/theme";
 import { DeepReadonly } from "@repo/utils";
 import { calc } from "@vanilla-extract/css-utils";
 import { GeistSans } from "geist/font/sans";
 import type { NextFont } from "next/dist/compiled/@next/font";
-import { FontSize, FontType } from "./contract";
-import { vars } from "./vars.css";
 
 export interface FontData {
   size: string;
@@ -33,14 +32,14 @@ export const FONT_DATA_MAP: DeepReadonly<
   Record<FontType, Record<FontSize, FontData>>
 > = {
   display: {
-    lg: new FontData(vars.fontSizes.display.lg, GeistSans, 400),
-    md: new FontData(vars.fontSizes.display.md, GeistSans, 400),
-    sm: new FontData(vars.fontSizes.display.sm, GeistSans, 400),
+    lg: new FontData(vars.fontSizes.display.lg, GeistSans, 700),
+    md: new FontData(vars.fontSizes.display.md, GeistSans, 700),
+    sm: new FontData(vars.fontSizes.display.sm, GeistSans, 700),
   },
   title: {
-    lg: new FontData(vars.fontSizes.title.lg, GeistSans, 400),
-    md: new FontData(vars.fontSizes.title.md, GeistSans, 400),
-    sm: new FontData(vars.fontSizes.title.sm, GeistSans, 400),
+    lg: new FontData(vars.fontSizes.title.lg, GeistSans, 700),
+    md: new FontData(vars.fontSizes.title.md, GeistSans, 700),
+    sm: new FontData(vars.fontSizes.title.sm, GeistSans, 700),
   },
   body: {
     lg: new FontData(vars.fontSizes.body.lg, GeistSans, 400),

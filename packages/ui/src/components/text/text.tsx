@@ -1,7 +1,8 @@
 import { Slot } from "@radix-ui/react-slot";
-import { FONT_DATA_MAP, FontData, FontSize, FontType } from "@repo/theme";
+import { FontSize, FontType } from "@repo/theme";
 import { mergeClassNames } from "@repo/utils";
 import { HTMLProps, useMemo } from "react";
+import { FONT_DATA_MAP, FontData } from "./fontData";
 
 type TextBaseProps = Omit<HTMLProps<HTMLDivElement>, "type" | "data" | "size">;
 
