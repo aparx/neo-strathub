@@ -51,8 +51,8 @@ export const Text = forwardRef<HTMLDivElement, TextProps>(
       <Component
         ref={ref}
         className={mergeClassNames(className, fontData.font.className)}
-        aria-role={(fontData.level ?? 0) > 6 ? "heading" : undefined}
-        aria-level={(fontData.level ?? 0) > 6 ? fontData.level : undefined}
+        role={(fontData.level ?? 0) > 6 ? "heading" : undefined}
+        aria-level={fontData.level}
         style={{
           fontSize: fontData.size,
           fontWeight: fontData.weight,
