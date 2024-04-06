@@ -1,3 +1,4 @@
+import "@repo/theme/css";
 import { Text } from "@repo/ui/components";
 import type { Metadata } from "next";
 import * as css from "./layout.css";

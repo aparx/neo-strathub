@@ -12,7 +12,7 @@ const hoverOrFocusSelector = `
 const iconSize = calc.add(
   calc.multiply(2, vars.spacing.md),
   createLineHeight(vars.fontSizes.body.md),
-  "2px" /* BORDER_WIDTH */,
+  "2px" /* BORDER_SIZE */,
 );
 
 export const button = recipe({
@@ -26,7 +26,6 @@ export const button = recipe({
     {
       display: "flex",
       gap: vars.spacing.md,
-      width: "fit-content",
       alignItems: "center",
       textDecoration: "none",
     },
@@ -36,6 +35,7 @@ export const button = recipe({
       true: { opacity: vars.emphasis.low, pointerEvents: "none" },
       false: { cursor: "pointer", transition: "100ms" },
     },
+    /* General color of the button (background, foreground, on hover, etc.)  */
     color: {
       default: {
         background: "transparent",
@@ -77,6 +77,7 @@ export const button = recipe({
         },
       },
     },
+    /* Overall appearance (spacing, sizing, etc.) of the button */
     appearance: {
       default: {},
       cta: {
