@@ -1,8 +1,10 @@
 import type { DeepRecord, RGB, RGBA } from "@repo/utils";
 
-export type SpaceUnit = "3xl" | "2xl" | "xl" | "lg" | "md" | "sm" | "xs";
-
-type Emphasis = "low" | "medium" | "high";
+interface ColorTonePalette extends DeepRecord<RGBA> {
+  base: RGBA;
+  darker: RGBA;
+  lighter: RGBA;
+}
 
 interface StateColorPalette extends DeepRecord<string> {
   base: RGB;
@@ -11,13 +13,9 @@ interface StateColorPalette extends DeepRecord<string> {
   opacity: `${number}%`;
 }
 
-interface ColorTonePalette extends DeepRecord<RGBA> {
-  base: RGBA;
-  darker: RGBA;
-  lighter: RGBA;
-}
+type Emphasis = "low" | "medium" | "high";
 
-interface Colors extends DeepRecord<RGBA> {
+interface Colors extends DeepRecord<string> {
   primary: ColorTonePalette;
   secondary: ColorTonePalette;
   foreground: RGBA;
@@ -31,8 +29,14 @@ interface Colors extends DeepRecord<RGBA> {
   state: Record<"hover", StateColorPalette>;
 }
 
+export type SpaceUnit = "3xl" | "2xl" | "xl" | "lg" | "md" | "sm" | "xs";
+
+export type FontType = "display" | "title" | "body" | "label";
+export type FontSize = "lg" | "md" | "sm";
+
 export interface Theme extends DeepRecord<string> {
   colors: Colors;
   emphasis: Record<Emphasis, `${number}`>;
   spacing: Record<SpaceUnit, string>;
+  fontSizes: Record<FontType, Record<FontSize, `${number}rem`>>;
 }

@@ -62,4 +62,26 @@ export const [themeClass, vars] = createTheme<Theme>({
     "2xl": "30px",
     "3xl": "40px",
   },
+  fontSizes: {
+    display: {
+      lg: "2.86rem",
+      md: "2.14rem",
+      sm: "1.43rem",
+    },
+    title: {
+      lg: "1.29rem",
+      md: "1.14rem",
+      sm: "1rem",
+    },
+    body: {
+      lg: "1.14rem",
+      md: "1rem",
+      sm: "0.86rem",
+    },
+    label: {
+      lg: "1rem",
+      md: "0.86rem",
+      sm: "0.79rem",
+    },
+  },
 });
