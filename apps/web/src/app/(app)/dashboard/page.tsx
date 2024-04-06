@@ -1,3 +1,4 @@
+import { LogoutButton } from "@/components/logoutButton";
 import { getServer, getUser } from "@/server";
 import { Flexbox } from "@repo/ui/components";
 import { cookies } from "next/headers";
@@ -13,7 +14,8 @@ export default async function Dashboard() {
 
   return (
     <Flexbox gap={"lg"} align={"center"}>
-      Dashboard!
+      Dashboard. Welcome: {user.email}.
+      <LogoutButton />
     </Flexbox>
   );
 }

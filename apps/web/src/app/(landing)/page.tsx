@@ -1,6 +1,6 @@
 import { createServer } from "@/utils/supabase/server";
 
-import { LoginButton } from "@/app/(landing)/_partial/loginButton";
+import { LoginButton } from "@/components/loginButton";
 import { Flexbox, Text } from "@repo/ui/components";
 import { cookies } from "next/headers";
 
