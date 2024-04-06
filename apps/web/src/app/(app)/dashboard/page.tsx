@@ -14,12 +14,6 @@ export default async function Dashboard() {
   return (
     <Flexbox gap={"lg"} align={"center"}>
       Dashboard!
-      <Test />
     </Flexbox>
   );
-}
-
-async function Test() {
-  const user = await getUser(cookies());
-  return <div />;
 }

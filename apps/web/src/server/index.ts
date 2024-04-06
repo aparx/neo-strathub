@@ -1,2 +1,2 @@
-export * from "./getServer";
-export * from "./getUser";
+export { getServer } from "./getServer";
+export { getUser } from "./getUser";
