@@ -13,6 +13,11 @@ export type DeepPartial<T> = T extends object
   ? { [P in keyof T]?: DeepPartial<T[P]> }
   : T;
 
+/** Deeply ensures all properties of `T` to be readonly. */
+export type DeepReadonly<T> = T extends object
+  ? { readonly [P in keyof T]: DeepReadonly<T[P]> }
+  : T;
+
 export type Numberish = number | `${number}`;
 
 export type Nullish<T = never> = T | null | undefined;

@@ -1,7 +1,7 @@
-import type { Theme } from "@/theme/contract";
-import { createTheme } from "@vanilla-extract/css";
+import { createGlobalTheme } from "@vanilla-extract/css";
+import type { Theme } from "./contract";
 
-export const [themeClass, vars] = createTheme<Theme>({
+export const vars = createGlobalTheme<Theme>(":root", {
   emphasis: {
     low: "0.38",
     medium: "0.7",

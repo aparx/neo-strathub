@@ -1,0 +1,41 @@
+{
+  "name": "@repo/theme",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    "./css": "./dist/index.css",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "main": "./dist/index.mjs",
+      "module": "./dist/index.mjs",
+      "import": "./dist/index.mjs"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "require": "./dist/*.js",
+      "main": "./dist/*.mjs",
+      "module": "./dist/*.mjs",
+      "import": "./dist/*.mjs"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.tsx --format esm,cjs --dts --external next",
+    "dev": "tsup src/index.tsx --format esm,cjs --watch --dts --external next",
+    "lint": "TIMING=1 eslint src/**/*.ts* --fix"
+  },
+  "dependencies": {
+    "@repo/utils": "workspace:^",
+    "@vanilla-extract/css": "^1.14.2",
+    "geist": "^1.3.0",
+    "next": "^14.1.1"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:^",
+    "@vanilla-extract/css-utils": "^0.1.3",
+    "@vanilla-extract/esbuild-plugin": "^2.3.5",
+    "@vanilla-extract/recipes": "^0.5.2",
+    "@vanilla-extract/sprinkles": "^1.6.1",
+    "tsup": "^8.0.2"
+  }
+}

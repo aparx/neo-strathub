@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { themeClass } from "@repo/ui";
 
 export const metadata: Metadata = {
   title: "Create Turborepo",
@@ -12,7 +11,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }): JSX.Element {
   return (
-    <html lang="en" className={themeClass}>
+    <html lang="en">
       <body>{children}</body>
     </html>
   );

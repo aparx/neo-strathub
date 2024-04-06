@@ -1,5 +1,5 @@
 import { createSprinkles, defineProperties } from "@vanilla-extract/sprinkles";
-import { BREAKPOINT_QUERIES } from "@/theme/breakpoint";
+import { BREAKPOINT_QUERIES } from "./breakpoint";
 
 const responsiveProps = defineProperties({
   conditions: BREAKPOINT_QUERIES,

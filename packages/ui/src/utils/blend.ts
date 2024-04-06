@@ -1,4 +1,4 @@
-import { vars } from "@/theme";
+import { vars } from "@repo/theme";
 
 type StateColorKey = keyof typeof vars.colors.state;
 

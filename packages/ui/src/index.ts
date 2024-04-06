@@ -1,2 +1,2 @@
+export * from "@repo/theme";
 export * from "./components";
-export * from "./theme";
