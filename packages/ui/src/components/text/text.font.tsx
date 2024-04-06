@@ -4,7 +4,7 @@ import { calc } from "@vanilla-extract/css-utils";
 import { GeistSans } from "geist/font/sans";
 import type { NextFont } from "next/dist/compiled/@next/font";
 
-export interface FontData {
+export interface TextFontData {
   size: string;
   font: NextFont;
   weight: number;
@@ -14,8 +14,12 @@ export interface FontData {
 
 // @formatter:off
 interface FontDataConstructor {
-  (size: string, font: NextFont, weight?: number): DeepReadonly<FontData>;
-  new (size: string, font: NextFont, weight?: number): DeepReadonly<FontData>;
+  (size: string, font: NextFont, weight?: number): DeepReadonly<TextFontData>;
+  new (
+    size: string,
+    font: NextFont,
+    weight?: number,
+  ): DeepReadonly<TextFontData>;
 }
 // @formatter:on
 
@@ -29,7 +33,7 @@ export const createLetterSpace = (size: string) => calc.multiply(size, 0.03);
 export const createLineHeight = (size: string) => calc.multiply(size, 1.2);
 
 export const FONT_DATA_MAP: DeepReadonly<
-  Record<FontType, Record<FontSize, FontData>>
+  Record<FontType, Record<FontSize, TextFontData>>
 > = {
   display: {
     lg: new FontData(vars.fontSizes.display.lg, GeistSans, 700),

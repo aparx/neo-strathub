@@ -7,7 +7,7 @@ export const BREAKPOINTS = {
 } as const;
 
 export const BREAKPOINT_QUERIES = {
-  mobile: { "@media": `screen and (max-width: ${BREAKPOINTS.tablet - 1}px)` },
+  mobile: { "@media": `screen and (min-width: ${BREAKPOINTS.mobile}px)` },
   tablet: { "@media": `screen and (min-width: ${BREAKPOINTS.tablet}px)` },
   desktop: { "@media": `screen and (min-width: ${BREAKPOINTS.desktop}px)` },
 } as const;

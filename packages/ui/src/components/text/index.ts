@@ -1,2 +1,2 @@
-export * from "./fontData";
 export * from "./text";
+export * from "./text.font";
