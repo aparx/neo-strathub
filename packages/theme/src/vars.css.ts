@@ -1,6 +1,16 @@
 import { createGlobalTheme } from "@vanilla-extract/css";
 import type { Theme } from "./contract";
 
+const spacing = {
+  xs: "2px",
+  sm: "5px",
+  md: "10px",
+  lg: "15px",
+  xl: "20px",
+  "2xl": "30px",
+  "3xl": "40px",
+};
+
 export const vars = createGlobalTheme<Theme>(":root", {
   emphasis: {
     low: "0.38",
@@ -43,7 +53,7 @@ export const vars = createGlobalTheme<Theme>(":root", {
       3: "rgba(17, 17, 17, 1)",
     },
     outline: {
-      card: "rgba(245, 245, 245, 0.15)",
+      card: "rgba(255, 255, 255, 0.15)",
     },
     state: {
       hover: {
@@ -61,6 +71,17 @@ export const vars = createGlobalTheme<Theme>(":root", {
     xl: "20px",
     "2xl": "30px",
     "3xl": "40px",
+  },
+  roundness: {
+    xs: "2px",
+    sm: "5px",
+    md: "10px",
+    lg: "15px",
+    xl: "20px",
+    "2xl": "30px",
+    "3xl": "40px",
+    full: "9999px",
+    none: "0px",
   },
   fontSizes: {
     display: {

@@ -38,5 +38,6 @@ export interface Theme extends DeepRecord<string> {
   colors: Colors;
   emphasis: Record<Emphasis, `${number}`>;
   spacing: Record<SpaceUnit, string>;
+  roundness: Record<SpaceUnit | "full" | "none", string>;
   fontSizes: Record<FontType, Record<FontSize, `${number}rem`>>;
 }

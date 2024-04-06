@@ -14,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }): JSX.Element {
   return (
-    <html lang="en">
+    <html lang="en" style={{ fontSize: "0.875rem" }}>
       <Text asChild>
         <body className={css.body}>{children}</body>
       </Text>
