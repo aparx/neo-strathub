@@ -12,6 +12,7 @@ const hoverOrFocusSelector = `
 const iconSize = calc.add(
   calc.multiply(2, vars.spacing.md),
   createLineHeight(vars.fontSizes.body.md),
+  "2px" /* BORDER_WIDTH */,
 );
 
 export const button = recipe({
@@ -47,6 +48,15 @@ export const button = recipe({
           },
         },
       },
+      primary: {
+        background: vars.colors.primary.darker,
+        color: vars.colors.emphasis.high,
+        selectors: {
+          [hoverOrFocusSelector]: {
+            background: blendState(vars.colors.primary.darker, "hover"),
+          },
+        },
+      },
       destructive: {
         background: vars.colors.destructive.darker,
         color: vars.colors.emphasis.high,
@@ -73,7 +83,7 @@ export const button = recipe({
         borderRadius: `${vars.roundness.full} !important`,
       },
       icon: {
-        padding: `0 !important`,
+        padding: "0 !important",
         minWidth: iconSize,
         minHeight: iconSize,
         justifyContent: "center",
