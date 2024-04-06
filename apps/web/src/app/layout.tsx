@@ -1,6 +1,7 @@
 import "@repo/theme/css";
-import { Text } from "@repo/ui/components";
+import { Spinner, Text } from "@repo/ui/components";
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import * as css from "./layout.css";
 import "./reset.css";
 
@@ -17,8 +18,18 @@ export default function RootLayout({
   return (
     <html lang="en" style={{ fontSize: "0.875rem" }}>
       <Text asChild>
-        <body className={css.body}>{children}</body>
+        <body className={css.body}>
+          <Suspense fallback={<PageLoader />}>{children}</Suspense>
+        </body>
       </Text>
     </html>
+  );
+}
+
+function PageLoader() {
+  return (
+    <div className={css.pageSuspense}>
+      <Spinner size={"2em"} />
+    </div>
   );
 }

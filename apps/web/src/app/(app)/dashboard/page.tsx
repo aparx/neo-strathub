@@ -1,17 +1,25 @@
-import { AuthButton } from "@/app/(landing)/_partial/authButton";
-import { createServer } from "@/utils/supabase/server";
+import { getServer, getUser } from "@/server";
+import { Flexbox } from "@repo/ui/components";
 import { cookies } from "next/headers";
 
 export default async function Dashboard() {
-  const supabase = createServer(cookies());
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const supabase = await getServer(cookies());
+  const user = await getUser(cookies());
+
+  if (!user) {
+    // Should be impossible to hit, but just-in-case
+    throw new Error("Must be logged in");
+  }
 
   return (
-    <div>
+    <Flexbox gap={"lg"} align={"center"}>
       Dashboard!
-      <AuthButton user={user} />
-    </div>
+      <Test />
+    </Flexbox>
   );
+}
+
+async function Test() {
+  const user = await getUser(cookies());
+  return <div />;
 }
