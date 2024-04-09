@@ -8,14 +8,14 @@ export interface FlexboxProps extends HTMLAttributes<HTMLDivElement> {
   justify?: Sprinkles["justifyContent"];
   align?: Sprinkles["alignItems"];
   gap?: Sprinkles["gap"];
-  dir?: "horizontal" | "vertical";
+  orient?: "horizontal" | "vertical";
   asChild?: boolean;
   wrap?: boolean | Sprinkles["flexWrap"];
 }
 
 export const Flexbox = forwardRef<HTMLDivElement, FlexboxProps>(
   function Flexbox(props, ref) {
-    const { asChild, justify, align, dir, gap, wrap, ...restProps } = props;
+    const { asChild, justify, align, orient, gap, wrap, ...restProps } = props;
     const Component = asChild ? Slot : "div";
     return (
       <Component
@@ -23,7 +23,7 @@ export const Flexbox = forwardRef<HTMLDivElement, FlexboxProps>(
         className={sprinkles({
           display: "flex",
           flexWrap: wrap === true ? "wrap" : wrap || "nowrap",
-          flexDirection: dir === "vertical" ? "column" : "row",
+          flexDirection: orient === "vertical" ? "column" : "row",
           justifyContent: justify,
           alignItems: align,
           gap,

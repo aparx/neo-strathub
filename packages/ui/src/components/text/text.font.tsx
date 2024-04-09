@@ -2,7 +2,7 @@ import { FontSize, FontType, vars } from "@repo/theme";
 import { DeepReadonly } from "@repo/utils";
 import { GeistSans } from "geist/font/sans";
 import type { NextFont } from "next/dist/compiled/@next/font";
-import { createLetterSpace, createLineHeight } from "./text.utils";
+import { createLetterSpace, createLineHeight } from "../../utils";
 
 export interface TextFontData {
   level?: number;

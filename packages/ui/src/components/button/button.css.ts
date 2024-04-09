@@ -1,8 +1,7 @@
 import { sprinkles, vars } from "@repo/theme";
 import { calc } from "@vanilla-extract/css-utils";
 import { RecipeVariants, recipe } from "@vanilla-extract/recipes";
-import { blendState } from "../../utils";
-import { createLineHeight } from "../text/text.utils";
+import { blendState, createLineHeight } from "../../utils";
 
 const hoverOrFocusSelector = `
   &:not([aria-disabled='true']):hover,
