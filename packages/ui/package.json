@@ -4,7 +4,8 @@
   "private": true,
   "exports": {
     "./components": "./src/components/index.ts",
-    "./utils": "./src/utils/index.ts"
+    "./utils": "./src/utils/index.ts",
+    "./helpers": "./src/helpers/index.ts"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

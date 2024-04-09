@@ -1,5 +1,5 @@
 import { ComponentProps } from "react";
-import { MdAdd, MdSettings } from "react-icons/md";
+import { MdAdd, MdSearch, MdSettings } from "react-icons/md";
 import { Text } from "../text";
 import { ICON_SIZES } from "./icon.utils";
 
@@ -14,18 +14,7 @@ export interface IconProps extends IconBaseProps {
 
 export function Custom({ icon, size = "md", alt, ...restProps }: IconProps) {
   return (
-    <Text
-      asChild
-      data={{
-        size: ICON_SIZES[size],
-        lineHeight: 0,
-      }}
-      style={{
-        position: "relative",
-        width: ICON_SIZES[size],
-        height: ICON_SIZES[size],
-      }}
-    >
+    <Text asChild data={{ size: ICON_SIZES[size], lineHeight: 0 }}>
       <i {...restProps} aria-label={alt} aria-hidden={alt == null}>
         {icon}
       </i>
@@ -33,10 +22,17 @@ export function Custom({ icon, size = "md", alt, ...restProps }: IconProps) {
   );
 }
 
-export function Add(props: IconBaseProps) {
-  return <Custom icon={<MdAdd />} {...props} />;
-}
+const ICON_MAP = {
+  add: <MdAdd />,
+  settings: <MdSettings />,
+  search: <MdSearch />,
+} as const satisfies Record<string, React.ReactNode>;
 
-export function Settings(props: IconBaseProps) {
-  return <Custom icon={<MdSettings />} {...props} />;
+export function Mapped({
+  type,
+  ...restProps
+}: IconBaseProps & {
+  type: keyof typeof ICON_MAP;
+}) {
+  return <Custom icon={ICON_MAP[type]} {...restProps} />;
 }

@@ -1,7 +1,8 @@
 import { vars } from "@repo/theme";
-import "@repo/theme/css";
 import { Text } from "@repo/ui/components";
 import type { Metadata } from "next";
+
+import "@repo/theme/css";
 import "./reset.css";
 
 export const metadata: Metadata = {
