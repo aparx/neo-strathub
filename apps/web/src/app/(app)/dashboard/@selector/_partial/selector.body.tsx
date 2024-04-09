@@ -6,7 +6,6 @@ import { useItemContext } from "../_context";
 export function SelectorBody() {
   const { items } = useItemContext();
 
-
   return (
     <Flexbox asChild orient={"vertical"} gap={"sm"}>
       <ul>

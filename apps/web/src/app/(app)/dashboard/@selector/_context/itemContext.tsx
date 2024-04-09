@@ -1,7 +1,7 @@
 "use client";
 
 import { SharedState, useSharedState } from "@repo/utils/react";
-import { createContext, useContext, useEffect, useMemo } from "react";
+import { createContext, useContext, useMemo } from "react";
 import type { ListItemData } from "../_components/listItem";
 
 export interface ItemContext {
@@ -19,9 +19,6 @@ export function ItemContextProvider({
   children: React.ReactNode;
 }) {
   const filter = useSharedState<string | undefined>();
-
-  // Reset the filter when the reference of elements themselves change
-  useEffect(() => filter.update(undefined), [elements]);
 
   // Filter the elements whenever the elements' reference or the filter changes
   const items = useMemo(() => {

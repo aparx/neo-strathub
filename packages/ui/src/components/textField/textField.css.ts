@@ -7,6 +7,8 @@ const shellBase = style({
   alignItems: "center",
   borderRadius: vars.roundness.md,
   padding: vars.spacing.md,
+  position: "relative",
+  overflow: "hidden",
 });
 
 export const shell = recipe({

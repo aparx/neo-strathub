@@ -12,7 +12,7 @@ const hoverOrFocusSelector = `
 const iconButtonSize = calc.add(
   calc.multiply(2, vars.spacing.md),
   createLineHeight(vars.fontSizes.body.md),
-  "2px" /* BORDER_SIZE */,
+  "4px" /* BORDER_SIZE */,
 );
 
 export const button = recipe({
