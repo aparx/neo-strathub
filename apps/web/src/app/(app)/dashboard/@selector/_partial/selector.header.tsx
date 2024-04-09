@@ -13,7 +13,7 @@ export function SelectorHeader() {
         placeholder={"Search"}
         onInput={(e) => filter.update(e.currentTarget.value)}
       />
-      <Button appearance={"icon"} style={{ flexGrow: 1 }}>
+      <Button appearance={"icon"}>
         <Icon.Mapped type={"add"} />
       </Button>
     </Flexbox>

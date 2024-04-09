@@ -1,3 +1,4 @@
+import { mergeClassNames } from "@repo/utils";
 import { InputHTMLAttributes } from "react";
 import { Text } from "../text";
 import * as css from "./textField.css";
@@ -8,10 +9,19 @@ export interface TextFieldProps extends TextFieldBaseProps {
   leading?: React.ReactNode;
 }
 
-export function TextField({ leading, disabled, ...restProps }: TextFieldProps) {
+export function TextField({
+  leading,
+  disabled,
+  className,
+  style,
+  ...restProps
+}: TextFieldProps) {
   return (
     <Text asChild>
-      <label className={css.shell({ disabled })}>
+      <label
+        className={mergeClassNames(css.shell({ disabled }), className)}
+        style={style}
+      >
         {leading != null && leading}
         <input
           className={css.input}

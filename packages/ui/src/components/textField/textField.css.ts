@@ -41,7 +41,7 @@ export const shell = recipe({
 });
 
 export const input = style({
-  display: "inline-block",
+  width: "100%",
   background: "transparent",
   border: "none",
   outline: "none",
