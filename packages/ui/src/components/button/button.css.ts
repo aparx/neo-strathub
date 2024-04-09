@@ -39,11 +39,10 @@ export const button = recipe({
     color: {
       default: {
         background: "transparent",
-        opacity: vars.emphasis.medium,
-        color: vars.colors.emphasis.high,
+        color: vars.colors.emphasis.medium,
         selectors: {
           [hoverOrFocusSelector]: {
-            opacity: vars.emphasis.high,
+            color: vars.colors.emphasis.high,
             background: vars.colors.state.hover.color,
           },
         },

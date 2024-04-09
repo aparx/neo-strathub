@@ -20,7 +20,15 @@ export default function SelectorDefault() {
   return (
     <ItemContextProvider elements={elements}>
       <Flexbox orient={"vertical"}>
-        <SelectorHeader />
+        <Flexbox
+          align={"center"}
+          style={{
+            minHeight: 57 - 20,
+            padding: `10px 0`,
+          }}
+        >
+          <SelectorHeader />
+        </Flexbox>
         <SelectorBody />
       </Flexbox>
     </ItemContextProvider>

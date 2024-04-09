@@ -26,7 +26,7 @@ export function ListItem({
   ...restProps
 }: ListItemProps) {
   return (
-    <Text asChild data={{ weight: 500 }}>
+    <Text asChild data={{ weight: 450 }}>
       <Link
         href={href}
         className={mergeClassNames(css.listItem({ active }), className)}

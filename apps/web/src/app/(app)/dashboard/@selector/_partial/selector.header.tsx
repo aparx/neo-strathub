@@ -7,9 +7,9 @@ export function SelectorHeader() {
   const { filter } = useItemContext();
 
   return (
-    <Flexbox gap={"md"}>
+    <Flexbox gap={"sm"}>
       <TextField
-        leading={<Icon.Mapped type={"search"} />}
+        leading={<Icon.Mapped type={"search"} color={"red"} />}
         placeholder={"Search"}
         onInput={(e) => filter.update(e.currentTarget.value)}
       />
