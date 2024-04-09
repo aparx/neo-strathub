@@ -33,7 +33,9 @@ export function ListItem({
         {...restProps}
       >
         <Flexbox gap={"md"} align={"center"} style={{ width: "fit-content" }}>
-          {icon != null ? <Icon icon={icon} className={css.itemIcon} /> : null}
+          {icon != null ? (
+            <Icon.Custom icon={icon} className={css.itemIcon} />
+          ) : null}
           {text}
         </Flexbox>
         {/* TODO */}
