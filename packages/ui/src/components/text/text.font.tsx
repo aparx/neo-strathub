@@ -1,5 +1,5 @@
 import { FontSize, FontType, vars } from "@repo/theme";
-import { DeepReadonly } from "@repo/utils";
+import { DeepReadonly, Numberish } from "@repo/utils";
 import { GeistSans } from "geist/font/sans";
 import type { NextFont } from "next/dist/compiled/@next/font";
 import { createLetterSpace, createLineHeight } from "../../utils";
@@ -8,9 +8,9 @@ export interface TextFontData {
   level?: number;
   size: string;
   font: NextFont;
-  weight: number;
-  letterSpacing: string;
-  lineHeight: string;
+  weight: Numberish;
+  letterSpacing: Numberish;
+  lineHeight: Numberish;
 }
 
 // @formatter:off

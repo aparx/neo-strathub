@@ -1,13 +1,21 @@
-import { ListItem, ListItemData } from "../_components";
+"use client";
+import { Flexbox } from "@repo/ui/components";
+import { ListItem } from "../_components";
+import { useItemContext } from "../_context";
 
-export function SelectorBody({ items }: { items: ListItemData[] }) {
+export function SelectorBody() {
+  const { items } = useItemContext();
+
+
   return (
-    <ul>
-      {items.map((item) => (
-        <li style={{ listStyle: "none" }}>
-          <ListItem text={item.text} />
-        </li>
-      ))}
-    </ul>
+    <Flexbox asChild orient={"vertical"} gap={"sm"}>
+      <ul>
+        {items.map((item) => (
+          <li key={item.href}>
+            <ListItem {...item} />
+          </li>
+        ))}
+      </ul>
+    </Flexbox>
   );
 }

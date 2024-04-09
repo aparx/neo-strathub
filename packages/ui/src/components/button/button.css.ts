@@ -2,13 +2,14 @@ import { sprinkles, vars } from "@repo/theme";
 import { calc } from "@vanilla-extract/css-utils";
 import { RecipeVariants, recipe } from "@vanilla-extract/recipes";
 import { blendState, createLineHeight } from "../../utils";
+import { ICON_SIZES } from "../icon/icon.utils";
 
 const hoverOrFocusSelector = `
   &:not([aria-disabled='true']):hover,
   &:not([aria-disabled='true']):focus-visible
 ` as const;
 
-const iconSize = calc.add(
+const iconButtonSize = calc.add(
   calc.multiply(2, vars.spacing.md),
   createLineHeight(vars.fontSizes.body.md),
   "2px" /* BORDER_SIZE */,
@@ -84,11 +85,11 @@ export const button = recipe({
       },
       icon: {
         padding: "0 !important",
-        minWidth: iconSize,
-        minHeight: iconSize,
+        minWidth: iconButtonSize,
+        minHeight: iconButtonSize,
         justifyContent: "center",
         alignItems: "center",
-        fontSize: `${createLineHeight(vars.fontSizes.body.lg)} !important`,
+        fontSize: `${ICON_SIZES.md} !important`,
       },
     },
   },

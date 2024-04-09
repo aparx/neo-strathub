@@ -1,12 +1,11 @@
 "use client";
 
-import { DeepReadonly } from "@repo/utils";
 import { SharedState, useSharedState } from "@repo/utils/react";
 import { createContext, useContext, useEffect, useMemo } from "react";
 import type { ListItemData } from "../_components/listItem";
 
 export interface ItemContext {
-  items: DeepReadonly<ListItemData[]>;
+  items: ReadonlyArray<Readonly<ListItemData>>;
   filter: SharedState<string | undefined>;
 }
 
@@ -24,10 +23,11 @@ export function ItemContextProvider({
   // Reset the filter when the reference of elements themselves change
   useEffect(() => filter.update(undefined), [elements]);
 
-  // Filter the elements after the filter provided
+  // Filter the elements whenever the elements' reference or the filter changes
   const items = useMemo(() => {
-    if (!filter.state) return elements;
-    const needle = filter.state!.toLowerCase();
+    const { state } = filter;
+    if (!state) return elements;
+    const needle = state.toLowerCase();
     return elements.filter(({ text }) => text.toLowerCase().includes(needle));
   }, [filter, elements]);
 

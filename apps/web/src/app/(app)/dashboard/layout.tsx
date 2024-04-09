@@ -18,7 +18,7 @@ export default async function DashboardLayout({
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1fr 3fr 1.5fr",
+          gridTemplateColumns: "minmax(275px, 1fr) 3fr 1.5fr",
           gap: vars.spacing.md,
           width: "100%",
           height: "100dvh",
