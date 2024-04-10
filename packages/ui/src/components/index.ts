@@ -1,3 +1,4 @@
+export * from "./breadcrumbs";
 export * from "./button";
 export * from "./flexbox";
 export * from "./icon";

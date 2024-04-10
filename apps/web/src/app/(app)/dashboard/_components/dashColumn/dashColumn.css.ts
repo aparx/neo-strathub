@@ -1,3 +1,4 @@
+import { DASHBOARD_GRID_GAP } from "@/app/(app)/dashboard/layout.css";
 import { vars } from "@repo/theme";
 import { createLineHeight } from "@repo/ui/utils";
 import { style } from "@vanilla-extract/css";
@@ -8,12 +9,12 @@ const partialPadding = vars.spacing.md;
 export const HEADER_HEIGHT = calc.add(
   createLineHeight(vars.fontSizes.body.md),
   calc.multiply(4, vars.spacing.md),
+  "2px",
 );
 
 const base = style({
   padding: partialPadding,
-  background: "rgba(0, 0, 0, 0.8)",
-  border: `1px solid ${vars.colors.outline.card}`,
+  background: vars.colors.accents[0],
 });
 
 export const root = style({
@@ -21,16 +22,20 @@ export const root = style({
   flexDirection: "column",
   position: "relative",
   overflow: "hidden",
+  gap: DASHBOARD_GRID_GAP,
 });
 
 export const header = style([
   base,
   {
     position: "sticky",
+    top: 0,
     display: "flex",
     alignItems: "center",
     minHeight: HEADER_HEIGHT,
-    top: 0,
+    flexBasis: HEADER_HEIGHT,
+    flexShrink: 0,
+    flexGrow: 0,
   },
 ]);
 
@@ -39,8 +44,6 @@ export const content = style([
   {
     overflowY: "auto",
     flexGrow: 1,
-    borderTop: "unset",
-    borderBottom: "unset",
     scrollbarWidth: "none",
     "::-webkit-scrollbar": {
       width: 0,

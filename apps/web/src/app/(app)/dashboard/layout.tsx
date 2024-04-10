@@ -1,4 +1,6 @@
 import { Suspense } from "react";
+import { LayoutHeader } from "./_partial";
+import * as css from "./layout.css";
 
 export default async function DashboardLayout({
   children,
@@ -13,18 +15,13 @@ export default async function DashboardLayout({
 }) {
   return (
     <Suspense fallback={"Loading..."}>
-      {children}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "minmax(275px, 1fr) 3fr 1.5fr",
-          width: "100%",
-          height: "100dvh",
-        }}
-      >
-        {selector}
-        {content}
-        {details}
+      <div className={css.rootLayout}>
+        <LayoutHeader />
+        <main className={css.gridLayout}>
+          {selector}
+          {content}
+          {details}
+        </main>
       </div>
     </Suspense>
   );

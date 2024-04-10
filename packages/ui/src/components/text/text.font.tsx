@@ -45,8 +45,8 @@ export const FONT_DATA_MAP: DeepReadonly<
     sm: new FontData(vars.fontSizes.body.sm, GeistSans, 400),
   },
   label: {
-    lg: new FontData(vars.fontSizes.label.lg, GeistSans, 700),
-    md: new FontData(vars.fontSizes.label.md, GeistSans, 700),
-    sm: new FontData(vars.fontSizes.label.sm, GeistSans, 700),
+    lg: new FontData(vars.fontSizes.label.lg, GeistSans, 500),
+    md: new FontData(vars.fontSizes.label.md, GeistSans, 500),
+    sm: new FontData(vars.fontSizes.label.sm, GeistSans, 500),
   },
 } as const;
