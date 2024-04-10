@@ -2,7 +2,6 @@ import { vars } from "@repo/theme";
 import { createLineHeight } from "@repo/ui/utils";
 import { style } from "@vanilla-extract/css";
 import { calc } from "@vanilla-extract/css-utils";
-import { recipe, RecipeVariants } from "@vanilla-extract/recipes";
 
 const partialPadding = vars.spacing.md;
 
@@ -17,26 +16,12 @@ const base = style({
   border: `1px solid ${vars.colors.outline.card}`,
 });
 
-export const root = recipe({
-  base: {
-    display: "flex",
-    flexDirection: "column",
-    position: "relative",
-  },
-  variants: {
-    scroll: {
-      viewport: {},
-      container: {
-        overflow: "hidden",
-      },
-    },
-  },
-  defaultVariants: {
-    scroll: "container",
-  },
+export const root = style({
+  display: "flex",
+  flexDirection: "column",
+  position: "relative",
+  overflow: "hidden",
 });
-
-export type RootVariants = RecipeVariants<typeof root>;
 
 export const header = style([
   base,
@@ -44,7 +29,7 @@ export const header = style([
     position: "sticky",
     display: "flex",
     alignItems: "center",
-    height: HEADER_HEIGHT,
+    minHeight: HEADER_HEIGHT,
     top: 0,
   },
 ]);
@@ -52,10 +37,14 @@ export const header = style([
 export const content = style([
   base,
   {
-    overflowY: "scroll",
+    overflowY: "auto",
     flexGrow: 1,
     borderTop: "unset",
     borderBottom: "unset",
+    scrollbarWidth: "none",
+    "::-webkit-scrollbar": {
+      width: 0,
+    },
   },
 ]);
 

@@ -1,4 +1,3 @@
-import { vars } from "@repo/theme";
 import { Suspense } from "react";
 
 export default async function DashboardLayout({
@@ -19,7 +18,6 @@ export default async function DashboardLayout({
         style={{
           display: "grid",
           gridTemplateColumns: "minmax(275px, 1fr) 3fr 1.5fr",
-          gap: vars.spacing.md,
           width: "100%",
           height: "100dvh",
         }}

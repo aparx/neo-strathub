@@ -2,10 +2,8 @@ import { mergeClassNames } from "@repo/utils";
 import { HTMLAttributes } from "react";
 import * as css from "./dashColumn.css";
 
-type RootProps = HTMLAttributes<HTMLDivElement> & css.RootVariants;
-
-export function Root({ children, scroll }: RootProps) {
-  return <div className={css.root({ scroll })}>{children}</div>;
+export function Root({ children }: HTMLAttributes<HTMLDivElement>) {
+  return <div className={css.root}>{children}</div>;
 }
 
 export const Header = createPartial(css.header);

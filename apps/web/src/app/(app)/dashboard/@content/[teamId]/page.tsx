@@ -1,13 +1,9 @@
-import { Flexbox } from "@repo/ui/components";
+import { DashContent } from "@/app/(app)/dashboard/@content/content";
 
 export default async function Content({
   params,
 }: {
   params: { teamId: string };
 }) {
-  return (
-    <Flexbox orient={"vertical"} gap={"lg"}>
-      Content at team
-    </Flexbox>
-  );
+  return <DashContent />;
 }

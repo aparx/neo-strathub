@@ -1,9 +1,5 @@
-import { Flexbox } from "@repo/ui/components";
+import { DashContent } from "./content";
 
 export default async function Content() {
-  return (
-    <Flexbox orient={"vertical"} gap={"lg"}>
-      Content at /
-    </Flexbox>
-  );
+  return <DashContent />;
 }

@@ -9,7 +9,7 @@ import {
 export function Selector() {
   return (
     <SelectorProvider>
-      <DashColumn.Root scroll={"container"}>
+      <DashColumn.Root>
         <DashColumn.Header style={{ borderLeft: "unset" }}>
           <SelectorHeader />
         </DashColumn.Header>
