@@ -15,6 +15,7 @@ export interface ListItemData {
 
 export interface ListItemProps extends ListItemBaseProps, ListItemData {
   active?: boolean;
+  loading?: boolean;
 }
 
 export function ListItem({
@@ -22,6 +23,7 @@ export function ListItem({
   text,
   href,
   active,
+  loading,
   className,
   ...restProps
 }: ListItemProps) {
@@ -29,7 +31,10 @@ export function ListItem({
     <Text asChild data={{ weight: 450 }}>
       <Link
         href={href}
-        className={mergeClassNames(css.listItem({ active }), className)}
+        className={mergeClassNames(
+          css.listItem({ active, loading }),
+          className,
+        )}
         {...restProps}
       >
         <Flexbox gap={"md"} align={"center"} style={{ width: "fit-content" }}>

@@ -54,6 +54,8 @@ export const content = style([
 export const footer = style([
   base,
   {
+    flexGrow: 0,
+    flexShrink: 0,
     position: "sticky",
     bottom: 0,
   },

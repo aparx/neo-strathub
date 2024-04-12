@@ -6,11 +6,11 @@ export function Root({ children }: HTMLAttributes<HTMLDivElement>) {
   return <div className={css.root}>{children}</div>;
 }
 
-export const Header = createPartial(css.header);
-export const Content = createPartial(css.content);
-export const Footer = createPartial(css.footer);
+export const Header = createPart(css.header);
+export const Content = createPart(css.content);
+export const Footer = createPart(css.footer);
 
-function createPartial(baseClassName: string) {
+function createPart(baseClassName: string) {
   return function _DashColumnPartial({
     className,
     ...restProps

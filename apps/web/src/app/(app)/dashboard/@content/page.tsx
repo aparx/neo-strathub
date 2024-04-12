@@ -1,5 +1,5 @@
 import { DashContent } from "./content";
 
 export default async function Content() {
-  return <DashContent />;
+  return <DashContent type={"overview"} />;
 }

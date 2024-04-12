@@ -1,9 +1,10 @@
 import { DashContent } from "@/app/(app)/dashboard/@content/content";
+import { DashboardParams } from "@/app/(app)/dashboard/_utils";
 
-export default async function Content({
+export default function Content({
   params,
 }: {
-  params: { teamId: string };
+  params: Pick<DashboardParams, "teamId">;
 }) {
-  return <DashContent />;
+  return <DashContent type={"team"} teamId={params.teamId} />;
 }

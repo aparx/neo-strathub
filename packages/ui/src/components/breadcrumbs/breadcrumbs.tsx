@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { HTMLAttributes, useMemo } from "react";
+import { AnchorHTMLAttributes, HTMLAttributes, useMemo } from "react";
 import { Flexbox } from "../flexbox";
 import { Text } from "../text";
 import * as css from "./breadcrumbs.css";
 
 export interface BreadcrumbData {
+  forceRefetch?: boolean;
   display: React.ReactNode;
   href: string;
 }
@@ -34,14 +35,16 @@ function useBreadcrumbComponents(breadcrumbs: BreadcrumbsProps["breadcrumbs"]) {
     const { length } = breadcrumbs;
     const arr = new Array<React.ReactNode>(Math.max(2 * length - 2, length));
     for (let i = 0; i < length; ++i) {
-      const { href, display } = breadcrumbs[i]!;
+      const { href, display, forceRefetch } = breadcrumbs[i]!;
       const active = i === length - 1;
       if (i > 0) arr.push(<BreadcrumbDivider key={i} />);
-      arr.push(
-        <Link key={href} href={href} className={css.breadcrumb({ active })}>
-          {display}
-        </Link>,
-      );
+      const props = {
+        key: href,
+        href: href,
+        className: css.breadcrumb({ active }),
+        children: display,
+      } satisfies AnchorHTMLAttributes<HTMLAnchorElement>;
+      arr.push(forceRefetch ? <a {...props} /> : <Link {...props} replace />);
     }
     return arr;
   }, [breadcrumbs]);

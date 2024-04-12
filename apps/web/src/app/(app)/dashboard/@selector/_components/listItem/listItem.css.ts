@@ -3,15 +3,18 @@ import { style } from "@vanilla-extract/css";
 import { recipe } from "@vanilla-extract/recipes";
 
 export const listItem = recipe({
-  base: sprinkles({
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "sm",
-    outline: "card",
-    borderRadius: "md",
-    gap: "md",
-  }),
+  base: [
+    sprinkles({
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      padding: "sm",
+      outline: "card",
+      borderRadius: "md",
+      gap: "md",
+    }),
+    { transition: "150ms" },
+  ],
   variants: {
     active: {
       true: {
@@ -28,9 +31,14 @@ export const listItem = recipe({
         },
       },
     },
+    loading: {
+      true: { opacity: vars.emphasis.low },
+      false: {},
+    },
   },
   defaultVariants: {
     active: false,
+    loading: false,
   },
 });
 
