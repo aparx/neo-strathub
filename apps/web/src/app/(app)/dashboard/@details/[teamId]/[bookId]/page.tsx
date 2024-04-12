@@ -4,7 +4,13 @@ import { DashboardParams } from "@/app/(app)/dashboard/_utils";
 export default async function DetailsPage({
   params,
 }: {
-  params: Pick<DashboardParams, "teamId">;
+  params: DashboardParams;
 }) {
-  return <DetailsContent type={"team"} teamId={params.teamId} />;
+  return (
+    <DetailsContent
+      type={"collection"}
+      teamId={params.teamId}
+      bookId={params.bookId}
+    />
+  );
 }

@@ -8,3 +8,17 @@ export const DASHBOARD_QUERY_PARAMS = {
 } as const satisfies Readonly<Record<string, string>>;
 
 export type DashboardQueryParams = typeof DASHBOARD_QUERY_PARAMS;
+
+export type SharedContentProps =
+  | {
+      type: "team";
+      teamId: string;
+    }
+  | {
+      type: "collection";
+      teamId: string;
+      bookId: string;
+    }
+  | {
+      type: "overview";
+    };

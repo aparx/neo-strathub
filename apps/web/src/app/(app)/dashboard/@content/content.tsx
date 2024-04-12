@@ -1,20 +1,7 @@
 import { DashColumn } from "@/app/(app)/dashboard/_components";
+import { SharedContentProps } from "@/app/(app)/dashboard/_utils";
 
-export type ContentProps =
-  | {
-      type: "team";
-      teamId: string;
-    }
-  | {
-      type: "collection";
-      teamId: string;
-      bookId: string;
-    }
-  | {
-      type: "overview";
-    };
-
-export function DashContent(props: ContentProps) {
+export function DashContent(props: SharedContentProps) {
   return (
     <DashColumn.Root>
       <DashColumn.Header>Content {props.type}</DashColumn.Header>
