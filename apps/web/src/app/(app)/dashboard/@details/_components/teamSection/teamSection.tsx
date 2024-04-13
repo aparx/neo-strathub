@@ -1,5 +1,5 @@
 import { vars } from "@repo/theme";
-import { Flexbox, Text } from "@repo/ui/components";
+import { Flexbox, Progress, Text } from "@repo/ui/components";
 import * as css from "./teamSection.css";
 
 export async function TeamSection({ teamId }: { teamId: string }) {
@@ -35,14 +35,18 @@ function Statistic({
   value: number;
   maximum: number;
 }) {
-  // Progress as value between 0 and 1
-  const progress = value / maximum;
-
   return (
     <Flexbox asChild justify={"space-between"} align={"center"}>
       <Text style={{ color: vars.colors.emphasis.medium }}>
         <div>{name}</div>
-        <div style={{ fontWeight: 500 }}>{Math.round(100 * progress)}%</div>
+        <Flexbox gap="md" align={"center"} style={{ fontWeight: 500 }}>
+          {value}
+          <Progress.CircularColorStep
+            size={"1.2em"}
+            value={value}
+            max={maximum}
+          />
+        </Flexbox>
       </Text>
     </Flexbox>
   );
