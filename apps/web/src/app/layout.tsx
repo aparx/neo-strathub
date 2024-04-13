@@ -3,6 +3,7 @@ import { Text } from "@repo/ui/components";
 import type { Metadata } from "next";
 
 import "@repo/theme/css";
+import "./global.css";
 import "./reset.css";
 
 export const metadata: Metadata = {

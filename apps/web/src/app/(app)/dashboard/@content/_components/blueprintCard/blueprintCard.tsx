@@ -1,6 +1,7 @@
+"use client";
 import { vars } from "@repo/theme";
 import { Button, Flexbox, Icon, Text } from "@repo/ui/components";
-import { ComponentPropsWithoutRef } from "react";
+import { ComponentPropsWithoutRef, useMemo } from "react";
 import { MdVisibility } from "react-icons/md";
 import * as css from "./blueprintCard.css";
 
@@ -29,13 +30,17 @@ export function BlueprintCard({
   tags = EMPTY_ARRAY,
   visibility,
 }: BlueprintCardProps) {
+  const actualTags = useMemo(() => {
+    return [arenaName, ...tags];
+  }, [tags]);
+
   return (
     <article className={css.article}>
-      <div style={{ flexGrow: 1, maxWidth: "100%" }}>
+      <div style={{ flexGrow: 1 }}>
         <header className={css.headerContainer}>
           <Icon.Custom
             icon={<MdVisibility />}
-            aria-label={`Visibility: ${visibility}`}
+            alt={`Visibility: ${visibility}`}
           />
           <div className={css.headerColumns}>
             <HeaderElement title={teamName} name={documentName} />
@@ -44,7 +49,7 @@ export function BlueprintCard({
         </header>
         <div className={css.tagsContainer}>
           <ul className={css.tagList}>
-            {tags.map((tag, index) => (
+            {actualTags.map((tag, index) => (
               <TagItem key={index /* OK */} name={tag} />
             ))}
           </ul>
@@ -65,17 +70,10 @@ export function BlueprintCard({
 function HeaderElement({ title, name }: { title: string; name: string }) {
   return (
     <Flexbox orient={"vertical"} gap={"sm"}>
-      <Text type={"label"} style={{ color: vars.colors.emphasis.low }}>
+      <Text type={"label"} style={{ color: vars.colors.emphasis.medium }}>
         {title}
       </Text>
-      <Text
-        type={"title"}
-        size={"sm"}
-        data={{ weight: 450 }}
-        style={{ color: vars.colors.emphasis.medium }}
-      >
-        {name}
-      </Text>
+      <Text style={{ color: vars.colors.emphasis.high }}>{name}</Text>
     </Flexbox>
   );
 }

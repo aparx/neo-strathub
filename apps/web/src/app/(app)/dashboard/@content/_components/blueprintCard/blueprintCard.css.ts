@@ -1,16 +1,25 @@
 import { sprinkles, vars } from "@repo/theme";
-import { createLineHeight } from "@repo/ui/utils";
-import { style } from "@vanilla-extract/css";
+import { blendState, createLineHeight } from "@repo/ui/utils";
+import { globalStyle, style } from "@vanilla-extract/css";
 import { calc } from "@vanilla-extract/css-utils";
 
 const border = `1px solid ${vars.colors.outline.card}`;
+const transition = "125ms";
+
+const articleBase = style({
+  display: "flex",
+  overflow: "hidden",
+  alignItems: "stretch",
+});
 
 export const article = style([
   sprinkles({ outline: "card", borderRadius: "md" }),
+  articleBase,
   {
-    display: "flex",
-    overflow: "hidden",
-    alignItems: "stretch",
+    transition,
+    ":hover": {
+      background: vars.colors.state.hover.color,
+    },
   },
 ]);
 
@@ -21,11 +30,13 @@ export const headerContainer = style({
   padding: vars.spacing.lg,
   background: vars.colors.accents[1],
   borderBottom: border,
+  transition,
 });
 
 export const headerColumns = style({
-  width: "100%",
-  columns: 2,
+  flexGrow: 1,
+  display: "grid",
+  gridTemplateColumns: "1.25fr 1fr",
   gap: vars.spacing.lg,
   maxWidth: 750, // TODO magic number
 });
@@ -42,13 +53,7 @@ export const tagsContainer = style({
     calc.multiply(2, vars.spacing.sm),
     createLineHeight(vars.fontSizes.label.sm),
   ),
-  "::after": {
-    content: "",
-    position: "absolute",
-    inset: 0,
-    left: calc.subtract("100%", vars.spacing.lg),
-    background: `linear-gradient(to right, transparent, ${vars.colors.accents[0]})`,
-  },
+  mask: `linear-gradient(to right, #000 ${calc.subtract("100%", vars.spacing.lg)}, #0000)`,
 });
 
 export const tagList = style({
@@ -65,6 +70,7 @@ export const tagItem = style({
   background: vars.colors.accents[1],
   color: vars.colors.emphasis.low,
   borderRadius: vars.roundness.sm,
+  transition,
 });
 
 /** Semantic footer (being the extra buttons for desktop only) */
@@ -76,4 +82,13 @@ export const footer = style({
   justifyContent: "center",
   gap: vars.spacing.md,
   padding: `0 ${vars.spacing.md}`,
+});
+
+globalStyle(`${articleBase}:hover ${tagItem}`, {
+  background: blendState(vars.colors.accents[1], "hover"),
+  color: vars.colors.emphasis.medium,
+});
+
+globalStyle(`${articleBase}:hover ${headerContainer}`, {
+  background: blendState(vars.colors.accents[1], "hover"),
 });
