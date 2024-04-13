@@ -9,7 +9,7 @@ export const callout = recipe({
     {
       display: "flex",
       alignItems: "center",
-      gap: vars.spacing.md,
+      gap: vars.spacing.lg,
       padding: vars.spacing.lg,
       borderRadius: vars.roundness.sm,
     },

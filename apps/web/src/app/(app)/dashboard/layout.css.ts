@@ -15,7 +15,7 @@ export const rootLayout = style({
 
 export const gridLayout = style({
   display: "grid",
-  gridTemplateColumns: "minmax(275px, 1fr) 3fr minmax(350px, 1.2fr)",
+  gridTemplateColumns: "minmax(275px, 1fr) 3fr minmax(375px, 1.2fr)",
   width: "100%",
   height: `calc(100% - ${LAYOUT_HEADER_HEIGHT})`,
   gap: DASHBOARD_GRID_GAP,

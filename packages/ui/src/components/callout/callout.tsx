@@ -1,6 +1,8 @@
 import { ComponentPropsWithoutRef } from "react";
-import { MdInfo, MdWarning } from "react-icons/md";
+import { MdInfoOutline } from "react-icons/md";
+import { RiErrorWarningLine } from "react-icons/ri";
 import { Flexbox } from "../flexbox";
+import { Icon } from "../icon";
 import { Text } from "../text";
 import * as css from "./callout.css";
 import { CalloutVariants } from "./callout.css";
@@ -12,7 +14,7 @@ export type CalloutProps = CalloutBaseProps &
     icon: React.ReactNode;
   };
 
-export function Base({ icon, children, color, ...restProps }: CalloutProps) {
+export function Custom({ icon, children, color, ...restProps }: CalloutProps) {
   return (
     <Flexbox
       asChild
@@ -21,7 +23,7 @@ export function Base({ icon, children, color, ...restProps }: CalloutProps) {
       {...restProps}
     >
       <Text type={"label"} size={"lg"}>
-        {icon}
+        <Icon.Custom icon={icon} />
         {children}
       </Text>
     </Flexbox>
@@ -29,9 +31,9 @@ export function Base({ icon, children, color, ...restProps }: CalloutProps) {
 }
 
 export function Warning(props: CalloutBaseProps) {
-  return <Base icon={<MdWarning />} color={"warning"} {...props} />;
+  return <Custom icon={<RiErrorWarningLine />} color={"warning"} {...props} />;
 }
 
-export function Information(props: CalloutBaseProps) {
-  return <Base icon={<MdInfo />} color={"secondary"} {...props} />;
+export function Info(props: CalloutBaseProps) {
+  return <Custom icon={<MdInfoOutline />} color={"primary"} {...props} />;
 }

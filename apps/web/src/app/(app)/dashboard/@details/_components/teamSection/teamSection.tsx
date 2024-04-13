@@ -23,10 +23,7 @@ export async function TeamSection({ teamId }: { teamId: string }) {
         </Flexbox>
       </div>
       <div className={css.annotation} style={{ borderTop: "unset" }}>
-        <Button color={"cta"} appearance={"cta"} style={{ marginLeft: "auto" }}>
-          Upgrade now
-          <MdArrowForward />
-        </Button>
+        <UpgradeButton />
       </div>
     </section>
   );
@@ -55,5 +52,14 @@ function Statistic({
         </Flexbox>
       </Text>
     </Flexbox>
+  );
+}
+
+function UpgradeButton() {
+  return (
+    <Button color={"cta"} appearance={"cta"} className={css.upgradeButton}>
+      Upgrade Plan
+      <MdArrowForward />
+    </Button>
   );
 }

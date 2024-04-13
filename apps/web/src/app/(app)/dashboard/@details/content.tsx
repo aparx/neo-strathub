@@ -2,16 +2,17 @@ import { DashColumn } from "@/app/(app)/dashboard/_components";
 import { SharedContentProps } from "@/app/(app)/dashboard/_utils";
 import { Callout } from "@repo/ui/components";
 import { Suspense } from "react";
-import { RiErrorWarningLine } from "react-icons/ri";
 import { TeamSection } from "./_components";
+import * as css from "./content.css";
 
 export async function DetailsContent(props: SharedContentProps) {
   return (
     <DashColumn.Root>
-      <DashColumn.Content>
-        <Callout.Base icon={<RiErrorWarningLine />} color={"warning"}>
-          This is an alpha version
-        </Callout.Base>
+      <DashColumn.Content className={css.content}>
+        <Callout.Warning>
+          Warning: Alpha version. Data may be lost.
+        </Callout.Warning>
+        {/* TODO: Document/Blueprint Inspector */}
         {props.type !== "overview" && (
           <Suspense key={props.teamId} fallback={"Loading Team..."}>
             <TeamSection teamId={props.teamId} />

@@ -16,9 +16,9 @@ export const vars = createGlobalTheme<Theme>(":root", {
     },
     secondary: {
       base: "rgba(144, 106, 226, 1)",
-      darker: "rgba(0, 0, 0, 0)",
-      lighter: "rgba(0, 0, 0, 0)",
-      darkest: "rgba(21, 37, 48, 1)",
+      darker: "rgba(100, 72, 161, 1)",
+      lighter: "rgba(177, 149, 237, 1)",
+      darkest: "rgba(43, 28, 74, 1)",
     },
     foreground: "rgba(245, 245, 245, 1)",
     scrim: "rgba(0, 0, 0, 0.7)",
