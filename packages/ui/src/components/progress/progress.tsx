@@ -52,13 +52,12 @@ export function CircularColorStep({
 }: CircularColorStepProps) {
   const progress = calculateProgress(value, max, min);
   const color = useMemo(() => {
-    const keys = Object.keys(steps).sort((a, b) => Number(b) - Number(a));
-    for (const key of keys) {
-      const numKey = Number(key);
-      if (progress >= Math.round(numKey))
-        return steps[numKey as keyof typeof steps];
-    }
-    return "transparent";
+    const stepKey = Object.keys(steps)
+      .map(Number)
+      .sort((a, b) => b - a)
+      .find((key) => progress >= key);
+    if (stepKey == null) return "transparent";
+    return steps[stepKey as keyof typeof steps];
   }, [progress]);
 
   return (

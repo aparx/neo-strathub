@@ -12,11 +12,13 @@ export const vars = createGlobalTheme<Theme>(":root", {
       base: "rgba(107, 185, 242, 1)",
       darker: "rgba(10, 85, 142, 1)",
       lighter: "rgba(107, 185, 242, 1)",
+      darkest: "rgba(21, 37, 48, 1)",
     },
     secondary: {
       base: "rgba(144, 106, 226, 1)",
       darker: "rgba(0, 0, 0, 0)",
       lighter: "rgba(0, 0, 0, 0)",
+      darkest: "rgba(21, 37, 48, 1)",
     },
     foreground: "rgba(245, 245, 245, 1)",
     scrim: "rgba(0, 0, 0, 0.7)",
@@ -25,11 +27,13 @@ export const vars = createGlobalTheme<Theme>(":root", {
       base: "rgba(211, 164, 45, 1)",
       darker: "rgba(255, 187, 12, 1)",
       lighter: "rgba(255, 241, 190, 1)",
+      darkest: "rgba(51, 37, 2, 1)",
     },
     destructive: {
       base: "rgba(224, 76, 85, 1)",
       darker: "rgba(122, 51, 55, 1)",
       lighter: "rgba(0, 0, 0, 0)",
+      darkest: "rgba(45, 15, 17, 1)",
     },
     emphasis: {
       low: "rgba(245, 245, 245, .38)",

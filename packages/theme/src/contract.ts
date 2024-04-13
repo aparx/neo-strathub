@@ -3,6 +3,7 @@ import type { DeepRecord, RGB, RGBA } from "@repo/utils";
 interface ColorTonePalette extends DeepRecord<RGBA> {
   base: RGBA;
   darker: RGBA;
+  darkest: RGBA;
   lighter: RGBA;
 }
 

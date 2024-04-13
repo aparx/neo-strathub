@@ -1,5 +1,6 @@
 export * from "./breadcrumbs";
 export * from "./button";
+export * from "./callout";
 export * from "./flexbox";
 export * from "./icon";
 export * from "./progress";
