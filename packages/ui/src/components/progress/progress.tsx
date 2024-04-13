@@ -11,7 +11,7 @@ interface ProgressBaseProps {
 
 interface CircularBaseProps extends ProgressBaseProps {
   size?: string;
-  /** Width amount between 0 and 1 multiplied with `size` */
+  /** Width amount between 0 and 1 (is multiplied with `size`) */
   arcWidth?: number;
 }
 
@@ -31,6 +31,18 @@ export const DEFAULT_COLOR_STEPS = {
   75: vars.colors.destructive.base,
 } as const satisfies CircularColorStepProps["steps"];
 
+/**
+ * Circular progress indicator, with the indicator color depending on the current
+ * percentage. The colors are supplied by `steps`. If a current percentage cannot be
+ * correlated to any supplied step, the `frontColor` defaults to `transparent`.
+ *
+ * @param steps the color steps, bound to their respective minimum percentage.
+ * @param value the value of the progress
+ * @param min the minimum value of the progress
+ * @param max the maximum value of the progress
+ * @param restProps
+ * @constructor
+ */
 export function CircularColorStep({
   steps = DEFAULT_COLOR_STEPS,
   value,
@@ -108,10 +120,7 @@ function AngledCircle({
         position: "absolute",
         width: "100%",
         height: "100%",
-        background: `conic-gradient(
-          ${frontColor} ${progress}%, 
-          ${backColor} ${progress}%
-        )`,
+        background: `conic-gradient(${frontColor} ${progress}%, ${backColor} ${progress}%)`,
       }}
     />
   );
