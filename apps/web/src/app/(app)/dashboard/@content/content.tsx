@@ -8,11 +8,10 @@ export function DashContent(props: SharedContentProps) {
     <DashColumn.Root>
       <DashColumn.Header>Content {props.type}</DashColumn.Header>
       <DashColumn.Content>
-        <ul className={css.list}>
+        <ul className={css.list} aria-label={"documents"}>
           {new Array(5).fill(
             <li>
               <BlueprintCard
-                gameName={"Game"}
                 teamName={"Example Team"}
                 documentName={"Lorem ipsum dolor sit amet"}
                 arenaName={"Lorem ipsum dolor"}

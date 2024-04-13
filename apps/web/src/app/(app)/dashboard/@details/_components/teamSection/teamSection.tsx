@@ -48,6 +48,7 @@ function Statistic({
         <Flexbox gap="md" align={"center"} style={{ fontWeight: 500 }}>
           {value}
           <Progress.CircularColorStep
+            label={"Progress"}
             size={"1.2em"}
             value={value}
             max={maximum}

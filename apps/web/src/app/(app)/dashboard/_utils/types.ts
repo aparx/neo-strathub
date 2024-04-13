@@ -4,7 +4,7 @@ export interface DashboardParams {
 }
 
 export const DASHBOARD_QUERY_PARAMS = {
-  document: "documentId",
+  document: "inspectDocument",
 } as const satisfies Readonly<Record<string, string>>;
 
 export type DashboardQueryParams = typeof DASHBOARD_QUERY_PARAMS;

@@ -1,12 +1,10 @@
-"use client";
+import { BlueprintVisibility } from "@/modules/blueprint/components";
 import { vars } from "@repo/theme";
 import { Button, Flexbox, Icon, Text } from "@repo/ui/components";
-import { ComponentPropsWithoutRef, useMemo } from "react";
-import { MdVisibility } from "react-icons/md";
+import { ComponentPropsWithoutRef } from "react";
 import * as css from "./blueprintCard.css";
 
 export interface BlueprintCardData {
-  gameName: string;
   documentName: string;
   teamName: string;
   arenaName: string;
@@ -23,43 +21,35 @@ export type BlueprintCardProps = Omit<
 const EMPTY_ARRAY = [] as const;
 
 export function BlueprintCard({
-  gameName,
   documentName,
   teamName,
   arenaName,
   tags = EMPTY_ARRAY,
   visibility,
 }: BlueprintCardProps) {
-  const actualTags = useMemo(() => {
-    return [arenaName, ...tags];
-  }, [tags]);
-
   return (
-    <article className={css.article}>
+    <article className={css.root}>
       <div style={{ flexGrow: 1 }}>
         <header className={css.headerContainer}>
-          <Icon.Custom
-            icon={<MdVisibility />}
-            alt={`Visibility: ${visibility}`}
-          />
+          <BlueprintVisibility type={visibility} size={"lg"} />
           <div className={css.headerColumns}>
             <HeaderElement title={teamName} name={documentName} />
             <HeaderElement title={"Game Map"} name={arenaName} />
           </div>
         </header>
         <div className={css.tagsContainer}>
-          <ul className={css.tagList}>
-            {actualTags.map((tag, index) => (
+          <ul className={css.tagList} aria-label={"tags"}>
+            {tags.map((tag, index) => (
               <TagItem key={index /* OK */} name={tag} />
             ))}
           </ul>
         </div>
       </div>
       <footer className={css.footer}>
-        <Button appearance={"icon"}>
+        <Button appearance={"icon"} aria-label={"Preview"}>
           <Icon.Mapped type={"preview"} />
         </Button>
-        <Button appearance={"icon"}>
+        <Button appearance={"icon"} aria-label={"Edit"}>
           <Icon.Mapped type={"edit"} />
         </Button>
       </footer>

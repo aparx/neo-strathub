@@ -7,6 +7,7 @@ interface ProgressBaseProps {
   value: number;
   max: number;
   min?: number;
+  label: string;
 }
 
 interface CircularBaseProps extends ProgressBaseProps {
@@ -79,6 +80,7 @@ export function Circular({
   size = "1em",
   frontColor = vars.colors.primary.base,
   backColor = vars.colors.overlay,
+  label,
 }: CircularProps) {
   return (
     <div
@@ -93,6 +95,7 @@ export function Circular({
       aria-valuemin={min}
       aria-valuemax={max}
       aria-valuenow={value}
+      aria-label={label}
     >
       <AngledCircle
         frontColor={frontColor}

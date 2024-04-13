@@ -45,8 +45,8 @@ type UseFetchElementsProps =
 function useFetchElements(data: UseFetchElementsProps) {
   // TODO actually fetch the data
   return useMemo(() => {
-    const arr = new Array(100);
-    for (let i = 0; i < 100; ++i) {
+    const arr = new Array(25);
+    for (let i = 0; i < 25; ++i) {
       let href: string;
       switch (data.type) {
         case "team":

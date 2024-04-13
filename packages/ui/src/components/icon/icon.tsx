@@ -4,7 +4,7 @@ import { MdAdd, MdEdit, MdSearch, MdSettings } from "react-icons/md";
 import { Text } from "../text";
 import { ICON_SIZES } from "./icon.utils";
 
-interface IconBaseProps extends Omit<ComponentProps<"div">, "children"> {
+export interface IconBaseProps extends Omit<ComponentProps<"div">, "children"> {
   size?: keyof typeof ICON_SIZES;
   alt?: string;
 }

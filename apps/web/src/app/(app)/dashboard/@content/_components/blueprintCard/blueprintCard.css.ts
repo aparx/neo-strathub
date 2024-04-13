@@ -4,17 +4,17 @@ import { globalStyle, style } from "@vanilla-extract/css";
 import { calc } from "@vanilla-extract/css-utils";
 
 const border = `1px solid ${vars.colors.outline.card}`;
-const transition = "125ms";
+const transition = "150ms";
 
-const articleBase = style({
+const rootBase = style({
   display: "flex",
   overflow: "hidden",
   alignItems: "stretch",
 });
 
-export const article = style([
+export const root = style([
   sprinkles({ outline: "card", borderRadius: "md" }),
-  articleBase,
+  rootBase,
   {
     transition,
     ":hover": {
@@ -84,11 +84,11 @@ export const footer = style({
   padding: `0 ${vars.spacing.md}`,
 });
 
-globalStyle(`${articleBase}:hover ${tagItem}`, {
+globalStyle(`${rootBase}:hover ${tagItem}`, {
   background: blendState(vars.colors.accents[1], "hover"),
   color: vars.colors.emphasis.medium,
 });
 
-globalStyle(`${articleBase}:hover ${headerContainer}`, {
+globalStyle(`${rootBase}:hover ${headerContainer}`, {
   background: blendState(vars.colors.accents[1], "hover"),
 });
