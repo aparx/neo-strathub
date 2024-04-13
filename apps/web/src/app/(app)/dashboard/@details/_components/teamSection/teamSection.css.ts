@@ -39,7 +39,7 @@ export const upgradeButton = style({
     content: "",
     position: "absolute",
     inset: 0,
-    border: `3px solid ${vars.colors.emphasis.medium}`,
+    border: `2px solid ${vars.colors.emphasis.medium}`,
     borderRadius: "inherit",
     filter: "blur(2px)",
     animation: `${keyframes({

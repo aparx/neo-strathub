@@ -1,5 +1,6 @@
 import { ComponentProps } from "react";
-import { MdAdd, MdSearch, MdSettings } from "react-icons/md";
+import { IoMdEye } from "react-icons/io";
+import { MdAdd, MdEdit, MdSearch, MdSettings } from "react-icons/md";
 import { Text } from "../text";
 import { ICON_SIZES } from "./icon.utils";
 
@@ -26,6 +27,8 @@ const ICON_MAP = {
   add: <MdAdd />,
   settings: <MdSettings />,
   search: <MdSearch />,
+  preview: <IoMdEye />,
+  edit: <MdEdit />,
 } as const satisfies Record<string, React.ReactNode>;
 
 export function Mapped({
