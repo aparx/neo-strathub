@@ -1,4 +1,4 @@
-import { getServer } from "@/server/getServer";
+import { getServer } from "@/utils/supabase/actions";
 import type { cookies } from "next/headers";
 import { cache } from "react";
 

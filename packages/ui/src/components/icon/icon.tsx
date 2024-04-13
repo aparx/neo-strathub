@@ -1,6 +1,7 @@
 import { ComponentProps } from "react";
 import { IoMdEye } from "react-icons/io";
 import { MdAdd, MdEdit, MdSearch, MdSettings } from "react-icons/md";
+import { RiFilterFill, RiFilterLine } from "react-icons/ri";
 import { Text } from "../text";
 import { ICON_SIZES } from "./icon.utils";
 
@@ -26,6 +27,8 @@ export function Custom({ icon, size = "md", alt, ...restProps }: IconProps) {
 const ICON_MAP = {
   add: <MdAdd />,
   settings: <MdSettings />,
+  filterEmpty: <RiFilterLine />,
+  filterFull: <RiFilterFill />,
   search: <MdSearch />,
   preview: <IoMdEye />,
   edit: <MdEdit />,

@@ -26,7 +26,10 @@ export function ContentHeader() {
           onInput={(e) => updateFilter(e.currentTarget.value)}
           style={{ flexGrow: 1 }}
         />
-        <Button appearance={"icon"}>
+        <Button appearance={"icon"} aria-label={"Filter search"}>
+          <Icon.Mapped type={"filterEmpty"} />
+        </Button>
+        <Button appearance={"icon"} aria-label={"Add blueprint"} disabled>
           <Icon.Mapped type={"add"} />
         </Button>
       </Flexbox>
