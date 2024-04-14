@@ -1,6 +1,6 @@
 import { DashColumn } from "@/app/(app)/dashboard/_components";
 import { SharedContentProps } from "@/app/(app)/dashboard/_utils";
-import { Callout } from "@repo/ui/components";
+import { Callout, Skeleton } from "@repo/ui/components";
 import { Suspense } from "react";
 import { TeamSection } from "./_components";
 import * as css from "./content.css";
@@ -12,6 +12,7 @@ export async function DetailsContent(props: SharedContentProps) {
         <Callout.Warning>
           Warning: Alpha version. Data may be lost.
         </Callout.Warning>
+        <Skeleton height={250} outline />
         {/* TODO: Document/Blueprint Inspector */}
         {props.type !== "overview" && (
           <Suspense key={props.teamId} fallback={"Loading Team..."}>

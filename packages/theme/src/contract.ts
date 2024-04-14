@@ -22,7 +22,7 @@ interface Colors extends DeepRecord<string> {
   foreground: RGBA;
   scrim: RGBA;
   overlay: RGBA;
-  accents: Record<0 | 1 | 2 | 3, RGBA>;
+  accents: Record<0 | 1 | 2 | 3 | 4 | 5, RGBA>;
   outline: Record<"card", RGBA>;
   warning: ColorTonePalette;
   destructive: ColorTonePalette;

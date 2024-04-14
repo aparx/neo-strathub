@@ -4,6 +4,7 @@ export * from "./callout";
 export * from "./flexbox";
 export * from "./icon";
 export * from "./progress";
+export * from "./skeleton";
 export * from "./spinner";
 export * from "./text";
 export * from "./textField";

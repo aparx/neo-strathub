@@ -45,6 +45,8 @@ export const vars = createGlobalTheme<Theme>(":root", {
       1: "rgba(8, 8, 8, 1)",
       2: "rgba(13, 13, 13, 1)",
       3: "rgba(17, 17, 17, 1)",
+      4: "rgba(20, 20, 20, 1)",
+      5: "rgba(24, 24, 24, 1)",
     },
     outline: {
       card: "rgba(255, 255, 255, 0.15)",
