@@ -1,5 +1,10 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { cache } from "react";
+
+export const getServer = cache((cookieStore: ReturnType<typeof cookies>) => {
+  return createServer(cookieStore);
+});
 
 export function createServer(cookieStore: ReturnType<typeof cookies>) {
   return createServerClient(

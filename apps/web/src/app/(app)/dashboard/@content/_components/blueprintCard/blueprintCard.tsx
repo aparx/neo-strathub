@@ -40,7 +40,7 @@ export function BlueprintCard({
         <div className={css.tagsContainer}>
           <ul className={css.tagList} aria-label={"tags"}>
             {tags.map((tag, index) => (
-              <TagItem key={index /* OK */} name={tag} />
+              <TagItem key={index /* OK */} content={tag} />
             ))}
           </ul>
         </div>
@@ -68,10 +68,10 @@ function HeaderElement({ title, name }: { title: string; name: string }) {
   );
 }
 
-function TagItem({ name }: { name: string }) {
+function TagItem({ content }: { content: string }) {
   return (
     <Text asChild type={"label"} size={"sm"}>
-      <li className={css.tagItem}>{name}</li>
+      <li className={css.tagItem}>{content}</li>
     </Text>
   );
 }

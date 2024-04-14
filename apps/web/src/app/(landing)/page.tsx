@@ -1,6 +1,5 @@
+import { AuthButton } from "@/modules/auth/components";
 import { createServer } from "@/utils/supabase/server";
-
-import { LoginButton } from "@/components/loginButton";
 import { Flexbox, Text } from "@repo/ui/components";
 import { cookies } from "next/headers";
 
@@ -13,7 +12,7 @@ export default async function Page() {
         Strathub Demo
       </Text>
       <Flexbox gap={"md"}>
-        <LoginButton />
+        <AuthButton.Login />
       </Flexbox>
     </div>
   );

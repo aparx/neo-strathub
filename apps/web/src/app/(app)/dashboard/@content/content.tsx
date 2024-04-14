@@ -2,7 +2,8 @@ import { DashColumn } from "@/app/(app)/dashboard/_components";
 import { SharedContentProps } from "@/app/(app)/dashboard/_utils";
 import { getBook } from "@/modules/book/actions";
 import { Flexbox, Icon, Text } from "@repo/ui/components";
-import { MdGames } from "react-icons/md";
+import { IoMdGlobe } from "react-icons/io";
+import { MdGames, MdPeople } from "react-icons/md";
 import { ContentBody, ContentHeader } from "./_partial";
 import * as css from "./content.css";
 
@@ -10,9 +11,7 @@ export async function DashContent(props: SharedContentProps) {
   return (
     <DashColumn.Root>
       <DashColumn.Header>
-        {props.type === "collection" ? (
-          <BookName bookId={props.bookId} />
-        ) : null}
+        <Title {...props} />
         <ContentHeader />
       </DashColumn.Header>
       <DashColumn.Content>
@@ -22,13 +21,24 @@ export async function DashContent(props: SharedContentProps) {
   );
 }
 
-async function BookName({ bookId }: { bookId: string }) {
-  const book = await getBook(bookId); // TODO error handling
+async function Title(props: SharedContentProps) {
+  switch (props.type) {
+    case "overview":
+      return <Navigation icon={<IoMdGlobe />} title={"Global Blueprints"} />;
+    case "team":
+      return <Navigation icon={<MdPeople />} title={"Team's Blueprints"} />;
+    case "collection":
+      const book = await getBook(props.bookId);
+      return <Navigation icon={<MdGames />} title={book.name} />;
+  }
+}
+
+function Navigation({ icon, title }: { icon: React.ReactNode; title: string }) {
   return (
-    <Flexbox gap={"md"} align={"center"}>
-      <Icon.Custom className={css.headerBookIcon} icon={<MdGames />} />
+    <Flexbox asChild gap={"md"} align={"center"}>
       <Text type={"label"} size={"lg"}>
-        {book.name}
+        <Icon.Custom className={css.headerIcon} icon={icon} />
+        {title}
       </Text>
     </Flexbox>
   );

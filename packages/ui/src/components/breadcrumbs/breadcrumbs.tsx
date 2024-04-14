@@ -5,9 +5,9 @@ import { Text } from "../text";
 import * as css from "./breadcrumbs.css";
 
 export interface BreadcrumbData {
+  href?: string;
   forceRefetch?: boolean;
   display: React.ReactNode;
-  href: string;
 }
 
 type BreadcrumbsBaseProps = Omit<HTMLAttributes<HTMLDivElement>, "children">;
@@ -39,12 +39,14 @@ function useBreadcrumbComponents(breadcrumbs: BreadcrumbsProps["breadcrumbs"]) {
       const active = i === length - 1;
       if (i > 0) arr.push(<BreadcrumbDivider key={i} />);
       const props = {
-        key: href,
+        key: href || i /* OK */,
         href: href,
         className: css.breadcrumb({ active }),
         children: display,
       } satisfies AnchorHTMLAttributes<HTMLAnchorElement>;
-      arr.push(forceRefetch ? <a {...props} /> : <Link {...props} replace />);
+      if (!href) arr.push(<div {...props} />);
+      else if (forceRefetch) arr.push(<a {...props} />);
+      else arr.push(<Link {...props} replace />);
     }
     return arr;
   }, [breadcrumbs]);

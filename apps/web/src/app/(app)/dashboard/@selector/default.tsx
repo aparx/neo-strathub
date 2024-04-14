@@ -1,4 +1,4 @@
-import { getUser } from "@/modules/user/actions";
+import { getUser } from "@/modules/auth/actions";
 import { cookies } from "next/headers";
 import { DashColumn } from "../_components";
 import {

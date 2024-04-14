@@ -9,10 +9,10 @@ import { MdGames, MdPeople } from "react-icons/md";
 
 /**
  * Provides context and fetches data necessary for the selector.
- * Such data, for example, is the user's teams and more.
+ * Such data, for example, is the auth's teams and more.
  *
  * @param children the children capable of using the context
- * @param user the authorized user (e.g. passed down by a server component)
+ * @param user the authorized auth (e.g. passed down by a server component)
  * @constructor
  */
 export function SelectorDataProvider({

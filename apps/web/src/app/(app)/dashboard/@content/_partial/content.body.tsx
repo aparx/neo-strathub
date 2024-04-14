@@ -10,7 +10,7 @@ export function ContentBody() {
             teamName={"Example Team"}
             documentName={"Lorem ipsum dolor sit amet"}
             arenaName={"Lorem ipsum dolor"}
-            visibility={"private"}
+            visibility={"public"}
             tags={new Array(6).fill("Foo Bar Baz")}
           />
         </li>,

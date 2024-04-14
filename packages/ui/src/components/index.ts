@@ -7,3 +7,4 @@ export * from "./progress";
 export * from "./spinner";
 export * from "./text";
 export * from "./textField";
+export * from "./tooltip";

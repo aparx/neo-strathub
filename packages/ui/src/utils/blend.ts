@@ -10,3 +10,7 @@ export function blendState(primary: string, state: StateColorKey) {
   const { base, opacity } = vars.colors.state[state];
   return blendColors(primary, `${base} ${opacity}`);
 }
+
+export function blendAlpha(color: string, alpha: number) {
+  return blendColors(color, `transparent ${Math.round(100 * alpha)}%`);
+}

@@ -71,6 +71,7 @@ export const tagItem = style({
   color: vars.colors.emphasis.low,
   borderRadius: vars.roundness.sm,
   transition,
+  willChange: "background",
 });
 
 /** Semantic footer (being the extra buttons for desktop only) */

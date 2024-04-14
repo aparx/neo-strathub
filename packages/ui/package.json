@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.0.2",
+    "@radix-ui/react-tooltip": "^1.0.7",
     "@repo/theme": "workspace:^",
     "@repo/utils": "workspace:^",
     "@vanilla-extract/css-utils": "^0.1.3",

@@ -11,7 +11,7 @@ export async function middleware(req: NextRequest) {
       });
     }
 
-    // Redirect user to dashboard if logged in
+    // Redirect auth to dashboard if logged in
     if (user != null && req.nextUrl.pathname === "/")
       return redirect("/dashboard");
 

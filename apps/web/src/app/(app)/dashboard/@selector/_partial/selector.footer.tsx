@@ -1,6 +1,6 @@
 "use server";
-import { LogoutButton } from "@/components/logoutButton";
-import { getUser } from "@/modules/user/actions";
+import { getUser } from "@/modules/auth/actions";
+import { AuthButton } from "@/modules/auth/components";
 import { Flexbox } from "@repo/ui/components";
 import { cookies } from "next/headers";
 
@@ -10,7 +10,7 @@ export async function SelectorFooter() {
   return (
     <Flexbox justify={"space-between"} align={"center"}>
       User: {user?.email}
-      <LogoutButton />
+      <AuthButton.Logout />
     </Flexbox>
   );
 }
