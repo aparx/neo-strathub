@@ -4,7 +4,7 @@
   "private": true,
   "exports": {
     ".": "./src/index.ts",
-    "./react": "./src/hooks/index.ts"
+    "./hooks": "./src/hooks/index.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",

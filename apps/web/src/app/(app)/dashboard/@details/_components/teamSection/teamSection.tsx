@@ -18,8 +18,8 @@ export async function TeamSection({ teamId }: { teamId: string }) {
         </Flexbox>
         <Flexbox orient={"vertical"} gap={"md"}>
           <Statistic name={"Members"} value={6} maximum={25} />
-          <Statistic name={"Collections"} value={27} maximum={50} />
-          <Statistic name={"Strategies"} value={367} maximum={450} />
+          <Statistic name={"Books"} value={27} maximum={50} />
+          <Statistic name={"Blueprints"} value={367} maximum={450} />
         </Flexbox>
       </div>
       <div className={css.annotation} style={{ borderTop: "unset" }}>

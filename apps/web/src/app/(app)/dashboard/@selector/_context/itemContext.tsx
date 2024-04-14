@@ -1,6 +1,6 @@
 "use client";
 
-import { SharedState, useSharedState } from "@repo/utils/react";
+import { SharedState, useSharedState } from "@repo/utils/hooks";
 import { createContext, useContext, useMemo } from "react";
 import type { ListItemData } from "../_components/listItem";
 
