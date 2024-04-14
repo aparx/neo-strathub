@@ -1,4 +1,4 @@
-import { Flexbox, Icon, Text } from "@repo/ui/components";
+import { Flexbox, Icon, Spinner, Text } from "@repo/ui/components";
 import { mergeClassNames } from "@repo/utils";
 import Link from "next/link";
 import React, { HTMLAttributes } from "react";
@@ -38,7 +38,12 @@ export function ListItem({
         {...restProps}
       >
         <Flexbox gap={"md"} align={"center"} style={{ width: "fit-content" }}>
-          {icon != null ? (
+          {loading ? (
+            <Icon.Custom
+              icon={<Spinner size={"1em"} />}
+              className={css.itemIcon}
+            />
+          ) : icon != null ? (
             <Icon.Custom icon={icon} className={css.itemIcon} />
           ) : null}
           {text}
