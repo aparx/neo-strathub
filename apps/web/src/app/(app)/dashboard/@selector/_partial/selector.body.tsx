@@ -11,7 +11,7 @@ export function SelectorBody() {
   const pathName = usePathname();
 
   useEffect(() => {
-    const anyActive = items.find((item) => pathName === item.href);
+    const anyActive = items.find((item) => item && pathName === item.href);
     if (anyActive) active.update(anyActive.href);
   }, [pathName]);
 

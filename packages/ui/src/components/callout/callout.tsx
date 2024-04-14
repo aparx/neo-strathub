@@ -1,3 +1,4 @@
+import { mergeClassNames } from "@repo/utils";
 import { ComponentPropsWithoutRef } from "react";
 import { MdInfoOutline } from "react-icons/md";
 import { RiErrorWarningLine } from "react-icons/ri";
@@ -14,12 +15,18 @@ export type CalloutProps = CalloutBaseProps &
     icon: React.ReactNode;
   };
 
-export function Custom({ icon, children, color, ...restProps }: CalloutProps) {
+export function Custom({
+  icon,
+  children,
+  color,
+  className,
+  ...restProps
+}: CalloutProps) {
   return (
     <Flexbox
       asChild
       gap={"lg"}
-      className={css.callout({ color })}
+      className={mergeClassNames(css.callout({ color }), className)}
       {...restProps}
     >
       <Text type={"label"} size={"lg"}>
