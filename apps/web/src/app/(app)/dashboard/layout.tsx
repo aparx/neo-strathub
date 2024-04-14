@@ -1,3 +1,5 @@
+import { Spinner } from "@repo/ui/components";
+import { Suspense } from "react";
 import { LayoutHeader } from "./_partial";
 import * as css from "./layout.css";
 
@@ -15,11 +17,21 @@ export default async function DashboardLayout({
   return (
     <div className={css.rootLayout}>
       <LayoutHeader />
-      <main className={css.gridLayout}>
-        {selector}
-        {content}
-        {details}
-      </main>
+      <Suspense fallback={<PageFallback />}>
+        <main className={css.gridLayout}>
+          {selector}
+          {content}
+          {details}
+        </main>
+      </Suspense>
+    </div>
+  );
+}
+
+function PageFallback() {
+  return (
+    <div className={css.pageFallback}>
+      <Spinner size={"2em"} />
     </div>
   );
 }

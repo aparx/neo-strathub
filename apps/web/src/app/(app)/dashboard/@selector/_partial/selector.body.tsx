@@ -3,22 +3,17 @@ import { Flexbox } from "@repo/ui/components";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { ListItem } from "../_components";
-import { ItemContext, useItemContext } from "../_context";
+import { useItemContext } from "../_context";
 
 export function SelectorBody() {
   const { items, active } = useItemContext();
-  const pathName = usePathname();
+  const pathname = usePathname();
 
   useEffect(() => {
-    const anyActive = items.find((item) => item && pathName === item.href);
+    const anyActive = items.find((item) => item && pathname === item.href);
     if (anyActive) active.update(anyActive.href);
-  }, [pathName]);
+  }, [pathname]);
 
-  return <ItemList items={items} active={active} />;
-}
-
-function ItemList({ items, active }: Pick<ItemContext, "items" | "active">) {
-  const pathname = usePathname();
   return (
     <Flexbox asChild orient={"vertical"} gap={"sm"}>
       <ul>

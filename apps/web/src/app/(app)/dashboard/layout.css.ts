@@ -11,12 +11,22 @@ export const rootLayout = style({
   height: `calc(100vh - ${DASHBOARD_GRID_GAP})`,
   background: vars.colors.outline.card,
   gap: DASHBOARD_GRID_GAP,
+  maxWidth: 1500, // TODO magic number
+  margin: "0 auto",
 });
 
 export const gridLayout = style({
   display: "grid",
-  gridTemplateColumns: "minmax(275px, 1fr) 3fr minmax(375px, 1.2fr)",
+  gridTemplateColumns: "minmax(275px, 1fr) 2.5fr minmax(375px, 1.2fr)",
   width: "100%",
   height: `calc(100% - ${LAYOUT_HEADER_HEIGHT})`,
   gap: DASHBOARD_GRID_GAP,
+});
+
+export const pageFallback = style({
+  width: "100%",
+  height: "100%",
+  background: vars.colors.accents[0],
+  display: "grid",
+  placeItems: "center",
 });

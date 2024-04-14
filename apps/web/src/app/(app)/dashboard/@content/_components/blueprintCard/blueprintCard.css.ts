@@ -38,7 +38,7 @@ export const headerColumns = style({
   display: "grid",
   gridTemplateColumns: "1.25fr 1fr",
   gap: vars.spacing.lg,
-  maxWidth: 750, // TODO magic number
+  maxWidth: 600, // TODO magic number
 });
 
 export const tagsContainer = style({
