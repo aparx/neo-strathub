@@ -5,7 +5,6 @@ import * as css from "./teamSection.css";
 
 export async function TeamSection({ teamId }: { teamId: string }) {
   // TODO fetch team using memoized function (react-cache)
-
   return (
     <section>
       <div className={css.main}>

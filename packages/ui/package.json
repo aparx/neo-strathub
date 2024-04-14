@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
-    "./animation": "./src/animation/index.ts",
     "./components": "./src/components/index.ts",
     "./utils": "./src/utils/index.ts",
     "./helpers": "./src/helpers/index.ts"

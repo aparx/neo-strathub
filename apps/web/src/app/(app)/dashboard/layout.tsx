@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { LayoutHeader } from "./_partial";
 import * as css from "./layout.css";
 
@@ -14,15 +13,13 @@ export default async function DashboardLayout({
   selector: React.ReactNode;
 }) {
   return (
-    <Suspense fallback={"Loading..."}>
-      <div className={css.rootLayout}>
-        <LayoutHeader />
-        <main className={css.gridLayout}>
-          {selector}
-          {content}
-          {details}
-        </main>
-      </div>
-    </Suspense>
+    <div className={css.rootLayout}>
+      <LayoutHeader />
+      <main className={css.gridLayout}>
+        {selector}
+        {content}
+        {details}
+      </main>
+    </div>
   );
 }

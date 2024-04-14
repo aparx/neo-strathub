@@ -39,14 +39,13 @@ function useBreadcrumbComponents(breadcrumbs: BreadcrumbsProps["breadcrumbs"]) {
       const active = i === length - 1;
       if (i > 0) arr.push(<BreadcrumbDivider key={i} />);
       const props = {
-        key: href || i /* OK */,
         href: href,
         className: css.breadcrumb({ active }),
         children: display,
       } satisfies AnchorHTMLAttributes<HTMLAnchorElement>;
-      if (!href) arr.push(<div {...props} />);
-      else if (forceRefetch) arr.push(<a {...props} />);
-      else arr.push(<Link {...props} replace />);
+      if (!href) arr.push(<div key={href || i} {...props} />);
+      else if (forceRefetch) arr.push(<a key={href || i} {...props} />);
+      else arr.push(<Link key={href || i} {...props} replace />);
     }
     return arr;
   }, [breadcrumbs]);
