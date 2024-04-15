@@ -7,5 +7,10 @@ export const shell = style({
 });
 
 export const container = style({
-  animation: `${keyframes({ from: { opacity: 0, transform: "translateX(2%)" } })} .75s`,
+  animation: `${keyframes({
+    from: {
+      opacity: 0,
+      transform: "translateX(2%)",
+    },
+  })} 1s`,
 });

@@ -8,7 +8,7 @@ const transition = "150ms";
 
 const rootBase = style({
   display: "flex",
-  overflow: "hidden",
+  contain: "paint",
   alignItems: "stretch",
 });
 
@@ -47,7 +47,7 @@ export const tagsContainer = style({
   alignItems: "center",
   width: "100%",
   padding: vars.spacing.md,
-  overflow: "hidden",
+  contain: "paint",
   minHeight: calc.add(
     calc.multiply(2, vars.spacing.md),
     calc.multiply(2, vars.spacing.sm),

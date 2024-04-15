@@ -17,7 +17,10 @@ export function LayoutHeader() {
     });
     if (teamId)
       // TODO replace `display: teamId` with a custom component (+ dropdown)
-      array.push({ href: "/team", display: teamId });
+      array.push({
+        href: "/team",
+        display: teamId,
+      });
     return array;
   }, [teamId]);
 

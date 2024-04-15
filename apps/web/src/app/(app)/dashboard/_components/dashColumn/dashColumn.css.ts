@@ -21,7 +21,7 @@ export const root = style({
   display: "flex",
   flexDirection: "column",
   position: "relative",
-  overflow: "hidden",
+  contain: "paint",
   gap: DASHBOARD_GRID_GAP,
 });
 

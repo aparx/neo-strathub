@@ -9,16 +9,17 @@ const blurRadius = 40;
 export const skeleton = style({
   position: "relative",
   background: back,
-  overflow: "hidden",
+  contain: "paint",
   "::after": {
     content: "",
     position: "absolute",
     width: "max(20px, 10%)",
-    height: "200%",
+    height: "150%",
     top: "50%",
     transform: "translateY(-50%)",
     rotate: "33deg",
     filter: `blur(${blurRadius}px)`,
+    willChange: "left",
     background: front,
     animation: `${keyframes({
       from: {
