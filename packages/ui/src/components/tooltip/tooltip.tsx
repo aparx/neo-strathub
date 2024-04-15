@@ -1,6 +1,6 @@
 "use client";
 import * as Primitive from "@radix-ui/react-tooltip";
-import { FontSize } from "@repo/theme/dist";
+import { FontSize } from "@repo/theme";
 import { mergeClassNames } from "@repo/utils";
 import { Text } from "../text";
 import * as css from "./tooltip.css";

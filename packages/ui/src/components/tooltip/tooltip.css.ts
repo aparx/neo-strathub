@@ -1,17 +1,17 @@
 import { vars } from "@repo/theme";
 import { globalStyle, keyframes, style } from "@vanilla-extract/css";
-import { blendAlpha } from "../../utils";
-
-const backdropColor = blendAlpha(vars.colors.accents[1], 0.5);
-const backdropFilter = "blur(10px)";
+import {
+  POPOVER_BACKDROP_FILTER,
+  POPOVER_BACKGROUND,
+} from "../popover/popover.css";
 
 export const arrow = style({
-  fill: backdropColor,
+  fill: POPOVER_BACKGROUND,
 });
 
 export const content = style({
-  background: backdropColor,
-  backdropFilter,
+  background: POPOVER_BACKGROUND,
+  backdropFilter: POPOVER_BACKDROP_FILTER,
   padding: vars.spacing.sm,
   borderRadius: vars.roundness.sm,
   border: `1px solid ${vars.colors.outline.card}`,
