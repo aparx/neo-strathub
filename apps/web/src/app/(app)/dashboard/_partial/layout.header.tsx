@@ -8,7 +8,12 @@ import {
 } from "@repo/ui/components";
 import { useParams } from "next/navigation";
 import { useMemo } from "react";
-import { MdDelete, MdPeople, MdSettings } from "react-icons/md";
+import {
+  MdArrowDropDown,
+  MdDelete,
+  MdPeople,
+  MdSettings,
+} from "react-icons/md";
 import * as css from "./layout.header.css";
 
 export function LayoutHeader() {
@@ -34,7 +39,10 @@ export function LayoutHeader() {
     <Text className={css.header} type={"label"} size={"lg"}>
       <Breadcrumbs breadcrumbs={breadcrumbs} />
       <Popover.Root>
-        <Popover.Trigger>Click me</Popover.Trigger>
+        <Popover.Trigger>
+          {/* TODO IconButton */}
+          <MdArrowDropDown />
+        </Popover.Trigger>
         <Popover.Content style={{ minWidth: 250 }}>
           <Popover.Item>
             <MdSettings />

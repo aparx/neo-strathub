@@ -16,15 +16,16 @@ const popoverBase = style({
   backdropFilter: POPOVER_BACKDROP_FILTER,
   padding: vars.spacing.sm,
   borderRadius: vars.roundness.sm,
-  overflow: "hidden",
   margin: `0 ${vars.spacing.md}`,
-  boxShadow: `0 0 4px ${vars.colors.scrim}`,
+  boxShadow: `0 2px ${vars.spacing.md} ${vars.colors.scrim}`,
   animationDuration: "400ms",
   animationTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
   willChange: "transform, opacity, scale",
 });
 
 export const popover = style([sprinkles({ outline: "card" }), popoverBase]);
+
+export const arrow = style({ fill: POPOVER_BACKGROUND });
 
 export const divider = recipe({
   base: {
@@ -49,6 +50,9 @@ export const divider = recipe({
 
 export type DividerVariants = RecipeVariants<typeof divider>;
 
+const hoverFocusSelector =
+  "&:not([aria-disabled]):hover, &:not([aria-disabled]):focus-visible";
+
 export const item = recipe({
   base: {
     display: "flex",
@@ -65,8 +69,9 @@ export const item = recipe({
       default: {
         color: vars.colors.emphasis.medium,
         selectors: {
-          "&:not([aria-disabled]):hover": {
+          [hoverFocusSelector]: {
             color: vars.colors.emphasis.high,
+            background: vars.colors.state.hover.color,
           },
         },
       },
@@ -74,7 +79,7 @@ export const item = recipe({
         background: destructiveBase,
         color: vars.colors.destructive.base,
         selectors: {
-          "&:not([aria-disabled]):hover": {
+          [hoverFocusSelector]: {
             background: blendState(destructiveBase, "hover"),
           },
         },
@@ -82,10 +87,7 @@ export const item = recipe({
     },
     disabled: {
       false: {
-        ":hover": {
-          cursor: "pointer",
-          background: vars.colors.state.hover.color,
-        },
+        cursor: "pointer",
       },
       true: {
         opacity: vars.emphasis.low,

@@ -7,6 +7,7 @@ export function ContentBody() {
       {new Array(5).fill(
         <li>
           <BlueprintCard
+            documentId={3}
             teamName={"Example Team"}
             documentName={"Lorem ipsum dolor sit amet"}
             arenaName={"Lorem ipsum dolor"}

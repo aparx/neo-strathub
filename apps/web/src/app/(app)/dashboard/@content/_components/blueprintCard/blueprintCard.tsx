@@ -1,10 +1,15 @@
+"use client";
+import { DASHBOARD_QUERY_PARAMS } from "@/app/(app)/dashboard/_utils";
 import { BlueprintVisibility } from "@/modules/blueprint/components";
 import { vars } from "@repo/theme";
 import { Button, Flexbox, Icon, Text } from "@repo/ui/components";
-import { ComponentPropsWithoutRef } from "react";
+import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
+import { ComponentPropsWithoutRef, useMemo } from "react";
 import * as css from "./blueprintCard.css";
 
 export interface BlueprintCardData {
+  documentId: string;
   documentName: string;
   teamName: string;
   arenaName: string;
@@ -21,15 +26,29 @@ export type BlueprintCardProps = Omit<
 const EMPTY_ARRAY = [] as const;
 
 export function BlueprintCard({
+  documentId,
   documentName,
   teamName,
   arenaName,
   tags = EMPTY_ARRAY,
   visibility,
 }: BlueprintCardProps) {
+  // TODO create actual href links to the
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const inspectLink = useMemo(() => {
+    const newQuery = new URLSearchParams(searchParams);
+    newQuery.set(DASHBOARD_QUERY_PARAMS.document, documentId);
+    return `${pathname}?${newQuery.toString()}`;
+  }, [pathname, searchParams]);
+
+  const editLink = `/app/edit/${documentId}?`;
+  const previewLink = `/app/preview/${documentId}`;
+
   return (
     <article className={css.root}>
-      <div style={{ flexGrow: 1 }}>
+      <Link href={inspectLink} style={{ flexGrow: 1, display: "block" }}>
         <header className={css.headerContainer}>
           <BlueprintVisibility type={visibility} size={"lg"} />
           <div className={css.headerColumns}>
@@ -44,13 +63,17 @@ export function BlueprintCard({
             ))}
           </ul>
         </div>
-      </div>
+      </Link>
       <footer className={css.footer}>
         <Button appearance={"icon"} aria-label={"Preview"}>
-          <Icon.Mapped type={"preview"} />
+          <Link href={previewLink}>
+            <Icon.Mapped type={"preview"} />
+          </Link>
         </Button>
-        <Button appearance={"icon"} aria-label={"Edit"}>
-          <Icon.Mapped type={"edit"} />
+        <Button asChild appearance={"icon"} aria-label={"Edit"}>
+          <Link href={editLink}>
+            <Icon.Mapped type={"edit"} />
+          </Link>
         </Button>
       </footer>
     </article>

@@ -24,7 +24,7 @@ export function Content({
         {...restProps}
       >
         {children}
-        <Primitive.Arrow style={{ fill: "red" }} />
+        <Primitive.Arrow className={css.arrow} />
       </Primitive.Content>
     </Primitive.Portal>
   );
