@@ -1,6 +1,13 @@
 import { ComponentProps } from "react";
 import { IoMdEye } from "react-icons/io";
-import { MdAdd, MdEdit, MdSearch, MdSettings } from "react-icons/md";
+import {
+  MdAdd,
+  MdDelete,
+  MdEdit,
+  MdPeople,
+  MdSearch,
+  MdSettings,
+} from "react-icons/md";
 import { RiFilterFill, RiFilterLine } from "react-icons/ri";
 import { Text } from "../text";
 import { ICON_SIZES } from "./icon.utils";
@@ -24,9 +31,11 @@ export function Custom({ icon, size = "md", alt, ...restProps }: IconProps) {
   );
 }
 
-const ICON_MAP = {
+const iconMap = {
   add: <MdAdd />,
   settings: <MdSettings />,
+  members: <MdPeople />,
+  delete: <MdDelete />,
   filterEmpty: <RiFilterLine />,
   filterFull: <RiFilterFill />,
   search: <MdSearch />,
@@ -38,7 +47,7 @@ export function Mapped({
   type,
   ...restProps
 }: IconBaseProps & {
-  type: keyof typeof ICON_MAP;
+  type: keyof typeof iconMap;
 }) {
-  return <Custom icon={ICON_MAP[type]} {...restProps} />;
+  return <Custom icon={iconMap[type]} {...restProps} />;
 }

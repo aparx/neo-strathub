@@ -4,7 +4,7 @@ import { RecipeVariants, recipe } from "@vanilla-extract/recipes";
 import { blendAlpha, blendState } from "../../utils";
 
 export const POPOVER_BACKGROUND = blendAlpha(vars.colors.accents[1], 0.8);
-export const POPOVER_BACKDROP_FILTER = "blur(10px)";
+export const POPOVER_BACKDROP_FILTER = "blur(5px)";
 
 const destructiveBase = blendAlpha(vars.colors.destructive.darkest, 0.5);
 

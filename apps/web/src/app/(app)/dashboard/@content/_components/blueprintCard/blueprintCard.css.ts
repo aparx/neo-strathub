@@ -17,8 +17,10 @@ export const root = style([
   rootBase,
   {
     transition,
-    ":hover": {
-      background: vars.colors.state.hover.color,
+    selectors: {
+      "&:hover, &:focus-within": {
+        background: vars.colors.state.hover.color,
+      },
     },
   },
 ]);
@@ -85,11 +87,17 @@ export const footer = style({
   padding: `0 ${vars.spacing.md}`,
 });
 
-globalStyle(`${rootBase}:hover ${tagItem}`, {
-  background: blendState(vars.colors.accents[1], "hover"),
-  color: vars.colors.emphasis.medium,
-});
+globalStyle(
+  `${rootBase}:hover ${tagItem}, ${rootBase}:focus-within ${tagItem}`,
+  {
+    background: blendState(vars.colors.accents[1], "hover"),
+    color: vars.colors.emphasis.medium,
+  },
+);
 
-globalStyle(`${rootBase}:hover ${headerContainer}`, {
-  background: blendState(vars.colors.accents[1], "hover"),
-});
+globalStyle(
+  `${rootBase}:hover ${headerContainer}, ${rootBase}:focus-within ${headerContainer}`,
+  {
+    background: blendState(vars.colors.accents[1], "hover"),
+  },
+);

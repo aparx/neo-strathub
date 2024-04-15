@@ -12,5 +12,5 @@ export function blendState(primary: string, state: StateColorKey) {
 }
 
 export function blendAlpha(color: string, alpha: number) {
-  return blendColors(color, `transparent ${Math.round(100 * alpha)}%`);
+  return blendColors(color, `transparent ${Math.round(100 * (1 - alpha))}%`);
 }

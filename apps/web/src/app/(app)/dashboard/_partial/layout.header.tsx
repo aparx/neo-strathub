@@ -3,17 +3,13 @@ import { DashboardParams } from "@/app/(app)/dashboard/_utils";
 import {
   Breadcrumbs,
   BreadcrumbsProps,
+  Icon,
   Popover,
   Text,
 } from "@repo/ui/components";
 import { useParams } from "next/navigation";
 import { useMemo } from "react";
-import {
-  MdArrowDropDown,
-  MdDelete,
-  MdPeople,
-  MdSettings,
-} from "react-icons/md";
+import { MdArrowDropDown } from "react-icons/md";
 import * as css from "./layout.header.css";
 
 export function LayoutHeader() {
@@ -41,20 +37,20 @@ export function LayoutHeader() {
       <Popover.Root>
         <Popover.Trigger>
           {/* TODO IconButton */}
-          <MdArrowDropDown />
+          <Icon.Custom icon={<MdArrowDropDown />} />
         </Popover.Trigger>
         <Popover.Content style={{ minWidth: 250 }}>
           <Popover.Item>
-            <MdSettings />
+            <Icon.Mapped type={"settings"} size={"sm"} />
             Settings
           </Popover.Item>
           <Popover.Item>
-            <MdPeople />
+            <Icon.Mapped type={"members"} size={"sm"} />
             Members
           </Popover.Item>
           <Popover.Divider />
           <Popover.Item color={"destructive"}>
-            <MdDelete />
+            <Icon.Mapped type={"delete"} size={"sm"} />
             Delete
           </Popover.Item>
         </Popover.Content>
