@@ -1,7 +1,6 @@
 "use server";
 import { getUser } from "@/modules/auth/actions";
-import { AuthButton } from "@/modules/auth/components";
-import { Flexbox } from "@repo/ui/components";
+import { Flexbox, Icon, IconButton } from "@repo/ui/components";
 import { cookies } from "next/headers";
 
 export async function SelectorFooter() {
@@ -10,7 +9,9 @@ export async function SelectorFooter() {
   return (
     <Flexbox justify={"space-between"} align={"center"}>
       User: {user?.email}
-      <AuthButton.Logout />
+      <IconButton>
+        <Icon.Mapped type={"settings"} />
+      </IconButton>
     </Flexbox>
   );
 }

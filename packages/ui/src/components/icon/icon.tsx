@@ -12,7 +12,7 @@ import { RiFilterFill, RiFilterLine } from "react-icons/ri";
 import { Text } from "../text";
 import { ICON_SIZES } from "./icon.utils";
 
-export interface IconBaseProps extends Omit<ComponentProps<"div">, "children"> {
+interface IconBaseProps extends Omit<ComponentProps<"div">, "children"> {
   size?: keyof typeof ICON_SIZES;
   alt?: string;
 }

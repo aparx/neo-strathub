@@ -4,6 +4,7 @@ import {
   Breadcrumbs,
   BreadcrumbsProps,
   Icon,
+  IconButton,
   Popover,
   Text,
 } from "@repo/ui/components";
@@ -35,9 +36,11 @@ export function LayoutHeader() {
     <Text className={css.header} type={"label"} size={"lg"}>
       <Breadcrumbs breadcrumbs={breadcrumbs} />
       <Popover.Root>
-        <Popover.Trigger>
+        <Popover.Trigger asChild>
           {/* TODO IconButton */}
-          <Icon.Custom icon={<MdArrowDropDown />} />
+          <IconButton>
+            <Icon.Custom icon={<MdArrowDropDown />} />
+          </IconButton>
         </Popover.Trigger>
         <Popover.Content style={{ minWidth: 250 }}>
           <Popover.Item>
