@@ -17,13 +17,14 @@ export function SelectorBody() {
   return (
     <Flexbox asChild orient={"vertical"} gap={"sm"}>
       <ul>
-        {items.map((item) => (
-          <li key={item.href}>
+        {items.map(({ href, ...restData }) => (
+          <li key={href}>
             <ListItem
-              {...item}
-              active={active.state === item.href}
-              loading={active.state === item.href && pathname !== item.href}
-              onClick={() => active.update(item.href)}
+              href={href}
+              active={active.state === href}
+              loading={active.state === href && pathname !== href}
+              onClick={(e) => !e.isDefaultPrevented() && active.update(href)}
+              {...restData}
             />
           </li>
         ))}

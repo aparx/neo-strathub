@@ -13,7 +13,10 @@ export const listItem = recipe({
       borderRadius: "md",
       gap: "md",
     }),
-    { transition: "150ms" },
+    {
+      transition: "150ms",
+      width: "100%",
+    },
   ],
   variants: {
     active: {

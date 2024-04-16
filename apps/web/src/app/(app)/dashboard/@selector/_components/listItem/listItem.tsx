@@ -1,11 +1,12 @@
-import { Flexbox, Icon, Spinner, Text } from "@repo/ui/components";
+"use client";
+import { Flexbox, Icon, IconButton, Spinner, Text } from "@repo/ui/components";
 import { mergeClassNames } from "@repo/utils";
 import Link from "next/link";
-import React, { HTMLAttributes } from "react";
-import { MdMoreVert } from "react-icons/md";
+import { useRouter } from "next/navigation";
+import React, { HTMLAttributes, useRef } from "react";
 import * as css from "./listItem.css";
 
-type ListItemBaseProps = Omit<HTMLAttributes<HTMLAnchorElement>, "children">;
+type ListItemBaseProps = Omit<HTMLAttributes<HTMLDivElement>, "children">;
 
 export interface ListItemData {
   icon?: React.ReactNode;
@@ -25,32 +26,58 @@ export function ListItem({
   active,
   loading,
   className,
+  onClick,
   ...restProps
 }: ListItemProps) {
+  // This component contains three interactive elements:
+  // (1) For ease of use a clickable `div` element, with its interactivity not
+  //     semantically displayed, to allow for nested "buttons" on most devices.
+  //     This division uses the router to manually redirect to the provided `href`,
+  //     unless any other interactable element within it is pressed.
+  //
+  //   (1.1) A link that semantically represents a navigation to screen-readers.
+  //
+  //   (1.2) A button acting as the settings button, outside the link and within the
+  //         interactable division element.
+  //
+  // This allows for an app-like feel while not throwing accessibility out the window.
+
+  const router = useRouter();
+  const detailsButton = useRef<HTMLButtonElement>(null);
+
   return (
     <Text asChild data={{ weight: 450 }}>
-      <Link
-        href={href}
+      <div
+        onClick={(e) => {
+          if (detailsButton.current?.contains(e.target as Node))
+            e.preventDefault();
+          if (!e.isDefaultPrevented() && e.target === e.currentTarget)
+            router.replace(href);
+          onClick?.(e);
+        }}
         className={mergeClassNames(
           css.listItem({ active, loading }),
           className,
         )}
         {...restProps}
       >
-        <Flexbox gap={"md"} align={"center"} style={{ width: "fit-content" }}>
-          {loading ? (
-            <Icon.Custom
-              icon={<Spinner size={"1em"} />}
-              className={css.itemIcon}
-            />
-          ) : icon != null ? (
-            <Icon.Custom icon={icon} className={css.itemIcon} />
-          ) : null}
-          {text}
-        </Flexbox>
-        {/* TODO */}
-        <MdMoreVert size={"1.2em"} />
-      </Link>
+        <Link href={href}>
+          <Flexbox gap={"md"} align={"center"} style={{ width: "fit-content" }}>
+            {loading ? (
+              <Icon.Custom
+                icon={<Spinner size={"1em"} />}
+                className={css.itemIcon}
+              />
+            ) : icon != null ? (
+              <Icon.Custom icon={icon} className={css.itemIcon} />
+            ) : null}
+            {text}
+          </Flexbox>
+        </Link>
+        <IconButton ref={detailsButton} aria-label={"Edit"}>
+          <Icon.Mapped type={"details"} />
+        </IconButton>
+      </div>
     </Text>
   );
 }
