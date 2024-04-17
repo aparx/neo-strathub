@@ -1,7 +1,7 @@
 -- noinspection SqlResolveForFile
 
 create type public.profile_role as enum ('admin', 'user');
-create type public.member_role as enum ('owner', 'manager', 'viewer');
+create type public.member_role as enum ('owner', 'admin', 'member');
 create type public.bp_visibility as enum ('public', 'private', 'unlisted');
 
 -- //////////////////////////////// GAME ////////////////////////////////
@@ -106,14 +106,14 @@ CREATE TABLE IF NOT EXISTS public.team_member
     team_id uuid               NOT NULL REFERENCES public.team (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    role    public.member_role NOT NULL DEFAULT 'viewer'::public.member_role
+    role    public.member_role NOT NULL DEFAULT 'member'::public.member_role
 );
 
 ALTER TABLE public.team_member
     ENABLE ROW LEVEL SECURITY;
 
 CREATE UNIQUE INDEX
-    IF NOT EXISTS idx_team_member_user_team
+    IF NOT EXISTS uidx_team_member_user_team
     ON public.team_member (user_id, team_id);
 
 -- //////////////////////////////// BLUEPRINT ////////////////////////////////
