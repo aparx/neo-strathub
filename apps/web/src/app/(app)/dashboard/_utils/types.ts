@@ -10,16 +10,19 @@ export const DASHBOARD_QUERY_PARAMS = {
 
 export type DashboardQueryParams = typeof DASHBOARD_QUERY_PARAMS;
 
-export type SharedContentProps =
+export type SharedContentProps = {
+  documentId?: string;
+} & (
   | {
       type: "team";
       teamId: string;
     }
   | {
-      type: "collection";
+      type: "book";
       teamId: string;
       bookId: string;
     }
   | {
       type: "overview";
-    };
+    }
+);

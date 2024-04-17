@@ -6,13 +6,16 @@ import { TeamSection } from "./_components";
 import * as css from "./content.css";
 
 export async function DetailsContent(props: SharedContentProps) {
+  console.log(props.documentId);
   return (
     <DashColumn.Root>
       <DashColumn.Content className={css.content}>
         <Callout.Warning>
           Warning: Alpha version. Data may be lost.
         </Callout.Warning>
-        <Skeleton height={250} outline />
+        {props.documentId != null && (
+          <Skeleton className={css.previewFadeIn} height={250} outline />
+        )}
         {/* TODO: Document/Blueprint Inspector */}
         {props.type !== "overview" && (
           <Suspense key={props.teamId} fallback={"Loading Team..."}>

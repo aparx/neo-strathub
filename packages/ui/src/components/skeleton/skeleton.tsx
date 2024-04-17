@@ -23,6 +23,7 @@ export function Skeleton({
   width,
   height = defaultHeight,
   style,
+  className,
   ...restProps
 }: SkeletonProps) {
   return (
@@ -30,6 +31,7 @@ export function Skeleton({
       className={mergeClassNames(
         css.skeleton,
         outline && sprinkles({ outline: "card" }),
+        className,
       )}
       style={{
         width,

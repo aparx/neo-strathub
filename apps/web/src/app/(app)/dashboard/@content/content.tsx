@@ -27,7 +27,7 @@ async function Title(props: SharedContentProps) {
       return <Navigation icon={<IoMdGlobe />} title={"Global Blueprints"} />;
     case "team":
       return <Navigation icon={<MdPeople />} title={"Team's Blueprints"} />;
-    case "collection":
+    case "book":
       const book = await getBook(props.bookId);
       return <Navigation icon={<MdGames />} title={book.name} />;
   }

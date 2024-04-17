@@ -1,16 +1,22 @@
 import { DetailsContent } from "@/app/(app)/dashboard/@details/content";
-import { DashboardParams } from "@/app/(app)/dashboard/_utils";
+import {
+  DASHBOARD_QUERY_PARAMS,
+  DashboardParams,
+} from "@/app/(app)/dashboard/_utils";
 
 export default async function DetailsPage({
   params,
+  searchParams,
 }: {
   params: DashboardParams;
+  searchParams: { [key: string]: string };
 }) {
   return (
     <DetailsContent
       type={"collection"}
       teamId={params.teamId}
       bookId={params.bookId}
+      documentId={searchParams[DASHBOARD_QUERY_PARAMS.document]}
     />
   );
 }
