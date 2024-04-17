@@ -6,7 +6,6 @@ import { TeamSection } from "./_components";
 import * as css from "./content.css";
 
 export async function DetailsContent(props: SharedContentProps) {
-  console.log(props.documentId);
   return (
     <DashColumn.Root>
       <DashColumn.Content className={css.content}>

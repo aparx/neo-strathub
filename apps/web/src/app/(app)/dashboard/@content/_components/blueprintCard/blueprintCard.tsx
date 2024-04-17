@@ -46,7 +46,11 @@ export function BlueprintCard({
 
   return (
     <article className={css.root}>
-      <Link href={inspectLink} style={{ flexGrow: 1, display: "block" }}>
+      <Link
+        href={inspectLink}
+        style={{ flexGrow: 1, display: "block" }}
+        scroll={false}
+      >
         <header className={css.headerContainer}>
           <BlueprintVisibility type={visibility} size={"lg"} />
           <div className={css.headerColumns}>
