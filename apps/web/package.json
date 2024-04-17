@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "pnpm run sb:gen:local && next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint . --max-warnings 0"
+    "lint": "eslint . --max-warnings 0",
+    "sb:gen:local": "npx supabase gen types typescript --local > ./src/utils/supabase/types.ts"
   },
   "dependencies": {
     "@repo/theme": "workspace:^",
@@ -34,6 +35,7 @@
     "@vanilla-extract/next-plugin": "^2.4.0",
     "eslint": "^8.57.0",
     "prettier": "^3.2.5",
+    "supabase": "^1.159.1",
     "typescript": "^5.3.3"
   }
 }
