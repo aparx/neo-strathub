@@ -29,7 +29,7 @@ export function SelectorDataProvider({
   // TODO useQuery that refetches and invalidates initial data on URL change
   // TODO actually cache, re-cache & translate input into items
   const elements = useFetchElements({
-    type: params.teamId ? "collection" : "team",
+    type: params.teamId ? "book" : "team",
     teamId: params.teamId!,
   });
 
@@ -42,7 +42,7 @@ export function SelectorDataProvider({
 
 type UseFetchElementsProps =
   | { type: "team" }
-  | { type: "collection"; teamId: string };
+  | { type: "book"; teamId: string };
 
 function useFetchElements(data: UseFetchElementsProps) {
   // TODO actually fetch the data
@@ -54,7 +54,7 @@ function useFetchElements(data: UseFetchElementsProps) {
         case "team":
           href = `/dashboard/${i}`;
           break;
-        case "collection":
+        case "book":
           href = `/dashboard/${data.teamId}/${i}`;
           break;
         default:
@@ -74,5 +74,5 @@ function useFetchElements(data: UseFetchElementsProps) {
       } satisfies ListItemData;
     }
     return arr;
-  }, [data.type, data.type === "collection" ? data.teamId : null]);
+  }, [data.type, data.type === "book" ? data.teamId : null]);
 }

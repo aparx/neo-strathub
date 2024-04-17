@@ -14,7 +14,7 @@ export async function DetailsContent(props: SharedContentProps) {
           Warning: Alpha version. Data may be lost.
         </Callout.Warning>
         {props.documentId != null && (
-          <Skeleton className={css.previewFadeIn} height={250} outline />
+          <Skeleton className={css.previewFadeIn} height={300} outline />
         )}
         {/* TODO: Document/Blueprint Inspector */}
         {props.type !== "overview" && (
