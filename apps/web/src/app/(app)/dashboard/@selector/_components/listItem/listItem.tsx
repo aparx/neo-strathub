@@ -1,5 +1,12 @@
 "use client";
-import { Flexbox, Icon, IconButton, Spinner, Text } from "@repo/ui/components";
+import {
+  Flexbox,
+  Icon,
+  IconButton,
+  Popover,
+  Spinner,
+  Text,
+} from "@repo/ui/components";
 import { mergeClassNames } from "@repo/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -10,6 +17,7 @@ type ListItemBaseProps = Omit<HTMLAttributes<HTMLDivElement>, "children">;
 
 export interface ListItemData {
   icon?: React.ReactNode;
+  popover?: React.ReactNode | null;
   text: string;
   href: string;
 }
@@ -27,18 +35,20 @@ export function ListItem({
   loading,
   className,
   onClick,
+  popover,
   ...restProps
 }: ListItemProps) {
   // This component contains three interactive elements:
+  //
   // (1) For ease of use a clickable `div` element, with its interactivity not
   //     semantically displayed, to allow for nested "buttons" on most devices.
   //     This division uses the router to manually redirect to the provided `href`,
   //     unless any other interactable element within it is pressed.
   //
-  //   (1.1) A link that semantically represents a navigation to screen-readers.
+  //     (1.1) A link that semantically represents a navigation to screen-readers.
   //
-  //   (1.2) A button acting as the settings button, outside the link and within the
-  //         interactable division element.
+  //     (1.2) A button acting as the settings button, outside the link and within
+  //           the interactable division element.
   //
   // This allows for an app-like feel while not throwing accessibility out the window.
 
@@ -74,9 +84,18 @@ export function ListItem({
             {text}
           </Flexbox>
         </Link>
-        <IconButton ref={detailsButton} aria-label={"Edit"}>
-          <Icon.Mapped type={"details"} />
-        </IconButton>
+        <Popover.Root>
+          <Popover.Trigger asChild>
+            <IconButton
+              ref={detailsButton}
+              aria-label={"Settings"}
+              disabled={!popover || loading}
+            >
+              <Icon.Mapped type={"details"} />
+            </IconButton>
+          </Popover.Trigger>
+          {popover}
+        </Popover.Root>
       </div>
     </Text>
   );

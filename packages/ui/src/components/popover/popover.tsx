@@ -12,11 +12,16 @@ export const Trigger = Primitive.Trigger;
 
 export const Close = Primitive.Close;
 
+export type PopoverContentProps = Omit<
+  Primitive.PopoverContentProps,
+  "asChild"
+>;
+
 export function Content({
   children,
   className,
   ...restProps
-}: Omit<Primitive.PopoverContentProps, "asChild">) {
+}: PopoverContentProps) {
   return (
     <Primitive.Portal>
       <Primitive.Content

@@ -1,10 +1,13 @@
 import { ComponentProps } from "react";
+import { BiLogOut } from "react-icons/bi";
 import { IoMdEye } from "react-icons/io";
 import {
   MdAdd,
+  MdArrowBack,
   MdDelete,
   MdEdit,
   MdMoreVert,
+  MdOutlineDriveFileRenameOutline,
   MdPeople,
   MdSearch,
   MdSettings,
@@ -13,7 +16,7 @@ import { RiFilterFill, RiFilterLine } from "react-icons/ri";
 import { Text } from "../text";
 import { ICON_SIZES } from "./icon.utils";
 
-interface IconBaseProps extends Omit<ComponentProps<"div">, "children"> {
+export interface IconBaseProps extends Omit<ComponentProps<"div">, "children"> {
   size?: keyof typeof ICON_SIZES;
   alt?: string;
 }
@@ -35,9 +38,12 @@ export function Custom({ icon, size = "md", alt, ...restProps }: IconProps) {
 const iconMap = {
   add: <MdAdd />,
   settings: <MdSettings />,
-  members: <MdPeople />,
-  delete: <MdDelete />,
+  rename: <MdOutlineDriveFileRenameOutline />,
   details: <MdMoreVert />,
+  members: <MdPeople />,
+  back: <MdArrowBack />,
+  leave: <BiLogOut />,
+  delete: <MdDelete />,
   filterEmpty: <RiFilterLine />,
   filterFull: <RiFilterFill />,
   search: <MdSearch />,

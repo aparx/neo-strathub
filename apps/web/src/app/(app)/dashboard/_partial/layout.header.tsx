@@ -1,5 +1,6 @@
 "use client";
 import { DashboardParams } from "@/app/(app)/dashboard/_utils";
+import { TeamPopover } from "@/modules/team/partial";
 import {
   Breadcrumbs,
   BreadcrumbsProps,
@@ -14,6 +15,22 @@ import { MdArrowDropDown } from "react-icons/md";
 import * as css from "./layout.header.css";
 
 export function LayoutHeader() {
+  return (
+    <Text className={css.header} type={"label"} size={"lg"}>
+      <Navigation />
+      <Popover.Root>
+        <Popover.Trigger asChild>
+          <IconButton>
+            <Icon.Custom icon={<MdArrowDropDown />} />
+          </IconButton>
+        </Popover.Trigger>
+        <TeamPopover style={{ minWidth: 250 }} />
+      </Popover.Root>
+    </Text>
+  );
+}
+
+function Navigation() {
   const { teamId } = useParams<Partial<DashboardParams>>();
 
   const breadcrumbs = useMemo(() => {
@@ -33,31 +50,8 @@ export function LayoutHeader() {
   }, [teamId]);
 
   return (
-    <Text className={css.header} type={"label"} size={"lg"}>
+    <nav>
       <Breadcrumbs breadcrumbs={breadcrumbs} />
-      <Popover.Root>
-        <Popover.Trigger asChild>
-          {/* TODO IconButton */}
-          <IconButton>
-            <Icon.Custom icon={<MdArrowDropDown />} />
-          </IconButton>
-        </Popover.Trigger>
-        <Popover.Content style={{ minWidth: 250 }}>
-          <Popover.Item>
-            <Icon.Mapped type={"settings"} size={"sm"} />
-            Settings
-          </Popover.Item>
-          <Popover.Item>
-            <Icon.Mapped type={"members"} size={"sm"} />
-            Members
-          </Popover.Item>
-          <Popover.Divider />
-          <Popover.Item color={"destructive"}>
-            <Icon.Mapped type={"delete"} size={"sm"} />
-            Delete
-          </Popover.Item>
-        </Popover.Content>
-      </Popover.Root>
-    </Text>
+    </nav>
   );
 }

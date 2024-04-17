@@ -23,14 +23,12 @@ export type BlueprintCardProps = Omit<
 > &
   BlueprintCardData;
 
-const EMPTY_ARRAY = [] as const;
-
 export function BlueprintCard({
   documentId,
   documentName,
   teamName,
   arenaName,
-  tags = EMPTY_ARRAY,
+  tags = [],
   visibility,
 }: BlueprintCardProps) {
   // TODO create actual href links to the

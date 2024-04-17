@@ -2,6 +2,8 @@
 import { ListItemData } from "@/app/(app)/dashboard/@selector/_components";
 import { ItemContextProvider } from "@/app/(app)/dashboard/@selector/_context";
 import { DashboardParams } from "@/app/(app)/dashboard/_utils";
+import { BookPopover } from "@/modules/book/partial/bookPopover";
+import { TeamPopover } from "@/modules/team/partial";
 import { User } from "@supabase/supabase-js";
 import { useParams } from "next/navigation";
 import { useMemo } from "react";
@@ -62,6 +64,12 @@ function useFetchElements(data: UseFetchElementsProps) {
       arr[i] = {
         icon: data.type === "team" ? <MdPeople /> : <MdGames />,
         text: `${data.type === "team" ? "Team" : "Stratbook"} ${i}`,
+        popover:
+          data.type === "team" ? (
+            <TeamPopover auth={"admin"} />
+          ) : (
+            <BookPopover auth={"admin"} />
+          ),
         href,
       } satisfies ListItemData;
     }
