@@ -1,0 +1,39 @@
+-- //////////////////////////////// GAME ////////////////////////////////
+
+CREATE POLICY "Public read access"
+    ON public.game AS PERMISSIVE
+    FOR SELECT TO public USING (true);
+
+-- //////////////////////////////// ARENA ////////////////////////////////
+
+CREATE POLICY "Public read access"
+    ON public.arena AS PERMISSIVE
+    FOR SELECT TO public USING (true);
+
+-- //////////////////////////////// PROFILE ////////////////////////////////
+
+CREATE POLICY "Public read access"
+    ON public.profile AS PERMISSIVE
+    FOR SELECT TO public USING (true);
+
+-- //////////////////////////////// PLAN ////////////////////////////////
+
+CREATE POLICY "Public read access"
+    ON public.plan AS PERMISSIVE
+    FOR SELECT TO public USING (true);
+
+-- //////////////////////////////// TEAM ////////////////////////////////
+
+CREATE POLICY "Public read access"
+    ON public.team AS PERMISSIVE
+    FOR SELECT TO public USING (true);
+
+-- //////////////////////////////// BOOK ////////////////////////////////
+
+-- //////////////////////////////// TEAM_MEMBER ////////////////////////////////
+
+CREATE POLICY "Public read access"
+    ON public.team_member AS PERMISSIVE
+    FOR SELECT TO public USING (true);
+
+-- //////////////////////////////// BLUEPRINT ////////////////////////////////

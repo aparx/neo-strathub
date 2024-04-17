@@ -171,6 +171,33 @@ export type Database = {
         }
         Relationships: []
       }
+      plan: {
+        Row: {
+          config: Json
+          id: number
+          is_default: boolean
+          name: string
+          pricing: number
+          pricing_interval: Database["public"]["Enums"]["pay_interval"] | null
+        }
+        Insert: {
+          config?: Json
+          id?: number
+          is_default?: boolean
+          name: string
+          pricing: number
+          pricing_interval?: Database["public"]["Enums"]["pay_interval"] | null
+        }
+        Update: {
+          config?: Json
+          id?: number
+          is_default?: boolean
+          name?: string
+          pricing?: number
+          pricing_interval?: Database["public"]["Enums"]["pay_interval"] | null
+        }
+        Relationships: []
+      }
       profile: {
         Row: {
           created_at: string
@@ -208,21 +235,32 @@ export type Database = {
           created_at: string
           id: string
           name: string
+          plan_id: number | null
           updated_at: string
         }
         Insert: {
           created_at?: string
           id?: string
           name: string
+          plan_id?: number | null
           updated_at?: string
         }
         Update: {
           created_at?: string
           id?: string
           name?: string
+          plan_id?: number | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "team_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plan"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       team_member: {
         Row: {
@@ -255,7 +293,7 @@ export type Database = {
             foreignKeyName: "team_member_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "profile"
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -269,7 +307,8 @@ export type Database = {
     }
     Enums: {
       bp_visibility: "public" | "private" | "unlisted"
-      member_role: "owner" | "manager" | "viewer"
+      member_role: "owner" | "admin" | "member"
+      pay_interval: "monthly" | "yearly"
       profile_role: "admin" | "user"
     }
     CompositeTypes: {

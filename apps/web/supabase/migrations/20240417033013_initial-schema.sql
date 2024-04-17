@@ -124,7 +124,7 @@ CREATE UNIQUE INDEX
 CREATE TABLE IF NOT EXISTS public.team_member
 (
     id      bigserial PRIMARY KEY,
-    user_id uuid               NOT NULL REFERENCES public.profile (id)
+    user_id uuid               NOT NULL REFERENCES auth.users (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
     team_id uuid               NOT NULL REFERENCES public.team (id)

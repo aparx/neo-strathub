@@ -1,3 +1,5 @@
+"use server";
+import { getTeam } from "@/modules/team/actions";
 import { vars } from "@repo/theme";
 import { Button, Flexbox, Progress, Text } from "@repo/ui/components";
 import { MdArrowForward } from "react-icons/md";
@@ -5,13 +7,15 @@ import * as css from "./teamSection.css";
 
 export async function TeamSection({ teamId }: { teamId: string }) {
   // TODO fetch team using memoized function (react-cache)
+  const team = await getTeam(teamId);
+
   return (
     <section>
       <div className={css.main}>
         <Flexbox asChild gap={"lg"} align={"center"}>
           <header>
             <Text type={"title"} size={"sm"}>
-              Team {teamId}
+              {team?.data?.name}
             </Text>
           </header>
         </Flexbox>

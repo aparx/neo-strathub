@@ -1,3 +1,4 @@
+import { Database } from "@/utils/supabase/types";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { cache } from "react";
@@ -7,7 +8,7 @@ export const getServer = cache((cookieStore: ReturnType<typeof cookies>) => {
 });
 
 export function createServer(cookieStore: ReturnType<typeof cookies>) {
-  return createServerClient(
+  return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
