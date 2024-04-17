@@ -34,6 +34,80 @@ export type Database = {
   }
   public: {
     Tables: {
+      arena: {
+        Row: {
+          game_id: number
+          id: number
+          metadata: Json | null
+          name: string
+        }
+        Insert: {
+          game_id: number
+          id?: number
+          metadata?: Json | null
+          name: string
+        }
+        Update: {
+          game_id?: number
+          id?: number
+          metadata?: Json | null
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "arena_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "game"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blueprint: {
+        Row: {
+          arena_id: number
+          book_id: string
+          data: Json
+          id: string
+          name: string
+          tags: string[] | null
+          visibility: Database["public"]["Enums"]["bp_visibility"]
+        }
+        Insert: {
+          arena_id: number
+          book_id: string
+          data?: Json
+          id?: string
+          name: string
+          tags?: string[] | null
+          visibility?: Database["public"]["Enums"]["bp_visibility"]
+        }
+        Update: {
+          arena_id?: number
+          book_id?: string
+          data?: Json
+          id?: string
+          name?: string
+          tags?: string[] | null
+          visibility?: Database["public"]["Enums"]["bp_visibility"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blueprint_arena_id_fkey"
+            columns: ["arena_id"]
+            isOneToOne: false
+            referencedRelation: "arena"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blueprint_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "book"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       book: {
         Row: {
           created_at: string
@@ -194,6 +268,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      bp_visibility: "public" | "private" | "unlisted"
       member_role: "owner" | "manager" | "viewer"
       profile_role: "admin" | "user"
     }

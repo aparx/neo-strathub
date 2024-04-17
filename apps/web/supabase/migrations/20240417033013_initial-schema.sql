@@ -3,6 +3,7 @@
 create type public.profile_role as enum ('admin', 'user');
 create type public.member_role as enum ('owner', 'admin', 'member');
 create type public.bp_visibility as enum ('public', 'private', 'unlisted');
+create type public.pay_interval as enum ('monthly', 'yearly');
 
 -- //////////////////////////////// GAME ////////////////////////////////
 
@@ -26,13 +27,18 @@ CREATE TABLE IF NOT EXISTS public.arena
     game_id  smallint    NOT NULL REFERENCES public.game (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    name     varchar(64) NOT NULL UNIQUE
+    name     varchar(64) NOT NULL
         CONSTRAINT min_name_length CHECK (length(name) >= 2),
     metadata json
 );
 
 ALTER TABLE public.arena
     ENABLE ROW LEVEL SECURITY;
+
+-- Duplicate arena names per game is forbidden
+CREATE UNIQUE INDEX
+    IF NOT EXISTS uidx_arena_name
+    ON public.arena (game_id, name);
 
 -- //////////////////////////////// PROFILE ////////////////////////////////
 
@@ -51,6 +57,21 @@ CREATE TABLE IF NOT EXISTS public.profile
 ALTER TABLE public.profile
     ENABLE ROW LEVEL SECURITY;
 
+-- //////////////////////////////// PLAN ////////////////////////////////
+
+CREATE TABLE IF NOT EXISTS public.plan
+(
+    id               smallserial PRIMARY KEY,
+    name             varchar(64)    NOT NULL UNIQUE,
+    pricing          decimal(10, 2) NOT NULL,
+    pricing_interval public.pay_interval,
+    is_default       bool           NOT NULL DEFAULT false,
+    config           json           NOT NULL DEFAULT '{}'
+);
+
+ALTER TABLE public.plan
+    ENABLE ROW LEVEL SECURITY;
+
 -- //////////////////////////////// TEAM ////////////////////////////////
 
 CREATE TABLE IF NOT EXISTS public.team
@@ -58,6 +79,9 @@ CREATE TABLE IF NOT EXISTS public.team
     id         uuid PRIMARY KEY     DEFAULT gen_random_uuid(),
     name       varchar(32) NOT NULL
         CONSTRAINT min_name_length CHECK (length(name) >= 3),
+    plan_id    smallint REFERENCES public.plan
+        ON DELETE SET NULL
+        ON UPDATE CASCADE,
     created_at timestamptz NOT NULL DEFAULT now(),
     updated_at timestamptz NOT NULL DEFAULT now()
 );
