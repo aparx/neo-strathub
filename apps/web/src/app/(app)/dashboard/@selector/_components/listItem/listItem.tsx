@@ -25,6 +25,7 @@ export interface ListItemData {
 export interface ListItemProps extends ListItemBaseProps, ListItemData {
   active?: boolean;
   loading?: boolean;
+  /** Event called when the item is clicked such that the user is redirected */
   onRedirect?: () => any;
 }
 

@@ -30,6 +30,11 @@ CREATE POLICY "Public read access"
 
 -- //////////////////////////////// BOOK ////////////////////////////////
 
+-- TODO REMOVE OR EDIT
+CREATE POLICY "Public read access"
+    ON public.book AS PERMISSIVE
+    FOR SELECT TO public USING (true);
+
 -- //////////////////////////////// TEAM_MEMBER ////////////////////////////////
 
 CREATE POLICY "Public read access"
@@ -37,3 +42,8 @@ CREATE POLICY "Public read access"
     FOR SELECT TO public USING (true);
 
 -- //////////////////////////////// BLUEPRINT ////////////////////////////////
+
+-- TODO REMOVE OR EDIT
+CREATE POLICY "Public read access"
+    ON public.blueprint AS PERMISSIVE
+    FOR SELECT TO public USING (true);
