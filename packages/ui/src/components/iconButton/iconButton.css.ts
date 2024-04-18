@@ -7,12 +7,13 @@ const hoverOrFocusSelector =
 
 export const button = recipe({
   base: {
-    display: "grid",
-    placeItems: "center",
+    display: "flex",
+    alignItems: "center",
     border: "transparent",
     outline: "none",
     padding: vars.spacing.sm,
     borderRadius: vars.roundness.sm,
+    gap: vars.spacing.sm,
   },
   variants: {
     color: {

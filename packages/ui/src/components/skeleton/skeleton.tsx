@@ -1,7 +1,7 @@
 import { sprinkles, vars } from "@repo/theme";
 import { mergeClassNames } from "@repo/utils";
-import { calc } from "@vanilla-extract/css-utils";
 import { ComponentPropsWithoutRef } from "react";
+import { createLineHeight } from "../../utils";
 import * as css from "./skeleton.css";
 
 export interface SkeletonProps extends ComponentPropsWithoutRef<"div"> {
@@ -12,16 +12,11 @@ export interface SkeletonProps extends ComponentPropsWithoutRef<"div"> {
   outline?: boolean;
 }
 
-const defaultHeight = calc.add(
-  calc.multiply(2, vars.spacing.sm),
-  vars.fontSizes.body.md,
-);
-
 export function Skeleton({
   outline,
   roundness = "sm",
   width,
-  height = defaultHeight,
+  height = createLineHeight("1em"),
   style,
   className,
   ...restProps

@@ -7,7 +7,6 @@ import {
 } from "@/modules/team/actions";
 import { vars } from "@repo/theme";
 import { Button, Flexbox, Progress, Skeleton, Text } from "@repo/ui/components";
-import { createLineHeight } from "@repo/ui/utils";
 import { Suspense } from "react";
 import { MdArrowForward } from "react-icons/md";
 import * as css from "./teamSection.css";
@@ -63,10 +62,7 @@ export async function TeamSection({ teamId }: { teamId: string }) {
         </Flexbox>
         <Flexbox orient={"vertical"} gap={"md"}>
           {statFields.map((field) => (
-            <Suspense
-              key={field.name}
-              fallback={<Skeleton height={createLineHeight("1em")} />}
-            >
+            <Suspense key={field.name} fallback={<Skeleton />}>
               <StatisticField {...field} name={field.name} team={team} />
             </Suspense>
           ))}

@@ -2,6 +2,7 @@ import { vars } from "@repo/theme";
 import { Text } from "@repo/ui/components";
 import type { Metadata } from "next";
 
+import { TanstackQueryProvider } from "@/modules/query/context/tanstackQueryProvider";
 import "@repo/theme/css";
 import "./global.css";
 import "./reset.css";
@@ -15,7 +16,7 @@ export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
-}): JSX.Element {
+}) {
   return (
     <html lang="en" style={{ fontSize: "0.875rem" }}>
       <Text asChild>
@@ -25,7 +26,7 @@ export default function RootLayout({
             color: vars.colors.emphasis.high,
           }}
         >
-          {children}
+          <TanstackQueryProvider>{children}</TanstackQueryProvider>
         </body>
       </Text>
     </html>

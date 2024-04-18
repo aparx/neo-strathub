@@ -26,7 +26,8 @@ export function Breadcrumbs({ breadcrumbs, ...restProps }: BreadcrumbsProps) {
               breadcrumbs.map(({ href, display, forceRefetch }, index) => {
                 // Determine what component to represent this breadcrumb
                 let child: React.ReactNode;
-                if (!href) child = <div>{display}</div>;
+                if (!href || index === breadcrumbs.length - 1)
+                  child = <div>{display}</div>;
                 else if (forceRefetch) child = <a href={href}>{display}</a>;
                 else child = <Link href={href}>{display}</Link>;
 
