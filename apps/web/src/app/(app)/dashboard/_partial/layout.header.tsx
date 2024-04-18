@@ -52,9 +52,9 @@ function Navigation() {
 
 function TeamButton({ teamId }: { teamId: string }) {
   const { data } = useTeam(teamId);
+  const [state, setState] = useState(false);
   const name = data?.name;
   if (!name?.length) return <Skeleton width={100} />;
-  const [state, setState] = useState(false);
 
   return (
     <Popover.Root onOpenChange={setState}>
