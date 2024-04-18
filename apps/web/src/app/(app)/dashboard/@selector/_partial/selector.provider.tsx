@@ -2,12 +2,14 @@
 import { ListItemData } from "@/app/(app)/dashboard/@selector/_components";
 import { ItemContextProvider } from "@/app/(app)/dashboard/@selector/_context";
 import { DashboardParams } from "@/app/(app)/dashboard/_utils";
-import { BookPopover } from "@/modules/book/partial/bookPopover";
 import { TeamPopover } from "@/modules/team/partial";
+import { createClient } from "@/utils/supabase/client";
+import { nonNull } from "@repo/utils";
 import { User } from "@supabase/supabase-js";
+import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import { useMemo } from "react";
-import { MdGames, MdPeople } from "react-icons/md";
+import { useEffect, useState } from "react";
+import { MdPeople } from "react-icons/md";
 
 /**
  * Provides context and fetches data necessary for the selector.
@@ -25,54 +27,44 @@ export function SelectorDataProvider({
   children: React.ReactNode;
 }) {
   const params = useParams<Partial<DashboardParams>>();
+  const [elements, setElements] = useState<ListItemData[]>([]);
 
-  // TODO useQuery that refetches and invalidates initial data on URL change
-  // TODO actually cache, re-cache & translate input into items
-  const elements = useFetchElements({
-    type: params.teamId ? "book" : "team",
-    teamId: params.teamId!,
+  const teamQuery = useQuery({
+    queryKey: ["myTeams"],
+    queryFn: () => getMyTeams(user.id),
+    enabled: !params.teamId,
+    refetchOnWindowFocus: false,
   });
 
+  useEffect(() => {
+    if (params.teamId || !teamQuery.data) return;
+    setElements(
+      teamQuery.data
+        .map(({ team, role }) => {
+          if (!team) return null;
+          return {
+            href: `/dashboard/${team.id}`,
+            text: team.name,
+            popover: <TeamPopover auth={role} />,
+            icon: <MdPeople />,
+          } satisfies ListItemData;
+        })
+        .filter(nonNull),
+    );
+  }, [teamQuery.data, params.teamId]);
+
   return (
-    <ItemContextProvider elements={elements} fetching={false}>
+    <ItemContextProvider elements={elements} fetching={teamQuery.isFetching}>
       {children}
     </ItemContextProvider>
   );
 }
 
-type UseFetchElementsProps =
-  | { type: "team" }
-  | { type: "book"; teamId: string };
-
-function useFetchElements(data: UseFetchElementsProps) {
-  // TODO actually fetch the data
-  return useMemo(() => {
-    const arr = new Array(5);
-    for (let i = 1; i <= 5; ++i) {
-      let href: string;
-      switch (data.type) {
-        case "team":
-          href = `/dashboard/${i}`;
-          break;
-        case "book":
-          href = `/dashboard/${data.teamId}/${i}`;
-          break;
-        default:
-          throw new Error("Invalid data type");
-      }
-
-      arr[i] = {
-        icon: data.type === "team" ? <MdPeople /> : <MdGames />,
-        text: `${data.type === "team" ? "Team" : "Stratbook"} ${i}`,
-        popover:
-          data.type === "team" ? (
-            <TeamPopover auth={"admin"} />
-          ) : (
-            <BookPopover auth={"admin"} />
-          ),
-        href,
-      } satisfies ListItemData;
-    }
-    return arr;
-  }, [data.type, data.type === "book" ? data.teamId : null]);
+async function getMyTeams(userId: string) {
+  return (
+    await createClient()
+      .from("team_member")
+      .select("team(id, name), role")
+      .eq("user_id", userId)
+  )?.data;
 }

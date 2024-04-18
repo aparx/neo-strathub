@@ -1,12 +1,12 @@
 "use client";
-import { Flexbox } from "@repo/ui/components";
+import { Flexbox, Skeleton } from "@repo/ui/components";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { ListItem } from "../_components";
 import { useItemContext } from "../_context";
 
 export function SelectorBody() {
-  const { items, active } = useItemContext();
+  const { items, active, fetching } = useItemContext();
   const pathname = usePathname();
 
   useEffect(() => {
@@ -23,12 +23,17 @@ export function SelectorBody() {
               href={href}
               active={active.state === href}
               loading={active.state === href && pathname !== href}
-              onClick={(e) => !e.isDefaultPrevented() && active.update(href)}
+              onRedirect={() => active.update(href)}
               {...restData}
             />
           </li>
         ))}
+        {fetching && new Array(3).fill(<ListItemSkeleton />)}
       </ul>
     </Flexbox>
   );
+}
+
+function ListItemSkeleton() {
+  return <Skeleton height={47} roundness={"md"} outline />;
 }

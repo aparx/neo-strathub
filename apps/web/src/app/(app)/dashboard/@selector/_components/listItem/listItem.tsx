@@ -25,6 +25,7 @@ export interface ListItemData {
 export interface ListItemProps extends ListItemBaseProps, ListItemData {
   active?: boolean;
   loading?: boolean;
+  onRedirect?: () => any;
 }
 
 export function ListItem({
@@ -36,6 +37,7 @@ export function ListItem({
   className,
   onClick,
   popover,
+  onRedirect,
   ...restProps
 }: ListItemProps) {
   // This component contains three interactive elements:
@@ -53,17 +55,18 @@ export function ListItem({
   // This allows for an app-like feel while not throwing accessibility out the window.
 
   const router = useRouter();
-  const detailsButton = useRef<HTMLButtonElement>(null);
+  const linkRef = useRef<HTMLAnchorElement>(null);
 
   return (
     <Text asChild data={{ weight: 450 }}>
       <div
         onClick={(e) => {
-          if (detailsButton.current?.contains(e.target as Node))
-            e.preventDefault();
-          if (!e.isDefaultPrevented() && e.target === e.currentTarget)
-            router.replace(href);
           onClick?.(e);
+          const target = e.target as Node;
+          if (linkRef.current?.contains(target) || target === e.currentTarget) {
+            router.replace(href);
+            onRedirect?.();
+          }
         }}
         className={mergeClassNames(
           css.listItem({ active, loading }),
@@ -71,7 +74,7 @@ export function ListItem({
         )}
         {...restProps}
       >
-        <Link href={href}>
+        <Link href={href} ref={linkRef}>
           <Flexbox gap={"md"} align={"center"} style={{ width: "fit-content" }}>
             {loading ? (
               <Icon.Custom
@@ -86,11 +89,7 @@ export function ListItem({
         </Link>
         <Popover.Root>
           <Popover.Trigger asChild>
-            <IconButton
-              ref={detailsButton}
-              aria-label={"Settings"}
-              disabled={!popover || loading}
-            >
+            <IconButton aria-label={"Settings"} disabled={!popover || loading}>
               <Icon.Mapped type={"details"} />
             </IconButton>
           </Popover.Trigger>
