@@ -1,6 +1,5 @@
 import { sprinkles, vars } from "@repo/theme";
-import { keyframes, style } from "@vanilla-extract/css";
-import { calc } from "@vanilla-extract/css-utils";
+import { style } from "@vanilla-extract/css";
 
 const sectionBase = style([
   sprinkles({
@@ -18,39 +17,5 @@ export const main = style([
     display: "flex",
     flexDirection: "column",
     borderRadius: vars.roundness.sm,
-    borderBottomLeftRadius: "unset",
-    borderBottomRightRadius: "unset",
   },
 ]);
-
-export const annotation = style([
-  sectionBase,
-  {
-    borderRadius: vars.roundness.sm,
-    borderTopLeftRadius: "unset",
-    borderTopRightRadius: "unset",
-  },
-]);
-
-export const upgradeButton = style({
-  marginLeft: "auto",
-  position: "relative",
-  "::before": {
-    content: "",
-    position: "absolute",
-    inset: 0,
-    border: `2px solid ${vars.colors.emphasis.medium}`,
-    borderRadius: "inherit",
-    filter: "blur(2px)",
-    animation: `${keyframes({
-      "50%": {
-        inset: 0,
-        opacity: 1,
-      },
-      to: {
-        opacity: 0,
-        inset: calc.multiply(-1, vars.spacing.md),
-      },
-    })} 3s linear infinite`,
-  },
-});

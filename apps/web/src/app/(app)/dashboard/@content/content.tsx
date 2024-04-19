@@ -1,5 +1,5 @@
 import { DashColumn } from "@/app/(app)/dashboard/_components";
-import { SharedContentProps } from "@/app/(app)/dashboard/_utils";
+import { ExtendedContentPathProps } from "@/app/(app)/dashboard/_utils";
 import { getBook } from "@/modules/book/actions";
 import { Flexbox, Icon, Text } from "@repo/ui/components";
 import { IoMdGlobe } from "react-icons/io";
@@ -7,7 +7,7 @@ import { MdGames, MdPeople } from "react-icons/md";
 import { ContentBody, ContentHeader } from "./_partial";
 import * as css from "./content.css";
 
-export async function DashContent(props: SharedContentProps) {
+export async function DashContent(props: ExtendedContentPathProps) {
   return (
     <DashColumn.Root>
       <DashColumn.Header>
@@ -15,21 +15,20 @@ export async function DashContent(props: SharedContentProps) {
         <ContentHeader />
       </DashColumn.Header>
       <DashColumn.Content>
-        <ContentBody />
+        <ContentBody bookId={props.bookId} teamId={props.teamId} />
       </DashColumn.Content>
     </DashColumn.Root>
   );
 }
 
-async function Title(props: SharedContentProps) {
-  switch (props.type) {
-    case "overview":
-      return <Navigation icon={<IoMdGlobe />} title={"Global Blueprints"} />;
-    case "team":
-      return <Navigation icon={<MdPeople />} title={"Team's Blueprints"} />;
-    case "book":
-      const book = await getBook(props.bookId);
-      return <Navigation icon={<MdGames />} title={book.name} />;
+async function Title(props: ExtendedContentPathProps) {
+  if (props.bookId) {
+    const book = await getBook(props.bookId);
+    return <Navigation icon={<MdGames />} title={book.name} />;
+  } else if (props.teamId) {
+    return <Navigation icon={<MdPeople />} title={"Team's Blueprints"} />;
+  } else {
+    return <Navigation icon={<IoMdGlobe />} title={"Global Blueprints"} />;
   }
 }
 

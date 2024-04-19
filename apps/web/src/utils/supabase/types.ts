@@ -36,22 +36,28 @@ export type Database = {
     Tables: {
       arena: {
         Row: {
+          created_at: string
           game_id: number
           id: number
           metadata: Json | null
           name: string
+          updated_at: string
         }
         Insert: {
+          created_at?: string
           game_id: number
           id?: number
           metadata?: Json | null
           name: string
+          updated_at?: string
         }
         Update: {
+          created_at?: string
           game_id?: number
           id?: number
           metadata?: Json | null
           name?: string
+          updated_at?: string
         }
         Relationships: [
           {
@@ -67,28 +73,34 @@ export type Database = {
         Row: {
           arena_id: number
           book_id: string
+          created_at: string
           data: Json
           id: string
           name: string
           tags: string[] | null
+          updated_at: string
           visibility: Database["public"]["Enums"]["bp_visibility"]
         }
         Insert: {
           arena_id: number
           book_id: string
+          created_at?: string
           data?: Json
           id?: string
           name: string
           tags?: string[] | null
+          updated_at?: string
           visibility?: Database["public"]["Enums"]["bp_visibility"]
         }
         Update: {
           arena_id?: number
           book_id?: string
+          created_at?: string
           data?: Json
           id?: string
           name?: string
           tags?: string[] | null
+          updated_at?: string
           visibility?: Database["public"]["Enums"]["bp_visibility"]
         }
         Relationships: [
@@ -174,27 +186,33 @@ export type Database = {
       plan: {
         Row: {
           config: Json
+          created_at: string
           id: number
           is_default: boolean
           name: string
           pricing: number
           pricing_interval: Database["public"]["Enums"]["pay_interval"] | null
+          updated_at: string
         }
         Insert: {
           config?: Json
+          created_at?: string
           id?: number
           is_default?: boolean
           name: string
           pricing: number
           pricing_interval?: Database["public"]["Enums"]["pay_interval"] | null
+          updated_at?: string
         }
         Update: {
           config?: Json
+          created_at?: string
           id?: number
           is_default?: boolean
           name?: string
           pricing?: number
           pricing_interval?: Database["public"]["Enums"]["pay_interval"] | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -264,21 +282,27 @@ export type Database = {
       }
       team_member: {
         Row: {
+          created_at: string
           id: number
           role: Database["public"]["Enums"]["member_role"]
           team_id: string
+          updated_at: string
           user_id: string
         }
         Insert: {
+          created_at?: string
           id?: number
           role?: Database["public"]["Enums"]["member_role"]
           team_id: string
+          updated_at?: string
           user_id: string
         }
         Update: {
+          created_at?: string
           id?: number
           role?: Database["public"]["Enums"]["member_role"]
           team_id?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: [

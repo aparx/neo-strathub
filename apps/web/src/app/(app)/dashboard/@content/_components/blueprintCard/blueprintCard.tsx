@@ -45,7 +45,12 @@ export function BlueprintCard({
   const previewLink = `/app/preview/${documentId}`;
 
   return (
-    <article className={css.root}>
+    <article
+      className={css.root}
+      data-id={documentId}
+      data-team={teamName}
+      data-arena={arenaName}
+    >
       <Link
         href={inspectLink}
         style={{ flexGrow: 1, display: "block" }}

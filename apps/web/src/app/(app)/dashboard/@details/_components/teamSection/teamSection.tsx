@@ -6,9 +6,8 @@ import {
   getTeam,
 } from "@/modules/team/actions";
 import { vars } from "@repo/theme";
-import { Button, Flexbox, Progress, Skeleton, Text } from "@repo/ui/components";
+import { Flexbox, Progress, Skeleton, Text } from "@repo/ui/components";
 import { Suspense } from "react";
-import { MdArrowForward } from "react-icons/md";
 import * as css from "./teamSection.css";
 
 interface StatisticFieldData {
@@ -51,29 +50,21 @@ export async function TeamSection({ teamId }: { teamId: string }) {
   if (!team) return null;
 
   return (
-    <section>
-      <div className={css.main}>
-        <Flexbox asChild gap={"lg"} align={"center"}>
-          <header>
-            <Text type={"title"} size={"sm"}>
-              {team.name}
-            </Text>
-          </header>
-        </Flexbox>
-        <Flexbox orient={"vertical"} gap={"md"}>
-          {statFields.map((field) => (
-            <Suspense key={field.name} fallback={<Skeleton />}>
-              <StatisticField {...field} name={field.name} team={team} />
-            </Suspense>
-          ))}
-        </Flexbox>
-      </div>
-      <div className={css.annotation} style={{ borderTop: "unset" }}>
-        <Button color={"cta"} appearance={"cta"} className={css.upgradeButton}>
-          Upgrade Plan
-          <MdArrowForward />
-        </Button>
-      </div>
+    <section className={css.main}>
+      <Flexbox asChild gap={"lg"} align={"center"}>
+        <header>
+          <Text type={"title"} size={"sm"}>
+            {team.name}
+          </Text>
+        </header>
+      </Flexbox>
+      <Flexbox orient={"vertical"} gap={"md"}>
+        {statFields.map((field) => (
+          <Suspense key={field.name} fallback={<Skeleton />}>
+            <StatisticField {...field} name={field.name} team={team} />
+          </Suspense>
+        ))}
+      </Flexbox>
     </section>
   );
 }

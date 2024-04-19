@@ -1,28 +1,17 @@
 import { Icon, Popover } from "@repo/ui/components";
 
-export interface BookPopoverProps extends Popover.PopoverContentProps {
-  auth?: "admin" | "member";
-}
-
-export function BookPopover({
-  auth = "member",
-  ...restProps
-}: BookPopoverProps) {
+export function BookPopover(props: Popover.PopoverContentProps) {
   return (
-    <Popover.Content {...restProps}>
+    <Popover.Content {...props}>
       <Popover.Item>
         <Icon.Mapped type={"rename"} size={"sm"} />
         Rename
       </Popover.Item>
-      {auth === "admin" && (
-        <>
-          <Popover.Divider />
-          <Popover.Item color={"destructive"}>
-            <Icon.Mapped type={"delete"} size={"sm"} />
-            Delete
-          </Popover.Item>
-        </>
-      )}
+      <Popover.Divider />
+      <Popover.Item color={"destructive"}>
+        <Icon.Mapped type={"delete"} size={"sm"} />
+        Delete
+      </Popover.Item>
     </Popover.Content>
   );
 }

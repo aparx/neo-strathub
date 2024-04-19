@@ -13,6 +13,7 @@ export const rootLayout = style({
   gap: DASHBOARD_GRID_GAP,
   maxWidth: 1500, // TODO magic number
   margin: "0 auto",
+  content: "paint",
 });
 
 export const gridLayout = style({

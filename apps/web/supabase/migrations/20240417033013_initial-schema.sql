@@ -23,13 +23,15 @@ ALTER TABLE public.game
 
 CREATE TABLE IF NOT EXISTS public.arena
 (
-    id       serial PRIMARY KEY,
-    game_id  smallint    NOT NULL REFERENCES public.game (id)
+    id         serial PRIMARY KEY,
+    game_id    smallint    NOT NULL REFERENCES public.game (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    name     varchar(64) NOT NULL
+    name       varchar(64) NOT NULL
         CONSTRAINT min_name_length CHECK (length(name) >= 2),
-    metadata json
+    metadata   json,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    updated_at timestamptz NOT NULL DEFAULT now()
 );
 
 ALTER TABLE public.arena
@@ -66,7 +68,9 @@ CREATE TABLE IF NOT EXISTS public.plan
     pricing          decimal(10, 2) NOT NULL,
     pricing_interval public.pay_interval,
     is_default       bool           NOT NULL DEFAULT false,
-    config           json           NOT NULL DEFAULT '{}'
+    config           json           NOT NULL DEFAULT '{}',
+    created_at       timestamptz    NOT NULL DEFAULT now(),
+    updated_at       timestamptz    NOT NULL DEFAULT now()
 );
 
 ALTER TABLE public.plan
@@ -123,14 +127,16 @@ CREATE UNIQUE INDEX
 
 CREATE TABLE IF NOT EXISTS public.team_member
 (
-    id      bigserial PRIMARY KEY,
-    user_id uuid               NOT NULL REFERENCES auth.users (id)
+    id         bigserial PRIMARY KEY,
+    user_id    uuid               NOT NULL REFERENCES auth.users (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    team_id uuid               NOT NULL REFERENCES public.team (id)
+    team_id    uuid               NOT NULL REFERENCES public.team (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    role    public.member_role NOT NULL DEFAULT 'member'::public.member_role
+    role       public.member_role NOT NULL DEFAULT 'member'::public.member_role,
+    created_at timestamptz        NOT NULL DEFAULT now(),
+    updated_at timestamptz        NOT NULL DEFAULT now()
 );
 
 ALTER TABLE public.team_member
@@ -156,7 +162,9 @@ CREATE TABLE IF NOT EXISTS public.blueprint
         CONSTRAINT min_name_length CHECK (length(name) >= 3),
     tags       varchar[],
     -- The actual data (including canvas) of the blueprint
-    data       jsonb                NOT NULL DEFAULT '{}'::jsonb
+    data       jsonb                NOT NULL DEFAULT '{}'::jsonb,
+    created_at timestamptz          NOT NULL DEFAULT now(),
+    updated_at timestamptz          NOT NULL DEFAULT now()
 );
 
 ALTER TABLE public.blueprint

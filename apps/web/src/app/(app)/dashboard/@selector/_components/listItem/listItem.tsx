@@ -65,7 +65,7 @@ export function ListItem({
           onClick?.(e);
           const target = e.target as Node;
           if (linkRef.current?.contains(target) || target === e.currentTarget) {
-            router.replace(href);
+            router.replace(href, { scroll: true });
             onRedirect?.();
           }
         }}
@@ -75,7 +75,7 @@ export function ListItem({
         )}
         {...restProps}
       >
-        <Link href={href} ref={linkRef}>
+        <Link href={href} ref={linkRef} scroll>
           <Flexbox gap={"md"} align={"center"} style={{ width: "fit-content" }}>
             {loading ? (
               <Icon.Custom

@@ -20,16 +20,19 @@ export default async function DashboardLayout({
   await getUser(cookies());
 
   return (
-    <div className={css.rootLayout}>
-      <LayoutHeader />
-      <Suspense fallback={<PageFallback />}>
-        <main className={css.gridLayout}>
-          {selector}
-          {content}
-          {details}
-        </main>
-      </Suspense>
-    </div>
+    <>
+      <div className={css.rootLayout}>
+        <LayoutHeader />
+        <Suspense fallback={<PageFallback />}>
+          <main className={css.gridLayout}>
+            {selector}
+            {content}
+            {details}
+          </main>
+        </Suspense>
+      </div>
+      {children}
+    </>
   );
 }
 

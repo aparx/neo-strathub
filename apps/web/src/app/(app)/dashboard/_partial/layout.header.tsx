@@ -73,7 +73,12 @@ function TeamButton({ teamId }: { teamId: string }) {
   return (
     <Popover.Root onOpenChange={setState}>
       <Popover.Trigger asChild>
-        <IconButton className={css.teamButton}>
+        <IconButton
+          style={{
+            color: vars.colors.emphasis.high,
+            fontWeight: "inherit",
+          }}
+        >
           {name}
           <Icon.Custom
             icon={<MdExpandMore />}

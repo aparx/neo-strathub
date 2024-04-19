@@ -1,12 +1,22 @@
 "use client";
+import { isPartOfURL } from "@/utils/generic";
+import { useURL } from "@/utils/hooks";
 import { Flexbox, Skeleton } from "@repo/ui/components";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
-import { ListItem } from "../_components";
+import { ListItem, ListItemData } from "../_components";
 import { useItemContext } from "../_context";
 
 export function SelectorBody() {
   const { items, active, fetching } = useItemContext();
+  const absoluteURL = useURL();
+  useEffect(() => {
+    const anyActive = items.find(({ href }) => {
+      return isPartOfURL(new URL(href, absoluteURL.origin), absoluteURL);
+    });
+    if (anyActive) active.update(anyActive.href);
+  }, [items, absoluteURL]);
+
   const pathname = usePathname();
 
   useEffect(() => {
@@ -17,16 +27,8 @@ export function SelectorBody() {
   return (
     <Flexbox asChild orient={"vertical"} gap={"sm"}>
       <ul>
-        {items.map(({ href, ...restData }) => (
-          <li key={href}>
-            <ListItem
-              href={href}
-              active={active.state === href}
-              loading={active.state === href && pathname !== href}
-              onRedirect={() => active.update(href)}
-              {...restData}
-            />
-          </li>
+        {items.map((data) => (
+          <Item key={data.href} {...data} />
         ))}
         {fetching && new Array(3).fill(<ListItemSkeleton />)}
       </ul>
@@ -36,4 +38,26 @@ export function SelectorBody() {
 
 function ListItemSkeleton() {
   return <Skeleton height={47} roundness={"md"} outline />;
+}
+
+function Item({ href, ...restData }: ListItemData) {
+  const { active } = useItemContext();
+  const currentUrl = useURL();
+  const isActive = active.state === href;
+  let isLoading = false;
+  if (isActive) {
+    const expect = new URL(href, currentUrl.origin);
+    isLoading = !isPartOfURL(expect, currentUrl);
+  }
+  return (
+    <li key={href}>
+      <ListItem
+        href={href}
+        active={isActive}
+        loading={isLoading}
+        onRedirect={() => active.update(href)}
+        {...restData}
+      />
+    </li>
+  );
 }

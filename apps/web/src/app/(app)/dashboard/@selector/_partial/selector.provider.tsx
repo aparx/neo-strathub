@@ -1,7 +1,10 @@
 "use client";
 import { ListItemData } from "@/app/(app)/dashboard/@selector/_components";
 import { ItemContextProvider } from "@/app/(app)/dashboard/@selector/_context";
-import { DashboardParams } from "@/app/(app)/dashboard/_utils";
+import {
+  DASHBOARD_QUERY_PARAMS,
+  DashboardParams,
+} from "@/app/(app)/dashboard/_utils";
 import { BookPopover } from "@/modules/book/partial/bookPopover";
 import { TeamPopover } from "@/modules/team/partial";
 import { createClient } from "@/utils/supabase/client";
@@ -79,10 +82,12 @@ function BooksProvider({
   const elements = useMemo(() => {
     if (!data) return [];
     return data.map(({ id, name }) => {
+      const searchParams = new URLSearchParams();
+      searchParams.set(DASHBOARD_QUERY_PARAMS.book, id);
       return {
-        href: `/dashboard/${teamId}/${id}`,
+        href: `/dashboard/${teamId}?${searchParams.toString()}`,
         text: name,
-        popover: <BookPopover auth={"member"} />,
+        popover: <BookPopover />,
         icon: <MdCollections />,
       } satisfies ListItemData;
     });

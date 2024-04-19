@@ -13,8 +13,8 @@ export default async function DetailsPage({
 }) {
   return (
     <DetailsContent
-      type={"team"}
       teamId={params.teamId}
+      bookId={searchParams[DASHBOARD_QUERY_PARAMS.book]}
       documentId={searchParams[DASHBOARD_QUERY_PARAMS.document]}
     />
   );

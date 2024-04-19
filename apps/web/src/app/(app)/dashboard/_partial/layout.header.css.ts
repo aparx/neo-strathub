@@ -18,8 +18,3 @@ export const header = style({
   flexShrink: 0,
   flexGrow: 0,
 });
-
-export const teamButton = style({
-  color: vars.colors.emphasis.high,
-  fontWeight: "500 !important",
-});
