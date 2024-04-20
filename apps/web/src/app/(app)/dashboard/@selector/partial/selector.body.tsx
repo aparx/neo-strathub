@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { ListItem, ListItemData } from "../components";
 import { useItemContext } from "../context";
+import * as css from "./selector.body.css";
 
 export function SelectorBody() {
   const { items, active, fetching } = useItemContext();
@@ -27,18 +28,24 @@ export function SelectorBody() {
   const skeletons = useMemo(() => {
     if (!fetching) return null;
     const arr: React.ReactNode[] = [];
-    for (let i = 0; i < 3; ++i) {
-      arr.push(<ListItemSkeleton key={i} />);
-    }
+    for (let i = 0; i < 3; ++i)
+      arr.push(
+        <li key={i}>
+          <ListItemSkeleton />
+        </li>,
+      );
     return arr;
   }, [fetching]);
 
   return (
-    <Flexbox asChild orient={"vertical"} gap={"sm"}>
+    <Flexbox
+      asChild
+      orient={"vertical"}
+      gap={"sm"}
+      className={css.slideInFromRight}
+    >
       <ul>
-        {items.map((data) => (
-          <Item key={data.href} {...data} />
-        ))}
+        {!fetching && items.map((data) => <Item key={data.href} {...data} />)}
         {skeletons}
       </ul>
     </Flexbox>

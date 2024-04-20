@@ -19,7 +19,7 @@ export async function ContentBody({ teamId, bookId }: ContentBodyProps) {
 }
 
 async function ItemList(props: ContentBodyProps) {
-  const { data, error } = await getMyBlueprints(props);
+  const { data } = await getMyBlueprints(props);
 
   return data?.map(({ id, name, book, arena, visibility, tags }) => (
     <li key={id}>

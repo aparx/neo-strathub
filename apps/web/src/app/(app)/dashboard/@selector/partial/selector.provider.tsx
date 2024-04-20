@@ -31,7 +31,6 @@ export function SelectorDataProvider({
   children: React.ReactNode;
 }) {
   const params = useParams<Partial<DashboardParams>>();
-  console.log(params);
 
   return params.teamId ? (
     <BooksProvider teamId={params.teamId}>{children}</BooksProvider>
@@ -104,13 +103,14 @@ function BooksProvider({
 function useGetTeams(userId: string) {
   const { isFetching, data } = useQuery({
     queryKey: ["teams", userId],
-    queryFn: async () =>
-      (
+    queryFn: async () => {
+      return (
         await createClient()
           .from("team_member")
           .select("team(id, name), role")
           .eq("user_id", userId)
-      )?.data,
+      )?.data;
+    },
     refetchOnWindowFocus: false,
   });
   return [isFetching, data] as const;
@@ -119,13 +119,14 @@ function useGetTeams(userId: string) {
 function useGetBooks(teamId: string) {
   const { isFetching, data } = useQuery({
     queryKey: ["books", teamId],
-    queryFn: async () =>
-      (
+    queryFn: async () => {
+      return (
         await createClient()
           .from("book")
           .select("id, name")
           .eq("team_id", teamId)
-      )?.data,
+      )?.data;
+    },
     refetchOnWindowFocus: false,
   });
   return [isFetching, data] as const;

@@ -23,7 +23,8 @@ export async function DashContent(props: ExtendedContentPathProps) {
 
 async function Title(props: ExtendedContentPathProps) {
   if (props.bookId) {
-    const book = await getBook(props.bookId);
+    const { data: book } = await getBook(props.bookId);
+    if (!book) throw new Error("Book could not be found");
     return <Navigation icon={<MdGames />} title={book.name} />;
   } else if (props.teamId) {
     return <Navigation icon={<MdPeople />} title={"Team's Blueprints"} />;
