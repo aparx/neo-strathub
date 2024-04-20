@@ -1,13 +1,7 @@
 import { keyframes, style } from "@vanilla-extract/css";
 
-export const slideInFromRight = style({
+export const slideIn = style({
   animation: `${keyframes({
-    from: { opacity: 0, transform: "translateX(5%)" },
-  })} .75s forwards`,
-});
-
-export const slideInFromLeft = style({
-  animation: `${keyframes({
-    from: { opacity: 0, transform: "translateX(-5%)" },
-  })} .75s forwards`,
+    from: { opacity: 0, transform: "translateX(-2%)" },
+  })} .5s forwards`,
 });

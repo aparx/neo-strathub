@@ -1,6 +1,6 @@
 import { vars } from "@repo/theme";
 import { createLineHeight } from "@repo/ui/utils";
-import { style } from "@vanilla-extract/css";
+import { keyframes, style } from "@vanilla-extract/css";
 import { calc } from "@vanilla-extract/css-utils";
 
 export const LAYOUT_HEADER_HEIGHT = calc.add(
@@ -17,4 +17,10 @@ export const header = style({
   flexBasis: LAYOUT_HEADER_HEIGHT,
   flexShrink: 0,
   flexGrow: 0,
+});
+
+export const teamButtonAnimation = style({
+  animation: `${keyframes({
+    from: { opacity: 0, transform: "translateY(10%)" },
+  })} .33s`,
 });

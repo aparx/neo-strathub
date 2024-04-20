@@ -1,6 +1,5 @@
 export interface DashboardParams {
   teamId: string;
-  bookId: string;
 }
 
 export const DASHBOARD_QUERY_PARAMS = {

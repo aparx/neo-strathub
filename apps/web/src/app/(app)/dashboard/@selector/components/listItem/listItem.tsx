@@ -39,6 +39,8 @@ export function ListItem({
   onClick,
   popover,
   onRedirect,
+  onMouseUp,
+  onMouseDown,
   ...restProps
 }: ListItemProps) {
   // This component contains three interactive elements:

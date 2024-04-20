@@ -38,12 +38,7 @@ export function SelectorBody() {
   }, [fetching]);
 
   return (
-    <Flexbox
-      asChild
-      orient={"vertical"}
-      gap={"sm"}
-      className={css.slideInFromRight}
-    >
+    <Flexbox asChild orient={"vertical"} gap={"sm"} className={css.slideIn}>
       <ul>
         {!fetching && items.map((data) => <Item key={data.href} {...data} />)}
         {skeletons}

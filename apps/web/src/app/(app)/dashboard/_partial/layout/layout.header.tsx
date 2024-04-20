@@ -73,6 +73,7 @@ function TeamButton({ teamId }: { teamId: string }) {
     <Popover.Root onOpenChange={setState}>
       <Popover.Trigger asChild>
         <IconButton
+          className={css.teamButtonAnimation}
           style={{
             color: vars.colors.emphasis.high,
             fontWeight: "inherit",
