@@ -1,13 +1,6 @@
 import { DashColumn } from "@/app/(app)/dashboard/_components";
-import { DashboardParams } from "@/app/(app)/dashboard/_utils";
 
-export default function DetailsDefault({
-  params,
-  searchParams,
-}: {
-  params: Pick<DashboardParams, "teamId">;
-  searchParams: { [key: string]: string };
-}) {
+export default function DetailsDefault() {
   return (
     <DashColumn.Root>
       <DashColumn.Content />

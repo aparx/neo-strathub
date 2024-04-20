@@ -1,6 +1,6 @@
 import { vars } from "@repo/theme";
 import { style } from "@vanilla-extract/css";
-import { LAYOUT_HEADER_HEIGHT } from "./_partial/layout.header.css";
+import { LAYOUT_HEADER_HEIGHT } from "./_partial/layout/layout.header.css";
 
 /** The gap between different layout elements (headers, content, footer, etc.) */
 export const DASHBOARD_GRID_GAP = "1px";

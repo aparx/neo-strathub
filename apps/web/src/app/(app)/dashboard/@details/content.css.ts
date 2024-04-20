@@ -5,7 +5,6 @@ export const content = style({
   display: "flex",
   flexDirection: "column",
   gap: vars.spacing.md,
-  height: "100%",
 });
 
 export const previewFadeIn = style({

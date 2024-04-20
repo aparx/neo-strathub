@@ -11,6 +11,7 @@ export default async function DetailsPage({
   params: Pick<DashboardParams, "teamId">;
   searchParams: { [key: string]: string };
 }) {
+  console.log("details page", params);
   return (
     <DetailsContent
       teamId={params.teamId}

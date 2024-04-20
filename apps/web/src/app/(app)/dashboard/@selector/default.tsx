@@ -1,14 +1,14 @@
+import { DashColumn } from "@/app/(app)/dashboard/_components";
 import { getUser } from "@/modules/auth/actions";
 import { cookies } from "next/headers";
-import { DashColumn } from "../_components";
 import {
   SelectorBody,
   SelectorDataProvider,
   SelectorFooter,
   SelectorHeader,
-} from "./_partial";
+} from "./partial";
 
-export default async function Selector() {
+export default async function SelectorDefault() {
   const user = await getUser(cookies());
   if (!user) throw new Error("Unauthorized");
 

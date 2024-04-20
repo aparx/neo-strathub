@@ -1,6 +1,6 @@
 "use client";
-import { ListItemData } from "@/app/(app)/dashboard/@selector/_components";
-import { ItemContextProvider } from "@/app/(app)/dashboard/@selector/_context";
+import { ListItemData } from "@/app/(app)/dashboard/@selector/components";
+import { ItemContextProvider } from "@/app/(app)/dashboard/@selector/context";
 import {
   DASHBOARD_QUERY_PARAMS,
   DashboardParams,
@@ -31,6 +31,7 @@ export function SelectorDataProvider({
   children: React.ReactNode;
 }) {
   const params = useParams<Partial<DashboardParams>>();
+  console.log(params);
 
   return params.teamId ? (
     <BooksProvider teamId={params.teamId}>{children}</BooksProvider>

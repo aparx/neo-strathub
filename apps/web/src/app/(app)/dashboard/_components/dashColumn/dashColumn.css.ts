@@ -44,7 +44,6 @@ export const content = style([
   {
     overflowY: "auto",
     flexGrow: 1,
-    height: 1,
     scrollbarWidth: "none",
     "::-webkit-scrollbar": {
       width: 0,

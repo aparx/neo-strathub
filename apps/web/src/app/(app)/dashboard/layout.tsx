@@ -12,9 +12,9 @@ export default async function DashboardLayout({
   details,
 }: {
   children: React.ReactNode;
+  selector: React.ReactNode;
   content: React.ReactNode;
   details: React.ReactNode;
-  selector: React.ReactNode;
 }) {
   // Ensure user is fetched at root to ensure authorization
   await getUser(cookies());

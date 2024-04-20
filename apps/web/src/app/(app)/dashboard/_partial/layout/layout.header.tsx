@@ -35,7 +35,6 @@ function Navigation() {
     array.push({
       href: "/dashboard",
       display: "Dashboard",
-      forceRefetch: true,
     });
     if (teamId)
       // TODO replace `display: teamId` with a custom component (+ dropdown)

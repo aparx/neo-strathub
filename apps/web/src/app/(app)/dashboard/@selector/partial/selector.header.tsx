@@ -1,6 +1,6 @@
 "use client";
 import { Button, Flexbox, Icon, TextField } from "@repo/ui/components";
-import { useItemContext } from "../_context";
+import { useItemContext } from "../context";
 
 export function SelectorHeader() {
   const { filter } = useItemContext();

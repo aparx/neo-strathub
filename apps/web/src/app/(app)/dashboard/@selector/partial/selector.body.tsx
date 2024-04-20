@@ -3,9 +3,9 @@ import { isPartOfURL } from "@/utils/generic";
 import { useURL } from "@/utils/hooks";
 import { Flexbox, Skeleton } from "@repo/ui/components";
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
-import { ListItem, ListItemData } from "../_components";
-import { useItemContext } from "../_context";
+import { useEffect, useMemo } from "react";
+import { ListItem, ListItemData } from "../components";
+import { useItemContext } from "../context";
 
 export function SelectorBody() {
   const { items, active, fetching } = useItemContext();
@@ -24,13 +24,22 @@ export function SelectorBody() {
     if (anyActive) active.update(anyActive.href);
   }, [pathname]);
 
+  const skeletons = useMemo(() => {
+    if (!fetching) return null;
+    const arr: React.ReactNode[] = [];
+    for (let i = 0; i < 3; ++i) {
+      arr.push(<ListItemSkeleton key={i} />);
+    }
+    return arr;
+  }, [fetching]);
+
   return (
     <Flexbox asChild orient={"vertical"} gap={"sm"}>
       <ul>
         {items.map((data) => (
           <Item key={data.href} {...data} />
         ))}
-        {fetching && new Array(3).fill(<ListItemSkeleton />)}
+        {skeletons}
       </ul>
     </Flexbox>
   );

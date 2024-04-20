@@ -1,8 +1,7 @@
 "use client";
-
 import { SharedState, useSharedState } from "@repo/utils/hooks";
 import { createContext, useContext, useMemo } from "react";
-import type { ListItemData } from "../_components/listItem";
+import type { ListItemData } from "../components/listItem";
 
 export interface ItemContext {
   items: ReadonlyArray<Readonly<ListItemData>>;
