@@ -24,6 +24,7 @@ export function ContentBody(filters: ContentBodyProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Scroll reset is important for performance & UX purposes
     containerRef.current?.scrollTo({ top: 0 });
   }, [filters.bookId, filters.teamId]);
 
@@ -32,7 +33,14 @@ export function ContentBody(filters: ContentBodyProps) {
       <ul className={css.list} aria-label={"blueprints"}>
         <ItemList items={items ?? []} onLastEntersViewport={fetchNextPage} />
         {isLoading && <SkeletonList />}
-        {isFetchingNextPage && <Spinner style={{ margin: "0 auto" }} />}
+        {isFetchingNextPage && (
+          <Spinner
+            role={"status"}
+            aria-live={"assertive"}
+            aria-label={"Loading..."}
+            style={{ margin: "0 auto" }}
+          />
+        )}
       </ul>
     </DashColumn.Content>
   );

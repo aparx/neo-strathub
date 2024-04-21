@@ -1,9 +1,10 @@
 import { vars } from "@repo/theme";
+import * as React from "react";
 import { CSSProperties } from "react";
 import { PiSpinnerBold } from "react-icons/pi";
 import * as css from "./spinner.css";
 
-export interface SpinnerProps {
+export interface SpinnerProps extends React.SVGAttributes<SVGElement> {
   /** @default "1em" */
   size?: string | number;
   /** @default vars.colors.foreground */
