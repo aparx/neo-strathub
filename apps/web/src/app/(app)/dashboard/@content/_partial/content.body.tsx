@@ -54,6 +54,7 @@ function useFetchBlueprints(queryInput: ContentBodyProps) {
       queryFn: ({ pageParam }) =>
         getMyBlueprints({ ...queryInput, cursorId: pageParam }),
       getNextPageParam: (lastPage) => lastPage.nextCursor,
+      refetchOnWindowFocus: false,
     });
 
   const items = useMemo(

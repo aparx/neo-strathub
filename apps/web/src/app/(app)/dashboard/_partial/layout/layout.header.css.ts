@@ -19,8 +19,17 @@ export const header = style({
   flexGrow: 0,
 });
 
-export const teamButtonAnimation = style({
+export const teamButtonShell = style({
+  willChange: "opacity, transform",
   animation: `${keyframes({
     from: { opacity: 0, transform: "translateY(75%)" },
   })} .2s`,
+});
+
+export const teamButtonIcon = style({
+  transition: ".15s",
+  willChange: "opacity, transform, rotate",
+  animation: `${keyframes({
+    from: { opacity: 0, transform: "translateY(50%)" },
+  })} .33s`,
 });

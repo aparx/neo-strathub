@@ -73,7 +73,7 @@ function TeamButton({ teamId }: { teamId: string }) {
     <Popover.Root onOpenChange={setState}>
       <Popover.Trigger asChild>
         <IconButton
-          className={css.teamButtonAnimation}
+          className={css.teamButtonShell}
           style={{
             color: vars.colors.emphasis.high,
             fontWeight: "inherit",
@@ -82,10 +82,8 @@ function TeamButton({ teamId }: { teamId: string }) {
           {name}
           <Icon.Custom
             icon={<MdExpandMore />}
-            style={{
-              transition: "150ms",
-              rotate: state ? "-180deg" : "unset",
-            }}
+            className={css.teamButtonIcon}
+            style={{ rotate: state ? "-180deg" : "unset" }}
           />
         </IconButton>
       </Popover.Trigger>
