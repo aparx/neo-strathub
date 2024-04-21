@@ -21,14 +21,14 @@ export function ContentBody(filters: ContentBodyProps) {
   const { items, isLoading, fetchNextPage, isFetchingNextPage } =
     useFetchBlueprints(filters);
 
-  const contentRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    contentRef.current?.scrollTo({ top: 0 });
+    containerRef.current?.scrollTo({ top: 0 });
   }, [filters.bookId, filters.teamId]);
 
   return (
-    <DashColumn.Content ref={contentRef} style={{ height: 1 }}>
+    <DashColumn.Content ref={containerRef} style={{ height: 1 }}>
       <ul className={css.list} aria-label={"blueprints"}>
         <ItemList items={items ?? []} onLastEntersViewport={fetchNextPage} />
         {isLoading && <SkeletonList />}
