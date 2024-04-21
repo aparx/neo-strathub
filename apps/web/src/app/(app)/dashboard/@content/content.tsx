@@ -14,9 +14,8 @@ export async function DashContent(props: ExtendedContentPathProps) {
         <Title {...props} />
         <ContentHeader />
       </DashColumn.Header>
-      <DashColumn.Content style={{ height: 1 }}>
-        <ContentBody bookId={props.bookId} teamId={props.teamId} />
-      </DashColumn.Content>
+      {/* Deferred DashColumn.Content to `ContentBody` */}
+      <ContentBody bookId={props.bookId} teamId={props.teamId} />
     </DashColumn.Root>
   );
 }

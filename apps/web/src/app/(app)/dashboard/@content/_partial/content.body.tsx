@@ -3,6 +3,7 @@ import {
   BlueprintCard,
   BlueprintCardProps,
 } from "@/app/(app)/dashboard/@content/_components";
+import { DashColumn } from "@/app/(app)/dashboard/_components";
 import {
   GetMyBlueprintsFilters,
   getMyBlueprints,
@@ -20,21 +21,21 @@ export function ContentBody(filters: ContentBodyProps) {
   const { items, isLoading, fetchNextPage, isFetchingNextPage } =
     useFetchBlueprints(filters);
 
-  return (
-    <ul className={css.list} aria-label={"documents"}>
-      <ItemList items={items ?? []} onLastEntersViewport={fetchNextPage} />
-      {isLoading && <SkeletonList />}
-      {isFetchingNextPage && <Spinner style={{ margin: "0 auto" }} />}
-    </ul>
-  );
-}
+  const contentRef = useRef<HTMLDivElement>(null);
 
-function SkeletonList() {
-  return Array.from({ length: 10 }, (_, index) => (
-    <li key={index}>
-      <Skeleton height={112} />
-    </li>
-  ));
+  useEffect(() => {
+    contentRef.current?.scrollTo({ top: 0 });
+  }, [filters.bookId, filters.teamId]);
+
+  return (
+    <DashColumn.Content ref={contentRef} style={{ height: 1 }}>
+      <ul className={css.list} aria-label={"blueprints"}>
+        <ItemList items={items ?? []} onLastEntersViewport={fetchNextPage} />
+        {isLoading && <SkeletonList />}
+        {isFetchingNextPage && <Spinner style={{ margin: "0 auto" }} />}
+      </ul>
+    </DashColumn.Content>
+  );
 }
 
 function useFetchBlueprints(queryInput: ContentBodyProps) {
@@ -59,6 +60,14 @@ function useFetchBlueprints(queryInput: ContentBodyProps) {
     fetchNextPage,
     isFetchingNextPage,
   } as const;
+}
+
+function SkeletonList() {
+  return Array.from({ length: 10 }, (_, index) => (
+    <li key={index}>
+      <Skeleton height={112} />
+    </li>
+  ));
 }
 
 function ItemList({
