@@ -2,7 +2,7 @@
 import { isIntersectingURL } from "@/utils/generic";
 import { useURL } from "@/utils/hooks";
 import { Flexbox, Skeleton } from "@repo/ui/components";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { ListItem, ListItemData } from "../components";
 import { useItemContext } from "../context";
@@ -47,17 +47,21 @@ function Item({ href, ...restData }: ListItemData) {
   const { active } = useItemContext();
   const currentUrl = useURL();
   const isActive = active.state === href;
-  let isLoading = false;
-  if (isActive) {
-    const expect = new URL(href, currentUrl.origin);
-    isLoading = !isIntersectingURL(expect, currentUrl);
-  }
+  const finalUrl = new URL(href, currentUrl.origin);
+
+  // Apply all the additional currently unset searchParams
+  useSearchParams().forEach((val, key) => {
+    if (!finalUrl.searchParams.has(key)) {
+      finalUrl.searchParams.set(key, val);
+    }
+  });
+
   return (
     <li key={href}>
       <ListItem
-        href={href}
+        href={`${finalUrl.pathname}?${finalUrl.searchParams}`}
         active={isActive}
-        loading={isLoading}
+        loading={isActive && !isIntersectingURL(finalUrl, currentUrl)}
         onRedirect={() => active.update(href)}
         {...restData}
       />

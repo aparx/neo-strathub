@@ -10,7 +10,7 @@ export interface GetMyBlueprintsFilters {
   visibility?: Enums<"bp_visibility">;
   filterByName?: string;
   filterByGame?: string;
-  filterByMap?: string[];
+  filterByArena?: string[];
   /** Pagination cursor (exclusive) */
   cursorId?: string;
 }
@@ -35,7 +35,7 @@ export async function getMyBlueprints(filters: GetMyBlueprintsFilters) {
   if (filters.visibility) query.eq("visibility", filters.visibility);
   if (filters.teamId) query.eq("book.team_id", filters.teamId);
   if (filters.bookId) query.eq("book_id", filters.bookId);
-  if (filters.filterByMap) query.in("arena.id", filters.filterByMap);
+  if (filters.filterByArena) query.in("arena.id", filters.filterByArena);
   if (filters.filterByGame) query.eq("game_id", filters.filterByGame);
   // TODO FTS using `filters.filterByName`
 

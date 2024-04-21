@@ -74,7 +74,7 @@ function useFetchBlueprints(queryInput: ContentBodyProps) {
 function SkeletonList() {
   return Array.from({ length: 10 }, (_, index) => (
     <li key={index}>
-      <Skeleton height={112} />
+      <Skeleton height={112} outline roundness={"md"} />
     </li>
   ));
 }

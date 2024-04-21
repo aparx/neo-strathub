@@ -1,5 +1,6 @@
+import { CONTENT_SEARCH_PARAMS } from "@/app/(app)/dashboard/@content/content.utils";
 import { DashColumn } from "@/app/(app)/dashboard/_components";
-import { ExtendedContentPathProps } from "@/app/(app)/dashboard/_utils";
+import { BaseContentPathProps } from "@/app/(app)/dashboard/_utils";
 import { getBook } from "@/modules/book/actions";
 import { Flexbox, Icon, Text } from "@repo/ui/components";
 import { IoMdGlobe } from "react-icons/io";
@@ -7,25 +8,41 @@ import { MdGames, MdPeople } from "react-icons/md";
 import { ContentBody, ContentHeader } from "./_partial";
 import * as css from "./content.css";
 
-export async function DashContent(props: ExtendedContentPathProps) {
+interface DashContentProps extends BaseContentPathProps {
+  searchParams?: Partial<Record<string, string>>;
+}
+
+export async function DashContent({
+  teamId,
+  bookId,
+  searchParams,
+}: DashContentProps) {
+  const arenaFilter = searchParams?.[CONTENT_SEARCH_PARAMS.filterByArena];
+  const filterByArena = arenaFilter?.split(",");
+
   return (
     <DashColumn.Root>
       <DashColumn.Header>
-        <Title {...props} />
+        <Title teamId={teamId} bookId={bookId} />
         <ContentHeader />
       </DashColumn.Header>
       {/* Deferred DashColumn.Content to `ContentBody` */}
-      <ContentBody bookId={props.bookId} teamId={props.teamId} />
+      <ContentBody
+        bookId={bookId}
+        teamId={teamId}
+        filterByName={searchParams?.[CONTENT_SEARCH_PARAMS.filterByName]}
+        filterByArena={filterByArena}
+      />
     </DashColumn.Root>
   );
 }
 
-async function Title(props: ExtendedContentPathProps) {
-  if (props.bookId) {
-    const { data: book } = await getBook(props.bookId);
+async function Title({ bookId, teamId }: { teamId?: string; bookId?: string }) {
+  if (bookId) {
+    const { data: book } = await getBook(bookId);
     if (!book) throw new Error("Book could not be found");
     return <Navigation icon={<MdGames />} title={book.name} />;
-  } else if (props.teamId) {
+  } else if (teamId) {
     return <Navigation icon={<MdPeople />} title={"Team's Blueprints"} />;
   } else {
     return <Navigation icon={<IoMdGlobe />} title={"Global Blueprints"} />;
@@ -34,10 +51,10 @@ async function Title(props: ExtendedContentPathProps) {
 
 function Navigation({ icon, title }: { icon: React.ReactNode; title: string }) {
   return (
-    <Flexbox asChild gap={"md"} align={"center"}>
+    <Flexbox asChild gap={"md"} align={"center"} style={{ overflow: "hidden" }}>
       <Text type={"label"} size={"lg"}>
         <Icon.Custom className={css.headerIcon} icon={icon} />
-        {title}
+        <span>{title}</span>
       </Text>
     </Flexbox>
   );

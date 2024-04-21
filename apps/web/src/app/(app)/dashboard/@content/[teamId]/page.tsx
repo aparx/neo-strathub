@@ -9,13 +9,14 @@ export default function Content({
   searchParams,
 }: {
   params: Pick<DashboardParams, "teamId">;
-  searchParams: Record<string, string>;
+  searchParams: Partial<Record<string, string>>;
 }) {
   return (
     <DashContent
       teamId={params.teamId}
       bookId={searchParams[DASHBOARD_QUERY_PARAMS.book]}
       documentId={searchParams[DASHBOARD_QUERY_PARAMS.document]}
+      searchParams={searchParams}
     />
   );
 }

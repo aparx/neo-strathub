@@ -9,9 +9,8 @@ export default async function DetailsPage({
   searchParams,
 }: {
   params: Pick<DashboardParams, "teamId">;
-  searchParams: { [key: string]: string };
+  searchParams: Partial<Record<string, string>>;
 }) {
-  console.log("details page", params);
   return (
     <DetailsContent
       teamId={params.teamId}

@@ -30,6 +30,6 @@ export const teamButtonIcon = style({
   transition: ".15s",
   willChange: "opacity, transform, rotate",
   animation: `${keyframes({
-    from: { opacity: 0, transform: "translateY(50%)" },
+    from: { opacity: 0, transform: "translateY(-50%)" },
   })} .33s`,
 });

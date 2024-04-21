@@ -1,5 +1,5 @@
 "use client";
-import { DASHBOARD_QUERY_PARAMS } from "@/app/(app)/dashboard/_utils";
+import { CONTENT_SEARCH_PARAMS } from "@/app/(app)/dashboard/@content/content.utils";
 import { Button, Flexbox, Icon, TextField } from "@repo/ui/components";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
@@ -11,8 +11,8 @@ export function ContentHeader() {
 
   const updateFilter = useDebouncedCallback((filter: string) => {
     const newQuery = new URLSearchParams(query);
-    if (!filter.length) newQuery.delete(DASHBOARD_QUERY_PARAMS.query);
-    else newQuery.set(DASHBOARD_QUERY_PARAMS.query, filter);
+    if (!filter.length) newQuery.delete(CONTENT_SEARCH_PARAMS.filterByName);
+    else newQuery.set(CONTENT_SEARCH_PARAMS.filterByName, filter);
     router.replace(`${pathname}?${newQuery.toString()}`, { scroll: false });
   }, 500);
 
@@ -22,7 +22,9 @@ export function ContentHeader() {
         <TextField
           leading={<Icon.Mapped type={"search"} color={"red"} />}
           placeholder={"Search"}
-          defaultValue={query.get(DASHBOARD_QUERY_PARAMS.query) || undefined}
+          defaultValue={
+            query.get(CONTENT_SEARCH_PARAMS.filterByName) || undefined
+          }
           onInput={(e) => updateFilter(e.currentTarget.value)}
           style={{ flexGrow: 1 }}
         />
