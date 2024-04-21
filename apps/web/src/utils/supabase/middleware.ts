@@ -1,4 +1,4 @@
-import type { createServer } from "@/utils/supabase/server";
+import type { createAnonServer } from "@/utils/supabase/server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { User } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
@@ -7,7 +7,7 @@ export async function updateSession(
   request: NextRequest,
   callback: (
     response: NextResponse,
-    supabase: ReturnType<typeof createServer>,
+    supabase: ReturnType<typeof createAnonServer>,
     user: User | null,
   ) => NextResponse,
 ) {

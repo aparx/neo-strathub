@@ -1,6 +1,6 @@
-INSERT INTO game (name, alias)
-VALUES ('Primary Game', 'PG'),
-       ('Secondary Game', 'SG');
+INSERT INTO game (name, alias, icon)
+VALUES ('Primary Game', 'PG', 'https://svgur.com/i/15ay.svg'),
+       ('Secondary Game', 'SG', 'https://svgur.com/i/15ay.svg');
 
 -- Insert sample plans
 INSERT INTO public.plan (name, pricing, pricing_interval, is_default)

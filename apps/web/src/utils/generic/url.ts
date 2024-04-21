@@ -11,7 +11,7 @@ export function getURL() {
   return url;
 }
 
-export function isPartOfURL(needle: URL, haystack: URL): boolean {
+export function isIntersectingURL(needle: URL, haystack: URL): boolean {
   if (needle.href === haystack.href) return true;
   // 1. Compare simple fields
   if (needle.username !== haystack.username) return false;

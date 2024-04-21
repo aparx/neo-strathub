@@ -13,8 +13,7 @@ CREATE TABLE IF NOT EXISTS public.game
     name       varchar(64) NOT NULL UNIQUE
         CONSTRAINT min_name_length CHECK (length(name) >= 2),
     alias      varchar(32),
-    -- Image icon to this game (saves from returning the entire metadata)
-    icon       varchar     NOT NULL DEFAULT '',
+    icon       varchar     NOT NULL,
     metadata   json        NOT NULL DEFAULT '{}',
     created_at timestamptz NOT NULL DEFAULT now()
 );

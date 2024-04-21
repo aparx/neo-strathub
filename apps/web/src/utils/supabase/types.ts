@@ -165,18 +165,24 @@ export type Database = {
       game: {
         Row: {
           alias: string | null
+          created_at: string
+          icon: string
           id: number
           metadata: Json
           name: string
         }
         Insert: {
           alias?: string | null
+          created_at?: string
+          icon: string
           id?: number
           metadata?: Json
           name: string
         }
         Update: {
           alias?: string | null
+          created_at?: string
+          icon?: string
           id?: number
           metadata?: Json
           name?: string

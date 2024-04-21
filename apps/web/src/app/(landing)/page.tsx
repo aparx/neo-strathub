@@ -1,10 +1,10 @@
 import { AuthButton } from "@/modules/auth/components";
-import { createServer } from "@/utils/supabase/server";
+import { createAnonServer } from "@/utils/supabase/server";
 import { Flexbox, Text } from "@repo/ui/components";
 import { cookies } from "next/headers";
 
 export default async function Page() {
-  const supabase = createServer(cookies());
+  const supabase = createAnonServer(cookies());
 
   return (
     <div>
