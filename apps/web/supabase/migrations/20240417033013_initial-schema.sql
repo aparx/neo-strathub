@@ -9,11 +9,14 @@ create type public.pay_interval as enum ('monthly', 'yearly');
 
 CREATE TABLE IF NOT EXISTS public.game
 (
-    id       smallserial PRIMARY KEY,
-    name     varchar(64) NOT NULL UNIQUE
+    id         smallserial PRIMARY KEY,
+    name       varchar(64) NOT NULL UNIQUE
         CONSTRAINT min_name_length CHECK (length(name) >= 2),
-    alias    varchar(32),
-    metadata json        NOT NULL DEFAULT '{}'
+    alias      varchar(32),
+    -- Image icon to this game (saves from returning the entire metadata)
+    icon       varchar     NOT NULL DEFAULT '',
+    metadata   json        NOT NULL DEFAULT '{}',
+    created_at timestamptz NOT NULL DEFAULT now()
 );
 
 ALTER TABLE public.game

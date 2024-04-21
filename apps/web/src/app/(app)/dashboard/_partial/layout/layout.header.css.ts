@@ -21,6 +21,6 @@ export const header = style({
 
 export const teamButtonAnimation = style({
   animation: `${keyframes({
-    from: { opacity: 0, transform: "translateY(10%)" },
-  })} .33s`,
+    from: { opacity: 0, transform: "translateY(75%)" },
+  })} .2s`,
 });

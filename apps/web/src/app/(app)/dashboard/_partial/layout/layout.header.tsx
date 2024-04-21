@@ -46,7 +46,7 @@ function Navigation() {
   }, [teamId]);
 
   return (
-    <nav>
+    <nav style={{ overflow: "hidden" }}>
       <Breadcrumbs breadcrumbs={breadcrumbs} />
     </nav>
   );

@@ -12,5 +12,5 @@ export const container = style({
       opacity: 0,
       transform: "translateX(2%)",
     },
-  })} 1s`,
+  })} .33s`,
 });
