@@ -1,3 +1,4 @@
+"use server";
 import { createAnonServer } from "@/utils/supabase/server";
 import { Enums } from "@/utils/supabase/types";
 import { Nullish } from "@repo/utils";
@@ -23,14 +24,26 @@ export async function getMyBlueprints(filters: GetMyBlueprintsFilters) {
     .select(`
        *, 
        book!inner(id, name, team_id, team(id, name)), 
-       arena(id, name, game!inner(id, name))
+       arena!inner(id, name, game!inner(id, name))
     `)
     .order("id")
     .order("updated_at", { ascending: false })
     .limit(BLUEPRINTS_PAGE_LIMIT);
+  if (filters.cursorId) query.gt("id", filters.cursorId);
+
+  // TODO test performance & add indexes to the SQL table
   if (filters.visibility) query.eq("visibility", filters.visibility);
   if (filters.teamId) query.eq("book.team_id", filters.teamId);
   if (filters.bookId) query.eq("book_id", filters.bookId);
-  if (filters.cursorId) query.gt("id", filters.cursorId);
-  return query;
+  if (filters.filterByMap) query.in("arena.id", filters.filterByMap);
+  if (filters.filterByGame) query.eq("game_id", filters.filterByGame);
+  // TODO FTS using `filters.filterByName`
+
+  const { data, error } = await query;
+
+  return {
+    data,
+    error,
+    nextCursor: data?.at(-1)?.id,
+  };
 }
