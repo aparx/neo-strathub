@@ -32,7 +32,7 @@ export const vars = createGlobalTheme<Theme>(":root", {
     destructive: {
       base: "rgba(224, 76, 85, 1)",
       darker: "rgba(122, 51, 55, 1)",
-      lighter: "rgba(0, 0, 0, 0)",
+      lighter: "rgba(237, 104, 112, 1)",
       darkest: "rgba(45, 15, 17, 1)",
     },
     emphasis: {

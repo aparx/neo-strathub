@@ -9,11 +9,13 @@ export default async function DashboardLayout({
   children,
   content,
   selector,
+  modal,
   details,
 }: {
   children: React.ReactNode;
   selector: React.ReactNode;
   content: React.ReactNode;
+  modal: React.ReactNode;
   details: React.ReactNode;
 }) {
   // Ensure user is fetched at root to ensure authorization
@@ -30,8 +32,9 @@ export default async function DashboardLayout({
             {details}
           </main>
         </Suspense>
+        {modal}
+        {children}
       </div>
-      {children}
     </>
   );
 }

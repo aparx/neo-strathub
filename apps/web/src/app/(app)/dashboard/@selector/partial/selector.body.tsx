@@ -1,5 +1,5 @@
 "use client";
-import { isIntersectingURL } from "@/utils/generic";
+import { isIncludingURL } from "@/utils/generic";
 import { useURL } from "@/utils/hooks";
 import { Flexbox, Skeleton } from "@repo/ui/components";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -13,7 +13,7 @@ export function SelectorBody() {
   const absoluteURL = useURL();
   useEffect(() => {
     const anyActive = items.find(({ href }) =>
-      isIntersectingURL(new URL(href, absoluteURL.origin), absoluteURL),
+      isIncludingURL(new URL(href, absoluteURL.origin), absoluteURL),
     );
     if (anyActive) active.update(anyActive.href);
   }, [items, absoluteURL]);
@@ -61,7 +61,7 @@ function Item({ href, ...restData }: ListItemData) {
       <ListItem
         href={`${finalUrl.pathname}?${finalUrl.searchParams}`}
         active={isActive}
-        loading={isActive && !isIntersectingURL(finalUrl, currentUrl)}
+        loading={isActive && !isIncludingURL(finalUrl, currentUrl)}
         onRedirect={() => active.update(href)}
         {...restData}
       />

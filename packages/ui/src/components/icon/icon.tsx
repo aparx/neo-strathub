@@ -4,6 +4,7 @@ import { IoMdEye } from "react-icons/io";
 import {
   MdAdd,
   MdArrowBack,
+  MdClose,
   MdDelete,
   MdEdit,
   MdMoreVert,
@@ -37,6 +38,7 @@ export function Custom({ icon, size = "md", alt, ...restProps }: IconProps) {
 
 const iconMap = {
   add: <MdAdd />,
+  close: <MdClose />,
   settings: <MdSettings />,
   rename: <MdOutlineDriveFileRenameOutline />,
   details: <MdMoreVert />,
