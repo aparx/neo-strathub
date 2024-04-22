@@ -4,6 +4,7 @@ import { IoMdEye } from "react-icons/io";
 import {
   MdAdd,
   MdArrowBack,
+  MdArrowUpward,
   MdClose,
   MdDelete,
   MdEdit,
@@ -51,6 +52,7 @@ const iconMap = {
   search: <MdSearch />,
   preview: <IoMdEye />,
   edit: <MdEdit />,
+  upgrade: <MdArrowUpward />,
 } as const satisfies Record<string, React.ReactNode>;
 
 export function Mapped({

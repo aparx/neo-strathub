@@ -2,6 +2,9 @@ import { sprinkles, vars } from "@repo/theme";
 import { keyframes, style } from "@vanilla-extract/css";
 import { calc } from "@vanilla-extract/css-utils";
 
+const margin = vars.spacing.md;
+const animationTimingFunction = "cubic-bezier(0.16, 1, 0.3, 1)";
+
 export const content = style([
   sprinkles({
     outline: "card",
@@ -16,15 +19,13 @@ export const content = style([
     flexDirection: "column",
     gap: vars.spacing.lg,
     padding: vars.spacing.lg,
-    margin: vars.spacing.md,
-    minWidth: `min(${calc.subtract("100dvw", calc.multiply(2, vars.spacing.md))}, 400px)`,
+    margin,
+    minWidth: `min(${calc.subtract("100dvw", calc.multiply(2, margin))}, 450px)`,
     background: vars.colors.accents[1],
     animation: `${keyframes({
-      from: {
-        opacity: 0,
-        transform: "translate(-50%, -48%) scale(0.96)",
-      },
-    })} 150ms cubic-bezier(0.16, 1, 0.3, 1)`,
+      from: { opacity: 0, transform: "translate(-50%, -48%) scale(0.96)" },
+    })} 150ms`,
+    animationTimingFunction,
   },
 ]);
 
@@ -35,7 +36,8 @@ export const scrim = style({
   filter: "blur(10px)",
   animation: `${keyframes({
     from: { opacity: 0 },
-  })} 150ms cubic-bezier(0.16, 1, 0.3, 1)`,
+  })} 150ms`,
+  animationTimingFunction,
 });
 
 export const title = style({
