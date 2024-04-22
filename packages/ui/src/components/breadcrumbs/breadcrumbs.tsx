@@ -6,7 +6,6 @@ import * as css from "./breadcrumbs.css";
 
 export interface BreadcrumbData {
   href?: string;
-  forceRefetch?: boolean;
   display: React.ReactNode;
 }
 
@@ -23,12 +22,11 @@ export function Breadcrumbs({ breadcrumbs, ...restProps }: BreadcrumbsProps) {
         <ol>
           {useMemo(
             () =>
-              breadcrumbs.map(({ href, display, forceRefetch }, index) => {
+              breadcrumbs.map(({ href, display }, index) => {
                 // Determine what component to represent this breadcrumb
                 let child: React.ReactNode;
                 if (!href || index === breadcrumbs.length - 1)
                   child = <div>{display}</div>;
-                else if (forceRefetch) child = <a href={href}>{display}</a>;
                 else child = <Link href={href}>{display}</Link>;
 
                 return (

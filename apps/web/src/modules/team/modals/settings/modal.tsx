@@ -1,6 +1,6 @@
 import { PageModalProps } from "@/app/(app)/dashboard/@modal/modals";
 import { getTeam } from "@/modules/team/actions";
-import { Breadcrumbs, Modal } from "@repo/ui/components";
+import { TeamSettingsModalContent } from "@/modules/team/modals/settings/content";
 
 export async function TeamSettingsModal({ params }: PageModalProps) {
   const teamId = params.teamId;
@@ -9,15 +9,5 @@ export async function TeamSettingsModal({ params }: PageModalProps) {
   const { data: team } = await getTeam(teamId);
   if (!team) throw new Error("Could not load team");
 
-  return (
-    <Modal.Content>
-      <Modal.Title>
-        <Breadcrumbs
-          breadcrumbs={[{ display: team.name }, { display: "Settings" }]}
-        />
-        <Modal.Exit />
-      </Modal.Title>
-      <Modal.Separator />
-    </Modal.Content>
-  );
+  return <TeamSettingsModalContent team={team} />;
 }

@@ -1,5 +1,4 @@
-import { TeamMembersModal } from "@/modules/team/modal/members";
-import { TeamSettingsModal } from "@/modules/team/modal/settings";
+import { TeamMembersModal, TeamSettingsModal } from "@/modules/team/modals";
 import { Nullish } from "@repo/utils";
 import { FC } from "react";
 
