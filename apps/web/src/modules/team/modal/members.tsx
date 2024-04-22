@@ -2,7 +2,7 @@ import { PageModalProps } from "@/app/(app)/dashboard/@modal/modals";
 import { getTeam } from "@/modules/team/actions";
 import { Breadcrumbs, Modal } from "@repo/ui/components";
 
-export async function TeamSettingsModal({ params }: PageModalProps) {
+export async function TeamMembersModal({ params }: PageModalProps) {
   const teamId = params.teamId;
   if (teamId == null) throw new Error("Missing teamId parameter");
 
@@ -13,7 +13,7 @@ export async function TeamSettingsModal({ params }: PageModalProps) {
     <Modal.Content>
       <Modal.Title>
         <Breadcrumbs
-          breadcrumbs={[{ display: team.name }, { display: "Settings" }]}
+          breadcrumbs={[{ display: team.name }, { display: "Members" }]}
         />
         <Modal.Exit />
       </Modal.Title>
