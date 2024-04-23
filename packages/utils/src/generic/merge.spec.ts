@@ -2,13 +2,13 @@ import { describe, expect, test } from "@jest/globals";
 import { mergeClassNames } from "./merge";
 
 describe("mergeClassNames", () => {
-  test("simple strings (not null)", () => {
+  test("letters", () => {
     expect(mergeClassNames("a")).toBe("a");
     expect(mergeClassNames("a", "b")).toBe("a b");
     expect(mergeClassNames("a", "b", "c")).toBe("a b c");
   });
 
-  test("whitespaces (not null)", () => {
+  test("string and whitespaces", () => {
     expect(mergeClassNames(" ", "a")).toBe("  a");
     expect(mergeClassNames(" ", "a", "b")).toBe("  a b");
     expect(mergeClassNames("a", "", "b")).toBe("a b");

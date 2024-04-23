@@ -2,19 +2,22 @@ import { describe, expect, test } from "@jest/globals";
 import { capitalize } from "./capitalize";
 
 describe("capitalize", () => {
-  test('capitalizes "Foo Bar" to be come "Foo Bar"', () => {
+  test("sentences", () => {
     expect(capitalize("Foo Bar")).toBe("Foo Bar");
-  });
-
-  test('capitalizes "foo Bar" to be come "Foo Bar"', () => {
     expect(capitalize("foo Bar")).toBe("Foo Bar");
+    expect(capitalize("hEllo WorlD")).toBe("HEllo WorlD");
   });
 
-  test("capitalizes null to be come null", () => {
+  test("letters and whitespaces", () => {
+    expect(capitalize("a")).toBe("A");
+    expect(capitalize("b")).toBe("B");
+    expect(capitalize("")).toBe("");
+    expect(capitalize(" a")).toBe(" a");
+    expect(capitalize(" ")).toBe(" ");
+  });
+
+  test("null and undefined", () => {
     expect(capitalize(null)).toBeNull();
-  });
-
-  test("capitalizes undefined to be come undefined", () => {
     expect(capitalize(undefined)).toBeUndefined();
   });
 });
