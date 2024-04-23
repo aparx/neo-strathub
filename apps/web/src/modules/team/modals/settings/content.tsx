@@ -1,7 +1,7 @@
 import { getTeam } from "@/modules/team/actions";
 import { PlanOverview } from "@/modules/team/modals/settings/components";
 import { BreadcrumbData, Breadcrumbs, Modal } from "@repo/ui/components";
-import { InferAsync } from "@repo/utils";
+import { InferAsync, capitalize } from "@repo/utils";
 import { useMemo } from "react";
 import * as css from "./content.css";
 
@@ -24,7 +24,7 @@ export function TeamSettingsModalContent({
       </Modal.Title>
       <PlanOverview
         color={"secondary"}
-        name={"Professional Plan"}
+        name={`${capitalize(team.plan?.name) ?? "Basic"} Plan`}
         usage={35}
         canUpgrade
       />
