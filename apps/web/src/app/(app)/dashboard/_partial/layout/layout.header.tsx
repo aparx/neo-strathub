@@ -83,7 +83,9 @@ function TeamButton({ teamId }: { teamId: string }) {
           />
         </IconButton>
       </Popover.Trigger>
-      <TeamPopover style={{ minWidth: 250 }} />
+      {data != null && (
+        <TeamPopover teamId={data.id} style={{ minWidth: 250 }} />
+      )}
     </Popover.Root>
   );
 }

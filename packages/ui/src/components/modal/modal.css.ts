@@ -1,8 +1,6 @@
 import { sprinkles, vars } from "@repo/theme";
 import { keyframes, style } from "@vanilla-extract/css";
-import { calc } from "@vanilla-extract/css-utils";
 
-const margin = vars.spacing.md;
 const animationTimingFunction = "cubic-bezier(0.16, 1, 0.3, 1)";
 
 export const content = style([
@@ -20,8 +18,7 @@ export const content = style([
     flexDirection: "column",
     gap: vars.spacing.lg,
     padding: vars.spacing.lg,
-    margin,
-    minWidth: `min(${calc.subtract("100dvw", calc.multiply(2, margin))}, 450px)`,
+    margin: vars.spacing.md,
     background: vars.colors.accents[1],
     animation: `${keyframes({
       from: { opacity: 0, transform: "translate(-50%, -48%) scale(0.96)" },

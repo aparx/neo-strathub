@@ -1,6 +1,8 @@
 "use client";
 import * as Primitive from "@radix-ui/react-dialog";
+import { vars } from "@repo/theme";
 import { mergeClassNames } from "@repo/utils";
+import { calc } from "@vanilla-extract/css-utils";
 import { ComponentProps } from "react";
 import { Icon } from "../icon";
 import { IconButton } from "../iconButton";
@@ -34,13 +36,21 @@ export function Title({ className, ...restProps }: Primitive.DialogTitleProps) {
 
 export function Content({
   className,
+  minWidth = 450,
+  style,
   ...restProps
-}: Primitive.DialogContentProps) {
+}: Primitive.DialogContentProps & {
+  minWidth?: number;
+}) {
   return (
     <Primitive.Portal>
       <Primitive.Overlay className={css.scrim} />
       <Primitive.Content
         className={mergeClassNames(className, css.content)}
+        style={{
+          minWidth: `min(${calc.subtract("100dvw", calc.multiply(2, vars.spacing.md))}, ${minWidth}px)`,
+          ...style,
+        }}
         {...restProps}
       />
     </Primitive.Portal>

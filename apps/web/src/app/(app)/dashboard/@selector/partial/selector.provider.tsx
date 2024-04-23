@@ -56,7 +56,7 @@ function TeamsProvider({
         return {
           href: `/dashboard/${team.id}`,
           text: team.name,
-          popover: <TeamPopover auth={role} />,
+          popover: <TeamPopover teamId={team.id} auth={role} />,
           icon: <MdPeople />,
         } satisfies ListItemData;
       })

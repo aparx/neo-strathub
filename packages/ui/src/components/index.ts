@@ -9,6 +9,7 @@ export * from "./popover";
 export * from "./progress";
 export * from "./skeleton";
 export * from "./spinner";
+export * from "./table";
 export * from "./text";
 export * from "./textField";
 export * from "./tooltip";
