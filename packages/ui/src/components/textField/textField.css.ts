@@ -20,25 +20,24 @@ export const shell = recipe({
     }),
   ],
   variants: {
-    disabled: {
-      true: {
-        color: vars.colors.emphasis.medium,
-        opacity: vars.emphasis.low,
-      },
-      false: {
+    state: {
+      default: {
         color: vars.colors.emphasis.medium,
         cursor: "text",
-        selectors: {
-          "&:hover, &:focus-within": {
-            background: vars.colors.state.hover.color,
-            color: vars.colors.emphasis.high,
-          },
-        },
+      },
+      error: {
+        color: vars.colors.emphasis.medium,
+        cursor: "text",
+        borderColor: vars.colors.destructive.lighter,
+      },
+      disabled: {
+        color: vars.colors.emphasis.medium,
+        opacity: vars.emphasis.low,
       },
     },
   },
   defaultVariants: {
-    disabled: false,
+    state: "default",
   },
 });
 
@@ -54,6 +53,20 @@ export const input = style({
   lineHeight: "inherit",
 });
 
+export const error = style({
+  color: vars.colors.destructive.lighter,
+  margin: `${vars.spacing.sm} 0`,
+});
+
 globalStyle(`${input}::placeholder`, {
   color: vars.colors.emphasis.low,
 });
+
+globalStyle(
+  `${shellBase}:not([data-state='disabled']):hover, 
+   ${shellBase}:not([data-state='disabled']):focus-within`,
+  {
+    background: vars.colors.state.hover.color,
+    color: vars.colors.emphasis.high,
+  },
+);

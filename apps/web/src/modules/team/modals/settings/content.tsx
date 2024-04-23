@@ -16,11 +16,11 @@ import { InferAsync, capitalize } from "@repo/utils";
 import { useMemo } from "react";
 import * as css from "./content.css";
 
-export function TeamSettingsModalContent({
-  team,
-}: {
+interface TeamSettingsModalProps {
   team: NonNullable<InferAsync<ReturnType<typeof getTeam>>["data"]>;
-}) {
+}
+
+export function TeamSettingsModalContent({ team }: TeamSettingsModalProps) {
   const titlePath: BreadcrumbData[] = useMemo(
     () => [{ display: team.name }, { display: "Settings" }],
     [team],
@@ -47,6 +47,21 @@ export function TeamSettingsModalContent({
 
       <Modal.Separator />
 
+      <SettingsForm team={team} />
+    </Modal.Content>
+  );
+}
+
+function SettingsForm({ team }: TeamSettingsModalProps) {
+  return (
+    <form
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "inherit",
+      }}
+    >
+      {/* Content */}
       <Flexbox orient={"vertical"} gap={"sm"}>
         <SettingField.Root>
           <SettingField.Slot>
@@ -64,20 +79,25 @@ export function TeamSettingsModalContent({
             Team Name
           </SettingField.Slot>
           <SettingField.Slot asChild>
-            <TextField placeholder={"Name"} defaultValue={team.name} />
+            <TextField
+              name={"name"}
+              placeholder={"Name"}
+              defaultValue={team.name}
+            />
           </SettingField.Slot>
         </SettingField.Root>
       </Flexbox>
 
+      {/* Footer */}
       <Flexbox gap={"sm"} style={{ marginLeft: "auto" }}>
         <Modal.Close asChild>
           <Button>Cancel</Button>
         </Modal.Close>
-        <Button color={"cta"}>
+        <Button color={"cta"} type={"submit"}>
           Save
           <Icon.Mapped type={"next"} />
         </Button>
       </Flexbox>
-    </Modal.Content>
+    </form>
   );
 }
