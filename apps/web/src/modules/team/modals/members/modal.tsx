@@ -1,19 +1,16 @@
-import { PageModalProps } from "@/app/(app)/dashboard/@modal/modals";
-import { getTeam } from "@/modules/team/actions";
-import { Breadcrumbs, Modal } from "@repo/ui/components";
+import { useGetTeamFromParams } from "@/app/(app)/dashboard/@modal/_hooks";
+import { Breadcrumbs, Modal, Spinner } from "@repo/ui/components";
 
-export async function TeamMembersModal({ params }: PageModalProps) {
-  const teamId = params.teamId;
-  if (teamId == null) throw new Error("Missing teamId parameter");
-
-  const { data: team } = await getTeam(teamId);
-  if (!team) throw new Error("Could not load team");
+export function TeamMembersModal() {
+  const { data, error } = useGetTeamFromParams();
+  if (error) throw new Error(error);
+  if (!data) return <Spinner />;
 
   return (
     <Modal.Content>
       <Modal.Title>
         <Breadcrumbs
-          breadcrumbs={[{ display: team.name }, { display: "Members" }]}
+          breadcrumbs={[{ display: data.name }, { display: "Members" }]}
         />
         <Modal.Exit />
       </Modal.Title>

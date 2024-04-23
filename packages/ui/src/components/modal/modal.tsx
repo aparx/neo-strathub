@@ -1,7 +1,7 @@
 "use client";
 import * as Primitive from "@radix-ui/react-dialog";
 import { mergeClassNames } from "@repo/utils";
-import { ComponentProps, useEffect, useState } from "react";
+import { ComponentProps } from "react";
 import { Icon } from "../icon";
 import { IconButton } from "../iconButton";
 import { Text } from "../text";
@@ -9,30 +9,7 @@ import * as css from "./modal.css";
 
 export const Trigger = Primitive.Trigger;
 export const Close = Primitive.Close;
-
-export function Root({
-  defaultOpen,
-  open,
-  onOpenChange,
-  ...restProps
-}: Primitive.DialogProps) {
-  const [initialOpen, setInitialOpen] = useState<boolean>();
-
-  useEffect(() => {
-    if (defaultOpen) setInitialOpen(true);
-  }, []);
-
-  return (
-    <Primitive.Root
-      open={open || initialOpen}
-      onOpenChange={(val) => {
-        if (initialOpen) setInitialOpen(val);
-        onOpenChange?.(val);
-      }}
-      {...restProps}
-    />
-  );
-}
+export const Root = Primitive.Root;
 
 export function Exit() {
   return (

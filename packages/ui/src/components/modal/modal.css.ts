@@ -11,6 +11,7 @@ export const content = style([
     borderRadius: "sm",
   }),
   {
+    overflow: "hidden",
     position: "absolute",
     left: "50%",
     top: "50%",

@@ -3,6 +3,7 @@ import { PlanOverview } from "@/modules/team/modals/settings/components";
 import { BreadcrumbData, Breadcrumbs, Modal } from "@repo/ui/components";
 import { InferAsync } from "@repo/utils";
 import { useMemo } from "react";
+import * as css from "./content.css";
 
 export function TeamSettingsModalContent({
   team,
@@ -16,18 +17,18 @@ export function TeamSettingsModalContent({
 
   return (
     <Modal.Content>
+      <div className={css.gradient({ color: "secondary" })} />
       <Modal.Title>
         <Breadcrumbs breadcrumbs={titlePath} />
         <Modal.Exit />
       </Modal.Title>
-      <Modal.Separator />
       <PlanOverview
-        color={"primary"}
-        name={"Advanced Plan"}
+        color={"secondary"}
+        name={"Professional Plan"}
         usage={35}
         canUpgrade
       />
-      <Modal.Separator />
+      <div>Fields</div>
     </Modal.Content>
   );
 }

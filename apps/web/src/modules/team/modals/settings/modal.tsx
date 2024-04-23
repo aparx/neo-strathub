@@ -1,13 +1,11 @@
-import { PageModalProps } from "@/app/(app)/dashboard/@modal/modals";
-import { getTeam } from "@/modules/team/actions";
+import { useGetTeamFromParams } from "@/app/(app)/dashboard/@modal/_hooks";
 import { TeamSettingsModalContent } from "@/modules/team/modals/settings/content";
+import { Spinner } from "@repo/ui/components";
 
-export async function TeamSettingsModal({ params }: PageModalProps) {
-  const teamId = params.teamId;
-  if (teamId == null) throw new Error("Missing teamId parameter");
+export function TeamSettingsModal() {
+  const { data, error } = useGetTeamFromParams();
+  if (error) throw new Error(error);
+  if (!data) return <Spinner />;
 
-  const { data: team } = await getTeam(teamId);
-  if (!team) throw new Error("Could not load team");
-
-  return <TeamSettingsModalContent team={team} />;
+  return <TeamSettingsModalContent team={data} />;
 }

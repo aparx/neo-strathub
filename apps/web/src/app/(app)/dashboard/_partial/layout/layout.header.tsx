@@ -1,6 +1,6 @@
 "use client";
 import { DashboardParams } from "@/app/(app)/dashboard/_utils";
-import { getTeam } from "@/modules/team/actions";
+import { useTeam } from "@/modules/team/clientActions";
 import { TeamPopover } from "@/modules/team/partial";
 import { vars } from "@repo/theme";
 import {
@@ -12,7 +12,6 @@ import {
   Skeleton,
   Text,
 } from "@repo/ui/components";
-import { useQuery } from "@tanstack/react-query";
 import { calc } from "@vanilla-extract/css-utils";
 import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -53,10 +52,7 @@ function Navigation() {
 }
 
 function TeamButton({ teamId }: { teamId: string }) {
-  const { data } = useQuery({
-    queryKey: ["team", teamId],
-    queryFn: async () => (await getTeam(teamId))?.data,
-  });
+  const { data } = useTeam(teamId);
   const [state, setState] = useState(false);
   const name = data?.name;
   if (!name?.length)
