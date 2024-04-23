@@ -6,7 +6,7 @@ type CapitalizeReturn<T extends Nullish<string>> = T extends string
     ? undefined
     : null;
 
-export function capitalize<T extends Nullish<string>>(
+export function capitalize<const T extends Nullish<string>>(
   value: T,
 ): CapitalizeReturn<T> {
   if (value == null || value.length === 0) return value as any;
