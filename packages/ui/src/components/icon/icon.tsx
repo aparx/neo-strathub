@@ -3,7 +3,9 @@ import { BiLogOut } from "react-icons/bi";
 import { IoMdEye } from "react-icons/io";
 import {
   MdAdd,
+  MdAlternateEmail,
   MdArrowBack,
+  MdArrowForward,
   MdArrowUpward,
   MdClose,
   MdDelete,
@@ -13,6 +15,7 @@ import {
   MdPeople,
   MdSearch,
   MdSettings,
+  MdTag,
 } from "react-icons/md";
 import { RiFilterFill, RiFilterLine } from "react-icons/ri";
 import { Text } from "../text";
@@ -44,7 +47,6 @@ const iconMap = {
   rename: <MdOutlineDriveFileRenameOutline />,
   details: <MdMoreVert />,
   members: <MdPeople />,
-  back: <MdArrowBack />,
   leave: <BiLogOut />,
   delete: <MdDelete />,
   filterEmpty: <RiFilterLine />,
@@ -53,6 +55,10 @@ const iconMap = {
   preview: <IoMdEye />,
   edit: <MdEdit />,
   upgrade: <MdArrowUpward />,
+  tag: <MdTag />,
+  name: <MdAlternateEmail />,
+  back: <MdArrowBack />,
+  next: <MdArrowForward />,
 } as const satisfies Record<string, React.ReactNode>;
 
 export function Mapped({

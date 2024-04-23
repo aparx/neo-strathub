@@ -3,7 +3,7 @@ import { InputHTMLAttributes } from "react";
 import { Text } from "../text";
 import * as css from "./textField.css";
 
-type TextFieldBaseProps = Omit<InputHTMLAttributes<HTMLInputElement>, "type">;
+type TextFieldBaseProps = InputHTMLAttributes<HTMLInputElement>;
 
 export interface TextFieldProps extends TextFieldBaseProps {
   leading?: React.ReactNode;

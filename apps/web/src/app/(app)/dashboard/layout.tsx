@@ -1,4 +1,5 @@
 import { getUser } from "@/modules/auth/actions";
+import { ModalController } from "@/modules/modal/components";
 import { Spinner } from "@repo/ui/components";
 import { cookies } from "next/headers";
 import { Suspense } from "react";
@@ -9,13 +10,11 @@ export default async function DashboardLayout({
   children,
   content,
   selector,
-  modal,
   details,
 }: {
   children: React.ReactNode;
   selector: React.ReactNode;
   content: React.ReactNode;
-  modal: React.ReactNode;
   details: React.ReactNode;
 }) {
   // Ensure user is fetched at root to ensure authorization
@@ -32,7 +31,7 @@ export default async function DashboardLayout({
             {details}
           </main>
         </Suspense>
-        {modal}
+        <ModalController />
         {children}
       </div>
     </>

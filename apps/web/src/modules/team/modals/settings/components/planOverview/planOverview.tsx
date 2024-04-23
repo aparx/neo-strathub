@@ -8,12 +8,14 @@ export type PlanOverviewProps = CardVariants & {
   canUpgrade?: boolean;
   /** Total usage in percent in range [0, 100] */
   usage: number;
+  pricing: string;
 };
 
 export function PlanOverview({
   color,
   name,
   canUpgrade,
+  pricing,
   usage,
 }: PlanOverviewProps) {
   return (
@@ -29,10 +31,16 @@ export function PlanOverview({
             backColor={vars.colors.overlay}
           />
           <span>{name}</span>
+          <Text asChild type={"label"} data={{ weight: 400 }}>
+            <div className={css.priceTag}>{pricing}</div>
+          </Text>
         </Flexbox>
       </Text>
-      <Button appearance={"cta"} color={"cta"}>
-        {canUpgrade ? "Upgrade" : "Need more?"}
+      <Button
+        appearance={"icon"}
+        color={"cta"}
+        style={{ borderRadius: vars.roundness.full }}
+      >
         <Icon.Mapped type={"upgrade"} />
       </Button>
     </div>

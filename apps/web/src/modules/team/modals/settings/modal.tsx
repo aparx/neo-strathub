@@ -1,4 +1,4 @@
-import { useGetTeamFromParams } from "@/app/(app)/dashboard/@modal/_hooks";
+import { useGetTeamFromParams } from "@/modules/modal/hooks";
 import { TeamSettingsModalContent } from "@/modules/team/modals/settings/content";
 import { Spinner } from "@repo/ui/components";
 

@@ -1,4 +1,4 @@
-import { useGetTeamFromParams } from "@/app/(app)/dashboard/@modal/_hooks";
+import { useGetTeamFromParams } from "@/modules/modal/hooks";
 import { Breadcrumbs, Modal, Spinner } from "@repo/ui/components";
 
 export function TeamMembersModal() {

@@ -1,4 +1,5 @@
 import { sprinkles, vars } from "@repo/theme";
+import { style } from "@vanilla-extract/css";
 import { RecipeVariants, recipe } from "@vanilla-extract/recipes";
 
 export const card = recipe({
@@ -36,3 +37,11 @@ export const card = recipe({
 });
 
 export type CardVariants = RecipeVariants<typeof card>;
+
+export const priceTag = style({
+  padding: `${vars.spacing.sm} ${vars.spacing.md}`,
+  background: vars.colors.overlay,
+  borderRadius: vars.roundness.full,
+  color: vars.colors.emphasis.medium,
+  border: `1px solid ${vars.colors.outline.card}`,
+});

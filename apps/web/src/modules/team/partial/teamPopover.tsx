@@ -1,6 +1,5 @@
 "use client";
-import { OpenModalLink } from "@/app/(app)/dashboard/@modal/_components";
-import { useURL } from "@/utils/hooks";
+import { OpenModalLink } from "@/modules/modal/components";
 import { Enums } from "@/utils/supabase/types";
 import { Icon, Popover } from "@repo/ui/components";
 
@@ -12,8 +11,6 @@ export function TeamPopover({
   auth = "member",
   ...restProps
 }: TeamPopoverProps) {
-  const url = useURL();
-
   return (
     <Popover.Content {...restProps}>
       <Popover.Item asChild>
