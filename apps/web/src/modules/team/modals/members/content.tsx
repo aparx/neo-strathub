@@ -20,7 +20,7 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
         <Modal.Exit />
       </Modal.Title>
 
-      <Table.Root style={{ overflowY: "auto", maxHeight: 200 }}>
+      <Table.Root style={{ overflowY: "auto", maxHeight: 300 }}>
         <Table.Head>
           <Table.Row>
             <Table.HeadCell>User</Table.HeadCell>
