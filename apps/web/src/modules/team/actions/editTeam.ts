@@ -11,5 +11,12 @@ export async function editTeam(prevState: any, formData: FormData) {
     name: formData.get("name"),
   });
 
+  if (!validatedFields.success)
+    return {
+      state: "error",
+      error: validatedFields.error.flatten().fieldErrors,
+    };
+
   // TODO ...
+  return { state: "success" };
 }

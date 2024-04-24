@@ -9,7 +9,7 @@ import { MdPeople } from "react-icons/md";
 import { ContentBody, ContentHeader } from "./_partial";
 import * as css from "./content.css";
 
-interface DashContentProps extends BaseContentPathProps {
+export interface DashContentProps extends BaseContentPathProps {
   searchParams?: Partial<Record<string, string>>;
 }
 
@@ -24,7 +24,7 @@ export async function DashContent({
   return (
     <DashColumn.Root>
       <DashColumn.Header>
-        <Title teamId={teamId} bookId={bookId} />
+        <HeaderTitle teamId={teamId} bookId={bookId} />
         <ContentHeader />
       </DashColumn.Header>
       {/* Deferred DashColumn.Content to `ContentBody` */}
@@ -38,25 +38,37 @@ export async function DashContent({
   );
 }
 
-async function Title({ bookId, teamId }: { teamId?: string; bookId?: string }) {
+async function HeaderTitle({
+  bookId,
+  teamId,
+}: {
+  teamId?: string;
+  bookId?: string;
+}) {
   if (bookId) {
     const { data: book } = await getBook(bookId);
     if (!book || !book.game) return <Skeleton width={"33%"} />;
     const { game } = book;
     return (
-      <Navigation
+      <LocationTitle
         icon={<SelectorGameImage src={game.icon} name={game.name} />}
         title={book.name}
       />
     );
   } else if (teamId) {
-    return <Navigation icon={<MdPeople />} title={"Team's Blueprints"} />;
+    return <LocationTitle icon={<MdPeople />} title={"Team's Blueprints"} />;
   } else {
-    return <Navigation icon={<IoMdGlobe />} title={"Global Blueprints"} />;
+    return <LocationTitle icon={<IoMdGlobe />} title={"Global Blueprints"} />;
   }
 }
 
-function Navigation({ icon, title }: { icon: React.ReactNode; title: string }) {
+function LocationTitle({
+  icon,
+  title,
+}: {
+  icon: React.ReactNode;
+  title: string;
+}) {
   return (
     <Flexbox asChild gap={"md"} align={"center"} style={{ overflow: "hidden" }}>
       <Text type={"label"} size={"lg"}>
