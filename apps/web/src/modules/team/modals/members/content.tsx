@@ -3,16 +3,19 @@ import { getTeam } from "@/modules/team/actions";
 import { RoleSelect } from "@/modules/team/modals/members/components";
 import { createClient } from "@/utils/supabase/client";
 import { Enums } from "@/utils/supabase/types";
+import { vars } from "@repo/theme";
 import {
   BreadcrumbData,
   Breadcrumbs,
   Icon,
   IconButton,
   Modal,
+  Skeleton,
   Table,
 } from "@repo/ui/components";
 import { InferAsync } from "@repo/utils";
 import { useQuery } from "@tanstack/react-query";
+import { calc } from "@vanilla-extract/css-utils";
 import { useMemo } from "react";
 
 interface TeamMembersModalProps {
@@ -55,8 +58,14 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
           </Table.Row>
         </Table.Head>
         <Table.Body>
+          {isLoading
+            ? Array.from({ length: 3 }, (_, index) => (
+                <MemberRowSkeleton key={index} />
+              ))
+            : null}
           {data?.data?.map((member) => (
             <MemberRow
+              key={member.profile_id}
               name={member.profile?.username ?? "(Anonymous)"}
               createdAt={member.created_at}
               role={member.role}
@@ -94,6 +103,24 @@ function MemberRow({
           <Icon.Mapped type={"details"} />
         </IconButton>
       </Table.Cell>
+    </Table.Row>
+  );
+}
+
+function MemberRowSkeleton() {
+  // This is referencing the height of the `RoleSelect` component
+  const maxHeight = calc.add(
+    vars.fontSizes.label.md,
+    calc.multiply(2, vars.spacing.md),
+  );
+
+  return (
+    <Table.Row>
+      {Array.from({ length: 4 }, (_, i) => (
+        <Table.Cell key={i}>
+          <Skeleton height={maxHeight} />
+        </Table.Cell>
+      ))}
     </Table.Row>
   );
 }
