@@ -1,9 +1,9 @@
 import Image, { ImageProps } from "next/image";
 import { CSSProperties } from "react";
 
-type CoverImageBaseProps = Omit<ImageProps, "fill" | "width" | "height">;
+type ImageFillBaseProps = Omit<ImageProps, "fill" | "width" | "height">;
 
-export interface CoverImageProps extends CoverImageBaseProps {
+export interface ImageFillProps extends ImageFillBaseProps {
   /** @default "cover" */
   fit?: CSSProperties["objectFit"];
   place?: CSSProperties["objectPosition"];
@@ -12,7 +12,7 @@ export interface CoverImageProps extends CoverImageBaseProps {
   height?: string | number;
 }
 
-export function CoverImage({
+export function ImageFill({
   fit = "cover",
   place,
   size,
@@ -20,7 +20,7 @@ export function CoverImage({
   height = size,
   style,
   ...restProps
-}: CoverImageProps) {
+}: ImageFillProps) {
   return (
     <div style={{ width, height, position: "relative" }}>
       <Image

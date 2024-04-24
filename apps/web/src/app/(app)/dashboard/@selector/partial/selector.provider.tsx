@@ -8,7 +8,7 @@ import {
 import { BookPopover } from "@/modules/book/partial/bookPopover";
 import { TeamPopover } from "@/modules/team/partial";
 import { createClient } from "@/utils/supabase/client";
-import { CoverImage } from "@repo/ui/components";
+import { ImageFill } from "@repo/ui/components";
 import { nonNull } from "@repo/utils";
 import { User } from "@supabase/supabase-js";
 import { useQuery } from "@tanstack/react-query";
@@ -107,7 +107,7 @@ function BooksProvider({
         text: name,
         popover: <BookPopover />,
         icon: game ? (
-          <CoverImage src={game.icon} alt={game.name} size={"1em"} />
+          <ImageFill src={game.icon} alt={game.name} size={"1em"} />
         ) : (
           <MdCollections />
         ),
