@@ -3,7 +3,7 @@ import { SharedState, useSharedState } from "@repo/utils/hooks";
 import { createContext, useContext, useMemo } from "react";
 import type { SelectorListItemData } from "../components/selectorListItem";
 
-export interface ItemContext {
+export interface SelectorItemContext {
   items: ReadonlyArray<Readonly<SelectorListItemData>>;
   filter: SharedState<string | undefined>;
   active: SharedState<SelectorListItemData["href"] | undefined>;
@@ -11,16 +11,16 @@ export interface ItemContext {
   fetching?: boolean;
 }
 
-const itemContext = createContext<ItemContext | null>(null);
+const itemContext = createContext<SelectorItemContext | null>(null);
 
-export function ItemContextProvider({
+export function SelectorItemContextProvider({
   children,
   elements,
   fetching,
 }: {
   children: React.ReactNode;
-  elements: ItemContext["items"];
-  fetching: ItemContext["fetching"];
+  elements: SelectorItemContext["items"];
+  fetching: SelectorItemContext["fetching"];
 }) {
   const filter = useSharedState<string | undefined>();
   const active = useSharedState<string | undefined>();

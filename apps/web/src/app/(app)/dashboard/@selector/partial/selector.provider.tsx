@@ -3,7 +3,7 @@ import {
   SelectorGameImage,
   SelectorListItemData,
 } from "@/app/(app)/dashboard/@selector/components";
-import { ItemContextProvider } from "@/app/(app)/dashboard/@selector/context";
+import { SelectorItemContextProvider } from "@/app/(app)/dashboard/@selector/context";
 import { DASHBOARD_QUERY_PARAMS } from "@/app/(app)/dashboard/_utils";
 import { BookPopover } from "@/modules/book/partial/bookPopover";
 import { TeamPopover } from "@/modules/team/partial";
@@ -75,9 +75,9 @@ function TeamsProvider({
   }, [data]);
 
   return (
-    <ItemContextProvider elements={elements} fetching={isFetching}>
+    <SelectorItemContextProvider elements={elements} fetching={isFetching}>
       {children}
-    </ItemContextProvider>
+    </SelectorItemContextProvider>
   );
 }
 
@@ -121,8 +121,8 @@ function BooksProvider({
   }, [data]);
 
   return (
-    <ItemContextProvider elements={elements} fetching={isFetching}>
+    <SelectorItemContextProvider elements={elements} fetching={isFetching}>
       {children}
-    </ItemContextProvider>
+    </SelectorItemContextProvider>
   );
 }

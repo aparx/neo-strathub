@@ -1,5 +1,5 @@
 import { CONTENT_SEARCH_PARAMS } from "@/app/(app)/dashboard/@content/content.utils";
-import { ListItemGameImage } from "@/app/(app)/dashboard/@selector/partial";
+import { SelectorGameImage } from "@/app/(app)/dashboard/@selector/components";
 import { DashColumn } from "@/app/(app)/dashboard/_components";
 import { BaseContentPathProps } from "@/app/(app)/dashboard/_utils";
 import { getBook } from "@/modules/book/actions";
@@ -45,7 +45,7 @@ async function Title({ bookId, teamId }: { teamId?: string; bookId?: string }) {
     const { game } = book;
     return (
       <Navigation
-        icon={<ListItemGameImage src={game.icon} name={game.name} />}
+        icon={<SelectorGameImage src={game.icon} name={game.name} />}
         title={book.name}
       />
     );
