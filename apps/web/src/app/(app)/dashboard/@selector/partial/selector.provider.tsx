@@ -8,6 +8,7 @@ import {
 import { BookPopover } from "@/modules/book/partial/bookPopover";
 import { TeamPopover } from "@/modules/team/partial";
 import { createClient } from "@/utils/supabase/client";
+import { CoverImage } from "@repo/ui/components";
 import { nonNull } from "@repo/utils";
 import { User } from "@supabase/supabase-js";
 import { useQuery } from "@tanstack/react-query";
@@ -70,36 +71,6 @@ function TeamsProvider({
   );
 }
 
-function BooksProvider({
-  children,
-  teamId,
-}: {
-  teamId: string;
-  children: React.ReactNode;
-}) {
-  const [isFetching, data] = useGetBooks(teamId);
-
-  const elements = useMemo(() => {
-    if (!data) return [];
-    return data.map(({ id, name }) => {
-      const searchParams = new URLSearchParams();
-      searchParams.set(DASHBOARD_QUERY_PARAMS.book, id);
-      return {
-        href: `/dashboard/${teamId}?${searchParams.toString()}`,
-        text: name,
-        popover: <BookPopover />,
-        icon: <MdCollections />,
-      } satisfies ListItemData;
-    });
-  }, [data]);
-
-  return (
-    <ItemContextProvider elements={elements} fetching={isFetching}>
-      {children}
-    </ItemContextProvider>
-  );
-}
-
 function useGetTeams(userId: string) {
   const { isFetching, data } = useQuery({
     queryKey: ["teams", userId],
@@ -116,6 +87,41 @@ function useGetTeams(userId: string) {
   return [isFetching, data] as const;
 }
 
+function BooksProvider({
+  children,
+  teamId,
+}: {
+  teamId: string;
+  children: React.ReactNode;
+}) {
+  const [isFetching, data] = useGetBooks(teamId);
+
+  const elements = useMemo(() => {
+    if (!data) return [];
+    return data.map(({ id, name, game }) => {
+      const searchParams = new URLSearchParams();
+      searchParams.set(DASHBOARD_QUERY_PARAMS.book, id);
+
+      return {
+        href: `/dashboard/${teamId}?${searchParams.toString()}`,
+        text: name,
+        popover: <BookPopover />,
+        icon: game ? (
+          <CoverImage src={game.icon} alt={game.name} size={"1em"} />
+        ) : (
+          <MdCollections />
+        ),
+      } satisfies ListItemData;
+    });
+  }, [data]);
+
+  return (
+    <ItemContextProvider elements={elements} fetching={isFetching}>
+      {children}
+    </ItemContextProvider>
+  );
+}
+
 function useGetBooks(teamId: string) {
   const { isFetching, data } = useQuery({
     queryKey: ["books", teamId],
@@ -123,7 +129,7 @@ function useGetBooks(teamId: string) {
       return (
         await createClient()
           .from("book")
-          .select("id, name")
+          .select("id, name, game(id, name, icon)")
           .eq("team_id", teamId)
       )?.data;
     },

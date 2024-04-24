@@ -1,7 +1,6 @@
 import { useUserContext } from "@/modules/auth/context";
 import { getTeam } from "@/modules/team/actions";
 import { RoleSelect } from "@/modules/team/modals/members/components";
-import { wait } from "@/utils/generic";
 import { createClient } from "@/utils/supabase/client";
 import { Enums } from "@/utils/supabase/types";
 import {
@@ -31,7 +30,6 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
   const { isLoading, data } = useQuery({
     queryKey: ["teamMembers", team.id],
     queryFn: async () => {
-      await wait(3000);
       return await createClient()
         .from("team_member")
         .select("*, profile(id, username)")
@@ -60,7 +58,7 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
           {data?.data?.map((member) => (
             <MemberRow
               name={member.profile?.username ?? "(Anonymous)"}
-              joinDate={new Date(member.created_at)}
+              createdAt={member.created_at}
               role={member.role}
             />
           ))}
@@ -72,20 +70,25 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
 
 function MemberRow({
   name,
-  joinDate,
+  createdAt,
   role,
 }: {
   name: string;
-  joinDate: Date;
+  createdAt: string;
   role: Enums<"member_role">;
 }) {
+  const joinDate = useMemo(
+    () => new Date(createdAt).toLocaleDateString(),
+    [createdAt],
+  );
+
   return (
     <Table.Row>
       <Table.Cell>{name}</Table.Cell>
       <Table.Cell>
         <RoleSelect initialRole={role} />
       </Table.Cell>
-      <Table.Cell>{joinDate.toLocaleDateString()}</Table.Cell>
+      <Table.Cell>{joinDate}</Table.Cell>
       <Table.Cell>
         <IconButton aria-label={"Edit"}>
           <Icon.Mapped type={"details"} />
