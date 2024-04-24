@@ -17,7 +17,7 @@ import {
   MdSettings,
   MdTag,
 } from "react-icons/md";
-import { RiFilterFill, RiFilterLine } from "react-icons/ri";
+import { RiExpandUpDownLine, RiFilterFill, RiFilterLine } from "react-icons/ri";
 import { Text } from "../text";
 import { ICON_SIZES } from "./icon.utils";
 
@@ -59,6 +59,7 @@ const iconMap = {
   name: <MdAlternateEmail />,
   back: <MdArrowBack />,
   next: <MdArrowForward />,
+  expand: <RiExpandUpDownLine />,
 } as const satisfies Record<string, React.ReactNode>;
 
 export function Mapped({

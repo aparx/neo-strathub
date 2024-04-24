@@ -1,4 +1,5 @@
 import { getUser } from "@/modules/auth/actions";
+import { UserContextProvider } from "@/modules/auth/context/userContext";
 import { ModalController } from "@/modules/modal/components";
 import { Spinner } from "@repo/ui/components";
 import { cookies } from "next/headers";
@@ -18,21 +19,23 @@ export default async function DashboardLayout({
   details: React.ReactNode;
 }) {
   // Ensure user is fetched at root to ensure authorization
-  await getUser(cookies());
+  const user = await getUser(cookies());
 
   return (
-    <div className={css.rootLayout}>
-      <LayoutHeader />
-      <Suspense fallback={<PageFallback />}>
-        <main className={css.gridLayout}>
-          {selector}
-          {content}
-          {details}
-        </main>
-      </Suspense>
-      <ModalController />
-      {children}
-    </div>
+    <UserContextProvider user={user}>
+      <div className={css.rootLayout}>
+        <LayoutHeader />
+        <Suspense fallback={<PageFallback />}>
+          <main className={css.gridLayout}>
+            {selector}
+            {content}
+            {details}
+          </main>
+        </Suspense>
+        <ModalController />
+        {children}
+      </div>
+    </UserContextProvider>
   );
 }
 

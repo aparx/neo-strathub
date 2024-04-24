@@ -49,6 +49,10 @@ export const row = style({
   position: "relative",
 });
 
+globalStyle(`${body} ${row}:hover`, {
+  background: vars.colors.state.hover.color,
+});
+
 globalStyle(`${row} + tr`, {
   borderTop: border,
 });

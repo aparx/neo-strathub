@@ -1,7 +1,7 @@
 -- noinspection SqlResolveForFile
 
 create type public.profile_role as enum ('admin', 'user');
-create type public.member_role as enum ('owner', 'admin', 'member');
+create type public.member_role as enum ('owner', 'editor', 'viewer');
 create type public.bp_visibility as enum ('public', 'private', 'unlisted');
 create type public.pay_interval as enum ('monthly', 'yearly');
 
@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS public.profile
     id         uuid PRIMARY KEY REFERENCES auth.users (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    username   varchar(64)         NOT NULL UNIQUE
+    username   varchar(32)         NOT NULL UNIQUE
         CONSTRAINT min_name_length CHECK (length(username) >= 3),
     role       public.profile_role NOT NULL DEFAULT 'user'::public.profile_role,
     created_at timestamptz         NOT NULL DEFAULT now(),
@@ -129,24 +129,21 @@ CREATE UNIQUE INDEX
 
 CREATE TABLE IF NOT EXISTS public.team_member
 (
-    id         bigserial PRIMARY KEY,
-    user_id    uuid               NOT NULL REFERENCES auth.users (id)
+    profile_id uuid               NOT NULL REFERENCES public.profile (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
     team_id    uuid               NOT NULL REFERENCES public.team (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    role       public.member_role NOT NULL DEFAULT 'member'::public.member_role,
+    role       public.member_role NOT NULL DEFAULT 'viewer'::public.member_role,
     created_at timestamptz        NOT NULL DEFAULT now(),
-    updated_at timestamptz        NOT NULL DEFAULT now()
+    updated_at timestamptz        NOT NULL DEFAULT now(),
+
+    PRIMARY KEY (profile_id, team_id)
 );
 
 ALTER TABLE public.team_member
     ENABLE ROW LEVEL SECURITY;
-
-CREATE UNIQUE INDEX
-    IF NOT EXISTS uidx_team_member_user_team
-    ON public.team_member (user_id, team_id);
 
 -- //////////////////////////////// BLUEPRINT ////////////////////////////////
 

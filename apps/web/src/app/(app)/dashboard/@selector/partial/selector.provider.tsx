@@ -108,7 +108,7 @@ function useGetTeams(userId: string) {
         await createClient()
           .from("team_member")
           .select("team(id, name), role")
-          .eq("user_id", userId)
+          .eq("profile_id", userId)
       )?.data;
     },
     refetchOnWindowFocus: false,
