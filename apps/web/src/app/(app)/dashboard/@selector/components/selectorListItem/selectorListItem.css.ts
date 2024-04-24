@@ -2,7 +2,7 @@ import { sprinkles, vars } from "@repo/theme";
 import { style } from "@vanilla-extract/css";
 import { recipe } from "@vanilla-extract/recipes";
 
-export const listItem = recipe({
+export const itemRoot = recipe({
   base: [
     sprinkles({
       display: "flex",

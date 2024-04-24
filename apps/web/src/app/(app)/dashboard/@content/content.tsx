@@ -1,10 +1,11 @@
 import { CONTENT_SEARCH_PARAMS } from "@/app/(app)/dashboard/@content/content.utils";
+import { ListItemGameImage } from "@/app/(app)/dashboard/@selector/partial";
 import { DashColumn } from "@/app/(app)/dashboard/_components";
 import { BaseContentPathProps } from "@/app/(app)/dashboard/_utils";
 import { getBook } from "@/modules/book/actions";
-import { Flexbox, Icon, Text } from "@repo/ui/components";
+import { Flexbox, Icon, Skeleton, Text } from "@repo/ui/components";
 import { IoMdGlobe } from "react-icons/io";
-import { MdGames, MdPeople } from "react-icons/md";
+import { MdPeople } from "react-icons/md";
 import { ContentBody, ContentHeader } from "./_partial";
 import * as css from "./content.css";
 
@@ -40,8 +41,14 @@ export async function DashContent({
 async function Title({ bookId, teamId }: { teamId?: string; bookId?: string }) {
   if (bookId) {
     const { data: book } = await getBook(bookId);
-    if (!book) throw new Error("Book could not be found");
-    return <Navigation icon={<MdGames />} title={book.name} />;
+    if (!book || !book.game) return <Skeleton width={"33%"} />;
+    const { game } = book;
+    return (
+      <Navigation
+        icon={<ListItemGameImage src={game.icon} name={game.name} />}
+        title={book.name}
+      />
+    );
   } else if (teamId) {
     return <Navigation icon={<MdPeople />} title={"Team's Blueprints"} />;
   } else {

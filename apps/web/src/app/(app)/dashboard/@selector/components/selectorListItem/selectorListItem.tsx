@@ -11,25 +11,25 @@ import { mergeClassNames } from "@repo/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { HTMLAttributes, useRef } from "react";
-import * as css from "./listItem.css";
+import * as css from "./selectorListItem.css";
 
-type ListItemBaseProps = Omit<HTMLAttributes<HTMLDivElement>, "children">;
+type BaseProps = Omit<HTMLAttributes<HTMLDivElement>, "children">;
 
-export interface ListItemData {
+export interface SelectorListItemData {
   icon?: React.ReactNode;
   popover?: React.ReactNode | null;
   text: string;
   href: string;
 }
 
-export interface ListItemProps extends ListItemBaseProps, ListItemData {
+export interface SelectorListItemProps extends BaseProps, SelectorListItemData {
   active?: boolean;
   loading?: boolean;
   /** Event called when the item is clicked such that the user is redirected */
   onRedirect?: () => any;
 }
 
-export function ListItem({
+export function SelectorListItem({
   icon,
   text,
   href,
@@ -42,7 +42,7 @@ export function ListItem({
   onMouseUp,
   onMouseDown,
   ...restProps
-}: ListItemProps) {
+}: SelectorListItemProps) {
   // This component contains three interactive elements:
   //
   // (1) For ease of use a clickable `div` element, with its interactivity not
@@ -72,7 +72,7 @@ export function ListItem({
           }
         }}
         className={mergeClassNames(
-          css.listItem({ active, loading }),
+          css.itemRoot({ active, loading }),
           className,
         )}
         {...restProps}

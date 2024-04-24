@@ -1,5 +1,4 @@
 "use client";
-import { DashboardParams } from "@/app/(app)/dashboard/_utils";
 import { useTeam } from "@/modules/team/clientActions";
 import { TeamPopover } from "@/modules/team/partial";
 import { vars } from "@repo/theme";
@@ -27,7 +26,7 @@ export function LayoutHeader() {
 }
 
 function Navigation() {
-  const { teamId } = useParams<Partial<DashboardParams>>();
+  const { teamId } = useParams<{ teamId?: string }>();
 
   const breadcrumbs = useMemo(() => {
     const array: BreadcrumbsProps["breadcrumbs"] = [];

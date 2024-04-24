@@ -4,7 +4,7 @@ import { useURL } from "@/utils/hooks";
 import { Flexbox, Skeleton } from "@repo/ui/components";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
-import { ListItem, ListItemData } from "../components";
+import { SelectorListItem, SelectorListItemData } from "../components";
 import { useItemContext } from "../context";
 import * as css from "./selector.body.css";
 
@@ -43,7 +43,7 @@ function SkeletonList({ amount: length }: { amount: number }) {
   ));
 }
 
-function Item({ href, ...restData }: ListItemData) {
+function Item({ href, ...restData }: SelectorListItemData) {
   const { active } = useItemContext();
   const currentUrl = useURL();
   const isActive = active.state === href;
@@ -58,7 +58,7 @@ function Item({ href, ...restData }: ListItemData) {
 
   return (
     <li key={href}>
-      <ListItem
+      <SelectorListItem
         href={`${finalUrl.pathname}?${finalUrl.searchParams}`}
         active={isActive}
         loading={isActive && !isIncludingURL(finalUrl, currentUrl)}

@@ -1,14 +1,13 @@
 "use client";
-import { ListItemData } from "@/app/(app)/dashboard/@selector/components";
-import { ItemContextProvider } from "@/app/(app)/dashboard/@selector/context";
 import {
-  DASHBOARD_QUERY_PARAMS,
-  DashboardParams,
-} from "@/app/(app)/dashboard/_utils";
+  SelectorGameImage,
+  SelectorListItemData,
+} from "@/app/(app)/dashboard/@selector/components";
+import { ItemContextProvider } from "@/app/(app)/dashboard/@selector/context";
+import { DASHBOARD_QUERY_PARAMS } from "@/app/(app)/dashboard/_utils";
 import { BookPopover } from "@/modules/book/partial/bookPopover";
 import { TeamPopover } from "@/modules/team/partial";
 import { createClient } from "@/utils/supabase/client";
-import { ImageFill } from "@repo/ui/components";
 import { nonNull } from "@repo/utils";
 import { User } from "@supabase/supabase-js";
 import { useQuery } from "@tanstack/react-query";
@@ -31,7 +30,7 @@ export function SelectorDataProvider({
   user: User;
   children: React.ReactNode;
 }) {
-  const params = useParams<Partial<DashboardParams>>();
+  const params = useParams<{ teamId?: string }>();
 
   return params.teamId ? (
     <BooksProvider teamId={params.teamId}>{children}</BooksProvider>
@@ -47,31 +46,6 @@ function TeamsProvider({
   userId: string;
   children: React.ReactNode;
 }) {
-  const [isFetching, data] = useGetTeams(userId);
-
-  const elements = useMemo(() => {
-    if (!data) return [];
-    return data
-      .map(({ team, role }) => {
-        if (!team) return null;
-        return {
-          href: `/dashboard/${team.id}`,
-          text: team.name,
-          popover: <TeamPopover teamId={team.id} auth={role} />,
-          icon: <MdPeople />,
-        } satisfies ListItemData;
-      })
-      .filter(nonNull);
-  }, [data]);
-
-  return (
-    <ItemContextProvider elements={elements} fetching={isFetching}>
-      {children}
-    </ItemContextProvider>
-  );
-}
-
-function useGetTeams(userId: string) {
   const { isFetching, data } = useQuery({
     queryKey: ["teams", userId],
     queryFn: async () => {
@@ -84,35 +58,20 @@ function useGetTeams(userId: string) {
     },
     refetchOnWindowFocus: false,
   });
-  return [isFetching, data] as const;
-}
-
-function BooksProvider({
-  children,
-  teamId,
-}: {
-  teamId: string;
-  children: React.ReactNode;
-}) {
-  const [isFetching, data] = useGetBooks(teamId);
 
   const elements = useMemo(() => {
     if (!data) return [];
-    return data.map(({ id, name, game }) => {
-      const searchParams = new URLSearchParams();
-      searchParams.set(DASHBOARD_QUERY_PARAMS.book, id);
-
-      return {
-        href: `/dashboard/${teamId}?${searchParams.toString()}`,
-        text: name,
-        popover: <BookPopover />,
-        icon: game ? (
-          <ImageFill src={game.icon} alt={game.name} size={"1em"} />
-        ) : (
-          <MdCollections />
-        ),
-      } satisfies ListItemData;
-    });
+    return data
+      .map(({ team, role }) => {
+        if (!team) return null;
+        return {
+          href: `/dashboard/${team.id}`,
+          text: team.name,
+          popover: <TeamPopover teamId={team.id} auth={role} />,
+          icon: <MdPeople />,
+        } satisfies SelectorListItemData;
+      })
+      .filter(nonNull);
   }, [data]);
 
   return (
@@ -122,7 +81,13 @@ function BooksProvider({
   );
 }
 
-function useGetBooks(teamId: string) {
+function BooksProvider({
+  children,
+  teamId,
+}: {
+  teamId: string;
+  children: React.ReactNode;
+}) {
   const { isFetching, data } = useQuery({
     queryKey: ["books", teamId],
     queryFn: async () => {
@@ -135,5 +100,29 @@ function useGetBooks(teamId: string) {
     },
     refetchOnWindowFocus: false,
   });
-  return [isFetching, data] as const;
+
+  const elements = useMemo(() => {
+    if (!data) return [];
+    return data.map(({ id, name, game }) => {
+      const searchParams = new URLSearchParams();
+      searchParams.set(DASHBOARD_QUERY_PARAMS.book, id);
+
+      return {
+        href: `/dashboard/${teamId}?${searchParams.toString()}`,
+        text: name,
+        popover: <BookPopover />,
+        icon: game ? (
+          <SelectorGameImage src={game.icon} name={game.name} />
+        ) : (
+          <MdCollections />
+        ),
+      } satisfies SelectorListItemData;
+    });
+  }, [data]);
+
+  return (
+    <ItemContextProvider elements={elements} fetching={isFetching}>
+      {children}
+    </ItemContextProvider>
+  );
 }

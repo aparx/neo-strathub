@@ -1,7 +1,3 @@
-export interface DashboardParams {
-  teamId: string;
-}
-
 export const DASHBOARD_QUERY_PARAMS = {
   document: "documentId",
   book: "bookId",

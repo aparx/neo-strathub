@@ -4,7 +4,6 @@ export * from "./callout";
 export * from "./flexbox";
 export * from "./icon";
 export * from "./iconButton";
-export * from "./imageFill";
 export * from "./modal";
 export * from "./popover";
 export * from "./progress";

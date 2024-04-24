@@ -6,7 +6,7 @@ export async function getMemberCount(teamId: string) {
   return (
     await getServer(cookies())
       .from("team_member")
-      .select("id", { count: "exact", head: true })
+      .select("*", { count: "exact", head: true })
       .eq("team_id", teamId)
   )?.count;
 }

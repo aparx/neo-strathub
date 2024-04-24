@@ -1,12 +1,12 @@
 "use client";
 import { SharedState, useSharedState } from "@repo/utils/hooks";
 import { createContext, useContext, useMemo } from "react";
-import type { ListItemData } from "../components/listItem";
+import type { SelectorListItemData } from "../components/selectorListItem";
 
 export interface ItemContext {
-  items: ReadonlyArray<Readonly<ListItemData>>;
+  items: ReadonlyArray<Readonly<SelectorListItemData>>;
   filter: SharedState<string | undefined>;
-  active: SharedState<ListItemData["href"] | undefined>;
+  active: SharedState<SelectorListItemData["href"] | undefined>;
   /** True if the items are re-fetched or initially fetched */
   fetching?: boolean;
 }

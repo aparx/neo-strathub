@@ -6,7 +6,7 @@ export const getBook = cache((bookId: string) => {
   // TODO fetch actual stratbook
   return createAnonServer(cookies())
     .from("book")
-    .select("*, team(id, name), game(id, name)")
+    .select("*, team(id, name), game(id, name, icon)")
     .eq("id", bookId)
     .maybeSingle();
 });

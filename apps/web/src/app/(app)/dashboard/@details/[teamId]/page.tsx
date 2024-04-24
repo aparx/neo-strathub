@@ -1,14 +1,11 @@
 import { DetailsContent } from "@/app/(app)/dashboard/@details/content";
-import {
-  DASHBOARD_QUERY_PARAMS,
-  DashboardParams,
-} from "@/app/(app)/dashboard/_utils";
+import { DASHBOARD_QUERY_PARAMS } from "@/app/(app)/dashboard/_utils";
 
 export default async function DetailsPage({
   params,
   searchParams,
 }: {
-  params: Pick<DashboardParams, "teamId">;
+  params: { teamId: string };
   searchParams: Partial<Record<string, string>>;
 }) {
   return (
