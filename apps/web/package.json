@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --max-warnings 0",
-    "sb:gen:local": "npx supabase gen types typescript --local > ./src/utils/supabase/types.ts"
+    "sb:gen:local": "npx supabase gen types typescript --local > ./src/utils/supabase/types.ts",
+    "sb:reseed": "npx tsx seed.ts > supabase/seed.sql && npx supabase db reset",
+    "sb:reset": "pnpm run sb:reseed && pnpm run sb:gen:local"
   },
   "dependencies": {
     "@radix-ui/react-select": "^2.0.0",
@@ -34,14 +36,19 @@
     "@next/eslint-plugin-next": "^14.1.1",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
+    "@snaplet/copycat": "^5.0.0",
+    "@snaplet/seed": "^0.96.0",
     "@types/eslint": "^8.56.5",
     "@types/node": "^20.11.24",
     "@types/react": "^18.2.61",
     "@types/react-dom": "^18.2.19",
     "@vanilla-extract/next-plugin": "^2.4.0",
     "eslint": "^8.57.0",
+    "lorem-ipsum": "^2.0.8",
+    "postgres": "^3.4.4",
     "prettier": "^3.2.5",
     "supabase": "^1.159.1",
+    "tsx": "^4.7.2",
     "typescript": "^5.3.3"
   }
 }

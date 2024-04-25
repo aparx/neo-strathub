@@ -52,7 +52,7 @@ function TeamsProvider({
       return (
         await createClient()
           .from("team_member")
-          .select("team(id, name), role")
+          .select("team(id, name)")
           .eq("profile_id", userId)
       )?.data;
     },
@@ -62,12 +62,12 @@ function TeamsProvider({
   const elements = useMemo(() => {
     if (!data) return [];
     return data
-      .map(({ team, role }) => {
+      .map(({ team }) => {
         if (!team) return null;
         return {
           href: `/dashboard/${team.id}`,
           text: team.name,
-          popover: <TeamPopover teamId={team.id} auth={role} />,
+          popover: <TeamPopover teamId={team.id} />,
           icon: <MdPeople />,
         } satisfies SelectorListItemData;
       })

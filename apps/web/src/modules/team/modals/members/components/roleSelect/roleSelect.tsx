@@ -1,41 +1,43 @@
 "use client";
-import { Enums } from "@/utils/supabase/types";
 import * as Select from "@radix-ui/react-select";
 import { vars } from "@repo/theme";
 import { Icon, Text } from "@repo/ui/components";
 import { capitalize } from "@repo/utils";
-import { useMemo, useState } from "react";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
 import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 import * as css from "./roleSelect.css";
 import { RoleSelectVariants } from "./roleSelect.css";
 
 type RoleColor = NonNullable<RoleSelectVariants>["color"];
 
-const roleMap = {
-  owner: "destructive",
-  editor: "warning",
-  viewer: "primary",
-} as const satisfies Record<Enums<"member_role">, RoleColor>;
-
-type RoleMap = typeof roleMap;
-type Role = Enums<"member_role">;
-
 export interface RoleSelectProps {
-  initialRole: keyof RoleMap;
-  onRoleChange?: (newRole: Role) => any;
+  initialRoleId: number;
+  onRoleChange?: (newRoleId: number) => any;
 }
 
-export function RoleSelect({ initialRole, onRoleChange }: RoleSelectProps) {
-  const [value, setValue] = useState<Role>(initialRole);
+export function RoleSelect({ initialRoleId, onRoleChange }: RoleSelectProps) {
+  const [value, setValue] = useState<string>();
 
-  const color = useMemo(() => (value ? roleMap[value as Role] : null), [value]);
+  const { data: roles } = useGetRoles();
+
+  useEffect(() => {}, [roles]);
+
+  const roleColorMap = new Map<string, RoleColor>();
+  if (roles) {
+  }
+
+  const color = useMemo(
+    () => (value ? roleColorMap.get(value) : null),
+    [value],
+  );
 
   return (
     <Select.Root
       value={value}
       onValueChange={(val) => {
-        setValue(val as Role);
-        onRoleChange?.(val as Role);
+        setValue(val as any);
+        onRoleChange?.(val as any);
       }}
     >
       <Text asChild type={"label"} data={{ weight: 500 }}>
@@ -56,8 +58,10 @@ export function RoleSelect({ initialRole, onRoleChange }: RoleSelectProps) {
             <Icon.Custom icon={<BiChevronUp />} />
           </Select.ScrollUpButton>
           <Select.Viewport>
-            {Object.getOwnPropertyNames(roleMap).map((key) => {
-              return <Item key={key} name={key} color={roleMap[key as Role]} />;
+            {Object.getOwnPropertyNames(roleColorMap).map((key) => {
+              return (
+                <Item key={key} name={key} color={roleColorMap.get(key)} />
+              );
             })}
           </Select.Viewport>
           <Select.ScrollDownButton>
@@ -86,4 +90,11 @@ function Item({ name, color }: { name: string; color: RoleColor }) {
       </Select.Item>
     </Text>
   );
+}
+
+function useGetRoles() {
+  return useSuspenseQuery({
+    queryKey: ["roles"],
+    queryFn: () => null,
+  });
 }

@@ -18,7 +18,7 @@ export const root = style({
 });
 
 export const table = style({
-  borderCollapse: "collapse !important",
+  borderCollapse: "collapse",
   width: "100%",
 });
 

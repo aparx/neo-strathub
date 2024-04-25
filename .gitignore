@@ -5,6 +5,9 @@ node_modules
 .pnp
 .pnp.js
 
+# @snaplet/seed
+.snaplet/
+
 # Local env files
 .env
 .env.local

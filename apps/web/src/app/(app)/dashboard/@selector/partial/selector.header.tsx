@@ -6,7 +6,7 @@ export function SelectorHeader() {
   const { filter } = useItemContext();
 
   return (
-    <Flexbox gap={"sm"} style={{ flexGrow: 1 }}>
+    <Flexbox gap={"sm"} style={{}}>
       <TextField
         leading={<Icon.Mapped type={"search"} color={"red"} />}
         placeholder={"Search"}

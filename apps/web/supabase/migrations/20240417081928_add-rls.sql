@@ -35,6 +35,12 @@ CREATE POLICY "Public read access"
     ON public.book AS PERMISSIVE
     FOR SELECT TO public USING (true);
 
+-- //////////////////////////////// TEAM_MEMBER_ROLE ////////////////////////////////
+
+CREATE POLICY "Public read access"
+    ON public.team_member_role AS PERMISSIVE
+    FOR SELECT TO public USING (true);
+
 -- //////////////////////////////// TEAM_MEMBER ////////////////////////////////
 
 CREATE POLICY "Public read access"

@@ -1,18 +1,12 @@
 "use client";
 import { OpenModalLink } from "@/modules/modal/components";
-import { Enums } from "@/utils/supabase/types";
 import { Icon, Popover } from "@repo/ui/components";
 
 export interface TeamPopoverProps extends Popover.PopoverContentProps {
   teamId: string;
-  auth?: Enums<"member_role">;
 }
 
-export function TeamPopover({
-  auth = "member",
-  teamId,
-  ...restProps
-}: TeamPopoverProps) {
+export function TeamPopover({ teamId, ...restProps }: TeamPopoverProps) {
   return (
     <Popover.Content {...restProps}>
       <Popover.Item asChild>

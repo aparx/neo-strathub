@@ -2,7 +2,6 @@ import { useUserContext } from "@/modules/auth/context";
 import { getTeam } from "@/modules/team/actions";
 import { RoleSelect } from "@/modules/team/modals/members/components";
 import { createClient } from "@/utils/supabase/client";
-import { Enums } from "@/utils/supabase/types";
 import { vars } from "@repo/theme";
 import {
   BreadcrumbData,
@@ -16,7 +15,8 @@ import {
 import { InferAsync } from "@repo/utils";
 import { useQuery } from "@tanstack/react-query";
 import { calc } from "@vanilla-extract/css-utils";
-import { useMemo } from "react";
+import { Suspense, useMemo } from "react";
+import * as css from "./content.css";
 
 interface TeamMembersModalProps {
   team: NonNullable<InferAsync<ReturnType<typeof getTeam>>["data"]>;
@@ -32,13 +32,12 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
 
   const { isLoading, data } = useQuery({
     queryKey: ["teamMembers", team.id],
-    queryFn: async () => {
-      return await createClient()
+    queryFn: async () =>
+      createClient()
         .from("team_member")
         .select("*, profile(id, username)")
         .eq("profile_id", user!.id)
-        .eq("team_id", team.id);
-    },
+        .eq("team_id", team.id),
   });
 
   return (
@@ -48,7 +47,9 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
         <Modal.Exit />
       </Modal.Title>
 
-      <Table.Root style={{ overflowY: "auto", maxHeight: 300 }}>
+      {/* TODO overview? */}
+
+      <Table.Root className={css.table}>
         <Table.Head>
           <Table.Row>
             <Table.HeadCell>User</Table.HeadCell>
@@ -68,7 +69,7 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
               key={member.profile_id}
               name={member.profile?.username ?? "(Anonymous)"}
               createdAt={member.created_at}
-              role={member.role}
+              roleId={member.role_id}
             />
           ))}
         </Table.Body>
@@ -80,11 +81,11 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
 function MemberRow({
   name,
   createdAt,
-  role,
+  roleId,
 }: {
   name: string;
   createdAt: string;
-  role: Enums<"member_role">;
+  roleId: number;
 }) {
   const joinDate = useMemo(
     () => new Date(createdAt).toLocaleDateString(),
@@ -95,11 +96,13 @@ function MemberRow({
     <Table.Row>
       <Table.Cell>{name}</Table.Cell>
       <Table.Cell>
-        <RoleSelect initialRole={role} />
+        <Suspense fallback={"Loading..."}>
+          <RoleSelect initialRoleId={roleId} />
+        </Suspense>
       </Table.Cell>
       <Table.Cell>{joinDate}</Table.Cell>
       <Table.Cell>
-        <IconButton aria-label={"Edit"}>
+        <IconButton aria-label={"Edit"} style={{ margin: "auto" }}>
           <Icon.Mapped type={"details"} />
         </IconButton>
       </Table.Cell>

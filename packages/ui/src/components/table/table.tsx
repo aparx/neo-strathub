@@ -9,7 +9,7 @@ export type TableBodyProps = ComponentPropsWithoutRef<"tbody">;
 export type TableRowProps = ComponentPropsWithoutRef<"tr">;
 export type TableCellProps = ComponentPropsWithoutRef<"td">;
 
-export const Root = forwardRef<HTMLElement, TableProps>(
+export const Root = forwardRef<HTMLDivElement, TableProps>(
   function TableRoot(props, ref) {
     const { className, children, ...restProps } = props;
     return (

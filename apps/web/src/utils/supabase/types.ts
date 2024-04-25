@@ -290,21 +290,21 @@ export type Database = {
         Row: {
           created_at: string
           profile_id: string
-          role: Database["public"]["Enums"]["member_role"]
+          role_id: number
           team_id: string
           updated_at: string
         }
         Insert: {
           created_at?: string
           profile_id: string
-          role?: Database["public"]["Enums"]["member_role"]
+          role_id: number
           team_id: string
           updated_at?: string
         }
         Update: {
           created_at?: string
           profile_id?: string
-          role?: Database["public"]["Enums"]["member_role"]
+          role_id?: number
           team_id?: string
           updated_at?: string
         }
@@ -317,6 +317,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "team_member_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "team_member_role"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "team_member_team_id_fkey"
             columns: ["team_id"]
             isOneToOne: false
@@ -324,6 +331,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      team_member_role: {
+        Row: {
+          flags: number
+          id: number
+          name: string
+        }
+        Insert: {
+          flags?: number
+          id?: number
+          name: string
+        }
+        Update: {
+          flags?: number
+          id?: number
+          name?: string
+        }
+        Relationships: []
       }
     }
     Views: {
@@ -334,7 +359,6 @@ export type Database = {
     }
     Enums: {
       bp_visibility: "public" | "private" | "unlisted"
-      member_role: "owner" | "editor" | "viewer"
       pay_interval: "monthly" | "yearly"
       profile_role: "admin" | "user"
     }

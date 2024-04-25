@@ -1,7 +1,6 @@
 -- noinspection SqlResolveForFile
 
 create type public.profile_role as enum ('admin', 'user');
-create type public.member_role as enum ('owner', 'editor', 'viewer');
 create type public.bp_visibility as enum ('public', 'private', 'unlisted');
 create type public.pay_interval as enum ('monthly', 'yearly');
 
@@ -83,7 +82,7 @@ ALTER TABLE public.plan
 CREATE TABLE IF NOT EXISTS public.team
 (
     id         uuid PRIMARY KEY     DEFAULT gen_random_uuid(),
-    name       varchar(32) NOT NULL
+    name       varchar(20) NOT NULL UNIQUE
         CONSTRAINT min_name_length CHECK (length(name) >= 3),
     plan_id    smallint REFERENCES public.plan
         ON DELETE SET NULL
@@ -95,17 +94,12 @@ CREATE TABLE IF NOT EXISTS public.team
 ALTER TABLE public.team
     ENABLE ROW LEVEL SECURITY;
 
--- Disallow case-insensitive duplicate team names globally
-CREATE UNIQUE INDEX
-    IF NOT EXISTS uidx_team_unique_name
-    ON public.team (lower(name));
-
 -- //////////////////////////////// BOOK ////////////////////////////////
 
 CREATE TABLE IF NOT EXISTS public.book
 (
     id         uuid PRIMARY KEY     DEFAULT gen_random_uuid(),
-    name       varchar(32) NOT NULL
+    name       varchar(20) NOT NULL
         CONSTRAINT min_name_length CHECK (length(name) >= 2),
     team_id    uuid        NOT NULL REFERENCES public.team (id)
         ON DELETE CASCADE
@@ -125,19 +119,31 @@ CREATE UNIQUE INDEX
     IF NOT EXISTS uidx_book_unique_name_per_team
     ON public.book (team_id, lower(name));
 
+-- //////////////////////////////// TEAM_MEMBER_ROLE ////////////////////////////////
+CREATE TABLE IF NOT EXISTS public.team_member_role
+(
+    id    serial PRIMARY KEY,
+    name  varchar(32) NOT NULL
+        CONSTRAINT min_name_length CHECK (length(name) >= 3),
+    flags bigint      NOT NULL DEFAULT 0
+);
+
+ALTER TABLE public.team_member_role
+    ENABLE ROW LEVEL SECURITY;
+
 -- //////////////////////////////// TEAM_MEMBER ////////////////////////////////
 
 CREATE TABLE IF NOT EXISTS public.team_member
 (
-    profile_id uuid               NOT NULL REFERENCES public.profile (id)
+    profile_id uuid        NOT NULL REFERENCES public.profile (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    team_id    uuid               NOT NULL REFERENCES public.team (id)
+    team_id    uuid        NOT NULL REFERENCES public.team (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    role       public.member_role NOT NULL DEFAULT 'viewer'::public.member_role,
-    created_at timestamptz        NOT NULL DEFAULT now(),
-    updated_at timestamptz        NOT NULL DEFAULT now(),
+    role_id    smallint    NOT NULL REFERENCES public.team_member_role (id),
+    created_at timestamptz NOT NULL DEFAULT now(),
+    updated_at timestamptz NOT NULL DEFAULT now(),
 
     PRIMARY KEY (profile_id, team_id)
 );
@@ -159,7 +165,8 @@ CREATE TABLE IF NOT EXISTS public.blueprint
     visibility public.bp_visibility NOT NULL DEFAULT 'private'::bp_visibility,
     name       varchar(128)         NOT NULL
         CONSTRAINT min_name_length CHECK (length(name) >= 3),
-    tags       varchar[],
+    tags       varchar(32)[]
+        CONSTRAINT max_tags_length CHECK (array_length(tags, 1) <= 16),
     -- The actual data (including canvas) of the blueprint
     data       jsonb                NOT NULL DEFAULT '{}'::jsonb,
     created_at timestamptz          NOT NULL DEFAULT now(),
