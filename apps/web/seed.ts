@@ -34,20 +34,20 @@ function generateUnique(context: Set<string>, generateFn: () => string) {
   return value;
 }
 
-function createWordGenerator({
-  range,
-  maxChars,
+function createSentenceGenerator({
+  words,
+  maxLength,
   casing,
 }: {
-  range: MinMaxRange;
-  maxChars?: number;
+  words: MinMaxRange;
+  maxLength?: number;
   casing?: "PascalCase";
 }) {
-  const [min, max] = range;
+  const [min, max] = words;
   return () => {
     let generated = lorem.generateWords(generateNumber(min, max));
     if (casing === "PascalCase") generated = pascalCase(generated);
-    return maxChars ? capStringLength(generated, maxChars) : generated;
+    return maxLength ? capStringLength(generated, maxLength) : generated;
   };
 }
 
@@ -70,43 +70,44 @@ async function main() {
   /** Generates an array of unique game names (wrapped) */
   function generateGames() {
     const nameContext = new Set<string>();
-    const wordGenerator = createWordGenerator({
-      range: [1, 2],
-      maxChars: 20,
+    const nameGenerator = createSentenceGenerator({
+      words: [1, 2],
+      maxLength: 20,
       casing: "PascalCase",
     });
     return generateArray({
       range: [1, 4],
       fillFn: () => ({
-        name: generateUnique(nameContext, wordGenerator),
+        name: generateUnique(nameContext, nameGenerator),
       }),
     });
   }
 
   /** Generates an array of unique book names (wrapped) */
   function generateBooks() {
-    const wordGenerator = createWordGenerator({
-      range: [1, 2],
-      maxChars: 20,
+    const nameGenerator = createSentenceGenerator({
+      words: [1, 2],
+      maxLength: 20,
       casing: "PascalCase",
     });
     const ctx = new Set<string>();
     return generateArray({
       range: [3, 10],
       fillFn: () => ({
-        name: capStringLength(generateUnique(ctx, wordGenerator), 20),
+        name: generateUnique(ctx, nameGenerator),
       }),
     });
   }
 
   /** Generates an array of blueprint tags */
   function generateBlueprintTags() {
+    const nameGenerator = createSentenceGenerator({
+      words: [1, 5],
+      maxLength: 32,
+    });
     return generateArray({
       range: [0, 10],
-      fillFn: createWordGenerator({
-        range: [1, 5],
-        maxChars: 32,
-      }),
+      fillFn: nameGenerator,
     });
   }
 
