@@ -85,16 +85,16 @@ async function main() {
 
   /** Generates an array of unique book names (wrapped) */
   function generateBooks() {
+    const nameContext = new Set<string>();
     const nameGenerator = createSentenceGenerator({
-      words: [1, 2],
+      words: [1, 3],
       maxLength: 20,
       casing: "PascalCase",
     });
-    const ctx = new Set<string>();
     return generateArray({
       range: [3, 10],
       fillFn: () => ({
-        name: generateUnique(ctx, nameGenerator),
+        name: generateUnique(nameContext, nameGenerator),
       }),
     });
   }
@@ -113,7 +113,7 @@ async function main() {
 
   const { game } = await seed.game(generateGames);
 
-  const { book } = await seed.plan(
+  const { book, plan } = await seed.plan(
     ["Essential", "Advanced", "Pro"].map((name, index) => ({
       name,
       is_default: index === 0,
@@ -126,7 +126,7 @@ async function main() {
   const { arena } = await seed.arena((x) => x(10));
 
   await seed.blueprint((x) => x(500, { tags: generateBlueprintTags }), {
-    connect: { book, arena },
+    connect: { book, plan, arena },
   });
 
   await seed.team_member_role([
