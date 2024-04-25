@@ -3,6 +3,8 @@ import { pascalCase } from "@repo/utils";
 import { createSeedClient } from "@snaplet/seed";
 import { LoremIpsum } from "lorem-ipsum";
 
+type MinMaxRange = readonly [min: number, max: number];
+
 const lorem = new LoremIpsum({
   sentencesPerParagraph: {
     min: 4,
@@ -14,44 +16,50 @@ const lorem = new LoremIpsum({
   },
 });
 
-function rand(min: number, max: number) {
-  return Math.ceil(Math.random() * (max - min) + min);
+function generateNumber(min: number, max: number) {
+  return Math.round(Math.random() * (max - min) + min);
 }
 
-function capLength(str: string, length: number) {
+function capStringLength(str: string, length: number) {
   if (str.length <= length) return str;
   return str.substring(0, length);
 }
 
-function generateUnique(context: Set<string>, generatorFn: () => string) {
+function generateUnique(context: Set<string>, generateFn: () => string) {
   let value: string;
   do {
-    value = generatorFn();
+    value = generateFn();
   } while (context.has(value));
   context.add(value);
   return value;
 }
 
 function createWordGenerator({
-  min,
-  max,
+  range,
   maxChars,
   casing,
 }: {
-  min: number;
-  max: number;
+  range: MinMaxRange;
   maxChars?: number;
-  casing?: "pascalCase";
+  casing?: "PascalCase";
 }) {
+  const [min, max] = range;
   return () => {
-    let generated = lorem.generateWords(rand(min, max));
-    if (casing === "pascalCase") generated = pascalCase(generated);
-    return maxChars ? capLength(generated, maxChars) : generated;
+    let generated = lorem.generateWords(generateNumber(min, max));
+    if (casing === "PascalCase") generated = pascalCase(generated);
+    return maxChars ? capStringLength(generated, maxChars) : generated;
   };
 }
 
-function generateArray<T>(min: number, max: number, fillFn: () => T): T[] {
-  return Array.from({ length: rand(min, max) }, fillFn);
+function generateArray<T>({
+  range,
+  fillFn,
+}: {
+  range: MinMaxRange;
+  fillFn: () => T;
+}): T[] {
+  const [min, max] = range;
+  return Array.from({ length: generateNumber(min, max) }, fillFn);
 }
 
 async function main() {
@@ -59,79 +67,66 @@ async function main() {
 
   await seed.$resetDatabase();
 
-  const { game } = await (() => {
-    const ctx = new Set<string>();
-    return seed.game(
-      generateArray(1, 4, () => ({
-        name: generateUnique(
-          ctx,
-          createWordGenerator({
-            min: 1,
-            max: 2,
-            casing: "pascalCase",
-          }),
-        ),
-      })),
-    );
-  })();
-
-  function generateBooks() {
-    const ctx = new Set<string>(); // Set that ensures no duplicates
-    return generateArray(3, 10, () => ({
-      name: capLength(
-        generateUnique(
-          ctx,
-          createWordGenerator({
-            min: 1,
-            max: 2,
-            maxChars: 20,
-            casing: "pascalCase",
-          }),
-        ),
-        20,
-      ),
-    }));
+  /** Generates an array of unique game names (wrapped) */
+  function generateGames() {
+    const nameContext = new Set<string>();
+    const wordGenerator = createWordGenerator({
+      range: [1, 2],
+      maxChars: 20,
+      casing: "PascalCase",
+    });
+    return generateArray({
+      range: [1, 4],
+      fillFn: () => ({
+        name: generateUnique(nameContext, wordGenerator),
+      }),
+    });
   }
 
+  /** Generates an array of unique book names (wrapped) */
+  function generateBooks() {
+    const wordGenerator = createWordGenerator({
+      range: [1, 2],
+      maxChars: 20,
+      casing: "PascalCase",
+    });
+    const ctx = new Set<string>();
+    return generateArray({
+      range: [3, 10],
+      fillFn: () => ({
+        name: capStringLength(generateUnique(ctx, wordGenerator), 20),
+      }),
+    });
+  }
+
+  /** Generates an array of blueprint tags */
+  function generateBlueprintTags() {
+    return generateArray({
+      range: [0, 10],
+      fillFn: createWordGenerator({
+        range: [1, 5],
+        maxChars: 32,
+      }),
+    });
+  }
+
+  const { game } = await seed.game(generateGames);
+
   const { book } = await seed.plan(
-    [
-      {
-        name: "Essential",
-        is_default: true,
-        team: (x) => x(3, { book: generateBooks() }),
-      },
-      {
-        name: "Advanced",
-        team: (x) => x(3, { book: generateBooks() }),
-      },
-      {
-        name: "Pro",
-        team: (x) => x(3, { book: generateBooks() }),
-      },
-    ],
-    {
-      connect: { game },
-    },
+    ["Essential", "Advanced", "Pro"].map((name, index) => ({
+      name,
+      is_default: index === 0,
+      pricing: index === 0 ? 0 : undefined /* randomize */,
+      team: (x) => x(3, { book: generateBooks }),
+    })),
+    { connect: { game } },
   );
 
   const { arena } = await seed.arena((x) => x(10));
 
-  await seed.blueprint(
-    (x) =>
-      x(500, {
-        tags: () =>
-          generateArray(
-            0,
-            10,
-            createWordGenerator({
-              min: 1,
-              max: 5,
-              maxChars: 32,
-            }),
-          ),
-      }),
-    { connect: { book, arena } },
-  );
+  await seed.blueprint((x) => x(500, { tags: generateBlueprintTags }), {
+    connect: { book, arena },
+  });
 
   await seed.team_member_role([
     {
