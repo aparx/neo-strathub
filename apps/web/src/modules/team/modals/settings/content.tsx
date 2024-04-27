@@ -3,6 +3,7 @@ import {
   PlanOverview,
   SettingField,
 } from "@/modules/team/modals/settings/components";
+import { formatCurrency } from "@/utils/generic";
 import {
   BreadcrumbData,
   Breadcrumbs,
@@ -27,7 +28,7 @@ export function TeamSettingsModalContent({ team }: TeamSettingsModalProps) {
   );
 
   const pricing = team.plan?.pricing ?? 0;
-  const priceTag = pricing > 0 ? `$${pricing} / month` : "Free";
+  const priceTag = pricing > 0 ? `${formatCurrency(pricing)} / month` : "Free";
 
   return (
     <Modal.Content>
@@ -89,7 +90,7 @@ function SettingsForm({ team }: TeamSettingsModalProps) {
       </Flexbox>
 
       {/* Footer */}
-      <Flexbox gap={"sm"} style={{ marginLeft: "auto" }}>
+      <Flexbox gap={"md"} style={{ marginLeft: "auto" }}>
         <Modal.Close asChild>
           <Button>Cancel</Button>
         </Modal.Close>

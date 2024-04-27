@@ -43,6 +43,7 @@ export const cell = style({
   position: "relative",
   padding: vars.spacing.md,
   textAlign: "left",
+  verticalAlign: "middle",
 });
 
 export const row = style({

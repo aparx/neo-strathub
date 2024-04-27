@@ -92,6 +92,7 @@ interface MemberRowProps {
 }
 
 function MemberRow({ member, teamId }: MemberRowProps) {
+  const { user } = useUserContext();
   const flags = member.team_member_role?.flags;
   const joinDate = useMemo(
     () => new Date(member.created_at).toLocaleDateString(),
@@ -108,6 +109,8 @@ function MemberRow({ member, teamId }: MemberRowProps) {
     // TODO error & success handling
   };
 
+  const isSelf = user?.id === member.profile_id;
+
   return (
     <Table.Row>
       <Table.Cell>{member.profile?.username ?? "(Deleted)"}</Table.Cell>
@@ -116,7 +119,7 @@ function MemberRow({ member, teamId }: MemberRowProps) {
           width={110}
           initialRoleId={member.role_id}
           onRoleChange={onRoleUpdate}
-          disabled={!hasFlag(flags, TeamMemberFlags.EDIT_MEMBERS)}
+          disabled={!hasFlag(flags, TeamMemberFlags.EDIT_MEMBERS) || isSelf}
         />
       </Table.Cell>
       <Table.Cell>{joinDate}</Table.Cell>
@@ -124,7 +127,7 @@ function MemberRow({ member, teamId }: MemberRowProps) {
         <IconButton
           aria-label={"Edit"}
           style={{ margin: "auto" }}
-          disabled={!hasFlag(flags, TeamMemberFlags.KICK_MEMBERS)}
+          disabled={!hasFlag(flags, TeamMemberFlags.KICK_MEMBERS) || isSelf}
         >
           <Icon.Mapped type={"details"} />
         </IconButton>
