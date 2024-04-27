@@ -1,3 +1,5 @@
+import { Nullish } from "@repo/utils";
+
 export enum TeamMemberFlags {
   /** Allows to view and interact with documents */
   VIEW_DOCUMENTS = 2 ** 0,
@@ -20,4 +22,12 @@ export enum TeamMemberFlags {
     ADD_MEMBERS |
     EDIT_MEMBERS |
     KICK_MEMBERS,
+}
+
+export function hasFlag(mask: Nullish<number>, flag: number) {
+  return mask != null && (mask & flag) !== 0;
+}
+
+export function setFlag(mask: Nullish<number>, flag: number, active: boolean) {
+  return mask != null ? (active ? mask | flag : mask & ~flag) : flag;
 }

@@ -1,5 +1,8 @@
 "use client";
+import { createClient } from "@/utils/supabase/client";
+import { Tables } from "@/utils/supabase/types";
 import * as Select from "@radix-ui/react-select";
+import { SelectProps } from "@radix-ui/react-select";
 import { vars } from "@repo/theme";
 import { Icon, Text } from "@repo/ui/components";
 import { capitalize } from "@repo/utils";
@@ -11,45 +14,72 @@ import { RoleSelectVariants } from "./roleSelect.css";
 
 type RoleColor = NonNullable<RoleSelectVariants>["color"];
 
-export interface RoleSelectProps {
+export interface RoleSelectProps
+  extends Omit<SelectProps, "value" | "onValueChange"> {
   initialRoleId: number;
-  onRoleChange?: (newRoleId: number) => any;
+  onRoleChange?: (newRole: Tables<"team_member_role">) => any;
 }
 
-export function RoleSelect({ initialRoleId, onRoleChange }: RoleSelectProps) {
+export function RoleSelect({
+  initialRoleId,
+  onRoleChange,
+  disabled,
+  ...restProps
+}: RoleSelectProps) {
   const [value, setValue] = useState<string>();
 
-  const { data: roles } = useGetRoles();
+  const {
+    data: { data: roles },
+  } = useSuspenseQuery({
+    queryKey: ["teamRoles"],
+    queryFn: async () => createClient().from("team_member_role").select(),
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
+  });
 
-  useEffect(() => {}, [roles]);
+  const colorMap = useMemo(() => {
+    const map = new Map<string, RoleColor>();
+    if (!roles) return map;
+    // Update the appropriate colors for each role, based on their flags
+    const colorPool: RoleColor[] = ["primary", "warning", "destructive"];
+    roles
+      .sort((a, b) => a.flags - b.flags)
+      .forEach((x, i) => map.set(x.name, colorPool[i % colorPool.length]));
+    return map;
+  }, [roles]);
 
-  const roleColorMap = new Map<string, RoleColor>();
-  if (roles) {
-  }
+  useEffect(() => {
+    // Update the initial role
+    setValue(roles?.find((x) => x.id === initialRoleId)?.name);
+  }, [roles]);
 
-  const color = useMemo(
-    () => (value ? roleColorMap.get(value) : null),
-    [value],
-  );
+  // The color of the current role
+  const color = value ? colorMap.get(value) : null;
 
   return (
     <Select.Root
       value={value}
       onValueChange={(val) => {
         setValue(val as any);
-        onRoleChange?.(val as any);
+        if (!onRoleChange) return;
+        const found = roles?.find((x) => x.name === val);
+        if (found) onRoleChange(found);
       }}
+      disabled={disabled}
+      {...restProps}
     >
       <Text asChild type={"label"} data={{ weight: 500 }}>
         <Select.Trigger
           className={css.trigger({ color: color ?? "primary" })}
           style={{ width: 120 }}
         >
-          <div className={css.indicator} />
+          <div className={css.itemIndicator} />
           <Select.Value />
-          <Select.Icon style={{ marginLeft: "auto" }}>
-            <Icon.Mapped type={"expand"} />
-          </Select.Icon>
+          {!disabled && (
+            <Select.Icon className={css.triggerExpand}>
+              <Icon.Mapped type={"expand"} size={"sm"} />
+            </Select.Icon>
+          )}
         </Select.Trigger>
       </Text>
       <Select.Portal>
@@ -58,11 +88,13 @@ export function RoleSelect({ initialRoleId, onRoleChange }: RoleSelectProps) {
             <Icon.Custom icon={<BiChevronUp />} />
           </Select.ScrollUpButton>
           <Select.Viewport>
-            {Object.getOwnPropertyNames(roleColorMap).map((key) => {
-              return (
-                <Item key={key} name={key} color={roleColorMap.get(key)} />
-              );
-            })}
+            {roles?.map((role) => (
+              <Item
+                key={role.id}
+                name={role.name}
+                color={colorMap.get(role.name)}
+              />
+            ))}
           </Select.Viewport>
           <Select.ScrollDownButton>
             <Icon.Custom icon={<BiChevronDown />} />
@@ -84,17 +116,10 @@ function Item({ name, color }: { name: string; color: RoleColor }) {
         }}
       >
         <Select.ItemIndicator>
-          <div className={css.indicator} />
+          <div className={css.itemIndicator} />
         </Select.ItemIndicator>
         <Select.ItemText>{capitalize(name)}</Select.ItemText>
       </Select.Item>
     </Text>
   );
-}
-
-function useGetRoles() {
-  return useSuspenseQuery({
-    queryKey: ["roles"],
-    queryFn: () => null,
-  });
 }

@@ -7,13 +7,18 @@ export const trigger = recipe({
   base: [
     sprinkles({ outline: "card" }),
     {
+      position: "relative",
       padding: vars.spacing.sm,
       paddingRight: vars.spacing.md,
       display: "flex",
       alignItems: "center",
       gap: vars.spacing.md,
-      cursor: "pointer",
       borderRadius: vars.roundness.full,
+      selectors: {
+        "&:not([data-disabled])": {
+          cursor: "pointer",
+        },
+      },
     },
   ],
   variants: {
@@ -39,7 +44,14 @@ export const trigger = recipe({
 
 export type RoleSelectVariants = RecipeVariants<typeof trigger>;
 
-export const indicator = style({
+export const triggerExpand = style({
+  position: "absolute",
+  right: vars.spacing.sm,
+  background: "inherit",
+  lineHeight: 0.5,
+});
+
+export const itemIndicator = style({
   width: "1em",
   height: "1em",
   background: "currentColor",

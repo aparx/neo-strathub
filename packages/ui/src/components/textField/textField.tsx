@@ -25,8 +25,8 @@ export function TextField({
     <Text>
       <label
         className={mergeClassNames(css.shell({ state }), className)}
-        style={style}
         data-state={state}
+        style={style}
       >
         {leading != null && leading}
         <input
