@@ -155,7 +155,6 @@ function MemberSlot({
   return (
     <MemberRow
       key={member.profile_id}
-      highlight={isUserThemselves}
       onRemove={onRemove}
       member={member}
       canModify={canModify}
@@ -166,14 +165,11 @@ function MemberSlot({
 
 function MemberRow({
   member: { created_at, profile_id, role_id, team_id, profile },
-  highlight,
   canKick,
   canModify,
   onRemove,
 }: {
   member: TeamMember;
-  /** Highlight this row (for example, if it is the logged in user themselves) */
-  highlight?: boolean;
   canKick?: boolean;
   canModify?: boolean;
   onRemove: () => any;
@@ -189,7 +185,7 @@ function MemberRow({
   };
 
   return (
-    <Table.Row className={css.memberRow({ highlight })}>
+    <Table.Row>
       <Table.Cell>{profile?.username ?? "(Deleted)"}</Table.Cell>
       <Table.Cell>
         <RoleSelect
