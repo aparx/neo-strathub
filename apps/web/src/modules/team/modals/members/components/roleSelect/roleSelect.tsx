@@ -4,11 +4,11 @@ import { Tables } from "@/utils/supabase/types";
 import * as Select from "@radix-ui/react-select";
 import { SelectProps } from "@radix-ui/react-select";
 import { vars } from "@repo/theme";
-import { Icon, Text } from "@repo/ui/components";
-import { capitalize } from "@repo/utils";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { Icon, Skeleton, Text } from "@repo/ui/components";
+import { Nullish, capitalize } from "@repo/utils";
+import { useQuery } from "@tanstack/react-query";
+import { calc } from "@vanilla-extract/css-utils";
 import { useEffect, useMemo, useState } from "react";
-import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 import * as css from "./roleSelect.css";
 import { RoleSelectVariants } from "./roleSelect.css";
 
@@ -16,29 +16,37 @@ type RoleColor = NonNullable<RoleSelectVariants>["color"];
 
 export interface RoleSelectProps
   extends Omit<SelectProps, "value" | "onValueChange"> {
+  width?: number | string;
   initialRoleId: number;
   onRoleChange?: (newRole: Tables<"team_member_role">) => any;
 }
 
-export function RoleSelect({
-  initialRoleId,
-  onRoleChange,
-  disabled,
-  ...restProps
-}: RoleSelectProps) {
-  const [value, setValue] = useState<string>();
+/** Referencing the height of the `RoleSelect` component */
+export const ROLE_SELECT_HEIGHT = calc.add(
+  vars.fontSizes.label.md,
+  calc.multiply(2, vars.spacing.sm),
+);
 
-  const {
-    data: { data: roles },
-  } = useSuspenseQuery({
+/** Hook that fetches all possible team member roles */
+function useGetRoles() {
+  return useQuery({
     queryKey: ["teamRoles"],
-    queryFn: async () => createClient().from("team_member_role").select(),
+    queryFn: async () => await createClient().from("team_member_role").select(),
     refetchOnWindowFocus: false,
     refetchInterval: false,
   });
+}
 
-  const colorMap = useMemo(() => {
-    const map = new Map<string, RoleColor>();
+type RoleData = NonNullable<
+  NonNullable<ReturnType<typeof useGetRoles>["data"]>["data"]
+>[number];
+
+type RoleColorMap = Map<string, RoleColor>;
+
+/** Hook that returns a map containing colors associated to roles' names */
+function useRoleColorMap(roles: Nullish<RoleData[]>) {
+  return useMemo(() => {
+    const map: RoleColorMap = new Map();
     if (!roles) return map;
     // Update the appropriate colors for each role, based on their flags
     const colorPool: RoleColor[] = ["primary", "warning", "destructive"];
@@ -47,14 +55,34 @@ export function RoleSelect({
       .forEach((x, i) => map.set(x.name, colorPool[i % colorPool.length]));
     return map;
   }, [roles]);
+}
+
+export function RoleSelect({
+  width,
+  initialRoleId,
+  onRoleChange,
+  disabled,
+  ...restProps
+}: RoleSelectProps) {
+  const [value, setValue] = useState<string>();
+  const { data, isLoading } = useGetRoles();
+  const roles = data?.data;
+  const colorMap = useRoleColorMap(roles);
 
   useEffect(() => {
     // Update the initial role
     setValue(roles?.find((x) => x.id === initialRoleId)?.name);
   }, [roles]);
 
-  // The color of the current role
-  const color = value ? colorMap.get(value) : null;
+  if (isLoading)
+    return (
+      <Skeleton
+        width={width}
+        height={ROLE_SELECT_HEIGHT}
+        roundness={"full"}
+        outline
+      />
+    );
 
   return (
     <Select.Root
@@ -68,40 +96,64 @@ export function RoleSelect({
       disabled={disabled}
       {...restProps}
     >
-      <Text asChild type={"label"} data={{ weight: 500 }}>
-        <Select.Trigger
-          className={css.trigger({ color: color ?? "primary" })}
-          style={{ width: 120 }}
-        >
-          <div className={css.itemIndicator} />
-          <Select.Value />
-          {!disabled && (
-            <Select.Icon className={css.triggerExpand}>
-              <Icon.Mapped type={"expand"} size={"sm"} />
-            </Select.Icon>
-          )}
-        </Select.Trigger>
-      </Text>
-      <Select.Portal>
-        <Select.Content className={css.content}>
-          <Select.ScrollUpButton>
-            <Icon.Custom icon={<BiChevronUp />} />
-          </Select.ScrollUpButton>
-          <Select.Viewport>
-            {roles?.map((role) => (
-              <Item
-                key={role.id}
-                name={role.name}
-                color={colorMap.get(role.name)}
-              />
-            ))}
-          </Select.Viewport>
-          <Select.ScrollDownButton>
-            <Icon.Custom icon={<BiChevronDown />} />
-          </Select.ScrollDownButton>
-        </Select.Content>
-      </Select.Portal>
+      <Trigger
+        color={value ? colorMap.get(value) : null}
+        width={width}
+        disabled={disabled}
+      />
+      <Portal roles={roles} colorMap={colorMap} />
     </Select.Root>
+  );
+}
+
+function Trigger({
+  color,
+  width,
+  disabled,
+}: {
+  color: Nullish<RoleColor>;
+  width?: string | number;
+  disabled?: boolean;
+}) {
+  return (
+    <Text asChild type={"label"} data={{ weight: 500 }}>
+      <Select.Trigger
+        className={css.trigger({ color: color ?? "primary" })}
+        style={{ minWidth: width }}
+      >
+        <div className={css.itemIndicator} />
+        <Select.Value />
+        {!disabled && (
+          <Select.Icon className={css.triggerExpand}>
+            <Icon.Mapped type={"expand"} size={"sm"} />
+          </Select.Icon>
+        )}
+      </Select.Trigger>
+    </Text>
+  );
+}
+
+function Portal({
+  roles,
+  colorMap,
+}: {
+  roles: Nullish<RoleData[]>;
+  colorMap: RoleColorMap;
+}) {
+  return (
+    <Select.Portal>
+      <Select.Content className={css.content}>
+        <Select.Viewport>
+          {roles?.map((role) => (
+            <Item
+              key={role.id}
+              name={role.name}
+              color={colorMap.get(role.name)}
+            />
+          ))}
+        </Select.Viewport>
+      </Select.Content>
+    </Select.Portal>
   );
 }
 

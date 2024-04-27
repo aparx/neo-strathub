@@ -2,11 +2,11 @@ import { useUserContext } from "@/modules/auth/context";
 import { TeamMemberFlags, hasFlag } from "@/modules/auth/flags";
 import { getTeam } from "@/modules/team/actions";
 import {
+  ROLE_SELECT_HEIGHT,
   RoleSelect,
   RoleSelectProps,
 } from "@/modules/team/modals/members/components";
 import { createClient } from "@/utils/supabase/client";
-import { vars } from "@repo/theme";
 import {
   BreadcrumbData,
   Breadcrumbs,
@@ -18,19 +18,12 @@ import {
 } from "@repo/ui/components";
 import { InferAsync } from "@repo/utils";
 import { useQuery } from "@tanstack/react-query";
-import { calc } from "@vanilla-extract/css-utils";
-import { Suspense, useMemo } from "react";
+import { useMemo } from "react";
 import * as css from "./content.css";
 
 interface TeamMembersModalProps {
   team: NonNullable<InferAsync<ReturnType<typeof getTeam>>["data"]>;
 }
-
-/** Referencing the height of the `RoleSelect` component */
-const MAX_ROW_HEIGHT = calc.add(
-  vars.fontSizes.label.md,
-  calc.multiply(2, vars.spacing.sm),
-);
 
 function useGetMembers(profileId: string, teamId: string) {
   return useQuery({
@@ -120,13 +113,12 @@ function MemberRow({ member, teamId }: MemberRowProps) {
     <Table.Row>
       <Table.Cell>{member.profile?.username ?? "(Deleted)"}</Table.Cell>
       <Table.Cell>
-        <Suspense fallback={<Skeleton width={100} height={MAX_ROW_HEIGHT} />}>
-          <RoleSelect
-            initialRoleId={member.role_id}
-            onRoleChange={onRoleUpdate}
-            disabled={!hasFlag(flags, TeamMemberFlags.EDIT_MEMBERS)}
-          />
-        </Suspense>
+        <RoleSelect
+          width={110}
+          initialRoleId={member.role_id}
+          onRoleChange={onRoleUpdate}
+          disabled={!hasFlag(flags, TeamMemberFlags.EDIT_MEMBERS)}
+        />
       </Table.Cell>
       <Table.Cell>{joinDate}</Table.Cell>
       <Table.Cell>
@@ -147,7 +139,7 @@ function MemberRowSkeleton() {
     <Table.Row>
       {Array.from({ length: 4 }, (_, i) => (
         <Table.Cell key={i}>
-          <Skeleton height={MAX_ROW_HEIGHT} />
+          <Skeleton height={ROLE_SELECT_HEIGHT} />
         </Table.Cell>
       ))}
     </Table.Row>
