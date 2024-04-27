@@ -1,12 +1,7 @@
-import { Database } from "@/utils/supabase/types";
+import type { Database } from "@/utils/supabase/types";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { cache } from "react";
 import "server-only";
-
-export const getServer = cache((cookieStore: ReturnType<typeof cookies>) => {
-  return createAnonServer(cookieStore);
-});
 
 export function createAnonServer(cookieStore: ReturnType<typeof cookies>) {
   return createServerClient<Database>(

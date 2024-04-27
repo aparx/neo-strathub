@@ -14,8 +14,9 @@ import { RoleSelectVariants } from "./roleSelect.css";
 
 type RoleColor = NonNullable<RoleSelectVariants>["color"];
 
-export interface RoleSelectProps
-  extends Omit<SelectProps, "value" | "onValueChange"> {
+type RoleSelectBaseProps = Omit<SelectProps, "value" | "onValueChange">;
+
+export interface RoleSelectProps extends RoleSelectBaseProps {
   width?: number | string;
   initialRoleId: number;
   onRoleChange?: (newRole: Tables<"team_member_role">) => any;
@@ -45,6 +46,7 @@ type RoleColorMap = Map<string, RoleColor>;
 
 /** Hook that returns a map containing colors associated to roles' names */
 function useRoleColorMap(roles: Nullish<RoleData[]>) {
+  // TODO this might be moved to a context in future versions
   return useMemo(() => {
     const map: RoleColorMap = new Map();
     if (!roles) return map;
@@ -88,10 +90,9 @@ export function RoleSelect({
     <Select.Root
       value={value}
       onValueChange={(val) => {
-        setValue(val as any);
-        if (!onRoleChange) return;
-        const found = roles?.find((x) => x.name === val);
-        if (found) onRoleChange(found);
+        setValue(val);
+        const newRole = roles?.find((x) => x.name === val);
+        if (newRole) onRoleChange?.(newRole);
       }}
       disabled={disabled}
       {...restProps}

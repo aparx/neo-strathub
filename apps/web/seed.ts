@@ -83,7 +83,7 @@ async function main() {
     });
   }
 
-  /** Generates an array of unique book names (wrapped) */
+  /** Generates an array of unique book names including an icon string */
   function generateBooks() {
     const nameContext = new Set<string>();
     const nameGenerator = createSentenceGenerator({
@@ -95,6 +95,7 @@ async function main() {
       range: [3, 10],
       fillFn: () => ({
         name: generateUnique(nameContext, nameGenerator),
+        icon: "https://svgur.com/i/15ay.svg",
       }),
     });
   }

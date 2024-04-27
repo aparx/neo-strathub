@@ -159,6 +159,9 @@ importers:
       lorem-ipsum:
         specifier: ^2.0.8
         version: 2.0.8
+      pg-error-enum:
+        specifier: ^0.7.1
+        version: 0.7.1
       postgres:
         specifier: ^3.4.4
         version: 3.4.4
@@ -8117,6 +8120,10 @@ packages:
 
   /perfect-debounce@1.0.0:
     resolution: {integrity: sha512-xCy9V055GLEqoFaHoC1SoLIaLmWctgCUaBaWxDZ7/Zx4CTyX7cJQLJOok/orfjZAh9kEYpjJa4d0KcJmCbctZA==}
+    dev: true
+
+  /pg-error-enum@0.7.1:
+    resolution: {integrity: sha512-3DWzlsIfjc9VrM1TLtTrn2/gruOCIteSdgRDUd2oco/2Qbj/TmMxhtAoBxVd8gy9A+cYc+ODKdD7HCqOTuqRgw==}
     dev: true
 
   /picocolors@1.0.0:

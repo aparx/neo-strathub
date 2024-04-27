@@ -31,7 +31,7 @@ function useGetMembers(profileId: string, teamId: string) {
     queryFn: async () =>
       createClient()
         .from("team_member")
-        .select("*, profile(id, username), team_member_role(id, flags)")
+        .select("*, signup(id, signup), team_member_role(id, flags)")
         .eq("profile_id", profileId)
         .eq("team_id", teamId),
   });

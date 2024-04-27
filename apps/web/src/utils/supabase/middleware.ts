@@ -9,7 +9,7 @@ export async function updateSession(
     response: NextResponse,
     supabase: ReturnType<typeof createAnonServer>,
     user: User | null,
-  ) => NextResponse,
+  ) => Promise<NextResponse>,
 ) {
   let response = NextResponse.next({
     request: {
@@ -65,5 +65,5 @@ export async function updateSession(
 
   const user = await supabase.auth.getUser();
 
-  return callback(response, supabase, user.data.user);
+  return await callback(response, supabase, user.data.user);
 }
