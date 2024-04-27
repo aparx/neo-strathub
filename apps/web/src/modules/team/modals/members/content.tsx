@@ -7,6 +7,7 @@ import {
   RoleSelectProps,
 } from "@/modules/team/modals/members/components";
 import { createClient } from "@/utils/supabase/client";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import {
   BreadcrumbData,
   Breadcrumbs,
@@ -18,7 +19,8 @@ import {
 } from "@repo/ui/components";
 import { InferAsync } from "@repo/utils";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { IoMdRemoveCircle } from "react-icons/io";
 import * as css from "./content.css";
 
 interface TeamMembersModalProps {
@@ -34,6 +36,7 @@ function useGetMembers(profileId: string, teamId: string) {
         .select("*, profile(id, username), team_member_role(id, flags)")
         .eq("profile_id", profileId)
         .eq("team_id", teamId),
+    refetchOnWindowFocus: false,
   });
 }
 
@@ -47,7 +50,30 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
     [team],
   );
   const { user } = useUserContext();
-  const { isLoading, data } = useGetMembers(user!.id, team.id);
+  const { isLoading, data, refetch } = useGetMembers(user!.id, team.id);
+
+  const [members, setMembers] = useState(data?.data);
+
+  useEffect(() => setMembers(data?.data), [data?.data]);
+
+  async function removeMember(member: TeamMember) {
+    // Optimistic update, remove the member first
+    setMembers((current) => {
+      const arrayCopy = current ? [...current] : [];
+      const index = arrayCopy.indexOf(member);
+      if (index != null) delete arrayCopy[index];
+      return arrayCopy;
+    });
+
+    await createClient()
+      .from("team_member")
+      .delete()
+      .eq("profile_id", member.profile_id)
+      .eq("team_id", member.team_id);
+
+    // Refetch to ensure displayed data synchronicity and authenticity
+    refetch().then((newData) => setMembers(newData.data?.data));
+  }
 
   return (
     <Modal.Content minWidth={600}>
@@ -64,7 +90,9 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
             <Table.HeadCell>User</Table.HeadCell>
             <Table.HeadCell>Role</Table.HeadCell>
             <Table.HeadCell>Join date</Table.HeadCell>
-            <Table.HeadCell>Edit</Table.HeadCell>
+            <Table.HeadCell>
+              <VisuallyHidden>Remove</VisuallyHidden>
+            </Table.HeadCell>
           </Table.Row>
         </Table.Head>
         <Table.Body>
@@ -73,11 +101,11 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
                 <MemberRowSkeleton key={index} />
               ))
             : null}
-          {data?.data?.map((member) => (
+          {members?.map((member) => (
             <MemberRow
               key={member.profile_id}
-              member={member}
-              teamId={team.id}
+              onRemove={() => removeMember(member)}
+              {...member}
             />
           ))}
         </Table.Body>
@@ -86,38 +114,42 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
   );
 }
 
-interface MemberRowProps {
-  member: TeamMember;
-  teamId: string;
-}
-
-function MemberRow({ member, teamId }: MemberRowProps) {
+function MemberRow({
+  team_member_role,
+  created_at,
+  profile_id,
+  role_id,
+  team_id,
+  profile,
+  onRemove,
+}: TeamMember & {
+  onRemove: () => any;
+}) {
   const { user } = useUserContext();
-  const flags = member.team_member_role?.flags;
+  const flags = team_member_role?.flags;
   const joinDate = useMemo(
-    () => new Date(member.created_at).toLocaleDateString(),
-    [member.created_at],
+    () => new Date(created_at).toLocaleDateString(),
+    [created_at],
   );
   const onRoleUpdate: RoleSelectProps["onRoleChange"] = async (newRole) => {
-    if (!member) return;
-    console.debug("#_onRoleUpdate", newRole, member.profile_id, teamId);
+    console.debug("#_onRoleUpdate", newRole, profile_id, team_id);
     await createClient()
       .from("team_member")
-      .update({ role_id: member.role_id })
-      .eq("profile_id", member.profile_id)
-      .eq("team_id", teamId);
+      .update({ role_id })
+      .eq("profile_id", profile_id)
+      .eq("team_id", team_id);
     // TODO error & success handling
   };
 
-  const isSelf = user?.id === member.profile_id;
+  const isSelf = user?.id === profile_id;
 
   return (
     <Table.Row>
-      <Table.Cell>{member.profile?.username ?? "(Deleted)"}</Table.Cell>
+      <Table.Cell>{profile?.username ?? "(Deleted)"}</Table.Cell>
       <Table.Cell>
         <RoleSelect
           width={110}
-          initialRoleId={member.role_id}
+          initialRoleId={role_id}
           onRoleChange={onRoleUpdate}
           disabled={!hasFlag(flags, TeamMemberFlags.EDIT_MEMBERS) || isSelf}
         />
@@ -125,11 +157,12 @@ function MemberRow({ member, teamId }: MemberRowProps) {
       <Table.Cell>{joinDate}</Table.Cell>
       <Table.Cell>
         <IconButton
-          aria-label={"Edit"}
+          aria-label={"Kick"}
           style={{ margin: "auto" }}
           disabled={!hasFlag(flags, TeamMemberFlags.KICK_MEMBERS) || isSelf}
+          onClick={onRemove}
         >
-          <Icon.Mapped type={"details"} />
+          <Icon.Custom icon={<IoMdRemoveCircle />} />
         </IconButton>
       </Table.Cell>
     </Table.Row>
