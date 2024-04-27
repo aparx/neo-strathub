@@ -43,6 +43,14 @@ type TeamMember = NonNullable<
   NonNullable<ReturnType<typeof useGetMembers>["data"]>["data"]
 >[number];
 
+function sortMembers(members: Nullish<TeamMember[]>) {
+  return members?.sort((a, b) => {
+    const flagsA = a.team_member_role?.flags;
+    const flagsB = b.team_member_role?.flags;
+    return (flagsA ?? 0) - (flagsB ?? 0);
+  });
+}
+
 export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
   const titlePath: BreadcrumbData[] = useMemo(
     () => [{ display: team.name }, { display: "Members" }],
@@ -53,7 +61,7 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
 
   const [members, setMembers] = useState(data?.data);
 
-  useEffect(() => setMembers(data?.data), [data?.data]);
+  useEffect(() => setMembers(sortMembers(data?.data)), [data?.data]);
 
   async function removeMember(member: TeamMember) {
     // Optimistic update, remove the member first
@@ -61,7 +69,7 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
       const newMembers = current ? [...current] : [];
       const index = newMembers.indexOf(member);
       if (index != null) delete newMembers[index];
-      return newMembers;
+      return newMembers; // Sort not needed, due to simple extraction
     });
 
     await createClient()
@@ -71,7 +79,7 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
       .eq("team_id", member.team_id);
 
     // Refetch to ensure displayed data synchronicity and authenticity
-    refetch().then((newData) => setMembers(newData.data?.data));
+    refetch().then((newData) => setMembers(sortMembers(newData.data?.data)));
   }
 
   const self = useMemo(() => {
@@ -107,8 +115,8 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
           {members?.map((member) => (
             <MemberSlot
               member={member}
-              self={self}
               onRemove={() => removeMember(member)}
+              self={self}
             />
           ))}
         </Table.Body>
@@ -147,6 +155,7 @@ function MemberSlot({
   return (
     <MemberRow
       key={member.profile_id}
+      highlight={isUserThemselves}
       onRemove={onRemove}
       member={member}
       canModify={canModify}
@@ -157,11 +166,14 @@ function MemberSlot({
 
 function MemberRow({
   member: { created_at, profile_id, role_id, team_id, profile },
+  highlight,
   canKick,
   canModify,
   onRemove,
 }: {
   member: TeamMember;
+  /** Highlight this row (for example, if it is the logged in user themselves) */
+  highlight?: boolean;
   canKick?: boolean;
   canModify?: boolean;
   onRemove: () => any;
@@ -177,7 +189,7 @@ function MemberRow({
   };
 
   return (
-    <Table.Row>
+    <Table.Row className={css.memberRow({ highlight })}>
       <Table.Cell>{profile?.username ?? "(Deleted)"}</Table.Cell>
       <Table.Cell>
         <RoleSelect
