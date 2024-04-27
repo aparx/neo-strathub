@@ -21,15 +21,36 @@ export async function createProfile(lastState: any, formData: FormData) {
       message: validated.error.flatten().fieldErrors,
     } as const;
 
-  // TODO profanity filter?
+  // Profiles can only be created by the service due to potential requirements
+  const service = createServiceServer(cookies());
+  const { error } = await service.from("profile").insert({
+    id: user.id,
+    username: validated.data.username,
+    role: "user",
+  });
 
-  const { error } = await createServiceServer(cookies())
-    .from("profile")
-    .insert({
-      id: user.id,
-      username: validated.data.username,
-      role: "user",
-    });
+  console.log(process.env.NODE_ENV);
+
+  if (process.env.NODE_ENV === "development") {
+    // For testing purposes give this member some random teams
+    const teamCount = Math.round(Math.random() * 2) + 1;
+    const { data: teams } = await service
+      .from("team")
+      .select("id")
+      .limit(2 * teamCount);
+    const { data: roles } = await service.from("team_member_role").select("id");
+    if (teams && roles?.length)
+      await service.from("team_member").insert(
+        teams
+          .sort(() => 0.5 - Math.random())
+          .slice(0, teamCount)
+          .map((x) => ({
+            profile_id: user.id,
+            team_id: x.id,
+            role_id: roles[Math.floor(Math.random() * (roles.length - 1))]!.id,
+          })),
+      );
+  }
 
   if (error)
     return {

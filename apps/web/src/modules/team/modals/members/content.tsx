@@ -31,7 +31,7 @@ function useGetMembers(profileId: string, teamId: string) {
     queryFn: async () =>
       createClient()
         .from("team_member")
-        .select("*, signup(id, signup), team_member_role(id, flags)")
+        .select("*, profile(id, username), team_member_role(id, flags)")
         .eq("profile_id", profileId)
         .eq("team_id", teamId),
   });
@@ -48,7 +48,6 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
   );
   const { user } = useUserContext();
   const { isLoading, data } = useGetMembers(user!.id, team.id);
-  const self = data?.data?.find((x) => x.profile_id === user?.id);
 
   return (
     <Modal.Content minWidth={600}>

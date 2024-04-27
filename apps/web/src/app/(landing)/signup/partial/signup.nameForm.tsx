@@ -31,9 +31,8 @@ export function SignupNameForm({ user }: { user: User }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   useEffect(() => {
-    if (state?.state === "success") {
+    if (state?.state === "success")
       router.replace(searchParams.get("redirect") ?? "/dashboard");
-    }
   }, [state]);
 
   return (
@@ -43,6 +42,7 @@ export function SignupNameForm({ user }: { user: User }) {
         <TextField
           name={"username"}
           placeholder={"Username"}
+          defaultValue={user.user_metadata.name}
           error={fieldError}
           required
         />
