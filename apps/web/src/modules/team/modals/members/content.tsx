@@ -17,7 +17,7 @@ import {
   Skeleton,
   Table,
 } from "@repo/ui/components";
-import { InferAsync } from "@repo/utils";
+import { InferAsync, Nullish } from "@repo/utils";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { IoMdRemoveCircle } from "react-icons/io";
@@ -34,7 +34,6 @@ function useGetMembers(profileId: string, teamId: string) {
       createClient()
         .from("team_member")
         .select("*, profile(id, username), team_member_role(id, flags)")
-        .eq("profile_id", profileId)
         .eq("team_id", teamId),
     refetchOnWindowFocus: false,
   });
@@ -59,10 +58,10 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
   async function removeMember(member: TeamMember) {
     // Optimistic update, remove the member first
     setMembers((current) => {
-      const arrayCopy = current ? [...current] : [];
-      const index = arrayCopy.indexOf(member);
-      if (index != null) delete arrayCopy[index];
-      return arrayCopy;
+      const newMembers = current ? [...current] : [];
+      const index = newMembers.indexOf(member);
+      if (index != null) delete newMembers[index];
+      return newMembers;
     });
 
     await createClient()
@@ -74,6 +73,10 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
     // Refetch to ensure displayed data synchronicity and authenticity
     refetch().then((newData) => setMembers(newData.data?.data));
   }
+
+  const self = useMemo(() => {
+    return members?.find((x) => x.profile_id === user?.id);
+  }, [members]);
 
   return (
     <Modal.Content minWidth={600}>
@@ -102,10 +105,10 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
               ))
             : null}
           {members?.map((member) => (
-            <MemberRow
-              key={member.profile_id}
+            <MemberSlot
+              member={member}
+              self={self}
               onRemove={() => removeMember(member)}
-              {...member}
             />
           ))}
         </Table.Body>
@@ -114,23 +117,55 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
   );
 }
 
-function MemberRow({
-  team_member_role,
-  created_at,
-  profile_id,
-  role_id,
-  team_id,
-  profile,
+function MemberSlot({
+  member,
+  self,
   onRemove,
-}: TeamMember & {
+}: {
+  member: TeamMember;
+  /** The user themselves as a member, can be null when they are site admins */
+  self: Nullish<TeamMember>;
   onRemove: () => any;
 }) {
-  const { user } = useUserContext();
-  const flags = team_member_role?.flags;
-  const joinDate = useMemo(
-    () => new Date(created_at).toLocaleDateString(),
-    [created_at],
+  const isUserThemselves = self?.profile_id === member.profile_id;
+  const selfFlags = self?.team_member_role?.flags;
+  const targetFlags = member.team_member_role?.flags;
+  let canModify = hasFlag(selfFlags, TeamMemberFlags.EDIT_MEMBERS);
+  let canKick = hasFlag(selfFlags, TeamMemberFlags.KICK_MEMBERS);
+
+  if (selfFlags && targetFlags) {
+    // Only allow modification of members when they have lower prioritisation
+    const isSelfPrioritized = selfFlags > targetFlags;
+    canModify &&= isSelfPrioritized;
+    canKick &&= isSelfPrioritized;
+  } else {
+    // Only allow modification of members when they are not the user themselves
+    canModify &&= !isUserThemselves;
+    canKick &&= !isUserThemselves;
+  }
+
+  return (
+    <MemberRow
+      key={member.profile_id}
+      onRemove={onRemove}
+      member={member}
+      canModify={canModify}
+      canKick={canKick}
+    />
   );
+}
+
+function MemberRow({
+  member: { created_at, profile_id, role_id, team_id, profile },
+  canKick,
+  canModify,
+  onRemove,
+}: {
+  member: TeamMember;
+  canKick?: boolean;
+  canModify?: boolean;
+  onRemove: () => any;
+}) {
   const onRoleUpdate: RoleSelectProps["onRoleChange"] = async (newRole) => {
     console.debug("#_onRoleUpdate", newRole, profile_id, team_id);
     await createClient()
@@ -141,8 +176,6 @@ function MemberRow({
     // TODO error & success handling
   };
 
-  const isSelf = user?.id === profile_id;
-
   return (
     <Table.Row>
       <Table.Cell>{profile?.username ?? "(Deleted)"}</Table.Cell>
@@ -151,15 +184,17 @@ function MemberRow({
           width={110}
           initialRoleId={role_id}
           onRoleChange={onRoleUpdate}
-          disabled={!hasFlag(flags, TeamMemberFlags.EDIT_MEMBERS) || isSelf}
+          disabled={!canModify}
         />
       </Table.Cell>
-      <Table.Cell>{joinDate}</Table.Cell>
+      <Table.Cell>
+        {useMemo(() => new Date(created_at).toLocaleDateString(), [created_at])}
+      </Table.Cell>
       <Table.Cell>
         <IconButton
           aria-label={"Kick"}
           style={{ margin: "auto" }}
-          disabled={!hasFlag(flags, TeamMemberFlags.KICK_MEMBERS) || isSelf}
+          disabled={!canKick}
           onClick={onRemove}
         >
           <Icon.Custom icon={<IoMdRemoveCircle />} />
