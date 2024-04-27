@@ -47,7 +47,7 @@ function sortMembers(members: Nullish<TeamMember[]>) {
   return members?.sort((a, b) => {
     const flagsA = a.team_member_role?.flags;
     const flagsB = b.team_member_role?.flags;
-    return (flagsA ?? 0) - (flagsB ?? 0);
+    return (flagsB ?? 0) - (flagsA ?? 0);
   });
 }
 
