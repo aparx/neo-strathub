@@ -6,20 +6,20 @@ import {
   RemoveMemberButton,
   RoleSelect,
   RoleSelectProps,
+  UserField,
 } from "@/modules/team/modals/members/components";
 import { createClient } from "@/utils/supabase/client";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import {
   BreadcrumbData,
   Breadcrumbs,
-  Flexbox,
   Modal,
   Skeleton,
   Table,
 } from "@repo/ui/components";
 import { InferAsync, Nullish, timeCallback } from "@repo/utils";
 import { useQuery } from "@tanstack/react-query";
-import { ComponentPropsWithoutRef, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import * as css from "./content.css";
 
 interface TeamMembersModalProps {
@@ -201,24 +201,13 @@ function MemberRow({
       <Table.Cell>
         <RemoveMemberButton
           disabled={!canKick}
-          userField={<UserField username={member.profile?.username} />}
+          userField={
+            <UserField username={member.profile?.username} highlight />
+          }
           onConfirm={onRemove}
         />
       </Table.Cell>
     </Table.Row>
-  );
-}
-
-interface UserFieldProps extends ComponentPropsWithoutRef<"div"> {
-  username?: string;
-}
-
-function UserField({ username, ...restProps }: UserFieldProps) {
-  return (
-    <Flexbox gap={"md"} align={"center"} {...restProps}>
-      <div className={css.avatar} />
-      {username ?? "(Deleted)"}
-    </Flexbox>
   );
 }
 
