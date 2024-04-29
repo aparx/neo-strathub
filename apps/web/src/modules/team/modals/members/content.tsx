@@ -64,19 +64,24 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
   useEffect(() => setMembers(sortMembers(data?.data)), [data?.data]);
 
   async function removeMember(member: TeamMember) {
+    console.debug("#_removeMember", member);
+    // TODO modal that asks if the removal is really what is wanted
+
     // Optimistic update, remove the member first
     setMembers((current) => {
       const newMembers = current ? [...current] : [];
       const index = newMembers.indexOf(member);
-      if (index != null) delete newMembers[index];
+      if (index != null) newMembers.splice(index, 1);
       return newMembers; // Sort not needed, due to simple extraction
     });
 
-    await createClient()
-      .from("team_member")
-      .delete()
-      .eq("profile_id", member.profile_id)
-      .eq("team_id", member.team_id);
+    console.log(
+      await createClient()
+        .from("team_member")
+        .delete()
+        .eq("profile_id", member.profile_id)
+        .eq("team_id", member.team_id),
+    );
 
     // Refetch to ensure displayed data synchronicity and authenticity
     refetch().then((newData) => setMembers(sortMembers(newData.data?.data)));
@@ -114,6 +119,7 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
             : null}
           {members?.map((member) => (
             <MemberSlot
+              key={member.profile_id}
               member={member}
               onRemove={() => removeMember(member)}
               self={self}
@@ -154,7 +160,6 @@ function MemberSlot({
 
   return (
     <MemberRow
-      key={member.profile_id}
       onRemove={onRemove}
       member={member}
       canModify={canModify}
@@ -176,11 +181,13 @@ function MemberRow({
 }) {
   const onRoleUpdate: RoleSelectProps["onRoleChange"] = async (newRole) => {
     console.debug("#_onRoleUpdate", newRole, profile_id, team_id);
-    await createClient()
-      .from("team_member")
-      .update({ role_id })
-      .eq("profile_id", profile_id)
-      .eq("team_id", team_id);
+    console.log(
+      await createClient()
+        .from("team_member")
+        .update({ role_id: newRole.id })
+        .eq("profile_id", profile_id)
+        .eq("team_id", team_id),
+    );
     // TODO error & success handling
   };
 

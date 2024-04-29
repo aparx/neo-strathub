@@ -355,7 +355,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      can_delete_member: {
+        Args: {
+          member: unknown
+        }
+        Returns: boolean
+      }
+      can_update_member: {
+        Args: {
+          member: unknown
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       bp_visibility: "public" | "private" | "unlisted"
