@@ -40,6 +40,7 @@ export function PlanOverview({
         appearance={"icon"}
         color={"cta"}
         style={{ borderRadius: vars.roundness.full }}
+        disabled={!canUpgrade}
       >
         <Icon.Mapped type={"upgrade"} />
       </Button>

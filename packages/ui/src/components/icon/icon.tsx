@@ -1,5 +1,6 @@
 import { ComponentProps } from "react";
 import { BiLogOut } from "react-icons/bi";
+import { CgNotes } from "react-icons/cg";
 import { IoMdEye } from "react-icons/io";
 import {
   MdAdd,
@@ -44,6 +45,7 @@ const iconMap = {
   add: <MdAdd />,
   close: <MdClose />,
   settings: <MdSettings />,
+  log: <CgNotes />,
   rename: <MdOutlineDriveFileRenameOutline />,
   details: <MdMoreVert />,
   members: <MdPeople />,

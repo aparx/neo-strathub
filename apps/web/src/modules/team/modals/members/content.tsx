@@ -3,6 +3,7 @@ import { TeamMemberFlags, hasFlag } from "@/modules/auth/flags";
 import { deleteMember, getTeam } from "@/modules/team/actions";
 import {
   ROLE_SELECT_HEIGHT,
+  RemoveMemberButton,
   RoleSelect,
   RoleSelectProps,
 } from "@/modules/team/modals/members/components";
@@ -11,16 +12,14 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import {
   BreadcrumbData,
   Breadcrumbs,
-  Icon,
-  IconButton,
+  Flexbox,
   Modal,
   Skeleton,
   Table,
 } from "@repo/ui/components";
 import { InferAsync, Nullish, timeCallback } from "@repo/utils";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
-import { IoMdRemoveCircle } from "react-icons/io";
+import { ComponentPropsWithoutRef, useEffect, useMemo, useState } from "react";
 import * as css from "./content.css";
 
 interface TeamMembersModalProps {
@@ -83,9 +82,10 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
       refetch().then((newData) => setMembers(sortMembers(newData.data?.data)));
   }, "removeMember");
 
-  const self = useMemo(() => {
-    return members?.find((x) => x.profile_id === user?.id);
-  }, [members]);
+  const self = useMemo(
+    () => members?.find((x) => x.profile_id === user?.id),
+    [members],
+  );
 
   return (
     <Modal.Content minWidth={600}>
@@ -165,7 +165,7 @@ function MemberSlot({
 }
 
 function MemberRow({
-  member: { created_at, profile_id, role_id, team_id, profile },
+  member,
   canKick,
   canModify,
   onRemove,
@@ -175,26 +175,23 @@ function MemberRow({
   canModify?: boolean;
   onRemove: () => any;
 }) {
-  const onRoleUpdate: RoleSelectProps["onRoleChange"] = async (newRole) => {
+  const { created_at, profile_id, role_id, team_id } = member;
+
+  const updateRole: RoleSelectProps["onSelect"] = async (newRole) => {
     console.debug("#_onRoleUpdate", newRole, profile_id, team_id);
-    console.log(
-      await createClient()
-        .from("team_member")
-        .update({ role_id: newRole.id })
-        .eq("profile_id", profile_id)
-        .eq("team_id", team_id),
-    );
-    // TODO error & success handling
+    // TODO implementation
   };
 
   return (
     <Table.Row>
-      <Table.Cell>{profile?.username ?? "(Deleted)"}</Table.Cell>
+      <Table.Cell>
+        <UserField username={member.profile?.username} />
+      </Table.Cell>
       <Table.Cell>
         <RoleSelect
           width={110}
           initialRoleId={role_id}
-          onRoleChange={onRoleUpdate}
+          onSelect={updateRole}
           disabled={!canModify}
         />
       </Table.Cell>
@@ -202,16 +199,26 @@ function MemberRow({
         {useMemo(() => new Date(created_at).toLocaleDateString(), [created_at])}
       </Table.Cell>
       <Table.Cell>
-        <IconButton
-          aria-label={"Kick"}
-          style={{ margin: "auto" }}
+        <RemoveMemberButton
           disabled={!canKick}
-          onClick={onRemove}
-        >
-          <Icon.Custom icon={<IoMdRemoveCircle />} />
-        </IconButton>
+          userField={<UserField username={member.profile?.username} />}
+          onConfirm={onRemove}
+        />
       </Table.Cell>
     </Table.Row>
+  );
+}
+
+interface UserFieldProps extends ComponentPropsWithoutRef<"div"> {
+  username?: string;
+}
+
+function UserField({ username, ...restProps }: UserFieldProps) {
+  return (
+    <Flexbox gap={"md"} align={"center"} {...restProps}>
+      <div className={css.avatar} />
+      {username ?? "(Deleted)"}
+    </Flexbox>
   );
 }
 

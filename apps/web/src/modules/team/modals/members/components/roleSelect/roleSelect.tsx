@@ -19,7 +19,7 @@ type RoleSelectBaseProps = Omit<SelectProps, "value" | "onValueChange">;
 export interface RoleSelectProps extends RoleSelectBaseProps {
   width?: number | string;
   initialRoleId: number;
-  onRoleChange?: (newRole: Tables<"team_member_role">) => any;
+  onSelect?: (newRole: Tables<"team_member_role">) => any;
 }
 
 /** Referencing the height of the `RoleSelect` component */
@@ -62,7 +62,7 @@ function useRoleColorMap(roles: Nullish<RoleData[]>) {
 export function RoleSelect({
   width,
   initialRoleId,
-  onRoleChange,
+  onSelect,
   disabled,
   ...restProps
 }: RoleSelectProps) {
@@ -92,7 +92,7 @@ export function RoleSelect({
       onValueChange={(val) => {
         setValue(val);
         const newRole = roles?.find((x) => x.name === val);
-        if (newRole) onRoleChange?.(newRole);
+        if (newRole) onSelect?.(newRole);
       }}
       disabled={disabled}
       {...restProps}

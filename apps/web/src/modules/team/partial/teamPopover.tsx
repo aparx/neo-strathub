@@ -21,6 +21,10 @@ export function TeamPopover({ teamId, ...restProps }: TeamPopoverProps) {
           Members
         </OpenModalLink>
       </Popover.Item>
+      <Popover.Item>
+        <Icon.Mapped type={"log"} size={"sm"} />
+        Audit Log
+      </Popover.Item>
       <Popover.Divider />
       <Popover.Item color={"destructive"}>
         <Icon.Mapped type={"leave"} size={"sm"} />

@@ -31,7 +31,7 @@ export function TeamSettingsModalContent({ team }: TeamSettingsModalProps) {
   const priceTag = pricing > 0 ? `${formatCurrency(pricing)} / month` : "Free";
 
   return (
-    <Modal.Content>
+    <Modal.Content minWidth={500}>
       <div className={css.gradient({ color: "primary" })} />
       <Modal.Title>
         <Breadcrumbs breadcrumbs={titlePath} />

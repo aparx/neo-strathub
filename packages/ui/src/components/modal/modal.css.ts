@@ -23,6 +23,7 @@ export const content = style([
     animation: `${keyframes({
       from: { opacity: 0, transform: "translate(-50%, -48%) scale(0.96)" },
     })} 150ms`,
+    color: vars.colors.emphasis.medium,
     animationTimingFunction,
   },
 ]);
@@ -43,6 +44,7 @@ export const title = style({
   justifyContent: "space-between",
   alignItems: "center",
   gap: vars.spacing.md,
+  color: vars.colors.emphasis.high,
 });
 
 export const separator = style({
