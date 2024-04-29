@@ -17,6 +17,11 @@ export const getProfile = cache(
     const server = getServer(cookieStore);
     const user = await getUser(cookieStore);
     if (!user) return null;
-    return server.from("profile").select().eq("id", user.id);
+    const { data } = await server
+      .from("profile")
+      .select()
+      .eq("id", user.id)
+      .maybeSingle();
+    return data;
   },
 );

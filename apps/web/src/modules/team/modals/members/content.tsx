@@ -1,11 +1,12 @@
 import { useUserContext } from "@/modules/auth/context";
 import { TeamMemberFlags, hasFlag } from "@/modules/auth/flags";
-import { getTeam } from "@/modules/team/actions";
+import { deleteMember, getTeam } from "@/modules/team/actions";
 import {
   ROLE_SELECT_HEIGHT,
   RoleSelect,
   RoleSelectProps,
 } from "@/modules/team/modals/members/components";
+import { time } from "@/utils/generic/time";
 import { createClient } from "@/utils/supabase/client";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import {
@@ -64,6 +65,7 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
   useEffect(() => setMembers(sortMembers(data?.data)), [data?.data]);
 
   async function removeMember(member: TeamMember) {
+    console.time("#_removeMember");
     console.debug("#_removeMember", member);
     // TODO modal that asks if the removal is really what is wanted
 
@@ -72,19 +74,16 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
       const newMembers = current ? [...current] : [];
       const index = newMembers.indexOf(member);
       if (index != null) newMembers.splice(index, 1);
-      return newMembers; // Sort not needed, due to simple extraction
+      return newMembers;
     });
 
-    console.log(
-      await createClient()
-        .from("team_member")
-        .delete()
-        .eq("profile_id", member.profile_id)
-        .eq("team_id", member.team_id),
-    );
+    const status = await deleteMember(member.profile_id, member.team_id);
+    console.debug("removeMember", status);
+    console.timeEnd("#_removeMember");
 
     // Refetch to ensure displayed data synchronicity and authenticity
-    refetch().then((newData) => setMembers(sortMembers(newData.data?.data)));
+    if (status.state === "error")
+      refetch().then((newData) => setMembers(sortMembers(newData.data?.data)));
   }
 
   const self = useMemo(() => {
@@ -121,7 +120,7 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
             <MemberSlot
               key={member.profile_id}
               member={member}
-              onRemove={() => removeMember(member)}
+              onRemove={time(() => removeMember(member), "removeMember")}
               self={self}
             />
           ))}

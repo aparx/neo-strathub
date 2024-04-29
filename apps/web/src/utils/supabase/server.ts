@@ -11,6 +11,8 @@ export function createAnonServer(cookieStore: ReturnType<typeof cookies>) {
   );
 }
 
+export type ServiceServer = ReturnType<typeof createServiceServer>;
+
 export function createServiceServer(cookieStore: ReturnType<typeof cookies>) {
   return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
