@@ -147,11 +147,11 @@ function MemberSlot({
     // Only allow modification of members when they have lower prioritisation
     const isSelfPrioritized = selfFlags > targetFlags;
     canModify &&= isSelfPrioritized;
-    canKick &&= isSelfPrioritized || isUserThemselves;
+    canKick &&= isSelfPrioritized;
   } else {
     // Only allow modification of members when they are not the user themselves
     canModify &&= !isUserThemselves;
-    canKick ||= isUserThemselves;
+    canKick &&= !isUserThemselves;
   }
 
   return (
