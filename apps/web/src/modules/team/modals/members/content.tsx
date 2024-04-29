@@ -6,7 +6,6 @@ import {
   RoleSelect,
   RoleSelectProps,
 } from "@/modules/team/modals/members/components";
-import { time } from "@/utils/generic/time";
 import { createClient } from "@/utils/supabase/client";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import {
@@ -18,7 +17,7 @@ import {
   Skeleton,
   Table,
 } from "@repo/ui/components";
-import { InferAsync, Nullish } from "@repo/utils";
+import { InferAsync, Nullish, timeCallback } from "@repo/utils";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { IoMdRemoveCircle } from "react-icons/io";
@@ -64,10 +63,9 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
 
   useEffect(() => setMembers(sortMembers(data?.data)), [data?.data]);
 
-  async function removeMember(member: TeamMember) {
-    console.time("#_removeMember");
-    console.debug("#_removeMember", member);
+  const removeMember = timeCallback(async (member: TeamMember) => {
     // TODO modal that asks if the removal is really what is wanted
+    console.debug("#_removeMember", "invoke", member);
 
     // Optimistic update, remove the member first
     setMembers((current) => {
@@ -78,13 +76,12 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
     });
 
     const status = await deleteMember(member.profile_id, member.team_id);
-    console.debug("removeMember", status);
-    console.timeEnd("#_removeMember");
+    console.debug("#_removeMember", "result", status);
 
     // Refetch to ensure displayed data synchronicity and authenticity
     if (status.state === "error")
       refetch().then((newData) => setMembers(sortMembers(newData.data?.data)));
-  }
+  }, "removeMember");
 
   const self = useMemo(() => {
     return members?.find((x) => x.profile_id === user?.id);
@@ -120,7 +117,7 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
             <MemberSlot
               key={member.profile_id}
               member={member}
-              onRemove={time(() => removeMember(member), "removeMember")}
+              onRemove={() => removeMember(member)}
               self={self}
             />
           ))}
@@ -150,11 +147,11 @@ function MemberSlot({
     // Only allow modification of members when they have lower prioritisation
     const isSelfPrioritized = selfFlags > targetFlags;
     canModify &&= isSelfPrioritized;
-    canKick &&= isSelfPrioritized;
+    canKick &&= isSelfPrioritized || isUserThemselves;
   } else {
     // Only allow modification of members when they are not the user themselves
     canModify &&= !isUserThemselves;
-    canKick &&= !isUserThemselves;
+    canKick ||= isUserThemselves;
   }
 
   return (
