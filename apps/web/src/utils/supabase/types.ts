@@ -224,6 +224,7 @@ export type Database = {
       }
       profile: {
         Row: {
+          avatar: string | null
           created_at: string
           id: string
           role: Database["public"]["Enums"]["profile_role"]
@@ -231,6 +232,7 @@ export type Database = {
           username: string
         }
         Insert: {
+          avatar?: string | null
           created_at?: string
           id: string
           role?: Database["public"]["Enums"]["profile_role"]
@@ -238,6 +240,7 @@ export type Database = {
           username: string
         }
         Update: {
+          avatar?: string | null
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["profile_role"]
@@ -355,18 +358,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      can_delete_member: {
-        Args: {
-          member: unknown
-        }
-        Returns: boolean
-      }
-      can_update_member: {
-        Args: {
-          member: unknown
-        }
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
       bp_visibility: "public" | "private" | "unlisted"

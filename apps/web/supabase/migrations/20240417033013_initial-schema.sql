@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS public.profile
     username   varchar(32)         NOT NULL UNIQUE
         CONSTRAINT min_name_length CHECK (length(username) >= 3),
     role       public.profile_role NOT NULL DEFAULT 'user'::public.profile_role,
+    avatar     varchar,
     created_at timestamptz         NOT NULL DEFAULT now(),
     updated_at timestamptz         NOT NULL DEFAULT now()
 );

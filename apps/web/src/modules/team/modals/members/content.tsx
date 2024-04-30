@@ -1,3 +1,4 @@
+import { UserField } from "@/modules/auth/components";
 import { useUserContext } from "@/modules/auth/context";
 import { TeamMemberFlags, hasFlag } from "@/modules/auth/flags";
 import { deleteMember, getTeam } from "@/modules/team/actions";
@@ -6,7 +7,6 @@ import {
   RemoveMemberButton,
   RoleSelect,
   RoleSelectProps,
-  UserField,
 } from "@/modules/team/modals/members/components";
 import { createClient } from "@/utils/supabase/client";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
@@ -32,7 +32,7 @@ function useGetMembers(profileId: string, teamId: string) {
     queryFn: async () =>
       createClient()
         .from("team_member")
-        .select("*, profile(id, username), team_member_role(id, flags)")
+        .select("*, profile!inner(id, username), team_member_role(id, flags)")
         .eq("team_id", teamId),
     refetchOnWindowFocus: false,
   });
@@ -57,6 +57,7 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
   );
   const { user } = useUserContext();
   const { isLoading, data, refetch } = useGetMembers(user!.id, team.id);
+  console.log(data);
 
   const [members, setMembers] = useState(data?.data);
 
@@ -185,7 +186,7 @@ function MemberRow({
   return (
     <Table.Row>
       <Table.Cell>
-        <UserField username={member.profile?.username} />
+        <UserField profile={member.profile} />
       </Table.Cell>
       <Table.Cell>
         <RoleSelect
@@ -201,9 +202,7 @@ function MemberRow({
       <Table.Cell>
         <RemoveMemberButton
           disabled={!canKick}
-          userField={
-            <UserField username={member.profile?.username} highlight />
-          }
+          userField={<UserField profile={member.profile} />}
           onConfirm={onRemove}
         />
       </Table.Cell>
