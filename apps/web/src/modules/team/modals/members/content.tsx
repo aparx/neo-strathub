@@ -32,7 +32,9 @@ function useGetMembers(profileId: string, teamId: string) {
     queryFn: async () =>
       createClient()
         .from("team_member")
-        .select("*, profile!inner(id, username), team_member_role(id, flags)")
+        .select(
+          "*, profile!inner(id, username, avatar), team_member_role(id, flags)",
+        )
         .eq("team_id", teamId),
     refetchOnWindowFocus: false,
   });
