@@ -68,3 +68,46 @@ CREATE TRIGGER trigger_delete_team_if_empty
     ON public.team_member
     FOR EACH ROW
 EXECUTE FUNCTION delete_team_if_empty();
+
+-- //////////////////////////////// TEAM ////////////////////////////////
+
+CREATE OR REPLACE FUNCTION team_create()
+    RETURNS TRIGGER AS $$
+DECLARE
+    _highest_role   record;
+    _random_game_id int;
+BEGIN
+    if (auth.uid() is not null) then
+        -- Select the highest available role
+        SELECT id, MAX(flags)
+        INTO _highest_role
+        FROM public.team_member_role
+        GROUP BY id
+        LIMIT 1;
+
+        -- Put the authorized user in that team
+        INSERT INTO public.team_member (profile_id, team_id, role_id)
+        VALUES (auth.uid(), new.id, _highest_role.id);
+    end if;
+
+    -- Insert an example book into that team
+    SELECT id INTO _random_game_id FROM public.game ORDER BY random() LIMIT 1;
+
+    if (_random_game_id is null) then
+        -- Skip the creation of a book, since no game is existing
+        return new;
+    end if;
+
+    INSERT INTO public.book (name, team_id, game_id)
+    VALUES ('Example Stratbook', new.id, _random_game_id);
+
+    return new;
+END;
+$$ VOLATILE LANGUAGE plpgsql
+   SECURITY DEFINER;
+
+CREATE TRIGGER trigger_on_team_create
+    AFTER INSERT
+    ON public.team
+    FOR EACH ROW
+EXECUTE FUNCTION team_create();

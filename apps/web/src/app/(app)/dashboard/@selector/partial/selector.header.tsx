@@ -1,4 +1,5 @@
 "use client";
+import { OpenModalLink } from "@/modules/modal/components";
 import { Button, Flexbox, Icon, TextField } from "@repo/ui/components";
 import { useItemContext } from "../context";
 
@@ -13,8 +14,10 @@ export function SelectorHeader() {
         onInput={(e) => filter.update(e.currentTarget.value)}
         style={{ flexGrow: 1 }}
       />
-      <Button appearance={"icon"}>
-        <Icon.Mapped type={"add"} />
+      <Button asChild appearance={"icon"}>
+        <OpenModalLink modal={"createTeam"}>
+          <Icon.Mapped type={"add"} />
+        </OpenModalLink>
       </Button>
     </Flexbox>
   );

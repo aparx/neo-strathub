@@ -1,3 +1,4 @@
+"use client";
 import { useGetTeamFromParams } from "@/modules/modal/hooks";
 import { TeamSettingsModalContent } from "@/modules/team/modals/settings/content";
 import { Spinner } from "@repo/ui/components";
