@@ -1,33 +1,19 @@
 import { vars } from "@repo/theme";
 import { keyframes, style } from "@vanilla-extract/css";
-import { calc } from "@vanilla-extract/css-utils";
+import { blendColors } from "../../utils";
 
 const back = vars.colors.accents[5];
-const front = vars.colors.emphasis.low;
-const blurRadius = 40;
+const front = blendColors(vars.colors.foreground, `${back} 90%`);
 
 export const skeleton = style({
-  position: "relative",
+  height: "100%",
+  width: "100%",
   background: back,
-  contain: "paint",
-  "::after": {
-    content: "",
-    position: "absolute",
-    width: "max(20px, 10%)",
-    height: "150%",
-    top: "50%",
-    transform: "translateY(-50%)",
-    rotate: "33deg",
-    filter: `blur(${blurRadius}px)`,
-    willChange: "left",
-    background: front,
-    animation: `${keyframes({
-      from: {
-        left: calc.subtract("-100%", `${blurRadius}px`),
-      },
-      to: {
-        left: calc.add("100%", `${blurRadius}px`),
-      },
-    })} 1s infinite`,
-  },
+  backgroundImage: `linear-gradient(-45deg, transparent 25%, ${front}, transparent 75%)`,
+  backgroundSize: "250%",
+  backgroundRepeat: "no-repeat",
+  animation: `${keyframes({
+    from: { backgroundPosition: "150%" },
+    to: { backgroundPosition: "-100%" },
+  })} 1s infinite`,
 });

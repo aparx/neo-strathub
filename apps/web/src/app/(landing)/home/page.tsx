@@ -8,7 +8,7 @@ export default async function Page() {
         Strathub Demo
       </Text>
       <Flexbox gap={"md"}>
-        <AuthButton.Login />
+        <AuthButton.SignIn>Login</AuthButton.SignIn>
       </Flexbox>
     </div>
   );

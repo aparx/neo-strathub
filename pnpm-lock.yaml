@@ -116,6 +116,9 @@ importers:
       react-icons:
         specifier: ^5.0.1
         version: 5.0.1(react@18.2.0)
+      server-act:
+        specifier: ^1.1.7
+        version: 1.1.7(typescript@5.3.3)(zod@3.23.3)
       server-only:
         specifier: ^0.0.1
         version: 0.0.1
@@ -8792,6 +8795,19 @@ packages:
       randombytes: 2.1.0
     dev: true
 
+  /server-act@1.1.7(typescript@5.3.3)(zod@3.23.3):
+    resolution: {integrity: sha512-qDT5lujG0TWyWlvJi8gnHvFOwzD/TrGrTIgSGIXLP+PQVW7pa40iBDaOQvTksgRWGKgGWBm2LAsAMyl5lXXiDw==}
+    peerDependencies:
+      typescript: ^5.2.2
+      zod: ^3.22.2
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+    dependencies:
+      typescript: 5.3.3
+      zod: 3.23.3
+    dev: false
+
   /server-only@0.0.1:
     resolution: {integrity: sha512-qepMx2JxAa5jjfzxG79yPPq+8BuFToHd1hm7kI+Z4zAq1ftQiP7HcxMhDDItrbtwVeLg/cY2JnKnrcFkmiswNA==}
     dev: false
@@ -9660,7 +9676,6 @@ packages:
   /typescript@5.3.3:
     resolution: {integrity: sha512-pXWcraxM0uxAS+tN0AG/BF2TyqmHO014Z070UsJ+pFvYuRSq8KH8DmWpnbXe0pEPDHXZV3FcAbJkijJ5oNEnWw==}
     engines: {node: '>=14.17'}
-    dev: true
 
   /ufo@1.5.3:
     resolution: {integrity: sha512-Y7HYmWaFwPUmkoQCUIAYpKqkOf+SbVj/2fJJZ4RJMCfZp0rTGwRbzQD+HghfnhKOjL9E01okqz+ncJskGYfBNw==}

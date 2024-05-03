@@ -142,7 +142,9 @@ CREATE TABLE IF NOT EXISTS public.team_member
     team_id    uuid        NOT NULL REFERENCES public.team (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    role_id    smallint    NOT NULL REFERENCES public.team_member_role (id),
+    role_id    smallint    NOT NULL REFERENCES public.team_member_role (id)
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE,
     created_at timestamptz NOT NULL DEFAULT now(),
     updated_at timestamptz NOT NULL DEFAULT now(),
 

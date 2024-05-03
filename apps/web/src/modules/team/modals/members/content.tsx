@@ -2,6 +2,7 @@ import { UserField } from "@/modules/auth/components";
 import { useUserContext } from "@/modules/auth/context";
 import { TeamMemberFlags, hasFlag } from "@/modules/auth/flags";
 import { deleteMember, getTeam } from "@/modules/team/actions";
+import { updateMember } from "@/modules/team/actions/member/updateMember";
 import {
   ROLE_SELECT_HEIGHT,
   RemoveMemberButton,
@@ -9,7 +10,9 @@ import {
   RoleSelectProps,
 } from "@/modules/team/modals/members/components";
 import { createClient } from "@/utils/supabase/client";
+import { Tables } from "@/utils/supabase/types";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { vars } from "@repo/theme";
 import {
   BreadcrumbData,
   Breadcrumbs,
@@ -17,9 +20,9 @@ import {
   Skeleton,
   Table,
 } from "@repo/ui/components";
-import { InferAsync, Nullish, timeCallback } from "@repo/utils";
+import { InferAsync, Nullish } from "@repo/utils";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import * as css from "./content.css";
 
 interface TeamMembersModalProps {
@@ -33,7 +36,7 @@ function useGetMembers(profileId: string, teamId: string) {
       createClient()
         .from("team_member")
         .select(
-          "*, profile!inner(id, username, avatar), team_member_role(id, flags)",
+          "*, profile!inner(id, username, avatar), team_member_role!inner(id, flags)",
         )
         .eq("team_id", teamId),
     refetchOnWindowFocus: false,
@@ -46,9 +49,7 @@ type TeamMember = NonNullable<
 
 function sortMembers(members: Nullish<TeamMember[]>) {
   return members?.sort((a, b) => {
-    const flagsA = a.team_member_role?.flags;
-    const flagsB = b.team_member_role?.flags;
-    return (flagsB ?? 0) - (flagsA ?? 0);
+    return b.team_member_role.flags - a.team_member_role.flags;
   });
 }
 
@@ -59,14 +60,12 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
   );
   const { user } = useUserContext();
   const { isLoading, data, refetch } = useGetMembers(user!.id, team.id);
-  console.log(data);
 
   const [members, setMembers] = useState(data?.data);
 
   useEffect(() => setMembers(sortMembers(data?.data)), [data?.data]);
 
-  const removeMember = timeCallback(async (member: TeamMember) => {
-    // TODO modal that asks if the removal is really what is wanted
+  const removeMember = useCallback(async (member: TeamMember) => {
     console.debug("#_removeMember", "invoke", member);
 
     // Optimistic update, remove the member first
@@ -77,13 +76,24 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
       return newMembers;
     });
 
-    const status = await deleteMember(member.profile_id, member.team_id);
-    console.debug("#_removeMember", "result", status);
+    await deleteMember(member).catch((e) => {
+      console.error("#_removeMember", "error", e);
+      // Refetch to ensure displayed data synchronicity and authenticity
+      refetch().then(({ data }) => setMembers(sortMembers(data?.data)));
+    });
+  }, []);
 
-    // Refetch to ensure displayed data synchronicity and authenticity
-    if (status.state === "error")
-      refetch().then((newData) => setMembers(sortMembers(newData.data?.data)));
-  }, "removeMember");
+  const updateRole = useCallback(
+    async (member: TeamMember, role: Tables<"team_member_role">) => {
+      console.debug("#_updateMember", "invoke", member, role);
+
+      await updateMember(member, role.id).catch((e) => {
+        console.error("#_updateMember", "error", e);
+        // TODO error handling, toast?
+      });
+    },
+    [],
+  );
 
   const self = useMemo(
     () => members?.find((x) => x.profile_id === user?.id),
@@ -121,6 +131,7 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
               key={member.profile_id}
               member={member}
               onRemove={() => removeMember(member)}
+              onUpdate={(newRole) => updateRole(member, newRole)}
               self={self}
             />
           ))}
@@ -134,11 +145,13 @@ function MemberSlot({
   member,
   self,
   onRemove,
+  onUpdate,
 }: {
   member: TeamMember;
   /** The user themselves as a member, can be null when they are site admins */
   self: Nullish<TeamMember>;
   onRemove: () => any;
+  onUpdate: RoleSelectProps["onSelect"];
 }) {
   const isUserThemselves = self?.profile_id === member.profile_id;
   const selfFlags = self?.team_member_role?.flags;
@@ -154,12 +167,14 @@ function MemberSlot({
   } else {
     // Only allow modification of members when they are not the user themselves
     canModify &&= !isUserThemselves;
-    canKick &&= !isUserThemselves;
   }
+
+  canKick ||= isUserThemselves;
 
   return (
     <MemberRow
       onRemove={onRemove}
+      onUpdate={onUpdate}
       member={member}
       canModify={canModify}
       canKick={canKick}
@@ -172,18 +187,15 @@ function MemberRow({
   canKick,
   canModify,
   onRemove,
+  onUpdate,
 }: {
   member: TeamMember;
   canKick?: boolean;
   canModify?: boolean;
   onRemove: () => any;
+  onUpdate: RoleSelectProps["onSelect"];
 }) {
-  const { created_at, profile_id, role_id, team_id } = member;
-
-  const updateRole: RoleSelectProps["onSelect"] = async (newRole) => {
-    console.debug("#_onRoleUpdate", newRole, profile_id, team_id);
-    // TODO implementation
-  };
+  const { created_at, role_id } = member;
 
   return (
     <Table.Row>
@@ -194,7 +206,7 @@ function MemberRow({
         <RoleSelect
           width={110}
           initialRoleId={role_id}
-          onSelect={updateRole}
+          onSelect={onUpdate}
           disabled={!canModify}
         />
       </Table.Cell>
@@ -204,8 +216,13 @@ function MemberRow({
       <Table.Cell>
         <RemoveMemberButton
           disabled={!canKick}
-          userField={<UserField profile={member.profile} />}
           onConfirm={onRemove}
+          userField={
+            <UserField
+              profile={member.profile}
+              style={{ color: vars.colors.emphasis.high }}
+            />
+          }
         />
       </Table.Cell>
     </Table.Row>

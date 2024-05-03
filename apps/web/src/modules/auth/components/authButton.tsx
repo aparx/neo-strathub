@@ -1,23 +1,46 @@
 "use client";
 import { useSignIn, useSignOut } from "@/utils/hooks";
-import { Button } from "@repo/ui/components";
-import { MdArrowForward } from "react-icons/md";
+import { Button, ButtonProps } from "@repo/ui/components";
 
-export function Login() {
-  const signIn = useSignIn();
+export interface AuthButtonProps extends Omit<ButtonProps, "onClick"> {
+  asChild?: boolean;
+  children: React.ReactNode;
+}
+
+export function SignIn({
+  children,
+  asChild,
+  color = "cta",
+  appearance = "cta",
+  ...restProps
+}: AuthButtonProps) {
   return (
-    <Button onClick={() => signIn()} color={"cta"} appearance={"cta"}>
-      Sign in
-      <MdArrowForward />
+    <Button
+      asChild={asChild}
+      onClick={useSignIn()}
+      color={color}
+      appearance={appearance}
+      {...restProps}
+    >
+      {children}
     </Button>
   );
 }
 
-export function Logout() {
-  const signOut = useSignOut();
+export function SignOut({
+  children,
+  asChild,
+  color = "destructive",
+  ...restProps
+}: AuthButtonProps) {
   return (
-    <Button onClick={() => signOut()} color={"destructive"}>
-      Sign out
+    <Button
+      asChild={asChild}
+      onClick={useSignOut()}
+      color={color}
+      {...restProps}
+    >
+      {children}
     </Button>
   );
 }

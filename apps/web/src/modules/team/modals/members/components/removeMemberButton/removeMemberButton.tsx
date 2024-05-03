@@ -39,13 +39,15 @@ export function RemoveMemberButton({
         </IconButton>
       </Modal.Trigger>
       <Modal.Content>
-        <Modal.Title>Are you sure?</Modal.Title>
-        <Flexbox gap={"md"} align={"center"}>
-          You are about to kick
-          {userField}
-          from the team.
+        <Modal.Title>About to kick a member</Modal.Title>
+        <Flexbox orient={"vertical"} gap={"md"}>
+          <Flexbox gap={"md"} align={"center"}>
+            You are about to kick
+            {userField}
+            from the team.
+          </Flexbox>
+          A kicked member can always rejoin if you invite them to.
         </Flexbox>
-        A kicked member can always rejoin if you invite them to.
         <footer className={css.footer}>
           <Modal.Close asChild>
             <Button>Cancel</Button>

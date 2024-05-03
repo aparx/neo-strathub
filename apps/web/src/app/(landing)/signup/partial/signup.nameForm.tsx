@@ -1,7 +1,7 @@
 "use client";
 import { createProfile } from "@/app/(landing)/signup/actions";
 import * as css from "@/app/(landing)/signup/page.css";
-import { useSignOut } from "@/utils/hooks";
+import { AuthButton } from "@/modules/auth/components";
 import {
   Button,
   Flexbox,
@@ -56,9 +56,7 @@ function Footer({ loading }: { loading?: boolean }) {
   const isPendingOrLoading = useFormStatus().pending || loading;
   return (
     <footer className={css.footer}>
-      <Button onClick={useSignOut()} disabled={isPendingOrLoading}>
-        Logout
-      </Button>
+      <AuthButton.SignOut>Sign out</AuthButton.SignOut>
       <Button type={"submit"} color={"cta"} disabled={isPendingOrLoading}>
         Continue
         {isPendingOrLoading ? (

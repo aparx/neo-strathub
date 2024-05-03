@@ -1,4 +1,3 @@
-import { Slot } from "@radix-ui/react-slot";
 import { sprinkles, vars } from "@repo/theme";
 import { mergeClassNames } from "@repo/utils";
 import { ComponentPropsWithoutRef } from "react";
@@ -6,7 +5,6 @@ import { createLineHeight } from "../../utils";
 import * as css from "./skeleton.css";
 
 export interface SkeletonProps extends ComponentPropsWithoutRef<"div"> {
-  asChild?: boolean;
   /** @default "sm" */
   roundness?: keyof typeof vars.roundness;
   width?: string | number;
@@ -15,7 +13,6 @@ export interface SkeletonProps extends ComponentPropsWithoutRef<"div"> {
 }
 
 export function Skeleton({
-  asChild,
   outline,
   roundness = "sm",
   width,
@@ -24,11 +21,9 @@ export function Skeleton({
   className,
   ...restProps
 }: SkeletonProps) {
-  const Component = asChild ? Slot : "div";
   return (
-    <Component
+    <div
       className={mergeClassNames(
-        css.skeleton,
         outline && sprinkles({ outline: "card" }),
         className,
       )}
@@ -36,9 +31,12 @@ export function Skeleton({
         width,
         height,
         borderRadius: vars.roundness[roundness],
+        overflow: "hidden",
         ...style,
       }}
       {...restProps}
-    />
+    >
+      <div className={css.skeleton} />
+    </div>
   );
 }

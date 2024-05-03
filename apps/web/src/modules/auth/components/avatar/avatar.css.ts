@@ -6,7 +6,7 @@ export const avatar = style({
   borderRadius: "100%",
   aspectRatio: "1 / 1",
   background: vars.colors.emphasis.low,
-  overflow: "hidden",
+  contain: "paint",
 });
 
 export const image = style({

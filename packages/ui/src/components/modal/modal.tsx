@@ -25,7 +25,7 @@ export function Exit() {
 
 export function Title({ className, ...restProps }: Primitive.DialogTitleProps) {
   return (
-    <Text asChild type={"title"} size={"sm"}>
+    <Text asChild type={"title"} size={"md"}>
       <Primitive.Title
         className={mergeClassNames(className, css.title)}
         {...restProps}

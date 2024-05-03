@@ -46,8 +46,6 @@ export function TeamSettingsModalContent({ team }: TeamSettingsModalProps) {
         canUpgrade
       />
 
-      <Modal.Separator />
-
       <SettingsForm team={team} />
     </Modal.Content>
   );

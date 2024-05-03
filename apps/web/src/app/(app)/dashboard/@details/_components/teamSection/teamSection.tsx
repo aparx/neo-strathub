@@ -40,7 +40,7 @@ const statFields = [
     name: "Blueprints",
     fetch: async ({ id }) => ({
       count: await getBlueprintCount(id),
-      max: 20,
+      max: 100,
     }),
   },
 ] as const satisfies StatisticFieldData[];
