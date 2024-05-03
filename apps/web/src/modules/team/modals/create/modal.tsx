@@ -1,12 +1,29 @@
 "use client";
 import { createTeam } from "@/modules/team/actions/createTeam";
-import { Button, Flexbox, Icon, Modal, TextField } from "@repo/ui/components";
+import {
+  Button,
+  Flexbox,
+  Icon,
+  Modal,
+  Spinner,
+  TextField,
+} from "@repo/ui/components";
+import { InferAsync } from "@repo/utils";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 
 export function CreateTeamModal() {
   const [state, dispatch] = useFormState(createTeam, null);
+  const router = useRouter();
 
-  console.log(state);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (state?.state !== "success") return;
+    setLoading(true); // ensure loading state is kept while redirecting
+    router.replace(`/dashboard/${state.createdId}`);
+  }, [state]);
 
   return (
     <Modal.Content asChild>
@@ -15,17 +32,46 @@ export function CreateTeamModal() {
           Create a new team
           <Modal.Exit />
         </Modal.Title>
-        <TextField name={"name"} placeholder={"Unique team name"} />
-        <Flexbox gap={"md"} style={{ marginLeft: "auto" }}>
-          <Modal.Close asChild>
-            <Button>Cancel</Button>
-          </Modal.Close>
-          <Button color={"cta"} disabled={useFormStatus().pending}>
-            Create
-            <Icon.Mapped type={"next"} />
-          </Button>
-        </Flexbox>
+        <FormContent loading={loading} state={state} />
       </form>
     </Modal.Content>
+  );
+}
+
+function FormContent({
+  loading,
+  state,
+}: {
+  loading: boolean;
+  state: InferAsync<ReturnType<typeof createTeam>> | null;
+}) {
+  const isLoading = useFormStatus().pending || loading;
+
+  return (
+    <>
+      <TextField
+        name={"name"}
+        placeholder={"Unique team name"}
+        disabled={isLoading}
+        error={
+          state?.state === "error"
+            ? `Error: ${state?.error?.name?.join(" ")}`
+            : null
+        }
+      />
+      <Flexbox gap={"md"} style={{ marginLeft: "auto" }}>
+        <Modal.Close asChild>
+          <Button>Cancel</Button>
+        </Modal.Close>
+        <Button type={"submit"} color={"cta"} disabled={isLoading}>
+          Create
+          {isLoading ? (
+            <Spinner color={"inherit"} />
+          ) : (
+            <Icon.Mapped type={"next"} />
+          )}
+        </Button>
+      </Flexbox>
+    </>
   );
 }

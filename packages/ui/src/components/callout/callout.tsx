@@ -30,7 +30,7 @@ export function Custom({
       {...restProps}
     >
       <Text type={"label"} size={"lg"}>
-        <Icon.Custom icon={icon} />
+        <Icon.Custom>{icon}</Icon.Custom>
         {children}
       </Text>
     </Flexbox>

@@ -35,7 +35,9 @@ export function RemoveMemberButton({
           className={mergeClassNames(className, css.trigger)}
           {...restProps}
         >
-          <Icon.Custom icon={<IoMdRemoveCircle />} />
+          <Icon.Custom>
+            <IoMdRemoveCircle />
+          </Icon.Custom>
         </IconButton>
       </Modal.Trigger>
       <Modal.Content>

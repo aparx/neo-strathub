@@ -2,6 +2,7 @@
 import { getUser } from "@/modules/auth/actions";
 import { getServer } from "@/utils/supabase/actions";
 import { cookies } from "next/headers";
+import { PostgresError } from "pg-error-enum";
 import { z } from "zod";
 
 const inputSchema = z.object({
@@ -14,11 +15,11 @@ function createError<T>(error: T) {
 
 export async function createTeam(lastState: any, formData: FormData) {
   // Parse form data
-  const validatedForm = inputSchema.safeParse({
+  const validatedFields = inputSchema.safeParse({
     name: formData.get("name"),
   });
-  if (!validatedForm.success)
-    return createError(validatedForm.error?.flatten().fieldErrors);
+  if (!validatedFields.success)
+    return createError(validatedFields.error?.flatten().fieldErrors);
 
   // Authenticate and ensure user is logged in
   const user = await getUser(cookies());
@@ -27,10 +28,17 @@ export async function createTeam(lastState: any, formData: FormData) {
   // Use the authorized anon server to try to create a team, to ensure RLS
   const insertion = await getServer(cookies())
     .from("team")
-    .insert({ name: validatedForm.data!.name })
+    .insert({ name: validatedFields.data!.name })
     .select("id")
     .single();
-  if (insertion.error) return createError(insertion.error);
+  if (insertion.error) {
+    let errorArray = new Array<string>(1);
+    if (insertion.error.code === PostgresError.UNIQUE_VIOLATION)
+      errorArray.push("Name must be unique");
+    else if (insertion.error.code === PostgresError.RAISE_EXCEPTION)
+      errorArray.push(insertion.error.message);
+    return createError({ name: errorArray });
+  }
 
   return {
     state: "success",

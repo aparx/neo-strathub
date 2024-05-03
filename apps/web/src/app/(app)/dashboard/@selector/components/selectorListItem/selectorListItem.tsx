@@ -80,12 +80,11 @@ export function SelectorListItem({
         <Link href={href} ref={linkRef} scroll>
           <Flexbox gap={"md"} align={"center"} style={{ width: "fit-content" }}>
             {loading ? (
-              <Icon.Custom
-                icon={<Spinner size={"1em"} />}
-                className={css.itemIcon}
-              />
+              <Icon.Custom className={css.itemIcon}>
+                <Spinner size={"1em"} />
+              </Icon.Custom>
             ) : icon != null ? (
-              <Icon.Custom icon={icon} className={css.itemIcon} />
+              <Icon.Custom className={css.itemIcon}>{icon}</Icon.Custom>
             ) : null}
             {text}
           </Flexbox>

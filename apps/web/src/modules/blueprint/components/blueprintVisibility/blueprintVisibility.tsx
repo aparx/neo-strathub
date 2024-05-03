@@ -16,7 +16,8 @@ const iconMap = {
   unlisted: <MdLinkOff />,
 } as const satisfies Record<VisibilityKey, React.ReactNode>;
 
-export interface BlueprintVisibilityProps extends Icon.IconBaseProps {
+export interface BlueprintVisibilityProps
+  extends Omit<Icon.IconProps, "children"> {
   type: keyof typeof iconMap;
 }
 
@@ -32,7 +33,9 @@ export function BlueprintVisibility({
       <Tooltip.Root>
         <Tooltip.Trigger asChild>
           <span style={{ color }}>
-            <Icon.Custom icon={iconMap[type]} alt={alt} {...restProps} />
+            <Icon.Custom alt={alt} {...restProps}>
+              {iconMap[type]}
+            </Icon.Custom>
           </span>
         </Tooltip.Trigger>
         <Tooltip.Content style={{ color }}>{type}</Tooltip.Content>

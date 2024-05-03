@@ -1,4 +1,4 @@
-import { ComponentProps } from "react";
+import { ComponentPropsWithoutRef } from "react";
 import { BiLogOut } from "react-icons/bi";
 import { CgNotes } from "react-icons/cg";
 import { IoMdEye } from "react-icons/io";
@@ -22,20 +22,21 @@ import { RiExpandUpDownLine, RiFilterFill, RiFilterLine } from "react-icons/ri";
 import { Text } from "../text";
 import { ICON_SIZES } from "./icon.utils";
 
-export interface IconBaseProps extends Omit<ComponentProps<"div">, "children"> {
+export interface IconProps extends ComponentPropsWithoutRef<"div"> {
   size?: keyof typeof ICON_SIZES;
   alt?: string;
 }
 
-export interface IconProps extends IconBaseProps {
-  icon: React.ReactNode;
-}
-
-export function Custom({ icon, size = "md", alt, ...restProps }: IconProps) {
+export function Custom({
+  children,
+  size = "md",
+  alt,
+  ...restProps
+}: IconProps) {
   return (
     <Text asChild data={{ size: ICON_SIZES[size], lineHeight: 0 }}>
       <i {...restProps} aria-label={alt} aria-hidden={alt == null}>
-        {icon}
+        {children}
       </i>
     </Text>
   );
@@ -67,8 +68,8 @@ const iconMap = {
 export function Mapped({
   type,
   ...restProps
-}: IconBaseProps & {
+}: IconProps & {
   type: keyof typeof iconMap;
 }) {
-  return <Custom icon={iconMap[type]} {...restProps} />;
+  return <Custom {...restProps}>{iconMap[type]}</Custom>;
 }

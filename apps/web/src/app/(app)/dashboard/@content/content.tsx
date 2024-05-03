@@ -72,7 +72,7 @@ function LocationTitle({
   return (
     <Flexbox asChild gap={"md"} align={"center"} style={{ overflow: "hidden" }}>
       <Text type={"label"} size={"lg"}>
-        <Icon.Custom className={css.headerIcon} icon={icon} />
+        <Icon.Custom className={css.headerIcon}>{icon}</Icon.Custom>
         <span>{title}</span>
       </Text>
     </Flexbox>

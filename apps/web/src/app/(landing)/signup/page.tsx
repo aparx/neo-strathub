@@ -20,7 +20,9 @@ export default async function SignupPage() {
       <main className={css.modal}>
         <Text asChild type={"title"}>
           <header className={css.header}>
-            <Icon.Custom icon={<IoMdLogIn />} />
+            <Icon.Custom>
+              <IoMdLogIn />
+            </Icon.Custom>
             Finish your signup
           </header>
         </Text>

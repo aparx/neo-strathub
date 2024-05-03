@@ -76,10 +76,11 @@ function TeamButton({ teamId }: { teamId: string }) {
         >
           {name}
           <Icon.Custom
-            icon={<MdExpandMore />}
             className={css.teamButtonIcon}
             style={{ rotate: state ? "-180deg" : "unset" }}
-          />
+          >
+            <MdExpandMore />
+          </Icon.Custom>
         </IconButton>
       </Popover.Trigger>
       {data != null && (

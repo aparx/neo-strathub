@@ -1,5 +1,5 @@
 import { sprinkles, vars } from "@repo/theme";
-import { globalStyle, style } from "@vanilla-extract/css";
+import { globalStyle, keyframes, style } from "@vanilla-extract/css";
 import { recipe } from "@vanilla-extract/recipes";
 
 const shellBase = style({
@@ -56,6 +56,15 @@ export const input = style({
 export const error = style({
   color: vars.colors.destructive.lighter,
   margin: `${vars.spacing.sm} 0`,
+  animation: `${keyframes({
+    from: { opacity: 0, transform: "translateX(-2px)" },
+  })} .25s`,
+});
+
+export const errorIcon = style({
+  animation: `${keyframes({
+    from: { rotate: "180deg", opacity: 0, scale: ".5" },
+  })} .25s`,
 });
 
 globalStyle(`${input}::placeholder`, {
