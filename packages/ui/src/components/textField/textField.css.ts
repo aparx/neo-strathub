@@ -13,28 +13,6 @@ const shellBase = style({
 
 export const root = style({});
 
-export const textLabel = style({
-  marginBottom: vars.spacing.sm,
-  color: vars.colors.emphasis.medium,
-  transition: ".15s",
-});
-
-export const asterisk = style({
-  color: vars.colors.emphasis.low,
-});
-
-globalStyle(`${root}[data-state='default']:focus-within ${textLabel}`, {
-  color: vars.colors.emphasis.high,
-});
-
-globalStyle(`${root}[data-state='error'] ${textLabel}`, {
-  color: vars.colors.destructive.lighter,
-});
-
-globalStyle(`${root}[data-state='disabled'] ${textLabel}`, {
-  color: vars.colors.emphasis.low,
-});
-
 export const shell = recipe({
   base: [
     shellBase,

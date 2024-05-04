@@ -30,7 +30,6 @@ export interface TextFieldProps extends TextFieldBaseProps {
   className?: string;
   leading?: React.ReactNode;
   error?: Nullish | string | string[];
-  label?: string;
 }
 
 export function TextField({
@@ -40,7 +39,6 @@ export function TextField({
   style,
   error,
   required,
-  label,
   type = "text",
   ...restProps
 }: TextFieldProps) {
@@ -53,11 +51,6 @@ export function TextField({
       data-state={state}
       style={style}
     >
-      {label && (
-        <Text type={"label"} size={"lg"} className={css.textLabel}>
-          {label} {required ? <span className={css.asterisk}>*</span> : null}
-        </Text>
-      )}
       <label className={css.shell({ state })}>
         {leading}
         <input
