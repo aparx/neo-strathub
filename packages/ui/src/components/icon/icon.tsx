@@ -1,7 +1,7 @@
 import { ComponentPropsWithoutRef } from "react";
 import { BiLogOut } from "react-icons/bi";
 import { CgNotes } from "react-icons/cg";
-import { IoMdEye } from "react-icons/io";
+import { IoMdBook, IoMdEye } from "react-icons/io";
 import {
   MdAdd,
   MdAlternateEmail,
@@ -63,6 +63,7 @@ const iconMap = {
   back: <MdArrowBack />,
   next: <MdArrowForward />,
   expand: <RiExpandUpDownLine />,
+  book: <IoMdBook />,
 } as const satisfies Record<string, React.ReactNode>;
 
 export function Mapped({

@@ -29,7 +29,10 @@ export function CreateTeamModal() {
     <Modal.Content asChild>
       <form action={dispatch}>
         <Modal.Title>
-          Create a new team
+          <Flexbox gap={"md"} align={"center"}>
+            <Icon.Mapped type={"members"} />
+            Create a new team
+          </Flexbox>
           <Modal.Exit />
         </Modal.Title>
         <FormContent loading={loading} state={state} />

@@ -11,6 +11,30 @@ const shellBase = style({
   overflow: "hidden",
 });
 
+export const root = style({});
+
+export const textLabel = style({
+  marginBottom: vars.spacing.sm,
+  color: vars.colors.emphasis.medium,
+  transition: ".15s",
+});
+
+export const asterisk = style({
+  color: vars.colors.emphasis.low,
+});
+
+globalStyle(`${root}[data-state='default']:focus-within ${textLabel}`, {
+  color: vars.colors.emphasis.high,
+});
+
+globalStyle(`${root}[data-state='error'] ${textLabel}`, {
+  color: vars.colors.destructive.lighter,
+});
+
+globalStyle(`${root}[data-state='disabled'] ${textLabel}`, {
+  color: vars.colors.emphasis.low,
+});
+
 export const shell = recipe({
   base: [
     shellBase,
@@ -72,8 +96,8 @@ globalStyle(`${input}::placeholder`, {
 });
 
 globalStyle(
-  `${shellBase}:not([data-state='disabled']):hover, 
-   ${shellBase}:not([data-state='disabled']):focus-within`,
+  `${root}:not([data-state='disabled']):hover ${shellBase}, 
+   ${root}:not([data-state='disabled']):focus-within ${shellBase}`,
   {
     background: vars.colors.state.hover.color,
     color: vars.colors.emphasis.high,

@@ -1,6 +1,6 @@
 import { vars } from "@repo/theme";
 import { Icon } from "@repo/ui/components";
-import { Nullish } from "@repo/utils";
+import { mergeClassNames, Nullish } from "@repo/utils";
 import { CSSProperties, InputHTMLAttributes } from "react";
 import { VscError } from "react-icons/vsc";
 import { Text } from "../text";
@@ -30,6 +30,7 @@ export interface TextFieldProps extends TextFieldBaseProps {
   className?: string;
   leading?: React.ReactNode;
   error?: Nullish | string | string[];
+  label?: string;
 }
 
 export function TextField({
@@ -38,6 +39,8 @@ export function TextField({
   className,
   style,
   error,
+  required,
+  label,
   type = "text",
   ...restProps
 }: TextFieldProps) {
@@ -45,29 +48,43 @@ export function TextField({
   const state = disabled ? "disabled" : hasError ? "error" : "default";
 
   return (
-    <Text className={className} style={style}>
-      <label className={css.shell({ state })} data-state={state}>
-        {leading != null && leading}
+    <Text
+      className={mergeClassNames(className, css.root)}
+      data-state={state}
+      style={style}
+    >
+      {label && (
+        <Text type={"label"} size={"lg"} className={css.textLabel}>
+          {label} {required ? <span className={css.asterisk}>*</span> : null}
+        </Text>
+      )}
+      <label className={css.shell({ state })}>
+        {leading}
         <input
           className={css.input}
           disabled={disabled}
           type={type}
+          required={required}
           {...restProps}
         />
-        {error != null && <ErrorIcon />}
+        {hasError && <ErrorIcon />}
       </label>
-      {error != null ? (
-        <Text asChild type={"label"} size={"md"}>
-          <p aria-live={"assertive"} className={css.error}>
-            {Array.isArray(error) ? error.join(", ") : error}
-          </p>
-        </Text>
-      ) : null}
+      {hasError && <Error error={error} />}
     </Text>
   );
 }
 
-export function ErrorIcon() {
+function Error({ error }: { error: Nullish | string | string[] }) {
+  return (
+    <Text asChild type={"label"} size={"md"}>
+      <p aria-live={"assertive"} className={css.error}>
+        {Array.isArray(error) ? error.join(", ") : error}
+      </p>
+    </Text>
+  );
+}
+
+function ErrorIcon() {
   return (
     <Icon.Custom>
       <VscError
