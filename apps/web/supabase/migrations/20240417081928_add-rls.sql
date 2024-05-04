@@ -29,8 +29,8 @@ CREATE POLICY "Public read access"
 CREATE OR REPLACE FUNCTION create_team_rls()
     RETURNS boolean AS $$
 DECLARE
-    _user_id      uuid = auth.uid();
-    _team_count   int;
+    _user_id    uuid = auth.uid();
+    _team_count int;
 BEGIN
     -- Check if the user has permission to create new teams ("hardcap")
     SELECT COUNT(team_id)
@@ -56,6 +56,7 @@ CREATE POLICY "Public read access"
     FOR SELECT TO authenticated USING (true);
 
 -- //////////////////////////////// BOOK ////////////////////////////////
+
 
 -- TODO REMOVE OR EDIT
 CREATE POLICY "Public read access"

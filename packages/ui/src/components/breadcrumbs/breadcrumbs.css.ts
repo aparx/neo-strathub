@@ -12,6 +12,10 @@ const breadcrumbBase = style({
   verticalAlign: "middle",
 });
 
+export const list = style({
+  display: "flex",
+});
+
 export const breadcrumb = recipe({
   base: breadcrumbBase,
   variants: {

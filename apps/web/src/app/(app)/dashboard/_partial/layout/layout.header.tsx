@@ -12,6 +12,7 @@ import {
   Text,
 } from "@repo/ui/components";
 import { calc } from "@vanilla-extract/css-utils";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { MdExpandMore } from "react-icons/md";
@@ -29,23 +30,17 @@ function Navigation() {
   const { teamId } = useParams<{ teamId?: string }>();
 
   const breadcrumbs = useMemo(() => {
-    const array: BreadcrumbsProps["breadcrumbs"] = [];
-    array.push({
-      href: "/dashboard",
-      display: "Dashboard",
-    });
+    const array: BreadcrumbsProps["crumbs"] = [];
+    array.push(<Link href={"/dashboard"}>Dashboard</Link>);
     if (teamId)
       // TODO replace `display: teamId` with a custom component (+ dropdown)
-      array.push({
-        href: "/team",
-        display: <TeamButton teamId={teamId} />,
-      });
+      array.push(<TeamButton teamId={teamId} />);
     return array;
   }, [teamId]);
 
   return (
     <nav style={{ overflow: "hidden" }}>
-      <Breadcrumbs breadcrumbs={breadcrumbs} />
+      <Breadcrumbs crumbs={breadcrumbs} />
     </nav>
   );
 }

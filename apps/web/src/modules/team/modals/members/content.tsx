@@ -13,13 +13,7 @@ import { createClient } from "@/utils/supabase/client";
 import { Tables } from "@/utils/supabase/types";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { vars } from "@repo/theme";
-import {
-  BreadcrumbData,
-  Breadcrumbs,
-  Modal,
-  Skeleton,
-  Table,
-} from "@repo/ui/components";
+import { Breadcrumbs, Modal, Skeleton, Table } from "@repo/ui/components";
 import { InferAsync, Nullish } from "@repo/utils";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -54,10 +48,6 @@ function sortMembers(members: Nullish<TeamMember[]>) {
 }
 
 export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
-  const titlePath: BreadcrumbData[] = useMemo(
-    () => [{ display: team.name }, { display: "Members" }],
-    [team],
-  );
   const { user } = useUserContext();
   const { isLoading, data, refetch } = useGetMembers(user!.id, team.id);
 
@@ -103,7 +93,7 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
   return (
     <Modal.Content minWidth={600}>
       <Modal.Title>
-        <Breadcrumbs breadcrumbs={titlePath} />
+        <Breadcrumbs crumbs={[team.name, "Members"]} />
         <Modal.Exit />
       </Modal.Title>
 

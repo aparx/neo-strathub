@@ -7,6 +7,6 @@ export function useGetTeamFromParams() {
   if (teamId == null) return { error: "Missing teamId", data: null };
   const { data, isLoading } = useTeam(teamId);
   if (isLoading) return { data: null, error: null };
-  if (!data) return { error: "Could not find team", data: null };
+  if (!data) return { data: null, error: "Could not find team" };
   return { data, error: null };
 }

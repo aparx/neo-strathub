@@ -5,7 +5,6 @@ import {
 } from "@/modules/team/modals/settings/components";
 import { formatCurrency } from "@/utils/generic";
 import {
-  BreadcrumbData,
   Breadcrumbs,
   Button,
   Flexbox,
@@ -14,7 +13,6 @@ import {
   TextField,
 } from "@repo/ui/components";
 import { InferAsync, capitalize } from "@repo/utils";
-import { useMemo } from "react";
 import * as css from "./content.css";
 
 interface TeamSettingsModalProps {
@@ -22,11 +20,6 @@ interface TeamSettingsModalProps {
 }
 
 export function TeamSettingsModalContent({ team }: TeamSettingsModalProps) {
-  const titlePath: BreadcrumbData[] = useMemo(
-    () => [{ display: team.name }, { display: "Settings" }],
-    [team],
-  );
-
   const pricing = team.plan?.pricing ?? 0;
   const priceTag = pricing > 0 ? `${formatCurrency(pricing)} / month` : "Free";
 
@@ -34,7 +27,7 @@ export function TeamSettingsModalContent({ team }: TeamSettingsModalProps) {
     <Modal.Content minWidth={500}>
       <div className={css.gradient({ color: "primary" })} />
       <Modal.Title>
-        <Breadcrumbs breadcrumbs={titlePath} />
+        <Breadcrumbs crumbs={[team.name, "Settings"]} />
         <Modal.Exit />
       </Modal.Title>
 

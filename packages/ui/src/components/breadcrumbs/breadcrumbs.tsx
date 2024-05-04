@@ -1,49 +1,39 @@
-import Link from "next/link";
-import { HTMLAttributes, useMemo } from "react";
-import { Flexbox } from "../flexbox";
+import { mergeClassNames } from "@repo/utils";
+import { ComponentPropsWithoutRef } from "react";
 import { Text } from "../text";
 import * as css from "./breadcrumbs.css";
 
-export interface BreadcrumbData {
-  href?: string;
-  display: React.ReactNode;
-}
-
-type BreadcrumbsBaseProps = Omit<HTMLAttributes<HTMLDivElement>, "children">;
+type BreadcrumbsBaseProps = Omit<ComponentPropsWithoutRef<"div">, "children">;
 
 export interface BreadcrumbsProps extends BreadcrumbsBaseProps {
-  breadcrumbs: BreadcrumbData[];
+  crumbs: React.ReactNode[];
 }
 
-export function Breadcrumbs({ breadcrumbs, ...restProps }: BreadcrumbsProps) {
+export function Breadcrumbs({
+  crumbs,
+  className,
+  ...restProps
+}: BreadcrumbsProps) {
   return (
-    <Flexbox asChild>
-      <Text asChild type={"label"} size={"lg"} {...restProps}>
-        <ol>
-          {useMemo(
-            () =>
-              breadcrumbs.map(({ href, display }, index) => {
-                // Determine what component to represent this breadcrumb
-                let child: React.ReactNode;
-                if (!href || index === breadcrumbs.length - 1)
-                  child = <div>{display}</div>;
-                else child = <Link href={href}>{display}</Link>;
-
-                return (
-                  <li
-                    key={index /* OK */}
-                    className={css.breadcrumb({
-                      active: index === breadcrumbs.length - 1,
-                    })}
-                  >
-                    {child}
-                  </li>
-                );
-              }),
-            [breadcrumbs],
-          )}
-        </ol>
-      </Text>
-    </Flexbox>
+    <Text
+      asChild
+      type={"label"}
+      size={"lg"}
+      className={mergeClassNames(className, css.list)}
+      {...restProps}
+    >
+      <ol>
+        {crumbs.map((breadcrumb, index) => (
+          <li
+            key={index /* OK */}
+            className={css.breadcrumb({
+              active: index === crumbs.length - 1,
+            })}
+          >
+            {breadcrumb}
+          </li>
+        ))}
+      </ol>
+    </Text>
   );
 }

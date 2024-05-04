@@ -15,13 +15,20 @@ export enum TeamMemberFlags {
   /** Allows to remove members (temporarily, until added again) */
   KICK_MEMBERS = 2 ** 5,
 
+  /** Allows to create and edit books */
+  MODIFY_BOOKS = 2 ** 6,
+  /** Allows to delete existing books */
+  DELETE_BOOKS = 2 ** 7,
+
   /** All flags conjoined into one */
   ALL = VIEW_DOCUMENTS |
     MODIFY_DOCUMENTS |
     DELETE_DOCUMENTS |
     ADD_MEMBERS |
     EDIT_MEMBERS |
-    KICK_MEMBERS,
+    KICK_MEMBERS |
+    MODIFY_BOOKS |
+    DELETE_BOOKS,
 }
 
 export function hasFlag(mask: Nullish<number>, flag: number) {

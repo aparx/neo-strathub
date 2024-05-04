@@ -1,11 +1,12 @@
-import { getServer } from "@/utils/supabase/actions";
+import { getServiceServer } from "@/utils/supabase/actions";
 import { InferAsync } from "@repo/utils";
 import { cookies } from "next/headers";
 import { cache } from "react";
 
+/** Returns a member (Warning: bypasses RLS by using the SERVICE_KEY) */
 export const getMember = cache(async (profileId: string, teamId: string) => {
   return (
-    await getServer(cookies())
+    await getServiceServer(cookies())
       .from("team_member")
       .select("team_id, profile_id, team_member_role!inner(id, flags)")
       .eq("profile_id", profileId)
