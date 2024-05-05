@@ -14,6 +14,9 @@ export const rootLayout = style({
   maxWidth: 1500, // TODO magic number
   margin: "0 auto",
   content: "paint",
+
+  // Disallow overflow in X and Y dimension
+  overflow: "hidden",
 });
 
 export const gridLayout = style({

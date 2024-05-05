@@ -53,6 +53,7 @@ function TeamsProvider({
         await createClient()
           .from("team_member")
           .select("team(id, name)")
+          .order("created_at")
           .eq("profile_id", userId)
       )?.data;
     },
@@ -95,6 +96,7 @@ function BooksProvider({
         await createClient()
           .from("book")
           .select("id, name, game(id, name, icon)")
+          .order("created_at")
           .eq("team_id", teamId)
       )?.data;
     },
@@ -106,8 +108,7 @@ function BooksProvider({
 
   useEffect(() => {
     if (!isLoading && bookParam && !data?.find((x) => x.id === bookParam))
-      // Book does not exist in cache, try and refetch
-      refetch();
+      refetch(); // Book does not exist in cache, try and refetch
   }, [bookParam]);
 
   const elements = useMemo(() => {
