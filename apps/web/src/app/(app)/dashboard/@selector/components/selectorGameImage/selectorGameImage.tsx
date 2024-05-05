@@ -28,7 +28,7 @@ export function SelectorGameImage({
       }}
       {...restProps}
     >
-      <Image src={src} alt={name} fill style={{ objectFit: "cover" }} />
+      <Image src={src} alt={name} fill style={{ objectFit: "contain" }} />
     </div>
   );
 }

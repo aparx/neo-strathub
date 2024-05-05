@@ -13,9 +13,15 @@ CREATE TABLE IF NOT EXISTS public.game
         CONSTRAINT min_name_length CHECK (length(name) >= 2),
     alias      varchar(32),
     icon       varchar     NOT NULL,
+    -- If true, this game is generally hidden from the public
+    hidden     bool        NOT NULL DEFAULT false,
     metadata   json        NOT NULL DEFAULT '{}',
     created_at timestamptz NOT NULL DEFAULT now()
 );
+
+CREATE INDEX
+    IF NOT EXISTS idx_game_id_hidden
+    ON public.game (id, hidden);
 
 ALTER TABLE public.game
     ENABLE ROW LEVEL SECURITY;
@@ -178,6 +184,10 @@ CREATE TABLE IF NOT EXISTS public.blueprint
 
 ALTER TABLE public.blueprint
     ENABLE ROW LEVEL SECURITY;
+
+CREATE INDEX
+    IF NOT EXISTS idx_book_visibility
+    ON public.blueprint (book_id, visibility);
 
 CREATE INDEX
     IF NOT EXISTS idx_blueprint_book_arena_name

@@ -166,6 +166,7 @@ export type Database = {
         Row: {
           alias: string | null
           created_at: string
+          hidden: boolean
           icon: string
           id: number
           metadata: Json
@@ -174,6 +175,7 @@ export type Database = {
         Insert: {
           alias?: string | null
           created_at?: string
+          hidden?: boolean
           icon: string
           id?: number
           metadata?: Json
@@ -182,6 +184,7 @@ export type Database = {
         Update: {
           alias?: string | null
           created_at?: string
+          hidden?: boolean
           icon?: string
           id?: number
           metadata?: Json
@@ -358,6 +361,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_select_blueprint: {
+        Args: {
+          target: unknown
+        }
+        Returns: boolean
+      }
+      can_select_book: {
+        Args: {
+          book: unknown
+        }
+        Returns: boolean
+      }
+      can_select_team_member: {
+        Args: {
+          target: unknown
+        }
+        Returns: boolean
+      }
       create_team_rls: {
         Args: Record<PropertyKey, never>
         Returns: boolean

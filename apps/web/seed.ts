@@ -95,7 +95,7 @@ async function main() {
       range: [3, 10],
       fillFn: () => ({
         name: generateUnique(nameContext, nameGenerator),
-        icon: "https://svgur.com/i/15ay.svg",
+        icon: "https://svgshare.com/i/15iw.svg",
       }),
     });
   }

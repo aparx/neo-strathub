@@ -1,6 +1,7 @@
 "use client";
 import { DASHBOARD_QUERY_PARAMS } from "@/app/(app)/dashboard/_utils";
 import { createBook } from "@/modules/book/actions/createBook";
+import { GameSelect } from "@/modules/book/modals/create/components";
 import { useGetTeamFromParams } from "@/modules/modal/hooks";
 import { useURL } from "@/utils/hooks";
 import {
@@ -42,27 +43,18 @@ export function CreateBookModal() {
     router.replace(newURL.href);
   }, [state]);
 
-  function submit(formData: FormData) {
-    formData.set("teamId", team.data!.id);
-    formData.set("gameId", "1"); // TODO
-    dispatch(formData);
-  }
-
   return (
-    <Modal.Content asChild>
-      <form action={submit}>
+    <Modal.Content asChild style={{ maxWidth: 300 }}>
+      <form
+        action={(formData) => {
+          formData.set("teamId", team.data!.id);
+          dispatch(formData);
+        }}
+      >
         <Modal.Title>
           <Breadcrumbs crumbs={[team.data?.name, <BreadcrumbTitle />]} />
           <Modal.Exit />
         </Modal.Title>
-        <input
-          type={"text"}
-          name={"teamId"}
-          value={team.data?.id}
-          disabled
-          aria-hidden
-          style={{ display: "none" }}
-        />
         <FormContent loading={loading || !team.data} state={state} />
       </form>
     </Modal.Content>
@@ -87,6 +79,7 @@ function FormContent({
         disabled={isLoading}
         required
       />
+      <GameSelect name={"gameId"} />
       <Flexbox gap={"md"} style={{ marginLeft: "auto" }}>
         <Modal.Close asChild>
           <Button>Cancel</Button>
