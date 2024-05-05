@@ -8,7 +8,7 @@ export interface SelectorItemContext {
   filter: SharedState<string | undefined>;
   active: SharedState<SelectorListItemData["href"] | undefined>;
   /** True if the items are re-fetched or initially fetched */
-  fetching?: boolean;
+  loading?: boolean;
 }
 
 const itemContext = createContext<SelectorItemContext | null>(null);
@@ -16,11 +16,11 @@ const itemContext = createContext<SelectorItemContext | null>(null);
 export function SelectorItemContextProvider({
   children,
   elements,
-  fetching,
+  loading,
 }: {
   children: React.ReactNode;
   elements: SelectorItemContext["items"];
-  fetching: SelectorItemContext["fetching"];
+  loading: SelectorItemContext["loading"];
 }) {
   const filter = useSharedState<string | undefined>();
   const active = useSharedState<string | undefined>();
@@ -34,7 +34,7 @@ export function SelectorItemContextProvider({
   }, [filter, elements]);
 
   return (
-    <itemContext.Provider value={{ items, filter, fetching, active }}>
+    <itemContext.Provider value={{ items, filter, loading: loading, active }}>
       {children}
     </itemContext.Provider>
   );

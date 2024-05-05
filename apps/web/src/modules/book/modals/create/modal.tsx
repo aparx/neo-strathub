@@ -39,6 +39,7 @@ export function CreateBookModal() {
     if (state?.state !== "success") return;
     setLoading(true); // ensure loading state is kept while rerouting
     const newURL = new URL(url);
+    newURL.searchParams.delete(DASHBOARD_QUERY_PARAMS.modal);
     newURL.searchParams.set(DASHBOARD_QUERY_PARAMS.book, state.createdId);
     router.replace(newURL.href);
   }, [state]);

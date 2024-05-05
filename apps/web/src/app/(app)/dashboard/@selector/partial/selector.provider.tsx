@@ -11,8 +11,8 @@ import { createClient } from "@/utils/supabase/client";
 import { nonNull } from "@repo/utils";
 import { User } from "@supabase/supabase-js";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "next/navigation";
-import { useMemo } from "react";
+import { useParams, useSearchParams } from "next/navigation";
+import { useEffect, useMemo } from "react";
 import { MdCollections, MdPeople } from "react-icons/md";
 
 /**
@@ -75,7 +75,7 @@ function TeamsProvider({
   }, [data]);
 
   return (
-    <SelectorItemContextProvider elements={elements} fetching={isFetching}>
+    <SelectorItemContextProvider elements={elements} loading={isFetching}>
       {children}
     </SelectorItemContextProvider>
   );
@@ -88,7 +88,7 @@ function BooksProvider({
   teamId: string;
   children: React.ReactNode;
 }) {
-  const { isFetching, data } = useQuery({
+  const { isLoading, data, refetch } = useQuery({
     queryKey: ["books", teamId],
     queryFn: async () => {
       return (
@@ -100,6 +100,15 @@ function BooksProvider({
     },
     refetchOnWindowFocus: false,
   });
+
+  const searchParams = useSearchParams();
+  const bookParam = searchParams.get(DASHBOARD_QUERY_PARAMS.book);
+
+  useEffect(() => {
+    if (!isLoading && bookParam && !data?.find((x) => x.id === bookParam))
+      // Book does not exist in cache, try and refetch
+      refetch();
+  }, [bookParam]);
 
   const elements = useMemo(() => {
     if (!data) return [];
@@ -121,7 +130,7 @@ function BooksProvider({
   }, [data]);
 
   return (
-    <SelectorItemContextProvider elements={elements} fetching={isFetching}>
+    <SelectorItemContextProvider elements={elements} loading={isLoading}>
       {children}
     </SelectorItemContextProvider>
   );

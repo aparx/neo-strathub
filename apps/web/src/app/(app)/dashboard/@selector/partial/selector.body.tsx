@@ -9,7 +9,7 @@ import { useItemContext } from "../context";
 import * as css from "./selector.body.css";
 
 export function SelectorBody() {
-  const { items, active, fetching } = useItemContext();
+  const { items, active, loading } = useItemContext();
   const absoluteURL = useURL();
   useEffect(() => {
     const anyActive = items.find(({ href }) =>
@@ -28,8 +28,8 @@ export function SelectorBody() {
   return (
     <Flexbox asChild orient={"vertical"} gap={"sm"} className={css.slideIn}>
       <ul>
-        {!fetching && items.map((data) => <Item key={data.href} {...data} />)}
-        {fetching && <SkeletonList amount={3} />}
+        {!loading && items.map((data) => <Item key={data.href} {...data} />)}
+        {loading && <SkeletonList amount={3} />}
       </ul>
     </Flexbox>
   );
