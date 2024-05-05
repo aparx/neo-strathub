@@ -79,6 +79,7 @@ async function main() {
       range: [1, 4],
       fillFn: () => ({
         name: generateUnique(nameContext, nameGenerator),
+        icon: "https://svgshare.com/i/15iw.svg",
       }),
     });
   }
@@ -91,11 +92,28 @@ async function main() {
       maxLength: 20,
       casing: "PascalCase",
     });
+
     return generateArray({
       range: [3, 10],
       fillFn: () => ({
         name: generateUnique(nameContext, nameGenerator),
-        icon: "https://svgshare.com/i/15iw.svg",
+      }),
+    });
+  }
+
+  function generateTeams() {
+    const nameContext = new Set<string>();
+    const nameGenerator = createSentenceGenerator({
+      words: [2, 4],
+      maxLength: 20,
+      casing: "PascalCase",
+    });
+
+    return generateArray({
+      range: [10, 20],
+      fillFn: () => ({
+        name: generateUnique(nameContext, nameGenerator),
+        book: generateBooks(),
       }),
     });
   }
@@ -119,15 +137,15 @@ async function main() {
       name,
       is_default: index === 0,
       pricing: index === 0 ? 0 : undefined /* randomize */,
-      team: (x) => x(3, { book: generateBooks }),
+      team: generateTeams,
     })),
     { connect: { game } },
   );
 
-  const { arena } = await seed.arena((x) => x(10));
+  const { arena } = await seed.arena((x) => x(10), { connect: { game } });
 
   await seed.blueprint((x) => x(500, { tags: generateBlueprintTags }), {
-    connect: { book, plan, arena },
+    connect: { book, plan, arena, game },
   });
 
   await seed.team_member_role([
