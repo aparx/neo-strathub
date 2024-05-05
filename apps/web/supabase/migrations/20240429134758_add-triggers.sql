@@ -91,7 +91,12 @@ BEGIN
     end if;
 
     -- Insert an example book into that team
-    SELECT id INTO _random_game_id FROM public.game ORDER BY random() LIMIT 1;
+    SELECT id
+    INTO _random_game_id
+    FROM public.game
+    WHERE hidden = false
+    ORDER BY random()
+    LIMIT 1;
 
     if (_random_game_id is null) then
         -- Skip the creation of a book, since no game is existing

@@ -80,6 +80,7 @@ async function main() {
       fillFn: () => ({
         name: generateUnique(nameContext, nameGenerator),
         icon: "https://svgshare.com/i/15iw.svg",
+        hidden: false,
       }),
     });
   }
