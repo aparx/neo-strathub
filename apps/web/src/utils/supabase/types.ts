@@ -414,9 +414,12 @@ export type Database = {
         }
         Returns: string
       }
-      create_team_rls: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
+      create_team: {
+        Args: {
+          team_name: string
+          target_plan_id: number
+        }
+        Returns: string
       }
     }
     Enums: {

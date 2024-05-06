@@ -39,30 +39,24 @@ export async function createBook(lastState: any, formData: FormData) {
   if (!hasFlag(selfMember.team_member_role.flags, TeamMemberFlags.MODIFY_BOOKS))
     throw new Error("Missing the permission to create a book");
 
-  const service = await getServiceServer(cookies());
+  const create = await getServiceServer(cookies()).rpc("create_book", {
+    book_name: validatedFields.data.name,
+    target_team_id: validatedFields.data.teamId,
+    target_game_id: validatedFields.data.gameId,
+  });
 
-  const insertion = await service
-    .rpc("create_book", {
-      book_name: validatedFields.data.name,
-      target_team_id: validatedFields.data.teamId,
-      target_game_id: validatedFields.data.gameId,
-    })
-    .single();
-
-  console.log(insertion);
-
-  if (insertion.error) {
+  if (create.error) {
     let errorArray: string[] = [];
-    if (insertion.error.code === PostgresError.UNIQUE_VIOLATION)
+    if (create.error.code === PostgresError.UNIQUE_VIOLATION)
       errorArray.push("A book with this name already exists for this team");
-    else if (insertion.error.code === PostgresError.RAISE_EXCEPTION)
-      errorArray.push(insertion.error.message);
-    else throw insertion.error;
+    else if (create.error.code === PostgresError.RAISE_EXCEPTION)
+      errorArray.push(create.error.message);
+    else throw create.error;
     return createFormError({ name: errorArray });
   }
 
   return {
     state: "success",
-    createdId: insertion.data,
+    createdId: create.data,
   } as const;
 }

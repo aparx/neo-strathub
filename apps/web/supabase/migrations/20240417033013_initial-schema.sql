@@ -4,206 +4,206 @@ create type public.profile_role as enum ('admin', 'user');
 create type public.bp_visibility as enum ('public', 'private', 'unlisted');
 create type public.pay_interval as enum ('monthly', 'yearly');
 
--- //////////////////////////////// GAME ////////////////////////////////
+-- //////////////////////////////// game ////////////////////////////////
 
-CREATE TABLE IF NOT EXISTS public.game
+create table if not exists public.game
 (
-    id         smallserial PRIMARY KEY,
-    name       varchar(64) NOT NULL UNIQUE
-        CONSTRAINT min_name_length CHECK (length(name) >= 2),
+    id         smallserial primary key,
+    name       varchar(64) not null unique
+        constraint min_name_length check (length(name) >= 2),
     alias      varchar(32),
-    icon       varchar     NOT NULL,
-    -- If true, this game is generally hidden from the public
-    hidden     bool        NOT NULL DEFAULT false,
-    metadata   json        NOT NULL DEFAULT '{}',
-    created_at timestamptz NOT NULL DEFAULT now()
+    icon       varchar     not null,
+    -- if true, this game is generally hidden from the public
+    hidden     bool        not null default false,
+    metadata   json        not null default '{}',
+    created_at timestamptz not null default now()
 );
 
-CREATE INDEX
-    IF NOT EXISTS idx_game_id_hidden
-    ON public.game (id, hidden);
+create index
+    if not exists idx_game_id_hidden
+    on public.game (id, hidden);
 
-ALTER TABLE public.game
-    ENABLE ROW LEVEL SECURITY;
+alter table public.game
+    enable row level security;
 
--- //////////////////////////////// ARENA ////////////////////////////////
+-- //////////////////////////////// arena ////////////////////////////////
 
-CREATE TABLE IF NOT EXISTS public.arena
+create table if not exists public.arena
 (
-    id         serial PRIMARY KEY,
-    game_id    smallint    NOT NULL REFERENCES public.game (id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-    name       varchar(64) NOT NULL
-        CONSTRAINT min_name_length CHECK (length(name) >= 2),
+    id         serial primary key,
+    game_id    smallint    not null references public.game (id)
+        on delete cascade
+        on update cascade,
+    name       varchar(64) not null
+        constraint min_name_length check (length(name) >= 2),
     metadata   json,
-    created_at timestamptz NOT NULL DEFAULT now(),
-    updated_at timestamptz NOT NULL DEFAULT now()
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
 );
 
-ALTER TABLE public.arena
-    ENABLE ROW LEVEL SECURITY;
+alter table public.arena
+    enable row level security;
 
--- Duplicate arena names per game is forbidden
-CREATE UNIQUE INDEX
-    IF NOT EXISTS uidx_arena_name
-    ON public.arena (game_id, name);
+-- duplicate arena names per game is forbidden
+create unique index
+    if not exists uidx_arena_name
+    on public.arena (game_id, name);
 
--- //////////////////////////////// PROFILE ////////////////////////////////
+-- //////////////////////////////// profile ////////////////////////////////
 
-CREATE TABLE IF NOT EXISTS public.profile
+create table if not exists public.profile
 (
-    id         uuid PRIMARY KEY REFERENCES auth.users (id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-    username   varchar(32)         NOT NULL UNIQUE
-        CONSTRAINT min_name_length CHECK (length(username) >= 3),
-    role       public.profile_role NOT NULL DEFAULT 'user'::public.profile_role,
+    id         uuid primary key references auth.users (id)
+        on delete cascade
+        on update cascade,
+    username   varchar(32)         not null unique
+        constraint min_name_length check (length(username) >= 3),
+    role       public.profile_role not null default 'user'::public.profile_role,
     avatar     varchar,
-    created_at timestamptz         NOT NULL DEFAULT now(),
-    updated_at timestamptz         NOT NULL DEFAULT now()
+    created_at timestamptz         not null default now(),
+    updated_at timestamptz         not null default now()
 );
 
-ALTER TABLE public.profile
-    ENABLE ROW LEVEL SECURITY;
+alter table public.profile
+    enable row level security;
 
--- //////////////////////////////// PLAN ////////////////////////////////
+-- //////////////////////////////// plan ////////////////////////////////
 
-CREATE TABLE IF NOT EXISTS public.plan
+create table if not exists public.plan
 (
-    id               smallserial PRIMARY KEY,
-    name             varchar(64)    NOT NULL UNIQUE,
-    pricing          decimal(10, 2) NOT NULL,
+    id               smallserial primary key,
+    name             varchar(64)    not null unique,
+    pricing          decimal(10, 2) not null,
     pricing_interval public.pay_interval,
-    is_default       bool           NOT NULL DEFAULT false,
-    config           json           NOT NULL DEFAULT '{}',
-    created_at       timestamptz    NOT NULL DEFAULT now(),
-    updated_at       timestamptz    NOT NULL DEFAULT now()
+    is_default       bool           not null default false,
+    config           json           not null default '{}',
+    created_at       timestamptz    not null default now(),
+    updated_at       timestamptz    not null default now()
 );
 
-ALTER TABLE public.plan
-    ENABLE ROW LEVEL SECURITY;
+alter table public.plan
+    enable row level security;
 
--- //////////////////////////////// TEAM ////////////////////////////////
+-- //////////////////////////////// team ////////////////////////////////
 
-CREATE TABLE IF NOT EXISTS public.team
+create table if not exists public.team
 (
-    id         uuid PRIMARY KEY     DEFAULT gen_random_uuid(),
-    name       varchar(20) NOT NULL UNIQUE
-        CONSTRAINT min_name_length CHECK (length(name) >= 3),
-    plan_id    smallint REFERENCES public.plan
-        ON DELETE SET NULL
-        ON UPDATE CASCADE,
-    created_at timestamptz NOT NULL DEFAULT now(),
-    updated_at timestamptz NOT NULL DEFAULT now()
+    id         uuid primary key     default gen_random_uuid(),
+    name       varchar(20) not null unique
+        constraint min_name_length check (length(name) >= 3),
+    plan_id    smallint references public.plan
+        on delete set null
+        on update cascade,
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
 );
 
-ALTER TABLE public.team
-    ENABLE ROW LEVEL SECURITY;
+alter table public.team
+    enable row level security;
 
--- //////////////////////////////// BOOK ////////////////////////////////
+-- //////////////////////////////// book ////////////////////////////////
 
-CREATE TABLE IF NOT EXISTS public.book
+create table if not exists public.book
 (
-    id         uuid PRIMARY KEY     DEFAULT gen_random_uuid(),
-    name       varchar(20) NOT NULL
-        CONSTRAINT min_name_length CHECK (length(name) >= 2),
-    team_id    uuid        NOT NULL REFERENCES public.team (id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-    game_id    smallint    NOT NULL REFERENCES public.game (id)
-        ON DELETE RESTRICT -- Restrict to prevent accidental deletion
-        ON UPDATE CASCADE,
-    created_at timestamptz NOT NULL DEFAULT now(),
-    updated_at timestamptz NOT NULL DEFAULT now()
+    id         uuid primary key     default gen_random_uuid(),
+    name       varchar(20) not null
+        constraint min_name_length check (length(name) >= 2),
+    team_id    uuid        not null references public.team (id)
+        on delete cascade
+        on update cascade,
+    game_id    smallint    not null references public.game (id)
+        on delete restrict -- restrict to prevent accidental deletion
+        on update cascade,
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
 );
 
-ALTER TABLE public.book
-    ENABLE ROW LEVEL SECURITY;
+alter table public.book
+    enable row level security;
 
--- Disallow case-insensitive duplicate book names per team
-CREATE UNIQUE INDEX
-    IF NOT EXISTS uidx_book_unique_name_per_team
-    ON public.book (team_id, lower(name));
+-- disallow case-insensitive duplicate book names per team
+create unique index
+    if not exists uidx_book_unique_name_per_team
+    on public.book (team_id, lower(name));
 
--- //////////////////////////////// TEAM_MEMBER_ROLE ////////////////////////////////
-CREATE TABLE IF NOT EXISTS public.team_member_role
+-- //////////////////////////////// team_member_role ////////////////////////////////
+create table if not exists public.team_member_role
 (
-    id    serial PRIMARY KEY,
-    name  varchar(32) NOT NULL
-        CONSTRAINT min_name_length CHECK (length(name) >= 3),
-    flags bigint      NOT NULL DEFAULT 0
+    id    serial primary key,
+    name  varchar(32) not null
+        constraint min_name_length check (length(name) >= 3),
+    flags bigint      not null default 0
 );
 
-ALTER TABLE public.team_member_role
-    ENABLE ROW LEVEL SECURITY;
+alter table public.team_member_role
+    enable row level security;
 
--- //////////////////////////////// TEAM_MEMBER ////////////////////////////////
+-- //////////////////////////////// team_member ////////////////////////////////
 
-CREATE TABLE IF NOT EXISTS public.team_member
+create table if not exists public.team_member
 (
-    profile_id uuid        NOT NULL REFERENCES public.profile (id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-    team_id    uuid        NOT NULL REFERENCES public.team (id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-    role_id    smallint    NOT NULL REFERENCES public.team_member_role (id)
-        ON DELETE RESTRICT
-        ON UPDATE CASCADE,
-    created_at timestamptz NOT NULL DEFAULT now(),
-    updated_at timestamptz NOT NULL DEFAULT now(),
+    profile_id uuid        not null references public.profile (id)
+        on delete cascade
+        on update cascade,
+    team_id    uuid        not null references public.team (id)
+        on delete cascade
+        on update cascade,
+    role_id    smallint    not null references public.team_member_role (id)
+        on delete restrict
+        on update cascade,
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now(),
 
-    PRIMARY KEY (profile_id, team_id)
+    primary key (profile_id, team_id)
 );
 
-ALTER TABLE public.team_member
-    ENABLE ROW LEVEL SECURITY;
+alter table public.team_member
+    enable row level security;
 
--- //////////////////////////////// BLUEPRINT ////////////////////////////////
+-- //////////////////////////////// blueprint ////////////////////////////////
 
-CREATE TABLE IF NOT EXISTS public.blueprint
+create table if not exists public.blueprint
 (
-    id         uuid PRIMARY KEY              default gen_random_uuid(),
-    book_id    uuid                 NOT NULL REFERENCES public.book (id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-    arena_id   int                  NOT NULL REFERENCES public.arena (id)
-        ON DELETE RESTRICT
-        ON UPDATE CASCADE,
-    visibility public.bp_visibility NOT NULL DEFAULT 'private'::bp_visibility,
-    name       varchar(128)         NOT NULL
-        CONSTRAINT min_name_length CHECK (length(name) >= 3),
+    id         uuid primary key              default gen_random_uuid(),
+    book_id    uuid                 not null references public.book (id)
+        on delete cascade
+        on update cascade,
+    arena_id   int                  not null references public.arena (id)
+        on delete restrict
+        on update cascade,
+    visibility public.bp_visibility not null default 'private'::bp_visibility,
+    name       varchar(128)         not null
+        constraint min_name_length check (length(name) >= 3),
     tags       varchar(32)[]
-        CONSTRAINT max_tags_length CHECK (array_length(tags, 1) <= 16),
-    -- The actual data (including canvas) of the blueprint
-    data       jsonb                NOT NULL DEFAULT '{}'::jsonb,
-    created_at timestamptz          NOT NULL DEFAULT now(),
-    updated_at timestamptz          NOT NULL DEFAULT now()
+        constraint max_tags_length check (array_length(tags, 1) <= 16),
+    -- the actual data (including canvas) of the blueprint
+    data       jsonb                not null default '{}'::jsonb,
+    created_at timestamptz          not null default now(),
+    updated_at timestamptz          not null default now()
 );
 
-ALTER TABLE public.blueprint
-    ENABLE ROW LEVEL SECURITY;
+alter table public.blueprint
+    enable row level security;
 
-CREATE INDEX
-    IF NOT EXISTS idx_book_visibility
-    ON public.blueprint (book_id, visibility);
+create index
+    if not exists idx_book_visibility
+    on public.blueprint (book_id, visibility);
 
-CREATE INDEX
-    IF NOT EXISTS idx_blueprint_book_arena_name
-    ON public.blueprint (book_id, arena_id, name);
+create index
+    if not exists idx_blueprint_book_arena_name
+    on public.blueprint (book_id, arena_id, name);
 
-CREATE INDEX
-    IF NOT EXISTS idx_blueprint_visibility
-    ON public.blueprint (visibility);
+create index
+    if not exists idx_blueprint_visibility
+    on public.blueprint (visibility);
 
--- //////////////////////////////// CONFIG ////////////////////////////////
+-- //////////////////////////////// config ////////////////////////////////
 
-CREATE TYPE config_value_type AS ENUM ('boolean', 'numeric', 'date', 'text');
+create type config_value_type as enum ('boolean', 'numeric', 'date', 'text');
 
-CREATE TABLE IF NOT EXISTS public.config
+create table if not exists public.config
 (
-    name          varchar PRIMARY KEY,
+    name          varchar primary key,
     type          config_value_type,
     boolean_value boolean,
     numeric_value numeric,
@@ -211,33 +211,33 @@ CREATE TABLE IF NOT EXISTS public.config
     text_value    varchar
 );
 
-ALTER TABLE public.config
-    ENABLE ROW LEVEL SECURITY;
+alter table public.config
+    enable row level security;
 
-ALTER TABLE public.config
-    ADD CONSTRAINT correct_value CHECK (
-        CASE
-            WHEN type = 'boolean'::config_value_type
-                THEN boolean_value IS NOT NULL
-            WHEN type = 'numeric'::config_value_type
-                THEN numeric_value IS NOT NULL
-            WHEN type = 'date'::config_value_type
-                THEN date_value IS NOT NULL
-            WHEN type = 'text'::config_value_type
-                THEN text_value IS NOT NULL
-            ELSE true
-            END);
+alter table public.config
+    add constraint correct_value check (
+        case
+            when type = 'boolean'::config_value_type
+                then boolean_value is not null
+            when type = 'numeric'::config_value_type
+                then numeric_value is not null
+            when type = 'date'::config_value_type
+                then date_value is not null
+            when type = 'text'::config_value_type
+                then text_value is not null
+            else true
+            end);
 
-ALTER TABLE public.config
-    ADD CONSTRAINT only_one_value CHECK (
-                (boolean_value IS NOT NULL)::integer +
-                (numeric_value IS NOT NULL)::integer +
-                (date_value IS NOT NULL)::integer +
-                (text_value IS NOT NULL)::integer
+alter table public.config
+    add constraint only_one_value check (
+                (boolean_value is not null)::integer +
+                (numeric_value is not null)::integer +
+                (date_value is not null)::integer +
+                (text_value is not null)::integer
             = 1);
 
--- DEFAULT CONFIG VALUES
+-- default config values
 
-INSERT INTO public.config
+insert into public.config
 (name, type, boolean_value, numeric_value, date_value, text_value)
-VALUES ('max_teams_per_user', 'numeric'::config_value_type, null, 50, null, null)
+values ('max_teams_per_user', 'numeric'::config_value_type, null, 50, null, null)
