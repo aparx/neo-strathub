@@ -13,6 +13,18 @@ export interface DragScrollAreaProps extends ComponentPropsWithoutRef<"div"> {
   asChild?: boolean;
 }
 
+/**
+ * Component that allows a user to drag the element in order to scroll in the
+ * dimensions, that the element was dragged. This eliminates the need for a
+ * interactable scrollbar.
+ *
+ * @param children
+ * @param asChild
+ * @param style
+ * @param onMouseDown
+ * @param restProps
+ * @constructor
+ */
 export function DragScrollArea({
   children,
   asChild,
