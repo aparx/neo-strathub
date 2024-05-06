@@ -1,3 +1,4 @@
+import { ExitInspectorButton } from "@/app/(app)/dashboard/@inspector/_partial/header/components";
 import { SelectorGameImage } from "@/app/(app)/dashboard/@selector/components";
 import { getServer } from "@/utils/supabase/actions";
 import { vars } from "@repo/theme";
@@ -20,7 +21,7 @@ export async function InspectorHeader({ documentId }: { documentId: string }) {
   }
   return (
     <header className={css.header}>
-      <Flexbox gap={"lg"}>
+      <Flexbox gap={"lg"} style={{ position: "relative" }}>
         <Icon.Custom className={css.game}>
           <SelectorGameImage
             src={data.book.game.icon}
@@ -37,6 +38,7 @@ export async function InspectorHeader({ documentId }: { documentId: string }) {
             </Text>
           </hgroup>
         </Flexbox>
+        <ExitInspectorButton className={css.exit} />
       </Flexbox>
       {data.tags && <TagList tags={data.tags} />}
       <div>{data.visibility}</div>

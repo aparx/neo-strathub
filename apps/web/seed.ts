@@ -1,4 +1,5 @@
 import { TeamMemberFlags } from "@/modules/auth/flags";
+import { PlanConfig } from "@/utils/supabase/models";
 import { pascalCase } from "@repo/utils";
 import { createSeedClient } from "@snaplet/seed";
 import { LoremIpsum } from "lorem-ipsum";
@@ -66,17 +67,6 @@ async function main() {
   const seed = await createSeedClient({ dryRun: true });
 
   await seed.$resetDatabase();
-
-  await seed.config([
-    {
-      name: "max_teams_per_user",
-      type: "numeric",
-      numeric_value: 50,
-      date_value: null,
-      text_value: null,
-      boolean_value: null,
-    },
-  ]);
 
   /** Generates an array of unique game names (wrapped) */
   function generateGames() {
@@ -150,6 +140,11 @@ async function main() {
       is_default: index === 0,
       pricing: index === 0 ? 0 : undefined /* randomize */,
       team: generateTeams,
+      config: {
+        max_members: (1 + index) * 6,
+        max_blueprints: (1 + index) * 100,
+        max_books: (1 + index) * 20,
+      } satisfies PlanConfig,
     })),
     { connect: { game } },
   );

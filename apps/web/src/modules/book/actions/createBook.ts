@@ -39,18 +39,17 @@ export async function createBook(lastState: any, formData: FormData) {
   if (!hasFlag(selfMember.team_member_role.flags, TeamMemberFlags.MODIFY_BOOKS))
     throw new Error("Missing the permission to create a book");
 
-  // TODO get team and check against the plan's limits
+  const service = await getServiceServer(cookies());
 
-  // Actually commit the insertion of the book
-  const insertion = await getServiceServer(cookies())
-    .from("book")
-    .insert({
-      name: validatedFields.data.name,
-      game_id: validatedFields.data.gameId,
-      team_id: validatedFields.data.teamId,
+  const insertion = await service
+    .rpc("create_book", {
+      book_name: validatedFields.data.name,
+      target_team_id: validatedFields.data.teamId,
+      target_game_id: validatedFields.data.gameId,
     })
-    .select("id")
     .single();
+
+  console.log(insertion);
 
   if (insertion.error) {
     let errorArray: string[] = [];
@@ -64,6 +63,6 @@ export async function createBook(lastState: any, formData: FormData) {
 
   return {
     state: "success",
-    createdId: insertion.data.id,
+    createdId: insertion.data,
   } as const;
 }

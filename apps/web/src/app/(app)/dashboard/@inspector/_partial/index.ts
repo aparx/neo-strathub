@@ -1,1 +1,1 @@
-export * from "./content.header";
+export * from "./header/content.header";

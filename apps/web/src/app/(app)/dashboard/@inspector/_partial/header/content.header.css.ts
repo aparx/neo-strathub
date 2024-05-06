@@ -1,5 +1,6 @@
 import { vars } from "@repo/theme";
 import { style } from "@vanilla-extract/css";
+import { calc } from "@vanilla-extract/css-utils";
 
 export const header = style({
   display: "flex",
@@ -16,7 +17,10 @@ export const game = style({
 });
 
 export const exit = style({
+  position: "absolute",
   marginLeft: "auto",
+  top: calc.negate(vars.spacing.sm),
+  right: calc.negate(vars.spacing.sm),
 });
 
 export const tags = style({

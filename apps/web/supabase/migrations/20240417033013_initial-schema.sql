@@ -235,3 +235,9 @@ ALTER TABLE public.config
                 (date_value IS NOT NULL)::integer +
                 (text_value IS NOT NULL)::integer
             = 1);
+
+-- DEFAULT CONFIG VALUES
+
+INSERT INTO public.config
+(name, type, boolean_value, numeric_value, date_value, text_value)
+VALUES ('max_teams_per_user', 'numeric'::config_value_type, null, 50, null, null)

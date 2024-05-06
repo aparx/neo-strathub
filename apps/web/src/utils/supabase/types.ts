@@ -406,6 +406,14 @@ export type Database = {
         }
         Returns: boolean
       }
+      create_book: {
+        Args: {
+          book_name: string
+          target_team_id: string
+          target_game_id: number
+        }
+        Returns: string
+      }
       create_team_rls: {
         Args: Record<PropertyKey, never>
         Returns: boolean

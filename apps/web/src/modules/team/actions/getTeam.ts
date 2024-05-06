@@ -6,7 +6,7 @@ import { cache } from "react";
 export const getTeam = cache(async (teamId: string) => {
   return getServer(cookies())
     .from("team")
-    .select("*, plan (id, name, pricing, is_default, config)")
+    .select("*, plan(id, name, pricing, is_default, config)")
     .eq("id", teamId)
     .maybeSingle();
 });

@@ -30,6 +30,7 @@ export function DragScrollArea({
   asChild,
   style,
   onMouseDown,
+  onTouchStart,
   ...restProps
 }: DragScrollAreaProps) {
   const [cursor, setCursor] = useState<CSSProperties["cursor"]>();
@@ -73,10 +74,11 @@ export function DragScrollArea({
       style={{ cursor: cursor, ...style }}
       data-grabbed={clickPosition.current != null}
       onMouseDown={(e) => {
-        dragStart(e.clientX, e.clientY);
         onMouseDown?.(e);
+        dragStart(e.clientX, e.clientY);
       }}
       onTouchStart={(e) => {
+        onTouchStart?.(e);
         if (e.touches.length !== 1) return;
         dragStart(e.touches[0]!.clientX, e.touches[0]!.clientY);
       }}
