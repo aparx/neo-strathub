@@ -1,5 +1,6 @@
 "use client";
 
+import { DeepInferUseQueryResult } from "@/utils/generic/types";
 import { createClient } from "@/utils/supabase/client";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { vars } from "@repo/theme";
@@ -25,9 +26,7 @@ function useGetGames() {
   });
 }
 
-type GameData = NonNullable<
-  NonNullable<ReturnType<typeof useGetGames>["data"]>["data"]
->[number];
+type GameData = DeepInferUseQueryResult<typeof useGetGames>;
 
 export function GameSelect({ className, name, ...restProps }: GameSelectProps) {
   const { data, isLoading } = useGetGames();

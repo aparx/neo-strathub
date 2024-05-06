@@ -9,6 +9,7 @@ import {
   RoleSelect,
   RoleSelectProps,
 } from "@/modules/team/modals/members/components";
+import { DeepInferUseQueryResult } from "@/utils/generic/types";
 import { createClient } from "@/utils/supabase/client";
 import { Tables } from "@/utils/supabase/types";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
@@ -37,9 +38,7 @@ function useGetMembers(profileId: string, teamId: string) {
   });
 }
 
-type TeamMember = NonNullable<
-  NonNullable<ReturnType<typeof useGetMembers>["data"]>["data"]
->[number];
+type TeamMember = DeepInferUseQueryResult<typeof useGetMembers>;
 
 function sortMembers(members: Nullish<TeamMember[]>) {
   return members?.sort((a, b) => {

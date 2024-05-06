@@ -1,5 +1,6 @@
 "use client";
 import { createTeam } from "@/modules/team/actions/createTeam";
+import { PlanSelect } from "@/modules/team/modals/create/components";
 import {
   Button,
   Flexbox,
@@ -62,6 +63,7 @@ function FormContent({
             : null
         }
       />
+      <PlanSelect />
       <Flexbox gap={"md"} style={{ marginLeft: "auto" }}>
         <Modal.Close asChild>
           <Button>Cancel</Button>

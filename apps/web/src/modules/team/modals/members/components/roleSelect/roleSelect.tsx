@@ -1,4 +1,5 @@
 "use client";
+import { DeepInferUseQueryResult } from "@/utils/generic/types";
 import { createClient } from "@/utils/supabase/client";
 import { Tables } from "@/utils/supabase/types";
 import * as Select from "@radix-ui/react-select";
@@ -38,9 +39,7 @@ function useGetRoles() {
   });
 }
 
-type RoleData = NonNullable<
-  NonNullable<ReturnType<typeof useGetRoles>["data"]>["data"]
->[number];
+type RoleData = DeepInferUseQueryResult<typeof useGetRoles>;
 
 type RoleColorMap = Map<string, RoleColor>;
 
