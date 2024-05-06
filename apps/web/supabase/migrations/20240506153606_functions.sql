@@ -58,21 +58,42 @@ begin
     values (team_name, target_plan_id)
     returning id into _uid;
 
-    if (auth.uid() is not null) then
-        -- Select the highest available role and assign the user to it
-        select id
-        into _highest_role_id
-        from public.team_member_role
-        order by flags desc
-        limit 1;
-
-        if (_highest_role_id is null) then
-            raise exception 'Could not find a fitting team_member_role';
-        end if;
-
-        insert into team_member (profile_id, team_id, role_id)
-        values (auth.uid(), _uid, _highest_role_id);
+    if (auth.uid() is null) then
+        return _uid;
     end if;
+
+    -- Check if the user is allowed to create any more teams in the first place
+    select count(team_id)
+    into _team_count
+    from public.team_member
+    where profile_id = auth.uid();
+
+    select numeric_value
+    into _max_team_count
+    from public.config
+    where name = 'max_teams_per_user';
+
+    if (_max_team_count is null) then
+        raise exception 'Missing max_teams_per_user numeric config value';
+    end if;
+
+    if (_team_count >= _max_team_count) then
+        raise exception 'Reached maximum amount of teams';
+    end if;
+
+    -- Select the highest available role and assign the user to it
+    select id
+    into _highest_role_id
+    from public.team_member_role
+    order by flags desc
+    limit 1;
+
+    if (_highest_role_id is null) then
+        raise exception 'Could not find a fitting team_member_role';
+    end if;
+
+    insert into team_member (profile_id, team_id, role_id)
+    values (auth.uid(), _uid, _highest_role_id);
 
     return _uid;
 end;

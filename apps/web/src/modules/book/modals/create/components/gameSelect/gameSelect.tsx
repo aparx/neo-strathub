@@ -47,6 +47,7 @@ export function GameSelect({ className, name, ...restProps }: GameSelectProps) {
     >
       {data?.data?.map((game) => (
         <GameOption
+          key={game.id}
           checked={active === game.id}
           onChange={(checked) => checked && setActive(game.id)}
           radioName={name}

@@ -10,7 +10,7 @@ export async function InspectorContent(props: ExtendedContentPathProps) {
 
   return (
     <section className={css.container}>
-      <Suspense fallback={"Loading..."}>
+      <Suspense key={props.documentId} fallback={"Loading..."}>
         <InspectorHeader documentId={props.documentId} />
       </Suspense>
       <Skeleton height={225} outline roundness={"md"} />
