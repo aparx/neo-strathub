@@ -29,11 +29,11 @@ export default async function DashboardLayout({
       <div className={css.rootLayout}>
         <LayoutHeader />
         <Suspense fallback={<PageFallback />}>
-          <main className={css.gridLayout}>
+          <div className={css.gridLayout}>
             {selector}
             {content}
             <Sidebar inspector={inspector} details={details} />
-          </main>
+          </div>
         </Suspense>
         <ModalController />
         {children}

@@ -1,5 +1,6 @@
 "use client";
 import { deleteBook } from "@/modules/book/actions/deleteBook";
+import { vars } from "@repo/theme";
 import { Button, Flexbox, Icon, Modal, Popover } from "@repo/ui/components";
 import { useState, useTransition } from "react";
 
@@ -40,27 +41,57 @@ export function BookPopover({
             Delete
           </Popover.Item>
         </Modal.Trigger>
-        <Modal.Content>
-          <Modal.Title>
-            Delete {bookName}?
-            <Modal.Exit />
-          </Modal.Title>
-          You are about to delete the book {bookName}.
-          <Flexbox gap={"md"} style={{ marginLeft: "auto" }}>
-            <Modal.Close asChild disabled={isPending}>
-              <Button>Cancel</Button>
-            </Modal.Close>
-            <Button
-              color={"destructive"}
-              onClick={confirmDelete}
-              disabled={isPending}
-            >
-              <Icon.Mapped type={"delete"} />
-              Delete
-            </Button>
-          </Flexbox>
-        </Modal.Content>
+        <ConfirmDeletionModalContent
+          isPending={isPending}
+          bookName={bookName}
+          bookId={bookId}
+          onDelete={confirmDelete}
+        />
       </Modal.Root>
     </Popover.Content>
+  );
+}
+
+function ConfirmDeletionModalContent({
+  isPending,
+  bookName,
+  bookId,
+  onDelete,
+}: {
+  isPending: boolean;
+  bookName: string;
+  bookId: string;
+  onDelete: () => any;
+}) {
+  return (
+    <Modal.Content>
+      <Modal.Title>
+        Deleting {bookName}
+        <Modal.Exit />
+      </Modal.Title>
+      <Flexbox orient={"vertical"} gap={"sm"}>
+        <Flexbox gap={"md"}>
+          You are about to delete
+          <Flexbox asChild gap={"sm"}>
+            <span style={{ color: vars.colors.emphasis.high }}>
+              <Icon.Mapped type={"book"} /> {bookName}
+            </span>
+          </Flexbox>
+          and all its blueprints!
+        </Flexbox>
+        <p style={{ color: vars.colors.destructive.lighter }}>
+          This action is unrecoverable and permanent.
+        </p>
+      </Flexbox>
+      <Flexbox gap={"md"} style={{ marginLeft: "auto" }}>
+        <Modal.Close asChild disabled={isPending}>
+          <Button>Cancel</Button>
+        </Modal.Close>
+        <Button color={"destructive"} onClick={onDelete} disabled={isPending}>
+          <Icon.Mapped type={"delete"} />
+          Delete Forever
+        </Button>
+      </Flexbox>
+    </Modal.Content>
   );
 }

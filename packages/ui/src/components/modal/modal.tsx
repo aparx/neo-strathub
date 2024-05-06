@@ -16,7 +16,7 @@ export const Root = Primitive.Root;
 export function Exit() {
   return (
     <Close asChild>
-      <IconButton>
+      <IconButton aria-label={"Close modal"}>
         <Icon.Mapped type={"close"} />
       </IconButton>
     </Close>

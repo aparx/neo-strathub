@@ -8,7 +8,7 @@ import {
   GetMyBlueprintsFilters,
   getMyBlueprints,
 } from "@/modules/blueprint/actions";
-import { Skeleton, Spinner } from "@repo/ui/components";
+import { Button, Icon, Skeleton, Spinner } from "@repo/ui/components";
 import { Nullish, nonNull } from "@repo/utils";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "framer-motion";
@@ -29,7 +29,11 @@ export function ContentBody(filters: ContentBodyProps) {
   }, [filters.bookId, filters.teamId]);
 
   return (
-    <DashColumn.Content ref={containerRef} style={{ height: 1 }}>
+    <DashColumn.Content
+      ref={containerRef}
+      style={{ height: 1, position: "relative" }}
+    >
+      {!isLoading && items?.length === 0 && <NoneFoundScreen />}
       <ul className={css.list} aria-label={"blueprints"}>
         <ItemList items={items ?? []} onLastEntersViewport={fetchNextPage} />
         {isLoading && <SkeletonList />}
@@ -144,5 +148,22 @@ function Blueprint({
         ...(tags ?? []),
       ]}
     />
+  );
+}
+
+/**
+ * Component shown when there are no blueprints found.
+ *
+ * @constructor
+ */
+function NoneFoundScreen() {
+  return (
+    <div className={css.noneFound}>
+      Could not find any blueprint, try adding one
+      <Button appearance={"cta"} color={"cta"}>
+        Add a blueprint
+        <Icon.Mapped type={"next"} />
+      </Button>
+    </div>
   );
 }

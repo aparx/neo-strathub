@@ -22,18 +22,20 @@ export async function DashContent({
   const filterByArena = arenaFilter?.split(",");
 
   return (
-    <DashColumn.Root>
-      <DashColumn.Header>
-        <HeaderTitle teamId={teamId} bookId={bookId} />
-        <ContentHeader />
-      </DashColumn.Header>
-      {/* Deferred DashColumn.Content to `ContentBody` */}
-      <ContentBody
-        bookId={bookId}
-        teamId={teamId}
-        filterByName={searchParams?.[CONTENT_SEARCH_PARAMS.filterByName]}
-        filterByArena={filterByArena}
-      />
+    <DashColumn.Root asChild>
+      <main>
+        <DashColumn.Header>
+          <HeaderTitle teamId={teamId} bookId={bookId} />
+          <ContentHeader />
+        </DashColumn.Header>
+        {/* Deferred DashColumn.Content to `ContentBody` */}
+        <ContentBody
+          bookId={bookId}
+          teamId={teamId}
+          filterByName={searchParams?.[CONTENT_SEARCH_PARAMS.filterByName]}
+          filterByArena={filterByArena}
+        />
+      </main>
     </DashColumn.Root>
   );
 }

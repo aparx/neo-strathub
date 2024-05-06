@@ -1,7 +1,10 @@
 "use client";
+import { DASHBOARD_QUERY_PARAMS } from "@/app/(app)/dashboard/_utils";
 import { createProfile } from "@/app/(landing)/signup/actions";
 import * as css from "@/app/(landing)/signup/page.css";
 import { AuthButton } from "@/modules/auth/components";
+import { ModalPageKey } from "@/modules/modal/modals";
+import { useURL } from "@/utils/hooks";
 import {
   Button,
   Flexbox,
@@ -12,7 +15,7 @@ import {
 } from "@repo/ui/components";
 import { Nullish } from "@repo/utils";
 import { User } from "@supabase/supabase-js";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { PostgresError } from "pg-error-enum";
 import { useEffect } from "react";
 import { useFormState, useFormStatus } from "react-dom";
@@ -29,10 +32,20 @@ export function SignupNameForm({ user }: { user: User }) {
   }
 
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const url = useURL();
+
   useEffect(() => {
-    if (state?.state === "success")
-      router.replace(searchParams.get("redirect") ?? "/dashboard");
+    if (state?.state !== "success") return;
+    const redirect = url.searchParams.get("redirect");
+    if (redirect && !["/home", "/dashboard"].includes(redirect))
+      return router.replace(redirect);
+    url.pathname = "/dashboard";
+    url.searchParams.forEach((_, key) => url.searchParams.delete(key));
+    url.searchParams.set(
+      DASHBOARD_QUERY_PARAMS.modal,
+      "createTeam" satisfies ModalPageKey,
+    );
+    router.replace(url.href);
   }, [state]);
 
   return (
