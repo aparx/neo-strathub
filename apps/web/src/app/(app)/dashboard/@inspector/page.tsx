@@ -1,4 +1,4 @@
-import { PreviewContent } from "@/app/(app)/dashboard/@preview/content";
+import { PreviewContent } from "@/app/(app)/dashboard/@inspector/content";
 import { DASHBOARD_QUERY_PARAMS } from "@/app/(app)/dashboard/_utils";
 
 export default function Preview({

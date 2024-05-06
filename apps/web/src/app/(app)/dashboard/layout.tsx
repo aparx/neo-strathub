@@ -13,13 +13,13 @@ export default async function DashboardLayout({
   content,
   selector,
   details,
-  preview,
+  inspector,
 }: {
   children: React.ReactNode;
   selector: React.ReactNode;
   content: React.ReactNode;
   details: React.ReactNode;
-  preview: React.ReactNode;
+  inspector: React.ReactNode;
 }) {
   // Ensure user is fetched at root to ensure authorization
   const user = await getUser(cookies());
@@ -32,7 +32,7 @@ export default async function DashboardLayout({
           <main className={css.gridLayout}>
             {selector}
             {content}
-            <Sidebar preview={preview} details={details} />
+            <Sidebar inspector={inspector} details={details} />
           </main>
         </Suspense>
         <ModalController />

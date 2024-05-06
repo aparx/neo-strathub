@@ -3,10 +3,10 @@ import * as css from "@/app/(app)/dashboard/layout.css";
 import { Callout } from "@repo/ui/components";
 
 export function Sidebar({
-  preview,
+  inspector,
   details,
 }: {
-  preview: React.ReactNode;
+  inspector: React.ReactNode;
   details: React.ReactNode;
 }) {
   return (
@@ -16,7 +16,7 @@ export function Sidebar({
           <Callout.Warning>
             Warning: Alpha version. Data may be lost.
           </Callout.Warning>
-          {preview}
+          {inspector}
           {details}
         </DashColumn.Content>
       </aside>
