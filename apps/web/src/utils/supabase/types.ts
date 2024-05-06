@@ -388,10 +388,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      can_create_team: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
       can_select_blueprint: {
         Args: {
           target: unknown

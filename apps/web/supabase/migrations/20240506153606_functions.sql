@@ -51,8 +51,10 @@ create or replace function create_team(
     team_name varchar, target_plan_id int
 ) returns uuid as $$
 declare
-    _highest_role_id int;
     _uid             uuid;
+    _team_count      int;
+    _max_team_count  int;
+    _highest_role_id int;
 begin
     insert into public.team (name, plan_id)
     values (team_name, target_plan_id)
@@ -99,3 +101,9 @@ begin
 end;
 $$ volatile language plpgsql
    security definer;
+
+-- Only allow authenticated and higher users to create teams
+revoke
+    execute on function
+    create_team(varchar, int)
+    from public, anon;
