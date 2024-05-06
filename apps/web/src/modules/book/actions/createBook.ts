@@ -55,7 +55,7 @@ export async function createBook(lastState: any, formData: FormData) {
   if (insertion.error) {
     let errorArray: string[] = [];
     if (insertion.error.code === PostgresError.UNIQUE_VIOLATION)
-      errorArray.push("Name must be unique");
+      errorArray.push("A book with this name already exists for this team");
     else if (insertion.error.code === PostgresError.RAISE_EXCEPTION)
       errorArray.push(insertion.error.message);
     else throw insertion.error;

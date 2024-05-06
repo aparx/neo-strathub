@@ -162,6 +162,33 @@ export type Database = {
           },
         ]
       }
+      config: {
+        Row: {
+          boolean_value: boolean | null
+          date_value: string | null
+          name: string
+          numeric_value: number | null
+          text_value: string | null
+          type: Database["public"]["Enums"]["config_value_type"]
+        }
+        Insert: {
+          boolean_value?: boolean | null
+          date_value?: string | null
+          name: string
+          numeric_value?: number | null
+          text_value?: string | null
+          type: Database["public"]["Enums"]["config_value_type"]
+        }
+        Update: {
+          boolean_value?: boolean | null
+          date_value?: string | null
+          name?: string
+          numeric_value?: number | null
+          text_value?: string | null
+          type?: Database["public"]["Enums"]["config_value_type"]
+        }
+        Relationships: []
+      }
       game: {
         Row: {
           alias: string | null
@@ -386,6 +413,7 @@ export type Database = {
     }
     Enums: {
       bp_visibility: "public" | "private" | "unlisted"
+      config_value_type: "boolean" | "numeric" | "date" | "text"
       pay_interval: "monthly" | "yearly"
       profile_role: "admin" | "user"
     }

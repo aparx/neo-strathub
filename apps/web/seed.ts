@@ -67,6 +67,12 @@ async function main() {
 
   await seed.$resetDatabase();
 
+  seed.config([
+    {
+      name: "",
+    },
+  ]);
+
   /** Generates an array of unique game names (wrapped) */
   function generateGames() {
     const nameContext = new Set<string>();

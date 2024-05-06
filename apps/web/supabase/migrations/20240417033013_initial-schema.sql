@@ -196,3 +196,39 @@ CREATE INDEX
 CREATE INDEX
     IF NOT EXISTS idx_blueprint_visibility
     ON public.blueprint (visibility);
+
+-- //////////////////////////////// CONFIG ////////////////////////////////
+
+CREATE TYPE config_value_type AS ENUM ('boolean', 'numeric', 'date', 'text');
+
+CREATE TABLE IF NOT EXISTS public.config
+(
+    name          varchar PRIMARY KEY,
+    type          config_value_type NOT NULL,
+    boolean_value boolean,
+    numeric_value numeric,
+    date_value    date,
+    text_value    varchar
+);
+
+ALTER TABLE public.config
+    ADD CONSTRAINT correct_value CHECK (
+        CASE
+            WHEN type = 'boolean'::config_value_type
+                THEN boolean_value IS NOT NULL
+            WHEN type = 'numeric'::config_value_type
+                THEN numeric_value IS NOT NULL
+            WHEN type = 'date'::config_value_type
+                THEN date_value IS NOT NULL
+            WHEN type = 'text'::config_value_type
+                THEN text_value IS NOT NULL
+            ELSE true
+            END);
+
+ALTER TABLE public.config
+    ADD CONSTRAINT only_one_value CHECK (
+                (boolean_value IS NOT NULL)::integer +
+                (numeric_value IS NOT NULL)::integer +
+                (date_value IS NOT NULL)::integer +
+                (text_value IS NOT NULL)::integer
+            = 1);

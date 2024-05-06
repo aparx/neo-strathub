@@ -161,3 +161,9 @@ CREATE POLICY "Public read access"
     ON public.blueprint AS PERMISSIVE
     FOR SELECT TO authenticated
     USING (can_select_blueprint(blueprint));
+
+-- //////////////////////////////// CONFIG ////////////////////////////////
+
+CREATE POLICY "Public read access"
+    ON public.config AS PERMISSIVE
+    FOR SELECT TO authenticated USING (true);
