@@ -1,14 +1,21 @@
-import { vars } from "@repo/theme";
-import { keyframes, style } from "@vanilla-extract/css";
+import { sprinkles, vars } from "@repo/theme";
+import { style } from "@vanilla-extract/css";
 
-export const content = style({
-  display: "flex",
-  flexDirection: "column",
-  gap: vars.spacing.md,
-});
+const sectionBase = style([
+  sprinkles({
+    outline: "card",
+  }),
+  {
+    padding: vars.spacing.lg,
+    gap: vars.spacing.lg,
+  },
+]);
 
-export const previewFadeIn = style({
-  animation: `${keyframes({
-    from: { opacity: 0, transform: "translateX(2%)" },
-  })} .5s`,
-});
+export const main = style([
+  sectionBase,
+  {
+    display: "flex",
+    flexDirection: "column",
+    borderRadius: vars.roundness.sm,
+  },
+]);

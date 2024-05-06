@@ -1,8 +1,32 @@
 "use server";
 import { getServer } from "@/utils/supabase/actions";
+import { Nullish } from "@repo/utils";
 import { cookies } from "next/headers";
+import { cache } from "react";
 
-export async function getBlueprintCount(teamId: string) {
+interface CountData {
+  count: number | Nullish;
+  max: number;
+}
+
+export const getCounts = cache(async (teamId: string) => {
+  return {
+    members: {
+      count: await getMemberCount(teamId),
+      max: 100,
+    },
+    books: {
+      count: await getBookCount(teamId),
+      max: 20,
+    },
+    blueprints: {
+      count: await getBlueprintCount(teamId),
+      max: 100,
+    },
+  } satisfies Record<string, CountData>;
+});
+
+async function getBlueprintCount(teamId: string) {
   return (
     await getServer(cookies())
       .from("blueprint")
@@ -11,7 +35,7 @@ export async function getBlueprintCount(teamId: string) {
   )?.count;
 }
 
-export async function getBookCount(teamId: string) {
+async function getBookCount(teamId: string) {
   return (
     await getServer(cookies())
       .from("book")
@@ -20,7 +44,7 @@ export async function getBookCount(teamId: string) {
   )?.count;
 }
 
-export async function getMemberCount(teamId: string) {
+async function getMemberCount(teamId: string) {
   return (
     await getServer(cookies())
       .from("team_member")

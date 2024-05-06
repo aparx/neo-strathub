@@ -21,11 +21,13 @@ export async function getMyBlueprints(filters: GetMyBlueprintsFilters) {
   // prettier-ignore
   const query = createAnonServer(cookies())
     .from("blueprint")
-    .select(`
+    .select(
+      `
        *, 
        book!inner(id, name, team_id, team(id, name)), 
        arena!inner(id, name, game!inner(id, name))
-    `)
+    `
+    )
     .order("id")
     .order("updated_at", { ascending: false })
     .limit(BLUEPRINTS_PAGE_LIMIT);

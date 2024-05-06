@@ -1,3 +1,4 @@
+import { Sidebar } from "@/app/(app)/dashboard/_partial/sidebar/sidebar";
 import { getUser } from "@/modules/auth/actions";
 import { UserContextProvider } from "@/modules/auth/context/userContext";
 import { ModalController } from "@/modules/modal/components";
@@ -12,11 +13,13 @@ export default async function DashboardLayout({
   content,
   selector,
   details,
+  preview,
 }: {
   children: React.ReactNode;
   selector: React.ReactNode;
   content: React.ReactNode;
   details: React.ReactNode;
+  preview: React.ReactNode;
 }) {
   // Ensure user is fetched at root to ensure authorization
   const user = await getUser(cookies());
@@ -29,7 +32,7 @@ export default async function DashboardLayout({
           <main className={css.gridLayout}>
             {selector}
             {content}
-            {details}
+            <Sidebar preview={preview} details={details} />
           </main>
         </Suspense>
         <ModalController />

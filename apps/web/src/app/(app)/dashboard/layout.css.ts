@@ -34,3 +34,9 @@ export const pageFallback = style({
   display: "grid",
   placeItems: "center",
 });
+
+export const sidebarContent = style({
+  display: "flex",
+  flexDirection: "column",
+  gap: vars.spacing.md,
+});

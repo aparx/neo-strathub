@@ -3,6 +3,8 @@ import { cookies } from "next/headers";
 import { cache } from "react";
 import "server-only";
 
+export type SupabaseAnonServer = ReturnType<typeof getServer>;
+
 export const getServer = cache((cookie: ReturnType<typeof cookies>) => {
   return createAnonServer(cookie);
 });

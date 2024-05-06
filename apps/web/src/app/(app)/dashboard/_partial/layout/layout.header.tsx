@@ -20,8 +20,10 @@ import * as css from "./layout.header.css";
 
 export function LayoutHeader() {
   return (
-    <Text className={css.header} type={"label"} size={"lg"}>
-      <Navigation />
+    <Text asChild className={css.header} type={"label"} size={"lg"}>
+      <header>
+        <Navigation />
+      </header>
     </Text>
   );
 }
