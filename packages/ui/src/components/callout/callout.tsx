@@ -29,9 +29,11 @@ export function Custom({
       className={mergeClassNames(css.callout({ color }), className)}
       {...restProps}
     >
-      <Text type={"label"} size={"lg"}>
-        <Icon.Custom>{icon}</Icon.Custom>
-        {children}
+      <Text asChild type={"label"} size={"lg"}>
+        <aside>
+          <Icon.Custom>{icon}</Icon.Custom>
+          {children}
+        </aside>
       </Text>
     </Flexbox>
   );

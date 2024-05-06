@@ -19,18 +19,22 @@ export function ContentHeader() {
   return (
     <div style={{ marginLeft: "auto" }}>
       <Flexbox gap={"sm"} style={{ flexGrow: 1 }}>
-        <TextField
-          leading={<Icon.Mapped type={"search"} color={"red"} />}
-          placeholder={"Search"}
-          defaultValue={
-            query.get(CONTENT_SEARCH_PARAMS.filterByName) || undefined
-          }
-          onInput={(e) => updateFilter(e.currentTarget.value)}
-          style={{ flexGrow: 1 }}
-        />
-        <Button appearance={"icon"} aria-label={"Filter search"}>
-          <Icon.Mapped type={"filterEmpty"} />
-        </Button>
+        <Flexbox asChild gap={"sm"} style={{ flexGrow: 1 }}>
+          <search>
+            <TextField
+              leading={<Icon.Mapped type={"search"} color={"red"} />}
+              placeholder={"Search"}
+              defaultValue={
+                query.get(CONTENT_SEARCH_PARAMS.filterByName) || undefined
+              }
+              onInput={(e) => updateFilter(e.currentTarget.value)}
+              style={{ flexGrow: 1 }}
+            />
+            <Button appearance={"icon"} aria-label={"Filter search"}>
+              <Icon.Mapped type={"filterEmpty"} />
+            </Button>
+          </search>
+        </Flexbox>
         <Button appearance={"icon"} aria-label={"Add blueprint"} disabled>
           <Icon.Mapped type={"add"} />
         </Button>

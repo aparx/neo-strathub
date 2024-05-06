@@ -1,22 +1,28 @@
+import { Slot } from "@radix-ui/react-slot";
 import { mergeClassNames } from "@repo/utils";
-import { forwardRef, HTMLAttributes } from "react";
+import { ComponentPropsWithoutRef, forwardRef } from "react";
 import * as css from "./dashColumn.css";
 
-export function Root({ children }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={css.root}>{children}</div>;
+export interface DashColumnProps extends ComponentPropsWithoutRef<"div"> {
+  asChild?: boolean;
 }
 
-export const Header = createPart(css.header);
-export const Content = createPart(css.content);
-export const Footer = createPart(css.footer);
+export const Root = createPart(css.root, "section");
+export const Header = createPart(css.header, "header");
+export const Content = createPart(css.content, "div");
+export const Footer = createPart(css.footer, "footer");
 
-function createPart(baseClassName: string) {
-  return forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
-    function _DashColumnPartial({ className, ...restProps }, ref) {
+function createPart<const TElement extends keyof HTMLElementTagNameMap>(
+  styleClass: string,
+  element: TElement,
+) {
+  return forwardRef<HTMLElementTagNameMap[TElement], DashColumnProps>(
+    function _DashColumnPartial({ asChild, className, ...restProps }, ref) {
+      const Component = asChild ? Slot : element;
       return (
-        <div
+        <Component
           ref={ref}
-          className={mergeClassNames(baseClassName, className)}
+          className={mergeClassNames(styleClass, className)}
           {...restProps}
         />
       );

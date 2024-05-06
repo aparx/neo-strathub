@@ -38,13 +38,14 @@ export function SelectorHeader() {
 
   return (
     <Flexbox gap={"sm"} style={{ width: "100%" }}>
-      <TextField
-        leading={<Icon.Mapped type={"search"} color={"red"} />}
-        placeholder={"Search"}
-        onInput={(e) => filter.update(e.currentTarget.value)}
-        style={{ flexGrow: 1, width: "100%" }}
-        disabled={loading}
-      />
+      <search style={{ flexGrow: 1, width: "100%" }}>
+        <TextField
+          leading={<Icon.Mapped type={"search"} color={"red"} />}
+          placeholder={"Search"}
+          onInput={(e) => filter.update(e.currentTarget.value)}
+          disabled={loading}
+        />
+      </search>
       {addable && (
         <Button asChild appearance={"icon"}>
           <OpenModalLink modal={params.teamId ? "createBook" : "createTeam"}>

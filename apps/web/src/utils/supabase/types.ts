@@ -169,7 +169,7 @@ export type Database = {
           name: string
           numeric_value: number | null
           text_value: string | null
-          type: Database["public"]["Enums"]["config_value_type"]
+          type: Database["public"]["Enums"]["config_value_type"] | null
         }
         Insert: {
           boolean_value?: boolean | null
@@ -177,7 +177,7 @@ export type Database = {
           name: string
           numeric_value?: number | null
           text_value?: string | null
-          type: Database["public"]["Enums"]["config_value_type"]
+          type?: Database["public"]["Enums"]["config_value_type"] | null
         }
         Update: {
           boolean_value?: boolean | null
@@ -185,7 +185,7 @@ export type Database = {
           name?: string
           numeric_value?: number | null
           text_value?: string | null
-          type?: Database["public"]["Enums"]["config_value_type"]
+          type?: Database["public"]["Enums"]["config_value_type"] | null
         }
         Relationships: []
       }

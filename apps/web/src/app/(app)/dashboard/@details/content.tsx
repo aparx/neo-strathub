@@ -6,17 +6,19 @@ import * as css from "./content.css";
 
 export async function DetailsContent(props: ExtendedContentPathProps) {
   return (
-    <DashColumn.Root>
-      <DashColumn.Content className={css.content}>
-        <Callout.Warning>
-          Warning: Alpha version. Data may be lost.
-        </Callout.Warning>
-        {props.documentId != null && (
-          <Skeleton className={css.previewFadeIn} height={300} outline />
-        )}
-        {/* TODO: Document/Blueprint Inspector */}
-        {props.teamId != null && <TeamSection teamId={props.teamId} />}
-      </DashColumn.Content>
+    <DashColumn.Root asChild>
+      <aside>
+        <DashColumn.Content className={css.content}>
+          <Callout.Warning>
+            Warning: Alpha version. Data may be lost.
+          </Callout.Warning>
+          {props.documentId != null && (
+            <Skeleton className={css.previewFadeIn} height={300} outline />
+          )}
+          {/* TODO: Document/Blueprint Inspector */}
+          {props.teamId != null && <TeamSection teamId={props.teamId} />}
+        </DashColumn.Content>
+      </aside>
     </DashColumn.Root>
   );
 }
