@@ -67,9 +67,14 @@ async function main() {
 
   await seed.$resetDatabase();
 
-  seed.config([
+  await seed.config([
     {
-      name: "",
+      name: "max_teams_per_user",
+      type: "numeric",
+      numeric_value: 50,
+      date_value: null,
+      text_value: null,
+      boolean_value: null,
     },
   ]);
 

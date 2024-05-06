@@ -34,8 +34,9 @@ CREATE POLICY "Public read access"
 CREATE OR REPLACE FUNCTION create_team_rls()
     RETURNS boolean AS $$
 DECLARE
-    _user_id    uuid = auth.uid();
-    _team_count int;
+    _user_id        uuid = auth.uid();
+    _team_count     int;
+    _max_team_count numeric;
 BEGIN
     -- Check if the user has permission to create new teams ("hardcap")
     SELECT COUNT(team_id)
@@ -43,12 +44,21 @@ BEGIN
     FROM public.team_member
     WHERE profile_id = _user_id;
 
-    if (_team_count >= 100) then
+    SELECT numeric_value
+    INTO _max_team_count
+    FROM public.config
+    WHERE name = 'max_teams_per_user';
+
+    if (_max_team_count is null) then
+        raise exception 'Missing max_teams_per_user numeric config value';
+    end if;
+
+    if (_team_count >= _max_team_count) then
         raise exception 'Reached maximum amount of teams';
     end if;
 
     return true;
-END;
+END ;
 $$ VOLATILE LANGUAGE plpgsql
    SECURITY DEFINER;
 

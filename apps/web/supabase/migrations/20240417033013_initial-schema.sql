@@ -204,12 +204,15 @@ CREATE TYPE config_value_type AS ENUM ('boolean', 'numeric', 'date', 'text');
 CREATE TABLE IF NOT EXISTS public.config
 (
     name          varchar PRIMARY KEY,
-    type          config_value_type NOT NULL,
+    type          config_value_type,
     boolean_value boolean,
     numeric_value numeric,
     date_value    date,
     text_value    varchar
 );
+
+ALTER TABLE public.config
+    ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE public.config
     ADD CONSTRAINT correct_value CHECK (
