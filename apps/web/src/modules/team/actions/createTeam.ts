@@ -1,6 +1,6 @@
 "use server";
 import { getUser } from "@/modules/auth/actions";
-import { getServiceServer } from "@/utils/supabase/actions";
+import { getServer } from "@/utils/supabase/actions";
 import { cookies } from "next/headers";
 import { PostgresError } from "pg-error-enum";
 import { z } from "zod";
@@ -27,7 +27,7 @@ export async function createTeam(lastState: any, formData: FormData) {
   const user = await getUser(cookies());
   if (!user) throw new Error("Unauthorized");
 
-  const create = await getServiceServer(cookies()).rpc("create_team", {
+  const create = await getServer(cookies()).rpc("create_team", {
     team_name: validatedFields.data.name,
     target_plan_id: validatedFields.data.planId,
   });

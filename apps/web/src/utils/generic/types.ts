@@ -18,12 +18,12 @@ export type GetUseQueryPostgrestResult<TQueryResult> =
  * `UseQueryResult<PostgrestResponse<...>>`.
  *
  * @example
- *   const useGetTeam = () => useQuery({
+ *   const useGetSomeArray = () => useQuery({
  *     queryKey: ["someKey"],
  *     queryFn: async () => ["Hello", "World"] as const,
  *   })
  *
- *   type T = DeepInferUseQueryResult<typeof useGetTeam>;
+ *   type T = DeepInferUseQueryResult<typeof useGetSomeArray>;
  *   //   ^? "Hello" | "World"
  */
 export type DeepInferUseQueryResult<THook extends (...args: any[]) => any> =

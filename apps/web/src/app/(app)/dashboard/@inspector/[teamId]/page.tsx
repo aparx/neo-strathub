@@ -1,7 +1,7 @@
-import { PreviewContent } from "@/app/(app)/dashboard/@inspector/content";
+import { InspectorContent } from "@/app/(app)/dashboard/@inspector/content";
 import { DASHBOARD_QUERY_PARAMS } from "@/app/(app)/dashboard/_utils";
 
-export default function Preview({
+export default function Inspector({
   params,
   searchParams,
 }: {
@@ -9,7 +9,7 @@ export default function Preview({
   searchParams: Partial<Record<string, string>>;
 }) {
   return (
-    <PreviewContent
+    <InspectorContent
       teamId={params.teamId}
       bookId={searchParams[DASHBOARD_QUERY_PARAMS.book]}
       documentId={searchParams[DASHBOARD_QUERY_PARAMS.document]}

@@ -5,7 +5,7 @@ import { Skeleton } from "@repo/ui/components";
 import { Suspense } from "react";
 import * as css from "./content.css";
 
-export async function PreviewContent(props: ExtendedContentPathProps) {
+export async function InspectorContent(props: ExtendedContentPathProps) {
   if (!props.documentId) return null;
 
   return (

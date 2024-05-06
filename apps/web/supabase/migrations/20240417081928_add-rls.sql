@@ -31,6 +31,40 @@ create policy "public read access"
 
 -- //////////////////////////////// team ////////////////////////////////
 
+create or replace function can_create_team()
+    returns boolean as $$
+declare
+    _team_count     int;
+    _max_team_count int;
+begin
+    -- The user is not allowed to create any more teams if exceeds the maximum team count
+    select count(team_id)
+    into _team_count
+    from public.team_member
+    where profile_id = auth.uid();
+
+    select numeric_value
+    into _max_team_count
+    from public.config
+    where name = 'max_teams_per_user';
+
+    if (_max_team_count is null) then
+        raise exception 'Missing max_teams_per_user numeric config value';
+    end if;
+
+    if (_team_count >= _max_team_count) then
+        raise exception 'Reached maximum amount of teams';
+    end if;
+
+    return true;
+end;
+$$ volatile language plpgsql
+   security definer;
+
+create policy "authenticated write access"
+    on public.team as permissive
+    for insert to authenticated with check (can_create_team());
+
 create policy "public read access"
     on public.team as permissive
     for select to authenticated using (true);

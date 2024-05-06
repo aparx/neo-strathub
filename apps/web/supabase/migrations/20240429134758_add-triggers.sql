@@ -46,15 +46,10 @@ execute function get_avatar_on_profile_insert();
 
 create or replace function delete_team_if_empty()
     returns trigger as $$
-declare
-    _count int;
 begin
-    select count(*)
-    into _count
-    from public.team_member
-    where team_id = old.team_id;
-
-    if (_count = 0) then
+    if (not exists(select profile_id
+                   from public.team_member
+                   where team_id = old.team_id)) then
         delete from public.team where id = old.team_id;
     end if;
 
@@ -71,26 +66,13 @@ execute function delete_team_if_empty();
 
 -- //////////////////////////////// team ////////////////////////////////
 
-create or replace function team_create()
+-- This function assigns
+create or replace function on_create_team()
     returns trigger as $$
 declare
-    _highest_role   record;
     _random_game_id int;
 begin
-    if (auth.uid() is not null) then
-        -- select the highest available role
-        select id, max(flags)
-        into _highest_role
-        from public.team_member_role
-        group by id
-        limit 1;
-
-        -- put the authorized user in that team
-        insert into public.team_member (profile_id, team_id, role_id)
-        values (auth.uid(), new.id, _highest_role.id);
-    end if;
-
-    -- insert an example book into that team
+    -- Create a sample book
     select id
     into _random_game_id
     from public.game
@@ -111,8 +93,8 @@ end;
 $$ volatile language plpgsql
    security definer;
 
-create trigger trigger_on_team_create
+create trigger trigger_create_sample_book
     after insert
     on public.team
     for each row
-execute function team_create();
+execute function on_create_team();

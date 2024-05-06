@@ -1,6 +1,5 @@
 -- noinspection SqlResolveForFile
 
--- //////////////////////////////// CREATE BOOK ////////////////////////////////
 create or replace function create_book(
     book_name varchar, target_team_id uuid, target_game_id int
 ) returns uuid as $$
@@ -41,45 +40,41 @@ $$ volatile language plpgsql
    security definer;
 
 -- only the service and higher level roles can create a book, to ensure server side logic
-revoke execute on function create_book(varchar, uuid, int)
+revoke
+    execute on function
+    create_book(varchar, uuid, int)
     from public, anon, authenticated;
 
--- //////////////////////////////// CREATE TEAM ////////////////////////////////
-create or replace function create_team(team_name varchar, target_plan_id int)
-    returns uuid as $$
+-- TODO create_team
+
+create or replace function create_team(
+    team_name varchar, target_plan_id int
+) returns uuid as $$
 declare
-    _team_count     int;
-    _max_team_count int;
-    _uid            uuid;
+    _highest_role_id int;
+    _uid             uuid;
 begin
     insert into public.team (name, plan_id)
     values (team_name, target_plan_id)
     returning id into _uid;
 
-    select count(team_id)
-    into _team_count
-    from public.team_member
-    where profile_id = _user_id;
+    if (auth.uid() is not null) then
+        -- Select the highest available role and assign the user to it
+        select id
+        into _highest_role_id
+        from public.team_member_role
+        order by flags desc
+        limit 1;
 
-    -- Check if the user is even allowed to create any more teams
-    select numeric_value
-    into _max_team_count
-    from public.config
-    where name = 'max_teams_per_user';
+        if (_highest_role_id is null) then
+            raise exception 'Could not find a fitting team_member_role';
+        end if;
 
-    if (_max_team_count is null) then
-        raise exception 'Missing max_teams_per_user numeric config value';
-    end if;
-
-    if (_team_count > _max_team_count) then
-        raise exception 'Reached maximum amount of teams';
+        insert into team_member (profile_id, team_id, role_id)
+        values (auth.uid(), _uid, _highest_role_id);
     end if;
 
     return _uid;
 end;
 $$ volatile language plpgsql
    security definer;
-
--- only the service and higher level roles can create a team, to ensure server side logic
-revoke execute on function create_team(varchar, int)
-    from public, anon, authenticated;

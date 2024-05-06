@@ -11,10 +11,15 @@ export async function InspectorHeader({ documentId }: { documentId: string }) {
     .from("blueprint")
     .select(
       `name, visibility, tags,
+       arena!inner(id, name),
        book!inner(id, name, team!inner(id, name), game!inner(name, icon))`,
     )
     .eq("id", documentId)
     .maybeSingle();
+
+  // Always include the arena name first within the tags
+  const tags = data ? [data.arena.name, ...(data.tags ?? [])] : null;
+
   if (!data) {
     console.error("Error", error); // TODO
     return null;
@@ -40,7 +45,7 @@ export async function InspectorHeader({ documentId }: { documentId: string }) {
         </Flexbox>
         <ExitInspectorButton className={css.exit} />
       </Flexbox>
-      {data.tags && <TagList tags={data.tags} />}
+      {tags && <TagList tags={tags} />}
       <div>{data.visibility}</div>
     </header>
   );

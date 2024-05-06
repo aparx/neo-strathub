@@ -135,6 +135,10 @@ create table if not exists public.team_member_role
     flags bigint      not null default 0
 );
 
+create index
+    if not exists idx_sorted_flags
+    on public.team_member_role (flags desc);
+
 alter table public.team_member_role
     enable row level security;
 

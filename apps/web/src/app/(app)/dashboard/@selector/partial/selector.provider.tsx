@@ -120,7 +120,7 @@ function BooksProvider({
       return {
         href: `/dashboard/${teamId}?${searchParams.toString()}`,
         text: name,
-        popover: <BookPopover />,
+        popover: <BookPopover bookId={id} bookName={name} />,
         icon: game ? (
           <SelectorGameImage src={game.icon} name={game.name} />
         ) : (

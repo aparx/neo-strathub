@@ -1,12 +1,6 @@
 "use client";
 import { Slot } from "@radix-ui/react-slot";
-import {
-  ComponentPropsWithoutRef,
-  CSSProperties,
-  useCallback,
-  useRef,
-  useState,
-} from "react";
+import { ComponentPropsWithoutRef, useCallback, useRef } from "react";
 import { useEventListener } from "usehooks-ts";
 
 export interface DragScrollAreaProps extends ComponentPropsWithoutRef<"div"> {
@@ -22,19 +16,17 @@ export interface DragScrollAreaProps extends ComponentPropsWithoutRef<"div"> {
  * @param asChild
  * @param style
  * @param onMouseDown
+ * @param onTouchStart
  * @param restProps
  * @constructor
  */
 export function DragScrollArea({
   children,
   asChild,
-  style,
   onMouseDown,
   onTouchStart,
   ...restProps
 }: DragScrollAreaProps) {
-  const [cursor, setCursor] = useState<CSSProperties["cursor"]>();
-
   const ref = useRef<HTMLDivElement>(null);
   const clickPosition = useRef<[x: number, y: number]>();
 
@@ -43,7 +35,6 @@ export function DragScrollArea({
       pointerX + (ref.current?.scrollLeft ?? 0),
       pointerY + (ref.current?.scrollTop ?? 0),
     ];
-    setCursor("grabbing");
   }, []);
 
   const dragMove = useCallback((pointerX: number, pointerY: number) => {
@@ -53,10 +44,7 @@ export function DragScrollArea({
     ref.current.scrollTop = beginY - pointerY;
   }, []);
 
-  const dragStop = useCallback(() => {
-    clickPosition.current = undefined;
-    setCursor(undefined);
-  }, []);
+  const dragStop = () => (clickPosition.current = undefined);
 
   useEventListener("mouseup", dragStop);
   useEventListener("touchend", dragStop);
@@ -71,7 +59,6 @@ export function DragScrollArea({
   return (
     <Component
       ref={ref}
-      style={{ cursor: cursor, ...style }}
       data-grabbed={clickPosition.current != null}
       onMouseDown={(e) => {
         onMouseDown?.(e);

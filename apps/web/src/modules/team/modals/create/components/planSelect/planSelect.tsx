@@ -4,8 +4,9 @@ import { DeepInferUseQueryResult } from "@/utils/generic/types";
 import { createClient } from "@/utils/supabase/client";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Skeleton } from "@repo/ui/components";
+import { mergeClassNames } from "@repo/utils";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { ComponentPropsWithoutRef, useEffect, useState } from "react";
 import * as css from "./planSelect.css";
 
 function useGetPlans() {
@@ -19,7 +20,22 @@ function useGetPlans() {
 
 type Plan = DeepInferUseQueryResult<typeof useGetPlans>;
 
-export function PlanSelect() {
+type PlanSelectBaseProps = Omit<
+  ComponentPropsWithoutRef<"div">,
+  "children" | "role"
+>;
+
+export interface PlanSelectProps extends PlanSelectBaseProps {
+  name: string;
+  required?: boolean;
+}
+
+export function PlanSelect({
+  name,
+  required,
+  className,
+  ...restProps
+}: PlanSelectProps) {
   const [selected, setSelected] = useState<number>();
   const { data, isLoading } = useGetPlans();
 
@@ -29,22 +45,24 @@ export function PlanSelect() {
     setSelected(data?.data?.find((x) => x.is_default)?.id);
   }, [data]);
 
-  if (isLoading) return <Skeleton width={"100%"} height={30} />;
+  if (isLoading)
+    return <Skeleton width={"100%"} height={132} outline roundness={"md"} />;
 
   return (
     <div
       role={"radiogroup"}
-      aria-required={true}
-      aria-label={"Choose a plan"}
-      className={css.group}
+      className={mergeClassNames(css.group, className)}
+      aria-required={required}
+      {...restProps}
     >
       {data?.data?.map((plan) => (
         <PlanCard
           key={plan.id}
           plan={plan}
-          radioName={"planId"}
+          radioName={name}
           selected={selected === plan.id}
           onSelect={() => setSelected(plan.id)}
+          required
         />
       ))}
     </div>
@@ -56,11 +74,13 @@ function PlanCard({
   radioName,
   selected,
   onSelect,
+  required,
 }: {
   plan: Plan;
   radioName: string;
   selected?: boolean;
   onSelect?: () => any;
+  required?: boolean;
 }) {
   return (
     <label data-plan-id={plan.id} className={css.label({ selected })}>
@@ -71,7 +91,7 @@ function PlanCard({
           name={radioName}
           checked={selected}
           onChange={(e) => e.target.checked && onSelect?.()}
-          required
+          required={required}
         />
       </VisuallyHidden>
       <h6>{plan.name}</h6>

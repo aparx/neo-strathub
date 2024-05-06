@@ -63,7 +63,7 @@ function FormContent({
             : null
         }
       />
-      <PlanSelect />
+      <PlanSelect name={"planId"} required />
       <Flexbox gap={"md"} style={{ marginLeft: "auto" }}>
         <Modal.Close asChild>
           <Button>Cancel</Button>
