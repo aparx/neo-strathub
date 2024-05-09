@@ -8,6 +8,7 @@ import { z } from "zod";
 const inputSchema = z.object({
   name: z.string().min(3).max(20),
   planId: z.number().positive(),
+  gameId: z.number().positive(),
 });
 
 function createError<T>(error: T) {
@@ -19,6 +20,7 @@ export async function createTeam(lastState: any, formData: FormData) {
   const validatedFields = inputSchema.safeParse({
     name: formData.get("name"),
     planId: Number(formData.get("planId")),
+    gameId: Number(formData.get("gameId")),
   });
   if (!validatedFields.success)
     return createError(validatedFields.error?.flatten().fieldErrors);
@@ -30,6 +32,7 @@ export async function createTeam(lastState: any, formData: FormData) {
   const create = await getServer(cookies()).rpc("create_team", {
     team_name: validatedFields.data.name,
     target_plan_id: validatedFields.data.planId,
+    target_game_id: validatedFields.data.gameId,
   });
 
   if (create.error) {

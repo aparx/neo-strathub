@@ -1,22 +1,17 @@
 -- noinspection SqlResolveForFile
 
 create or replace function create_book(
-    book_name varchar, target_team_id uuid, target_game_id int
+    book_name varchar, target_team_id uuid
 ) returns uuid as $$
 declare
     _book_id        varchar;
     _book_count     int;
     _max_book_count int;
 begin
-    if (exists(select id
-               from public.game
-               where id = target_game_id
-                 and hidden = true)) then
-        raise exception 'Game is hidden, cannot create book';
-    end if;
+    -- TODO check if game is hidden
 
-    insert into public.book (name, team_id, game_id)
-    values (book_name, target_team_id, target_game_id)
+    insert into public.book (name, team_id)
+    values (book_name, target_team_id)
     returning id into _book_id;
 
     select count(id)
@@ -42,13 +37,13 @@ $$ volatile language plpgsql
 -- only the service and higher level roles can create a book, to ensure server side logic
 revoke
     execute on function
-    create_book(varchar, uuid, int)
+    create_book(varchar, uuid)
     from public, anon, authenticated;
 
 -- TODO create_team
 
 create or replace function create_team(
-    team_name varchar, target_plan_id int
+    team_name varchar, target_plan_id int, target_game_id int
 ) returns uuid as $$
 declare
     _uid             uuid;
@@ -56,8 +51,16 @@ declare
     _max_team_count  int;
     _highest_role_id int;
 begin
-    insert into public.team (name, plan_id)
-    values (team_name, target_plan_id)
+    -- Check if game is hidden, if so deny
+    if (not exists(select id
+                   from public.game
+                   where id = target_game_id
+                     and hidden = false)) then
+        raise exception 'Game not found or is hidden';
+    end if;
+
+    insert into public.team (name, plan_id, game_id)
+    values (team_name, target_plan_id, target_game_id)
     returning id into _uid;
 
     if (auth.uid() is null) then
@@ -105,5 +108,5 @@ $$ volatile language plpgsql
 -- Only allow authenticated and higher users to create teams
 revoke
     execute on function
-    create_team(varchar, int)
+    create_team(varchar, int, int)
     from public, anon;

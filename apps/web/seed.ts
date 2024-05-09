@@ -77,7 +77,7 @@ async function main() {
       casing: "PascalCase",
     });
     return generateArray({
-      range: [1, 4],
+      range: [3, 6],
       fillFn: () => ({
         name: generateUnique(nameContext, nameGenerator),
         icon: "https://svgshare.com/i/15iw.svg",

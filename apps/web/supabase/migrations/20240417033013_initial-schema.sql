@@ -15,7 +15,7 @@ create table if not exists public.game
     icon       varchar     not null,
     -- if true, this game is generally hidden from the public
     hidden     bool        not null default false,
-    metadata   json        not null default '{}',
+    metadata   jsonb       not null default '{}'::jsonb,
     created_at timestamptz not null default now()
 );
 
@@ -36,7 +36,7 @@ create table if not exists public.arena
         on update cascade,
     name       varchar(64) not null
         constraint min_name_length check (length(name) >= 2),
-    metadata   json,
+    metadata   jsonb       not null default '{}'::jsonb,
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
@@ -94,6 +94,9 @@ create table if not exists public.team
     plan_id    smallint references public.plan
         on delete set null
         on update cascade,
+    game_id    smallint    not null references public.game (id)
+        on delete restrict -- restrict to prevent accidental deletion
+        on update cascade,
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
@@ -111,9 +114,6 @@ create table if not exists public.book
     team_id    uuid        not null references public.team (id)
         on delete cascade
         on update cascade,
-    game_id    smallint    not null references public.game (id)
-        on delete restrict -- restrict to prevent accidental deletion
-        on update cascade,
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
@@ -127,6 +127,7 @@ create unique index
     on public.book (team_id, lower(name));
 
 -- //////////////////////////////// team_member_role ////////////////////////////////
+
 create table if not exists public.team_member_role
 (
     id    serial primary key,
@@ -180,8 +181,6 @@ create table if not exists public.blueprint
         constraint min_name_length check (length(name) >= 3),
     tags       varchar(32)[]
         constraint max_tags_length check (array_length(tags, 1) <= 16),
-    -- the actual data (including canvas) of the blueprint
-    data       jsonb                not null default '{}'::jsonb,
     created_at timestamptz          not null default now(),
     updated_at timestamptz          not null default now()
 );
@@ -200,6 +199,85 @@ create index
 create index
     if not exists idx_blueprint_visibility
     on public.blueprint (visibility);
+
+-- //////////////////////////////// blueprint_stage ////////////////////////////////
+
+-- This table is representing a stage in a blueprint strategy.
+-- A blueprint is represented in stages. It contains the (partial) data of a blueprint.
+create table if not exists public.blueprint_stage
+(
+    id           uuid primary key     default gen_random_uuid(),
+    blueprint_id uuid        not null references public.blueprint (id)
+        on delete cascade
+        on update cascade,
+    stage        int2        not null
+        constraint stage_positive check (stage > 0),
+    data         jsonb       not null default '{}'::jsonb,
+    created_at   timestamptz not null default now(),
+    updated_at   timestamptz not null default now()
+);
+
+alter table public.blueprint_stage
+    enable row level security;
+
+create unique index
+    if not exists uidx_blueprint_stage_per_blueprint
+    on public.blueprint_stage (blueprint_id, stage);
+
+-- //////////////////////////////// team_player_slot ////////////////////////////////
+
+-- This table is an assignment table in which team members can be assigned to slots,
+-- that can be used in all blueprints of that team.
+create table if not exists public.team_player_slot
+(
+    -- This PK is referenced in the data of a blueprint_stage
+    id         uuid primary key     default gen_random_uuid(),
+    team_id    uuid        not null references public.team (id)
+        on delete cascade
+        on update cascade,
+    member_id  uuid,
+    -- The color used to represent this player (visually) in the blueprint
+    color      varchar(32) not null,
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now(),
+
+    constraint fk_team_member
+        foreign key (team_id, member_id)
+            references public.team_member (team_id, profile_id)
+            on delete set null
+            on update cascade
+);
+
+alter table public.team_player_slot
+    enable row level security;
+
+create unique index
+    if not exists uidx_unique_player_per_team
+    on public.team_player_slot (team_id, member_id);
+
+-- //////////////////////////////// game_object ////////////////////////////////
+
+create type game_object_type as enum ('character', 'gadget', 'floor');
+
+-- A game object is an object that is related to a game and can be used in a blueprint
+create table if not exists game_object
+(
+    id       serial primary key,
+    game_id  int              not null references public.game (id)
+        on delete restrict
+        on update cascade,
+    type     game_object_type not null,
+    name     varchar(32),
+    url      varchar          not null,
+    metadata jsonb
+);
+
+alter table public.game_object
+    enable row level security;
+
+create index
+    if not exists idx_game_type
+    on public.game_object (game_id, type, name);
 
 -- //////////////////////////////// config ////////////////////////////////
 

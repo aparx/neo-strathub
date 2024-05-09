@@ -1,6 +1,9 @@
 "use client";
 import { createTeam } from "@/modules/team/actions/createTeam";
-import { PlanSelect } from "@/modules/team/modals/create/components";
+import {
+  GameSelect,
+  PlanSelect,
+} from "@/modules/team/modals/create/components";
 import {
   Button,
   Flexbox,
@@ -64,6 +67,7 @@ function FormContent({
         }
       />
       <PlanSelect name={"planId"} required />
+      <GameSelect name={"gameId"} />
       <Flexbox gap={"md"} style={{ marginLeft: "auto" }}>
         <Modal.Close asChild>
           <Button>Cancel</Button>

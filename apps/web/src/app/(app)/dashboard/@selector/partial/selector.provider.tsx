@@ -13,7 +13,7 @@ import { User } from "@supabase/supabase-js";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
-import { MdCollections, MdPeople } from "react-icons/md";
+import { MdCollections } from "react-icons/md";
 
 /**
  * Provides context and fetches data necessary for the selector.
@@ -52,7 +52,7 @@ function TeamsProvider({
       return (
         await createClient()
           .from("team_member")
-          .select("team(id, name)")
+          .select("team(id, name, game!inner(id, name, icon))")
           .order("created_at")
           .eq("profile_id", userId)
       )?.data;
@@ -63,16 +63,14 @@ function TeamsProvider({
   const elements = useMemo(() => {
     if (!data) return [];
     return data
-      .map(({ team }) => {
-        if (!team) return null;
-        return {
-          href: `/dashboard/${team.id}`,
-          text: team.name,
-          popover: <TeamPopover teamId={team.id} />,
-          icon: <MdPeople />,
-        } satisfies SelectorListItemData;
-      })
-      .filter(nonNull);
+      .map((element) => element.team)
+      .filter(nonNull)
+      .map<SelectorListItemData>(({ id, name, game }) => ({
+        href: `/dashboard/${id}`,
+        text: name,
+        popover: <TeamPopover teamId={id} />,
+        icon: <SelectorGameImage src={game.icon} name={game.name} />,
+      }));
   }, [data]);
 
   return (
@@ -95,7 +93,7 @@ function BooksProvider({
       return (
         await createClient()
           .from("book")
-          .select("id, name, game(id, name, icon)")
+          .select("id, name")
           .order("created_at")
           .eq("team_id", teamId)
       )?.data;
@@ -113,7 +111,7 @@ function BooksProvider({
 
   const elements = useMemo(() => {
     if (!data) return [];
-    return data.map(({ id, name, game }) => {
+    return data.map(({ id, name }) => {
       const searchParams = new URLSearchParams();
       searchParams.set(DASHBOARD_QUERY_PARAMS.book, id);
 
@@ -121,11 +119,7 @@ function BooksProvider({
         href: `/dashboard/${teamId}?${searchParams.toString()}`,
         text: name,
         popover: <BookPopover bookId={id} bookName={name} />,
-        icon: game ? (
-          <SelectorGameImage src={game.icon} name={game.name} />
-        ) : (
-          <MdCollections />
-        ),
+        icon: <MdCollections />,
       } satisfies SelectorListItemData;
     });
   }, [data]);

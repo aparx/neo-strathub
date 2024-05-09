@@ -1,5 +1,4 @@
 "use client";
-
 import { DeepInferUseQueryResult } from "@/utils/generic/types";
 import { createClient } from "@/utils/supabase/client";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";

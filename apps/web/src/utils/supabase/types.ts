@@ -39,7 +39,7 @@ export type Database = {
           created_at: string
           game_id: number
           id: number
-          metadata: Json | null
+          metadata: Json
           name: string
           updated_at: string
         }
@@ -47,7 +47,7 @@ export type Database = {
           created_at?: string
           game_id: number
           id?: number
-          metadata?: Json | null
+          metadata?: Json
           name: string
           updated_at?: string
         }
@@ -55,7 +55,7 @@ export type Database = {
           created_at?: string
           game_id?: number
           id?: number
-          metadata?: Json | null
+          metadata?: Json
           name?: string
           updated_at?: string
         }
@@ -74,7 +74,6 @@ export type Database = {
           arena_id: number
           book_id: string
           created_at: string
-          data: Json
           id: string
           name: string
           tags: string[] | null
@@ -85,7 +84,6 @@ export type Database = {
           arena_id: number
           book_id: string
           created_at?: string
-          data?: Json
           id?: string
           name: string
           tags?: string[] | null
@@ -96,7 +94,6 @@ export type Database = {
           arena_id?: number
           book_id?: string
           created_at?: string
-          data?: Json
           id?: string
           name?: string
           tags?: string[] | null
@@ -120,10 +117,44 @@ export type Database = {
           },
         ]
       }
+      blueprint_stage: {
+        Row: {
+          blueprint_id: string
+          created_at: string
+          data: Json
+          id: string
+          stage: number
+          updated_at: string
+        }
+        Insert: {
+          blueprint_id: string
+          created_at?: string
+          data?: Json
+          id?: string
+          stage: number
+          updated_at?: string
+        }
+        Update: {
+          blueprint_id?: string
+          created_at?: string
+          data?: Json
+          id?: string
+          stage?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blueprint_stage_blueprint_id_fkey"
+            columns: ["blueprint_id"]
+            isOneToOne: false
+            referencedRelation: "blueprint"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       book: {
         Row: {
           created_at: string
-          game_id: number
           id: string
           name: string
           team_id: string
@@ -131,7 +162,6 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          game_id: number
           id?: string
           name: string
           team_id: string
@@ -139,20 +169,12 @@ export type Database = {
         }
         Update: {
           created_at?: string
-          game_id?: number
           id?: string
           name?: string
           team_id?: string
           updated_at?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "book_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "game"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "book_team_id_fkey"
             columns: ["team_id"]
@@ -218,6 +240,41 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      game_object: {
+        Row: {
+          game_id: number
+          id: number
+          metadata: Json | null
+          name: string | null
+          type: Database["public"]["Enums"]["game_object_type"]
+          url: string
+        }
+        Insert: {
+          game_id: number
+          id?: number
+          metadata?: Json | null
+          name?: string | null
+          type: Database["public"]["Enums"]["game_object_type"]
+          url: string
+        }
+        Update: {
+          game_id?: number
+          id?: number
+          metadata?: Json | null
+          name?: string | null
+          type?: Database["public"]["Enums"]["game_object_type"]
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_object_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "game"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       plan: {
         Row: {
@@ -290,6 +347,7 @@ export type Database = {
       team: {
         Row: {
           created_at: string
+          game_id: number
           id: string
           name: string
           plan_id: number | null
@@ -297,6 +355,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          game_id: number
           id?: string
           name: string
           plan_id?: number | null
@@ -304,12 +363,20 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          game_id?: number
           id?: string
           name?: string
           plan_id?: number | null
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "team_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "game"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "team_plan_id_fkey"
             columns: ["plan_id"]
@@ -383,6 +450,48 @@ export type Database = {
         }
         Relationships: []
       }
+      team_player_slot: {
+        Row: {
+          color: string
+          created_at: string
+          id: string
+          member_id: string | null
+          team_id: string
+          updated_at: string
+        }
+        Insert: {
+          color: string
+          created_at?: string
+          id?: string
+          member_id?: string | null
+          team_id: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          id?: string
+          member_id?: string | null
+          team_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_team_member"
+            columns: ["team_id", "member_id"]
+            isOneToOne: false
+            referencedRelation: "team_member"
+            referencedColumns: ["team_id", "profile_id"]
+          },
+          {
+            foreignKeyName: "team_player_slot_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "team"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -410,7 +519,6 @@ export type Database = {
         Args: {
           book_name: string
           target_team_id: string
-          target_game_id: number
         }
         Returns: string
       }
@@ -418,6 +526,7 @@ export type Database = {
         Args: {
           team_name: string
           target_plan_id: number
+          target_game_id: number
         }
         Returns: string
       }
@@ -425,6 +534,7 @@ export type Database = {
     Enums: {
       bp_visibility: "public" | "private" | "unlisted"
       config_value_type: "boolean" | "numeric" | "date" | "text"
+      game_object_type: "character" | "gadget" | "floor"
       pay_interval: "monthly" | "yearly"
       profile_role: "admin" | "user"
     }

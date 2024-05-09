@@ -43,14 +43,6 @@ begin
     -- only allow the book to be seen when the user is a member of the team or there
     -- is any publicly accessible blueprint within that book.
 
-    if (not exists(select id
-                   from public.game
-                   where id = book.game_id
-                     and hidden = false)) then
-        -- game of book does not exist or is hidden, thus disallow read
-        return false;
-    end if;
-
     if (exists(select profile_id
                from public.team_member
                where profile_id = auth.uid()

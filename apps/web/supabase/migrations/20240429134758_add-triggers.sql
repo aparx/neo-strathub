@@ -69,24 +69,9 @@ execute function delete_team_if_empty();
 -- This function assigns
 create or replace function on_create_team()
     returns trigger as $$
-declare
-    _random_game_id int;
 begin
-    -- Create a sample book
-    select id
-    into _random_game_id
-    from public.game
-    where hidden = false
-    order by random()
-    limit 1;
-
-    if (_random_game_id is null) then
-        -- skip the creation of a book, since no game is existing
-        return new;
-    end if;
-
-    insert into public.book (name, team_id, game_id)
-    values ('Example Stratbook', new.id, _random_game_id);
+    insert into public.book (name, team_id)
+    values ('Example Stratbook', new.id);
 
     return new;
 end;

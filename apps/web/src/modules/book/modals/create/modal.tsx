@@ -1,10 +1,8 @@
 "use client";
 import { DASHBOARD_QUERY_PARAMS } from "@/app/(app)/dashboard/_utils";
 import { createBook } from "@/modules/book/actions/createBook";
-import { GameSelect } from "@/modules/book/modals/create/components";
 import { useGetTeamFromParams } from "@/modules/modal/hooks";
 import { useURL } from "@/utils/hooks";
-import { createClient } from "@/utils/supabase/client";
 import {
   Breadcrumbs,
   Button,
@@ -35,17 +33,6 @@ export function CreateBookModal() {
   const team = useGetTeamFromParams();
   const url = useURL();
   const router = useRouter();
-
-  useEffect(() => {
-    if (!team.data) return;
-    createClient()
-      .rpc("create_book", {
-        book_name: "testBook",
-        target_team_id: team.data.id,
-        target_game_id: 33,
-      })
-      .then(console.log);
-  }, [team.data]);
 
   useEffect(() => {
     if (state?.state !== "success") return;
@@ -92,7 +79,6 @@ function FormContent({
         disabled={isLoading}
         required
       />
-      <GameSelect name={"gameId"} />
       <Flexbox gap={"md"} style={{ marginLeft: "auto" }}>
         <Modal.Close asChild>
           <Button>Cancel</Button>

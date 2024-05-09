@@ -10,7 +10,6 @@ import { z } from "zod";
 
 const inputSchema = z.object({
   teamId: z.string().uuid(),
-  gameId: z.number().int().positive(),
   name: z.string().min(3).max(20),
 });
 
@@ -22,7 +21,6 @@ export async function createBook(lastState: any, formData: FormData) {
   // Parse form data and ensure data authenticity
   const validatedFields = inputSchema.safeParse({
     teamId: formData.get("teamId"),
-    gameId: Number(formData.get("gameId")),
     name: formData.get("name"),
   });
   if (!validatedFields.success)
@@ -42,7 +40,6 @@ export async function createBook(lastState: any, formData: FormData) {
   const create = await getServiceServer(cookies()).rpc("create_book", {
     book_name: validatedFields.data.name,
     target_team_id: validatedFields.data.teamId,
-    target_game_id: validatedFields.data.gameId,
   });
 
   if (create.error) {

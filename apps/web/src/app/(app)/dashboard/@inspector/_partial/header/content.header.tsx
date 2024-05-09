@@ -11,8 +11,8 @@ export async function InspectorHeader({ documentId }: { documentId: string }) {
     .from("blueprint")
     .select(
       `name, visibility, tags,
-       arena!inner(id, name),
-       book!inner(id, name, team!inner(id, name), game!inner(name, icon))`,
+       arena!inner(id, name, game!inner(name, icon)),
+       book!inner(id, name, team!inner(id, name))`,
     )
     .eq("id", documentId)
     .maybeSingle();
@@ -29,8 +29,8 @@ export async function InspectorHeader({ documentId }: { documentId: string }) {
       <Flexbox gap={"lg"} style={{ position: "relative" }}>
         <Icon.Custom className={css.game}>
           <SelectorGameImage
-            src={data.book.game.icon}
-            name={data.book.game.name}
+            src={data.arena.game.icon}
+            name={data.arena.game.name}
           />
         </Icon.Custom>
         <Flexbox asChild orient={"vertical"} gap={"sm"}>

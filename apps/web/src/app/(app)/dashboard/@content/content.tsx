@@ -49,8 +49,10 @@ async function HeaderTitle({
 }) {
   if (bookId) {
     const { data: book } = await getBook(bookId);
-    if (!book || !book.game) return <Skeleton width={"33%"} />;
-    const { game } = book;
+    if (!book || !book?.team) return <Skeleton width={"33%"} />;
+    const {
+      team: { game },
+    } = book;
     return (
       <LocationTitle
         icon={<SelectorGameImage src={game.icon} name={game.name} />}
