@@ -1,3 +1,4 @@
+import { HelpButton } from "@/components";
 import { UserField } from "@/modules/auth/components";
 import { useUserContext } from "@/modules/auth/context";
 import { TeamMemberFlags, hasFlag } from "@/modules/auth/flags";
@@ -14,7 +15,13 @@ import { createClient } from "@/utils/supabase/client";
 import { Tables } from "@/utils/supabase/types";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { vars } from "@repo/theme";
-import { Breadcrumbs, Modal, Skeleton, Table } from "@repo/ui/components";
+import {
+  Breadcrumbs,
+  Flexbox,
+  Modal,
+  Skeleton,
+  Table,
+} from "@repo/ui/components";
 import { InferAsync, Nullish } from "@repo/utils";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -90,7 +97,7 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
   );
 
   return (
-    <Modal.Content minWidth={600}>
+    <Modal.Content minWidth={700}>
       <Modal.Title>
         <Breadcrumbs crumbs={[team.name, "Members"]} />
         <Modal.Exit />
@@ -102,6 +109,19 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
         <Table.Head>
           <Table.Row>
             <Table.HeadCell>User</Table.HeadCell>
+            <Table.HeadCell style={{ position: "relative" }}>
+              <Flexbox align={"center"}>
+                Slot
+                <HelpButton.Root>
+                  <HelpButton.Trigger />
+                  <HelpButton.Content>
+                    A player slot is a slot to which a member of a team can be
+                    assigned and colored, so that they can be used in
+                    blueprints. It makes swapping players very easy.
+                  </HelpButton.Content>
+                </HelpButton.Root>
+              </Flexbox>
+            </Table.HeadCell>
             <Table.HeadCell>Role</Table.HeadCell>
             <Table.HeadCell>Join date</Table.HeadCell>
             <Table.HeadCell>
@@ -191,6 +211,7 @@ function MemberRow({
       <Table.Cell>
         <UserField profile={member.profile} />
       </Table.Cell>
+      <Table.Cell>Player Slot #1</Table.Cell>
       <Table.Cell>
         <RoleSelect
           width={110}

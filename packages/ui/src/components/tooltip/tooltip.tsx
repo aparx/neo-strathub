@@ -9,6 +9,8 @@ export const Provider = Primitive.Provider;
 export const Root = Primitive.Root;
 export const Trigger = Primitive.Trigger;
 
+export type TooltipRootProps = Primitive.TooltipProps;
+
 export interface TooltipContentProps extends Primitive.TooltipContentProps {
   /** @default "md" */
   size?: FontSize;

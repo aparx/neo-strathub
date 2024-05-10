@@ -3,6 +3,7 @@ import { SelectorGameImage } from "@/app/(app)/dashboard/@selector/components";
 import { DashColumn } from "@/app/(app)/dashboard/_components";
 import { BaseContentPathProps } from "@/app/(app)/dashboard/_utils";
 import { getBook } from "@/modules/book/actions";
+import { getTeam } from "@/modules/team/actions";
 import { Flexbox, Icon, Skeleton, Text } from "@repo/ui/components";
 import { IoMdGlobe } from "react-icons/io";
 import { MdPeople } from "react-icons/md";
@@ -60,7 +61,15 @@ async function HeaderTitle({
       />
     );
   } else if (teamId) {
-    return <LocationTitle icon={<MdPeople />} title={"Team's Blueprints"} />;
+    const { data: team } = await getTeam(teamId);
+    if (!team)
+      return <LocationTitle icon={<MdPeople />} title={"Team's Blueprints"} />;
+    return (
+      <LocationTitle
+        icon={<SelectorGameImage src={team.game.icon} name={team.game.name} />}
+        title={`Team's Blueprints`}
+      />
+    );
   } else {
     return <LocationTitle icon={<IoMdGlobe />} title={"Global Blueprints"} />;
   }
