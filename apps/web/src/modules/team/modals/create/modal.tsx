@@ -1,9 +1,14 @@
 "use client";
 import { createTeam } from "@/modules/team/actions/createTeam";
 import {
+  createTeamSchema,
+  CreateTeamSchema,
+} from "@/modules/team/actions/createTeam.schema";
+import {
   GameSelect,
   PlanSelect,
 } from "@/modules/team/modals/create/components";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Button,
   Flexbox,
@@ -14,73 +19,80 @@ import {
 } from "@repo/ui/components";
 import { InferAsync } from "@repo/utils";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useFormState, useFormStatus } from "react-dom";
+import { useState, useTransition } from "react";
+import { useForm } from "react-hook-form";
 
 export function CreateTeamModal() {
-  const [state, dispatch] = useFormState(createTeam, null);
   const router = useRouter();
+  const [state, setState] =
+    useState<InferAsync<ReturnType<typeof createTeam>>>();
+  const [isPending, startTransition] = useTransition();
 
-  const [loading, setLoading] = useState(false);
+  const { register, handleSubmit, formState, control } =
+    useForm<CreateTeamSchema>({
+      resolver: zodResolver(createTeamSchema),
+    });
 
-  useEffect(() => {
-    if (state?.state !== "success") return;
-    setLoading(true); // ensure loading state is kept while redirecting
-    router.replace(`/dashboard/${state.createdId}`);
-  }, [state]);
+  function submit(data: CreateTeamSchema) {
+    startTransition(async () => {
+      const newState = await createTeam(data);
+      if (newState.state !== "success") return setState(newState);
+
+      // Redirect user to the just created team, since success
+      await router.replace(`/dashboard/${newState.createdId}`);
+    });
+  }
+
+  const isLoading = formState.isLoading || isPending;
 
   return (
     <Modal.Content asChild>
-      <form action={dispatch}>
+      <form onSubmit={handleSubmit(submit)}>
         <Modal.Title>
-          <Flexbox gap={"md"} align={"center"}>
-            <Icon.Mapped type={"members"} />
-            Create a new team
-          </Flexbox>
+          Create a new team
           <Modal.Exit />
         </Modal.Title>
-        <FormContent loading={loading} state={state} />
+        <TextField
+          {...register("name")}
+          error={
+            formState.errors.name?.message ||
+            (state?.state === "error" && state?.error?.name) ||
+            null
+          }
+        />
+
+        <GameSelect
+          name={"gameId"}
+          control={control}
+          rules={{ required: true }}
+          defaultValue={(defaultGameId) => defaultGameId}
+        />
+
+        <PlanSelect
+          name={"planId"}
+          control={control}
+          rules={{ required: true }}
+          defaultValue={(defaultPlanId) => defaultPlanId}
+        />
+
+        <Flexbox gap={"md"} style={{ marginLeft: "auto" }}>
+          <Modal.Close asChild>
+            <Button disabled={isLoading}>Cancel</Button>
+          </Modal.Close>
+          <Button
+            type={"submit"}
+            color={"cta"}
+            disabled={isLoading || !formState.isValid}
+          >
+            Create
+            {isLoading ? (
+              <Spinner style={{ color: "inherit" }} />
+            ) : (
+              <Icon.Mapped type={"next"} />
+            )}
+          </Button>
+        </Flexbox>
       </form>
     </Modal.Content>
-  );
-}
-
-function FormContent({
-  loading,
-  state,
-}: {
-  loading: boolean;
-  state: InferAsync<ReturnType<typeof createTeam>> | null;
-}) {
-  const isLoading = useFormStatus().pending || loading;
-
-  return (
-    <>
-      <TextField
-        name={"name"}
-        placeholder={"Unique team name"}
-        disabled={isLoading}
-        error={
-          state?.state === "error"
-            ? `Error: ${state?.error?.name?.join(" ")}`
-            : null
-        }
-      />
-      <PlanSelect name={"planId"} required />
-      <GameSelect name={"gameId"} />
-      <Flexbox gap={"md"} style={{ marginLeft: "auto" }}>
-        <Modal.Close asChild>
-          <Button>Cancel</Button>
-        </Modal.Close>
-        <Button type={"submit"} color={"cta"} disabled={isLoading}>
-          Create
-          {isLoading ? (
-            <Spinner color={"inherit"} />
-          ) : (
-            <Icon.Mapped type={"next"} />
-          )}
-        </Button>
-      </Flexbox>
-    </>
   );
 }

@@ -4,9 +4,8 @@ import { DeepInferUseQueryResult } from "@/utils/generic/types";
 import { createClient } from "@/utils/supabase/client";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Skeleton } from "@repo/ui/components";
-import { mergeClassNames } from "@repo/utils";
 import { useQuery } from "@tanstack/react-query";
-import { ComponentPropsWithoutRef, useEffect, useState } from "react";
+import { Controller, FieldValues, UseControllerProps } from "react-hook-form";
 import * as css from "./planSelect.css";
 
 function useGetPlans() {
@@ -18,80 +17,78 @@ function useGetPlans() {
   });
 }
 
-type Plan = DeepInferUseQueryResult<typeof useGetPlans>;
+type PlanData = DeepInferUseQueryResult<typeof useGetPlans>;
 
-type PlanSelectBaseProps = Omit<
-  ComponentPropsWithoutRef<"div">,
-  "children" | "role"
->;
-
-export interface PlanSelectProps extends PlanSelectBaseProps {
-  name: string;
-  required?: boolean;
-}
-
-export function PlanSelect({
-  name,
-  required,
-  className,
+export function PlanSelect<TFieldValues extends FieldValues>({
+  defaultValue,
   ...restProps
-}: PlanSelectProps) {
-  const [selected, setSelected] = useState<number>();
+}: Omit<UseControllerProps<TFieldValues>, "defaultValue"> & {
+  defaultValue: (
+    defaultId: number | undefined,
+  ) => UseControllerProps<TFieldValues>["defaultValue"];
+}) {
   const { data, isLoading } = useGetPlans();
-
-  useEffect(() => {
-    // Update the initial selected to the default plan (if existing)
-    if (!data?.data || selected != null) return;
-    setSelected(data?.data?.find((x) => x.is_default)?.id);
-  }, [data]);
-
-  if (isLoading)
-    return <Skeleton width={"100%"} height={132} outline roundness={"md"} />;
+  if (isLoading || !data?.data?.length)
+    return <Skeleton width={"100%"} height={132} />;
 
   return (
-    <div
-      role={"radiogroup"}
-      className={mergeClassNames(css.group, className)}
-      aria-required={required}
+    <Controller
       {...restProps}
-    >
-      {data?.data?.map((plan) => (
-        <PlanCard
-          key={plan.id}
+      render={({ field }) => <PlanGroup plans={data.data} {...field} />}
+      defaultValue={defaultValue(data?.data?.find((x) => x.is_default)?.id)}
+    />
+  );
+}
+
+interface PlanSelectSharedInputProps {
+  name: string;
+  required?: boolean;
+  disabled?: boolean;
+  onBlur?: () => any;
+}
+
+interface PlanGroupProps extends PlanSelectSharedInputProps {
+  plans: PlanData[];
+  onChange?: (newValue: number) => void;
+  value?: number;
+}
+
+function PlanGroup({ plans, onChange, value, ...inputProps }: PlanGroupProps) {
+  return (
+    <div role={"radiogroup"} className={css.group}>
+      {plans.map((plan) => (
+        <PlanOption
           plan={plan}
-          radioName={name}
-          selected={selected === plan.id}
-          onSelect={() => setSelected(plan.id)}
-          required
+          checked={value === plan.id}
+          onSelect={() => onChange?.(plan.id)}
+          {...inputProps}
         />
       ))}
     </div>
   );
 }
 
-function PlanCard({
-  plan,
-  radioName,
-  selected,
-  onSelect,
-  required,
-}: {
-  plan: Plan;
-  radioName: string;
-  selected?: boolean;
+interface PlanOptionProps extends PlanSelectSharedInputProps {
+  plan: PlanData;
+  checked: boolean;
   onSelect?: () => any;
-  required?: boolean;
-}) {
+}
+
+function PlanOption({
+  plan,
+  checked,
+  onSelect,
+  ...inputProps
+}: PlanOptionProps) {
   return (
-    <label data-plan-id={plan.id} className={css.label({ selected })}>
+    <label data-plan-id={plan.id} className={css.label({ selected: checked })}>
       <VisuallyHidden asChild>
         <input
           type={"radio"}
           value={plan.id}
-          name={radioName}
-          checked={selected}
-          onChange={(e) => e.target.checked && onSelect?.()}
-          required={required}
+          checked={checked}
+          onChange={(e) => e.currentTarget.value && onSelect?.()}
+          {...inputProps}
         />
       </VisuallyHidden>
       <h6>{plan.name}</h6>

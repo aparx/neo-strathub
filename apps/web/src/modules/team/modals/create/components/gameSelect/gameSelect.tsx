@@ -3,19 +3,12 @@ import { DeepInferUseQueryResult } from "@/utils/generic/types";
 import { createClient } from "@/utils/supabase/client";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { vars } from "@repo/theme";
+import { Skeleton } from "@repo/ui/components";
 import { createLineHeight } from "@repo/ui/utils";
-import { mergeClassNames } from "@repo/utils";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
-import { ComponentPropsWithoutRef, useEffect, useState } from "react";
+import { Controller, FieldValues, UseControllerProps } from "react-hook-form";
 import * as css from "./gameSelect.css";
-
-type GameSelectBaseProps = Omit<ComponentPropsWithoutRef<"div">, "children">;
-
-export interface GameSelectProps extends GameSelectBaseProps {
-  /** The name of each radio button */
-  name: string;
-}
 
 function useGetGames() {
   return useQuery({
@@ -27,48 +20,68 @@ function useGetGames() {
 
 type GameData = DeepInferUseQueryResult<typeof useGetGames>;
 
-export function GameSelect({ className, name, ...restProps }: GameSelectProps) {
+export function GameSelect<TFieldValues extends FieldValues = FieldValues>({
+  defaultValue,
+  ...restProps
+}: Omit<UseControllerProps<TFieldValues>, "defaultValue"> & {
+  defaultValue: (
+    defaultId: number | undefined,
+  ) => UseControllerProps<TFieldValues>["defaultValue"];
+}) {
   const { data, isLoading } = useGetGames();
-  const [active, setActive] = useState<number>();
-
-  useEffect(() => {
-    if (active == null)
-      // Ensure a default active state
-      setActive(data?.data?.[0]?.id);
-  }, [data]);
+  if (isLoading || !data?.data?.length)
+    return <Skeleton width={"100%"} height={43} />;
 
   return (
-    <div
-      role={"radiogroup"}
-      aria-required={true}
-      className={mergeClassNames(className, css.group)}
+    <Controller
       {...restProps}
-    >
-      {data?.data?.map((game) => (
+      render={({ field }) => <GameGroup data={data.data} {...field} />}
+      defaultValue={defaultValue(data.data[0]?.id)}
+    />
+  );
+}
+
+interface GameSelectSharedInputProps {
+  name: string;
+  required?: boolean;
+  disabled?: boolean;
+  onBlur?: () => any;
+}
+
+interface GameGroupProps extends GameSelectSharedInputProps {
+  data: GameData[];
+  onChange?: (newValue: number) => void;
+  value?: number;
+}
+
+function GameGroup({ data, onChange, value, ...inputProps }: GameGroupProps) {
+  return (
+    <div role={"radiogroup"} className={css.group}>
+      {data?.map((game) => (
         <GameOption
           key={game.id}
-          checked={active === game.id}
-          onChange={(checked) => checked && setActive(game.id)}
-          radioName={name}
-          {...game}
+          checked={value === game.id}
+          game={game}
+          onSelect={() => onChange?.(game.id)}
+          {...inputProps}
         />
       ))}
     </div>
   );
 }
 
+interface GameOptionProps extends GameSelectSharedInputProps {
+  game: GameData;
+  checked: boolean;
+  onSelect?: () => any;
+}
+
 function GameOption({
-  id,
-  name,
-  icon,
+  game,
   checked,
-  onChange,
-  radioName,
-}: GameData & {
-  checked?: boolean;
-  onChange?: (checked: boolean) => any;
-  radioName: string;
-}) {
+  onSelect,
+  ...inputProps
+}: GameOptionProps) {
   const size = createLineHeight(vars.fontSizes.title.lg);
 
   return (
@@ -76,15 +89,19 @@ function GameOption({
       <VisuallyHidden asChild>
         <input
           type={"radio"}
-          name={radioName}
-          value={id}
+          value={game.id}
           checked={checked}
-          aria-checked={checked}
-          onChange={(e) => onChange?.(e.target?.checked)}
+          onChange={(e) => e.currentTarget.checked && onSelect?.()}
+          {...inputProps}
         />
       </VisuallyHidden>
       <div style={{ width: size, height: size, position: "relative" }}>
-        <Image src={icon} alt={name} fill style={{ objectFit: "contain" }} />
+        <Image
+          src={game.icon}
+          alt={game.name}
+          fill
+          style={{ objectFit: "contain" }}
+        />
       </div>
     </label>
   );
