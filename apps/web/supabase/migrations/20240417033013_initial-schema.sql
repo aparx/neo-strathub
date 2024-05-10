@@ -9,8 +9,8 @@ create type public.pay_interval as enum ('monthly', 'yearly');
 create table if not exists public.game
 (
     id         smallserial primary key,
-    name       varchar(64) not null unique
-        constraint min_name_length check (length(name) >= 2),
+    name       text        not null unique
+        constraint name_length check (length(name) >= 2 and length(name) <= 32),
     alias      varchar(32),
     icon       varchar     not null,
     -- if true, this game is generally hidden from the public
@@ -34,8 +34,8 @@ create table if not exists public.arena
     game_id    smallint    not null references public.game (id)
         on delete cascade
         on update cascade,
-    name       varchar(64) not null
-        constraint min_name_length check (length(name) >= 2),
+    name       text        not null
+        constraint name_length check (length(name) >= 2 and length(name) <= 32),
     metadata   jsonb       not null default '{}'::jsonb,
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
@@ -56,8 +56,8 @@ create table if not exists public.profile
     id         uuid primary key references auth.users (id)
         on delete cascade
         on update cascade,
-    username   varchar(32)         not null unique
-        constraint min_name_length check (length(username) >= 3),
+    username   text                not null unique
+        constraint name_length check (length(username) >= 3 and length(username) <= 32),
     role       public.profile_role not null default 'user'::public.profile_role,
     avatar     varchar,
     created_at timestamptz         not null default now(),
@@ -72,7 +72,8 @@ alter table public.profile
 create table if not exists public.plan
 (
     id               smallserial primary key,
-    name             varchar(64)    not null unique,
+    name             text           not null unique
+        constraint name_length check (length(name) <= 32),
     pricing          decimal(10, 2) not null,
     pricing_interval public.pay_interval,
     is_default       bool           not null default false,
@@ -89,8 +90,8 @@ alter table public.plan
 create table if not exists public.team
 (
     id         uuid primary key     default gen_random_uuid(),
-    name       varchar(20) not null unique
-        constraint min_name_length check (length(name) >= 3),
+    name       text        not null unique
+        constraint name_length check (length(name) >= 3 and length(name) <= 20),
     plan_id    smallint references public.plan
         on delete set null
         on update cascade,
@@ -109,8 +110,8 @@ alter table public.team
 create table if not exists public.book
 (
     id         uuid primary key     default gen_random_uuid(),
-    name       varchar(32) not null
-        constraint min_name_length check (length(name) >= 2),
+    name       text        not null
+        constraint name_length check (length(name) >= 2 and length(name) <= 32),
     team_id    uuid        not null references public.team (id)
         on delete cascade
         on update cascade,
@@ -131,9 +132,9 @@ create unique index
 create table if not exists public.team_member_role
 (
     id    serial primary key,
-    name  varchar(32) not null
-        constraint min_name_length check (length(name) >= 3),
-    flags bigint      not null default 0
+    name  text   not null
+        constraint name_length check (length(name) >= 3 and length(name) <= 32),
+    flags bigint not null default 0
 );
 
 create index
@@ -179,8 +180,8 @@ create table if not exists public.blueprint
         on delete restrict
         on update cascade,
     visibility public.bp_visibility not null default 'private'::bp_visibility,
-    name       varchar(128)         not null
-        constraint min_name_length check (length(name) >= 3),
+    name       text                 not null
+        constraint name_length check (length(name) >= 3 and length(name) <= 64),
     tags       varchar(32)[]
         constraint max_tags_length check (array_length(tags, 1) <= 16),
     created_at timestamptz          not null default now(),
@@ -284,7 +285,7 @@ create table if not exists public.game_object
         on delete restrict
         on update cascade,
     type     game_object_type not null,
-    name     varchar(32),
+    name     varchar(64),
     url      varchar          not null,
     metadata jsonb
 );
@@ -310,7 +311,8 @@ create table if not exists public.audit_log
         on delete no action
         on update cascade,
     type       audit_log_type       default 'info'::audit_log_type,
-    message    varchar(128),
+    message    text
+        constraint message_length check (message is null or length(message) <= 128),
     created_at timestamptz not null default now()
 );
 
