@@ -54,6 +54,7 @@ export function CreateTeamModal() {
           </Modal.Title>
           <TextField
             {...register("name")}
+            disabled={isLoading}
             placeholder={"Name of team (unique)"}
             error={
               formState.errors.name?.message ||

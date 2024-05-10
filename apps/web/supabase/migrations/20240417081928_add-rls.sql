@@ -96,6 +96,21 @@ create policy "public read access"
     using (auth.uid() = team_member.profile_id or
            can_select_team_member(team_member));
 
+-- //////////////////////////////// team_player_slot ////////////////////////////////
+
+-- Public read access for team_player_slot, only then, when the authenticated user
+-- is a member of that team or can see a book (thus has any exposed blueprint)
+create policy "public read access"
+    on public.team_player_slot as permissive
+    for select to authenticated
+    using (exists(select id
+                  from team_member
+                  where team_member.team_id = team_player_slot.team_id
+                    and profile_id = auth.uid())
+    or exists(select id
+              from book
+              where book.team_id = team_player_slot.team_id));
+
 -- //////////////////////////////// blueprint ////////////////////////////////
 
 create or replace function can_select_blueprint(target blueprint)

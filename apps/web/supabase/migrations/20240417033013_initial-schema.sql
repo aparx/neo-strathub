@@ -109,7 +109,7 @@ alter table public.team
 create table if not exists public.book
 (
     id         uuid primary key     default gen_random_uuid(),
-    name       varchar(20) not null
+    name       varchar(32) not null
         constraint min_name_length check (length(name) >= 2),
     team_id    uuid        not null references public.team (id)
         on delete cascade

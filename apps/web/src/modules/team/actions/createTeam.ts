@@ -21,7 +21,7 @@ export async function createTeam(team: CreateTeamSchema) {
   if (!user) throw new Error("Unauthorized");
 
   const create = await getServer(cookies()).rpc("create_team", {
-    team_name: validatedFields.name,
+    team_name: validatedFields.name.trim(),
     target_plan_id: validatedFields.planId,
     target_game_id: validatedFields.gameId,
   });

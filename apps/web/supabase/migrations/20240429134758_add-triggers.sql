@@ -64,14 +64,60 @@ create trigger trigger_delete_team_if_empty
     for each row
 execute function delete_team_if_empty();
 
+create or replace function on_create_team_member()
+    returns trigger as
+$$
+declare
+    _free_slot_id uuid;
+begin
+    -- Try to assign new team_member to a team_player_slot if any is free
+    select id
+    into _free_slot_id
+    from public.team_player_slot
+    where team_player_slot.team_id = new.team_id
+      and team_player_slot.member_id is null;
+
+    if (_free_slot_id is not null) then
+        update public.team_player_slot
+        set member_id = new.profile_id
+        where id = _free_slot_id;
+    end if;
+
+    return new;
+end;
+$$ volatile language plpgsql
+   security definer;
+
+create trigger trigger_create_team_member
+    after insert
+    on public.team_member
+    for each row
+execute function on_create_team_member();
+
 -- //////////////////////////////// team ////////////////////////////////
 
 -- This function assigns
 create or replace function on_create_team()
     returns trigger as $$
+declare
+    _game_player_count int;
 begin
     insert into public.book (name, team_id)
     values ('Example Stratbook', new.id);
+
+    -- Try to insert as many member roles as there are players per team for given game
+    select (public.game.metadata ->> 'player_count')::int
+    into _game_player_count
+    from public.team
+             left join game on game.id = team.game_id
+    where team.id = new.id;
+
+    if (_game_player_count is not null) then
+        for i in 1.._game_player_count loop
+            insert into public.team_player_slot (team_id, color)
+            values (new.id, 'hsl(' || ((i * 51) % 360) || ', 75%, 75%)');
+        end loop;
+    end if;
 
     return new;
 end;

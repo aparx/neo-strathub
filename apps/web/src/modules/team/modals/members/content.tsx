@@ -122,7 +122,9 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
                 </HelpButton.Root>
               </Flexbox>
             </Table.HeadCell>
-            <Table.HeadCell>Role</Table.HeadCell>
+            <Table.HeadCell>
+              <Flexbox align={"center"}>Role</Flexbox>
+            </Table.HeadCell>
             <Table.HeadCell>Join date</Table.HeadCell>
             <Table.HeadCell>
               <VisuallyHidden>Remove</VisuallyHidden>
