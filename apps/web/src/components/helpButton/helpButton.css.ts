@@ -5,13 +5,11 @@ export const trigger = style({
   color: vars.colors.emphasis.medium,
   background: "transparent",
   border: "none",
-  selectors: {
-    "&:hover::before": {
-      width: "100%",
-      height: "100%",
-      background: vars.colors.state.hover.color,
-      padding: vars.spacing.md,
-    },
+  position: "relative",
+  transition: ".15s color",
+  lineHeight: 0,
+  ":hover": {
+    color: vars.colors.emphasis.high,
   },
 });
 

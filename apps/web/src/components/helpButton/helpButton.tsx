@@ -1,7 +1,7 @@
 import { Icon, Tooltip } from "@repo/ui/components";
 import { mergeClassNames } from "@repo/utils";
 import { ComponentPropsWithoutRef } from "react";
-import { MdHelp } from "react-icons/md";
+import { MdHelpOutline } from "react-icons/md";
 import * as css from "./helpButton.css";
 
 export function Root(props: Tooltip.TooltipRootProps) {
@@ -25,7 +25,7 @@ export function Trigger({ className, ...restProps }: HelpButtonTriggerProps) {
         {...restProps}
       >
         <Icon.Custom size={"sm"}>
-          <MdHelp />
+          <MdHelpOutline />
         </Icon.Custom>
       </button>
     </Tooltip.Trigger>
