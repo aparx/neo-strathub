@@ -61,40 +61,42 @@ export function CreateBookModal() {
   const isLoading = formState.isLoading || isPending;
 
   return (
-    <Modal.Content asChild style={{ maxWidth: 300 }}>
-      <form onSubmit={handleSubmit(submit)}>
-        <Modal.Title>
-          <Breadcrumbs crumbs={[team.data?.name, <BreadcrumbTitle />]} />
-          <Modal.Exit />
-        </Modal.Title>
-        <TextField
-          placeholder={"Name of book"}
-          {...register("name")}
-          disabled={isLoading}
-          error={
-            formState.errors.name?.message ||
-            (state?.state === "error" && state?.error.name) ||
-            null
-          }
-        />
-        <Flexbox gap={"md"} style={{ marginLeft: "auto" }}>
-          <Modal.Close asChild>
-            <Button>Cancel</Button>
-          </Modal.Close>
-          <Button
-            type={"submit"}
-            color={"cta"}
-            disabled={isLoading || !formState.isValid}
-          >
-            Create
-            {isLoading ? (
-              <Spinner color={"inherit"} />
-            ) : (
-              <Icon.Mapped type={"next"} />
-            )}
-          </Button>
-        </Flexbox>
-      </form>
+    <Modal.Content style={{ maxWidth: 300 }}>
+      <Flexbox asChild orient={"vertical"} gap={"lg"}>
+        <form onSubmit={handleSubmit(submit)}>
+          <Modal.Title>
+            <Breadcrumbs crumbs={[team.data?.name, <BreadcrumbTitle />]} />
+            <Modal.Exit />
+          </Modal.Title>
+          <TextField
+            {...register("name")}
+            placeholder={"Name of book"}
+            disabled={isLoading}
+            error={
+              formState.errors.name?.message ||
+              (state?.state === "error" && state?.error.name) ||
+              null
+            }
+          />
+          <Flexbox gap={"md"} style={{ marginLeft: "auto" }}>
+            <Modal.Close asChild>
+              <Button>Cancel</Button>
+            </Modal.Close>
+            <Button
+              type={"submit"}
+              color={"cta"}
+              disabled={isLoading || !formState.isValid}
+            >
+              Create
+              {isLoading ? (
+                <Spinner color={"inherit"} />
+              ) : (
+                <Icon.Mapped type={"next"} />
+              )}
+            </Button>
+          </Flexbox>
+        </form>
+      </Flexbox>
     </Modal.Content>
   );
 }

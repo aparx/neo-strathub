@@ -37,7 +37,6 @@ export function CreateTeamModal() {
     startTransition(async () => {
       const newState = await createTeam(data);
       if (newState.state !== "success") return setState(newState);
-
       // Redirect user to the just created team, since success
       await router.replace(`/dashboard/${newState.createdId}`);
     });
@@ -46,53 +45,58 @@ export function CreateTeamModal() {
   const isLoading = formState.isLoading || isPending;
 
   return (
-    <Modal.Content asChild>
-      <form onSubmit={handleSubmit(submit)}>
-        <Modal.Title>
-          Create a new team
-          <Modal.Exit />
-        </Modal.Title>
-        <TextField
-          {...register("name")}
-          error={
-            formState.errors.name?.message ||
-            (state?.state === "error" && state?.error?.name) ||
-            null
-          }
-        />
+    <Modal.Content>
+      <Flexbox asChild orient={"vertical"} gap={"lg"}>
+        <form onSubmit={handleSubmit(submit)}>
+          <Modal.Title>
+            Create a new team
+            <Modal.Exit />
+          </Modal.Title>
+          <TextField
+            {...register("name")}
+            placeholder={"Name of team (unique)"}
+            error={
+              formState.errors.name?.message ||
+              (state?.state === "error" && state?.error?.name) ||
+              null
+            }
+          />
 
-        <GameSelect
-          name={"gameId"}
-          control={control}
-          rules={{ required: true }}
-          defaultValue={(defaultGameId) => defaultGameId}
-        />
+          <GameSelect
+            name={"gameId"}
+            control={control}
+            rules={{ required: true }}
+            defaultValue={(defaultGameId) => defaultGameId}
+            disabled={isLoading}
+          />
 
-        <PlanSelect
-          name={"planId"}
-          control={control}
-          rules={{ required: true }}
-          defaultValue={(defaultPlanId) => defaultPlanId}
-        />
+          <PlanSelect
+            name={"planId"}
+            control={control}
+            rules={{ required: true }}
+            defaultValue={(defaultPlanId) => defaultPlanId}
+            disabled={isLoading}
+          />
 
-        <Flexbox gap={"md"} style={{ marginLeft: "auto" }}>
-          <Modal.Close asChild>
-            <Button disabled={isLoading}>Cancel</Button>
-          </Modal.Close>
-          <Button
-            type={"submit"}
-            color={"cta"}
-            disabled={isLoading || !formState.isValid}
-          >
-            Create
-            {isLoading ? (
-              <Spinner style={{ color: "inherit" }} />
-            ) : (
-              <Icon.Mapped type={"next"} />
-            )}
-          </Button>
-        </Flexbox>
-      </form>
+          <Flexbox gap={"md"} style={{ marginLeft: "auto" }}>
+            <Modal.Close asChild>
+              <Button disabled={isLoading}>Cancel</Button>
+            </Modal.Close>
+            <Button
+              type={"submit"}
+              color={"cta"}
+              disabled={isLoading || !formState.isValid}
+            >
+              Create
+              {isLoading ? (
+                <Spinner style={{ color: "inherit" }} />
+              ) : (
+                <Icon.Mapped type={"next"} />
+              )}
+            </Button>
+          </Flexbox>
+        </form>
+      </Flexbox>
     </Modal.Content>
   );
 }

@@ -1,19 +1,31 @@
 import { sprinkles, vars } from "@repo/theme";
-import { style } from "@vanilla-extract/css";
 import { recipe } from "@vanilla-extract/recipes";
 
-export const group = style([
-  sprinkles({ outline: "card" }),
-  {
-    display: "flex",
-    flexDirection: "column",
-    gap: vars.spacing.sm,
-    background: vars.colors.accents[2],
-    padding: vars.spacing.sm,
-    borderRadius: vars.roundness.md,
-    overflow: "hidden",
+export const group = recipe({
+  base: [
+    sprinkles({ outline: "card" }),
+    {
+      display: "flex",
+      flexDirection: "column",
+      gap: vars.spacing.sm,
+      background: vars.colors.accents[2],
+      padding: vars.spacing.sm,
+      borderRadius: vars.roundness.md,
+      overflow: "hidden",
+    },
+  ],
+  variants: {
+    disabled: {
+      false: {},
+      true: {
+        opacity: vars.emphasis.low,
+      },
+    },
   },
-]);
+  defaultVariants: {
+    disabled: false,
+  },
+});
 
 export const label = recipe({
   base: {

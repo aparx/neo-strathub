@@ -1,17 +1,29 @@
 import { sprinkles, vars } from "@repo/theme";
-import { style } from "@vanilla-extract/css";
 import { recipe } from "@vanilla-extract/recipes";
 
-export const group = style({
-  display: "flex",
-  gap: vars.spacing.sm,
-  overflowX: "auto",
-  "::-webkit-scrollbar": {
-    height: 3,
-    background: vars.colors.accents[3],
+export const group = recipe({
+  base: {
+    display: "flex",
+    gap: vars.spacing.sm,
+    overflowX: "auto",
+    "::-webkit-scrollbar": {
+      height: 3,
+      background: vars.colors.accents[3],
+    },
+    "::-webkit-scrollbar-thumb": {
+      background: vars.colors.emphasis.medium,
+    },
   },
-  "::-webkit-scrollbar-thumb": {
-    background: vars.colors.emphasis.medium,
+  variants: {
+    disabled: {
+      false: {},
+      true: {
+        opacity: vars.emphasis.low,
+      },
+    },
+  },
+  defaultVariants: {
+    disabled: false,
   },
 });
 
@@ -27,13 +39,13 @@ export const option = recipe({
       padding: vars.spacing.md,
       transition: "150ms",
       willChange: "color, background",
-      cursor: "pointer",
     },
   ],
   variants: {
     checked: {
       false: {
         color: vars.colors.emphasis.medium,
+        cursor: "pointer",
       },
       true: {
         background: vars.colors.primary.darker,

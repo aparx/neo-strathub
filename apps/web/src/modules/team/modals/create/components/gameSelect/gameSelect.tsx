@@ -54,15 +54,30 @@ interface GameGroupProps extends GameSelectSharedInputProps {
   value?: number;
 }
 
-function GameGroup({ data, onChange, value, ...inputProps }: GameGroupProps) {
+function GameGroup({
+  data,
+  onChange,
+  value,
+  disabled,
+  required,
+  ...inputProps
+}: GameGroupProps) {
   return (
-    <div role={"radiogroup"} className={css.group}>
+    <div
+      role={"radiogroup"}
+      className={css.group({ disabled })}
+      aria-disabled={disabled}
+      aria-required={required}
+      style={{ display: data.length <= 1 ? "none" : undefined }}
+    >
       {data?.map((game) => (
         <GameOption
           key={game.id}
           checked={value === game.id}
           game={game}
           onSelect={() => onChange?.(game.id)}
+          disabled={disabled}
+          required={required}
           {...inputProps}
         />
       ))}

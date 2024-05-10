@@ -34,7 +34,7 @@ export function PlanSelect<TFieldValues extends FieldValues>({
   return (
     <Controller
       {...restProps}
-      render={({ field }) => <PlanGroup plans={data.data} {...field} />}
+      render={({ field }) => <PlanGroup data={data.data} {...field} />}
       defaultValue={defaultValue(data?.data?.find((x) => x.is_default)?.id)}
     />
   );
@@ -48,15 +48,28 @@ interface PlanSelectSharedInputProps {
 }
 
 interface PlanGroupProps extends PlanSelectSharedInputProps {
-  plans: PlanData[];
+  data: PlanData[];
   onChange?: (newValue: number) => void;
   value?: number;
 }
 
-function PlanGroup({ plans, onChange, value, ...inputProps }: PlanGroupProps) {
+function PlanGroup({
+  data,
+  onChange,
+  value,
+  required,
+  disabled,
+  ...inputProps
+}: PlanGroupProps) {
   return (
-    <div role={"radiogroup"} className={css.group}>
-      {plans.map((plan) => (
+    <div
+      role={"radiogroup"}
+      className={css.group({ disabled })}
+      aria-disabled={disabled}
+      aria-required={required}
+      style={{ display: data.length <= 1 ? "none" : undefined }}
+    >
+      {data.map((plan) => (
         <PlanOption
           plan={plan}
           checked={value === plan.id}
