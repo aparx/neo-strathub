@@ -121,7 +121,6 @@ function Trigger({
         className={css.trigger({ color: color ?? "primary" })}
         style={{ minWidth: width }}
       >
-        <div className={css.itemIndicator} />
         <Select.Value />
         {!disabled && (
           <Select.Icon className={css.triggerExpand}>
@@ -167,9 +166,6 @@ function Item({ name, color }: { name: string; color: RoleColor }) {
           color: vars.colors[color ?? "primary"].lighter,
         }}
       >
-        <Select.ItemIndicator>
-          <div className={css.itemIndicator} />
-        </Select.ItemIndicator>
         <Select.ItemText>{capitalize(name)}</Select.ItemText>
       </Select.Item>
     </Text>

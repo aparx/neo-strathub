@@ -147,6 +147,7 @@ alter table public.team_member_role
 
 create table if not exists public.team_member
 (
+    id         serial primary key,
     profile_id uuid        not null references public.profile (id)
         on delete cascade
         on update cascade,
@@ -157,10 +158,11 @@ create table if not exists public.team_member
         on delete restrict
         on update cascade,
     created_at timestamptz not null default now(),
-    updated_at timestamptz not null default now(),
-
-    primary key (profile_id, team_id)
+    updated_at timestamptz not null default now()
 );
+
+create unique index uidx_pk_team_member
+    on public.team_member (profile_id, team_id);
 
 alter table public.team_member
     enable row level security;
@@ -235,32 +237,47 @@ create table if not exists public.team_player_slot
     team_id    uuid        not null references public.team (id)
         on delete cascade
         on update cascade,
-    member_id  uuid,
+    slot_index int
+        constraint positive_slot_index check (slot_index >= 0),
     -- The color used to represent this player (visually) in the blueprint
     color      varchar(32) not null,
     created_at timestamptz not null default now(),
-    updated_at timestamptz not null default now(),
-
-    constraint fk_team_member
-        foreign key (team_id, member_id)
-            references public.team_member (team_id, profile_id)
-            on delete set null
-            on update cascade
+    updated_at timestamptz not null default now()
 );
 
 alter table public.team_player_slot
     enable row level security;
 
-create unique index
-    if not exists uidx_unique_player_per_team
-    on public.team_player_slot (team_id, member_id);
+create unique index uidx_unique_slot_index_per_team
+    on public.team_player_slot (team_id, slot_index);
+
+-- team_player_slot & member join table that enables multiple members for a single slot
+create table if not exists public.player_slot_assign
+(
+    slot_id    uuid        not null references public.team_player_slot (id)
+        on delete cascade
+        on update cascade,
+    member_id  int         not null references public.team_member (id)
+        on delete cascade
+        on update cascade,
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now(),
+
+    primary key (slot_id, member_id)
+);
+
+alter table public.player_slot_assign
+    enable row level security;
+
+create unique index uidx_unique_member_per_slot
+    on public.player_slot_assign (slot_id, member_id);
 
 -- //////////////////////////////// game_object ////////////////////////////////
 
 create type game_object_type as enum ('character', 'gadget', 'floor');
 
 -- A game object is an object that is related to a game and can be used in a blueprint
-create table if not exists game_object
+create table if not exists public.game_object
 (
     id       serial primary key,
     game_id  int              not null references public.game (id)
@@ -278,6 +295,24 @@ alter table public.game_object
 create index
     if not exists idx_game_type
     on public.game_object (game_id, type, name);
+
+-- //////////////////////////////// audit_log ////////////////////////////////
+
+create type audit_log_type as enum ('error', 'delete', 'create', 'info');
+
+create table if not exists public.audit_log
+(
+    id         bigserial primary key,
+    team_id    uuid        not null references public.team (id)
+        on delete cascade
+        on update cascade,
+    profile_id uuid references public.profile (id)
+        on delete no action
+        on update cascade,
+    type       audit_log_type       default 'info'::audit_log_type,
+    message    varchar(128),
+    created_at timestamptz not null default now()
+);
 
 -- //////////////////////////////// config ////////////////////////////////
 

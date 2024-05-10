@@ -10,6 +10,7 @@ import {
   RoleSelect,
   RoleSelectProps,
 } from "@/modules/team/modals/members/components";
+import { MemberPlayerSlot } from "@/modules/team/modals/members/components/memberPlayerSlot";
 import { DeepInferUseQueryResult } from "@/utils/generic/types";
 import { createClient } from "@/utils/supabase/client";
 import { Tables } from "@/utils/supabase/types";
@@ -24,6 +25,7 @@ import {
 } from "@repo/ui/components";
 import { InferAsync, Nullish } from "@repo/utils";
 import { useQuery } from "@tanstack/react-query";
+import moment from "moment";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import * as css from "./content.css";
 
@@ -103,8 +105,6 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
         <Modal.Exit />
       </Modal.Title>
 
-      {/* TODO overview? */}
-
       <Table.Root className={css.table}>
         <Table.Head>
           <Table.Row>
@@ -115,16 +115,14 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
                 <HelpButton.Root>
                   <HelpButton.Trigger />
                   <HelpButton.Content>
-                    A player slot is a slot to which a member of a team can be
-                    assigned and colored, so that they can be used in
+                    A player slot is a slot to which multiple members of a team
+                    can be assigned and colored, so that they can be used in
                     blueprints. It makes swapping players very easy.
                   </HelpButton.Content>
                 </HelpButton.Root>
               </Flexbox>
             </Table.HeadCell>
-            <Table.HeadCell>
-              <Flexbox align={"center"}>Role</Flexbox>
-            </Table.HeadCell>
+            <Table.HeadCell>Role</Table.HeadCell>
             <Table.HeadCell>Join date</Table.HeadCell>
             <Table.HeadCell>
               <VisuallyHidden>Remove</VisuallyHidden>
@@ -213,17 +211,22 @@ function MemberRow({
       <Table.Cell>
         <UserField profile={member.profile} />
       </Table.Cell>
-      <Table.Cell>Player Slot #1</Table.Cell>
+      <Table.Cell>
+        <MemberPlayerSlot memberId={member.id} />
+      </Table.Cell>
       <Table.Cell>
         <RoleSelect
-          width={110}
+          width={100}
           initialRoleId={role_id}
           onSelect={onUpdate}
           disabled={!canModify}
         />
       </Table.Cell>
       <Table.Cell>
-        {useMemo(() => new Date(created_at).toLocaleDateString(), [created_at])}
+        {useMemo(
+          () => moment(created_at).format("YYYY-MM-DD HH:mm"),
+          [created_at],
+        )}
       </Table.Cell>
       <Table.Cell>
         <RemoveMemberButton

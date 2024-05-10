@@ -8,8 +8,7 @@ export const trigger = recipe({
     sprinkles({ outline: "card" }),
     {
       position: "relative",
-      padding: vars.spacing.sm,
-      paddingRight: vars.spacing.md,
+      padding: `${vars.spacing.sm} ${vars.spacing.md}`,
       display: "flex",
       alignItems: "center",
       gap: vars.spacing.md,
@@ -26,14 +25,29 @@ export const trigger = recipe({
       destructive: {
         background: vars.colors.destructive.darkest,
         color: vars.colors.destructive.lighter,
+        selectors: {
+          "&:not([data-disabled]):hover": {
+            background: blendState(vars.colors.destructive.darkest, "hover"),
+          },
+        },
       },
       primary: {
         background: vars.colors.primary.darkest,
         color: vars.colors.primary.lighter,
+        selectors: {
+          "&:not([data-disabled]):hover": {
+            background: blendState(vars.colors.primary.darkest, "hover"),
+          },
+        },
       },
       warning: {
         background: vars.colors.warning.darkest,
         color: vars.colors.warning.lighter,
+        selectors: {
+          "&:not([data-disabled]):hover": {
+            background: blendState(vars.colors.warning.darkest, "hover"),
+          },
+        },
       },
     },
   },

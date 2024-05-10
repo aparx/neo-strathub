@@ -75,12 +75,15 @@ begin
     into _free_slot_id
     from public.team_player_slot
     where team_player_slot.team_id = new.team_id
-      and team_player_slot.member_id is null;
+      and not exists(select id
+                     from player_slot_assign
+                     where slot_id = team_player_slot.id)
+    order by slot_index
+    limit 1;
 
     if (_free_slot_id is not null) then
-        update public.team_player_slot
-        set member_id = new.profile_id
-        where id = _free_slot_id;
+        insert into public.player_slot_assign (slot_id, member_id)
+        values (_free_slot_id, new.id);
     end if;
 
     return new;
@@ -93,6 +96,33 @@ create trigger trigger_create_team_member
     on public.team_member
     for each row
 execute function on_create_team_member();
+
+-- //////////////////////////////// team_player_slot ////////////////////////////////
+
+create or replace function create_team_player_slot_index()
+    returns trigger as $$
+declare
+    _max_index int;
+begin
+    if (new.slot_index is not null) then
+        return new;
+    end if;
+
+    select max(slot_index)
+    into _max_index
+    from public.team_player_slot
+    where team_id = new.team_id;
+
+    new.slot_index := (case when (_max_index is null) then 0 else 1 + _max_index end);
+    return new;
+end;
+$$ volatile language plpgsql;
+
+create trigger trigger_update_team_player_slot_index
+    before insert
+    on public.team_player_slot
+    for each row
+execute function create_team_player_slot_index();
 
 -- //////////////////////////////// team ////////////////////////////////
 
@@ -114,8 +144,8 @@ begin
 
     if (_game_player_count is not null) then
         for i in 1.._game_player_count loop
-            insert into public.team_player_slot (team_id, color)
-            values (new.id, 'hsl(' || ((i * 51) % 360) || ', 75%, 75%)');
+            insert into public.team_player_slot (team_id, color, slot_index)
+            values (new.id, 'hsl(' || (((i - 1) * 60) % 360) || ', 75%, 75%)', i - 1);
         end loop;
     end if;
 

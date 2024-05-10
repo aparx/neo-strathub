@@ -309,6 +309,42 @@ export type Database = {
         }
         Relationships: []
       }
+      player_slot_assign: {
+        Row: {
+          created_at: string
+          member_id: number
+          slot_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          member_id: number
+          slot_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          member_id?: number
+          slot_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_slot_assign_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "team_member"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_slot_assign_slot_id_fkey"
+            columns: ["slot_id"]
+            isOneToOne: false
+            referencedRelation: "team_player_slot"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profile: {
         Row: {
           avatar: string | null
@@ -389,6 +425,7 @@ export type Database = {
       team_member: {
         Row: {
           created_at: string
+          id: number
           profile_id: string
           role_id: number
           team_id: string
@@ -396,6 +433,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          id?: number
           profile_id: string
           role_id: number
           team_id: string
@@ -403,6 +441,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          id?: number
           profile_id?: string
           role_id?: number
           team_id?: string
@@ -455,7 +494,7 @@ export type Database = {
           color: string
           created_at: string
           id: string
-          member_id: string | null
+          slot_index: number | null
           team_id: string
           updated_at: string
         }
@@ -463,7 +502,7 @@ export type Database = {
           color: string
           created_at?: string
           id?: string
-          member_id?: string | null
+          slot_index?: number | null
           team_id: string
           updated_at?: string
         }
@@ -471,18 +510,11 @@ export type Database = {
           color?: string
           created_at?: string
           id?: string
-          member_id?: string | null
+          slot_index?: number | null
           team_id?: string
           updated_at?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "fk_team_member"
-            columns: ["team_id", "member_id"]
-            isOneToOne: false
-            referencedRelation: "team_member"
-            referencedColumns: ["team_id", "profile_id"]
-          },
           {
             foreignKeyName: "team_player_slot_team_id_fkey"
             columns: ["team_id"]

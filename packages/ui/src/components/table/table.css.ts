@@ -5,8 +5,9 @@ import { createLineHeight } from "../../utils";
 const border = `1px solid ${vars.colors.accents[1]}`;
 
 export const root = style({
-  overflow: "hidden",
   borderRadius: vars.spacing.sm,
+  borderCollapse: "collapse",
+  border: `1px solid ${vars.colors.outline.card}`,
   "::-webkit-scrollbar": {
     background: vars.colors.overlay,
     width: vars.spacing.sm,
@@ -36,7 +37,7 @@ export const body = style({
   background: vars.colors.accents[2],
   color: vars.colors.emphasis.medium,
   maxHeight: 30,
-  overflow: "scroll",
+  overflow: "auto",
 });
 
 export const cell = style({

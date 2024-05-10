@@ -111,6 +111,14 @@ create policy "public read access"
               from book
               where book.team_id = team_player_slot.team_id));
 
+-- //////////////////////////////// player_slot_assign ////////////////////////////////
+create policy "public read access"
+    on public.player_slot_assign as permissive
+    for select to authenticated
+    using (exists(select id
+                  from team_player_slot
+                  where id = player_slot_assign.slot_id));
+
 -- //////////////////////////////// blueprint ////////////////////////////////
 
 create or replace function can_select_blueprint(target blueprint)
