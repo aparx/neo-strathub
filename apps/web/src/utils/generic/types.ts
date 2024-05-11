@@ -1,16 +1,24 @@
 import { PostgrestResponse } from "@supabase/supabase-js";
-import { UseQueryResult } from "@tanstack/react-query";
+import {
+  InfiniteData,
+  UseInfiniteQueryResult,
+  UseQueryResult,
+} from "@tanstack/react-query";
 
-export type GetUseQueryPostgrestResult<TQueryResult> =
-  TQueryResult extends UseQueryResult<PostgrestResponse<infer TDeepData>>
-    ? TDeepData extends any[]
-      ? TDeepData[number]
-      : TDeepData
-    : TQueryResult extends UseQueryResult<infer TCloseData>
-      ? TCloseData extends any[]
-        ? TCloseData[number]
-        : TCloseData
+type NarrowData<T> = NonNullable<T extends any[] ? T[number] : T>;
+
+export type GetUseQueryData<TQueryResult> =
+  TQueryResult extends UseInfiniteQueryResult<infer TData>
+    ? NarrowData<InferPostgrestData<UnwrapInfiniteData<TData>>>
+    : TQueryResult extends UseQueryResult<infer TData>
+      ? NarrowData<InferPostgrestData<TData>>
       : never;
+
+type InferPostgrestData<TData> =
+  TData extends PostgrestResponse<any> ? TData["data"] : TData;
+
+type UnwrapInfiniteData<TRes> =
+  TRes extends InfiniteData<any> ? TRes["pages"][number] : TRes;
 
 /**
  * Utility type that infers the deepest return value of a function (`THook`),
@@ -29,6 +37,6 @@ export type GetUseQueryPostgrestResult<TQueryResult> =
 export type DeepInferUseQueryResult<THook extends (...args: any[]) => any> =
   THook extends (...args: any[]) => infer TReturn
     ? TReturn extends Promise<infer TInner>
-      ? GetUseQueryPostgrestResult<TInner>
-      : GetUseQueryPostgrestResult<TReturn>
+      ? GetUseQueryData<TInner>
+      : GetUseQueryData<TReturn>
     : never;

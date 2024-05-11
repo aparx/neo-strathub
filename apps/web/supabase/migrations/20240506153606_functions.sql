@@ -1,7 +1,7 @@
 -- noinspection SqlResolveForFile
 
 create or replace function create_book(
-    book_name varchar, target_team_id uuid
+    book_name varchar, target_team_id uuid, performer_id uuid
 ) returns uuid as $$
 declare
     _book_id        varchar;
@@ -30,8 +30,8 @@ begin
     end if;
 
     insert into public.audit_log (team_id, performer_id, type, message)
-    values (target_team_id, auth.uid(), 'create'::audit_log_type,
-            'Created book with name "' || book_name || '"');
+    values (target_team_id, performer_id, 'create'::audit_log_type,
+            'Created book "' || book_name || '"');
 
     return _book_id;
 end;
@@ -41,7 +41,7 @@ $$ volatile language plpgsql
 -- only the service and higher level roles can create a book, to ensure server side logic
 revoke
     execute on function
-    create_book(varchar, uuid)
+    create_book(varchar, uuid, uuid)
     from public, anon, authenticated;
 
 -- TODO create_team
@@ -69,7 +69,7 @@ begin
 
     insert into public.audit_log (team_id, performer_id, type, message)
     values (_uid, auth.uid(), 'create'::audit_log_type,
-            'Created team with name "' || team_name || '"');
+            'Created team "' || team_name || '"');
 
     if (auth.uid() is null) then
         return _uid;

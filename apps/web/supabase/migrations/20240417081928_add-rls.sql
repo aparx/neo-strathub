@@ -169,7 +169,7 @@ begin
         select public.team_member_role.flags
         into _member_flags
         from team_member
-                 left join team_member_role on team_member.role_id = team_member_role.id
+                 left join team_member_role on team_member_role.id = team_member.role_id
         where team_id = entry.team_id
           and profile_id = auth.uid();
         -- Check if user is member and their flags contains VIEW_AUDIT_LOG

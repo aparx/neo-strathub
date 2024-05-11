@@ -5,6 +5,7 @@ import { createLineHeight } from "../../utils";
 const border = `1px solid ${vars.colors.accents[1]}`;
 
 export const root = style({
+  overflow: "auto",
   borderRadius: vars.spacing.sm,
   borderCollapse: "collapse",
   border: `1px solid ${vars.colors.outline.card}`,

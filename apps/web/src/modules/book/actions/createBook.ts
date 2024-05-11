@@ -33,6 +33,7 @@ export async function createBook(inputData: CreateBookSchema) {
   const create = await getServiceServer(cookies()).rpc("create_book", {
     book_name: validated.name,
     target_team_id: validated.teamId,
+    performer_id: user.id,
   });
 
   if (create.error) {
