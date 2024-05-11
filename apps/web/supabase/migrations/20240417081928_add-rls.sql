@@ -147,10 +147,43 @@ begin
 end;
 $$ language plpgsql security definer;
 
-create policy "public read access"
+create policy "read access"
     on public.blueprint as permissive
     for select to authenticated
     using (can_select_blueprint(blueprint));
+
+-- //////////////////////////////// audit_log ////////////////////////////////
+
+create or replace function can_select_audit_log(entry audit_log)
+    returns boolean as $$
+declare
+    _member_flags bigint;
+begin
+    -- Check if the performer is the authenticated user itself
+    if (entry.performer_id is not null and entry.performer_id = auth.uid()) then
+        return true;
+    end if;
+
+    if (entry.team_id is not null) then
+        -- Authenticated user must be a member of the team
+        select public.team_member_role.flags
+        into _member_flags
+        from team_member
+                 left join team_member_role on team_member.role_id = team_member_role.id
+        where team_id = entry.team_id
+          and profile_id = auth.uid();
+        -- Check if user is member and their flags contains VIEW_AUDIT_LOG
+        return _member_flags is not null and _member_flags & (2 ** 8) != 0;
+    end if;
+
+    return false;
+end;
+$$ language plpgsql security definer;
+
+create policy "read access"
+    on public.audit_log as permissive
+    for select to authenticated
+    using (can_select_audit_log(audit_log));
 
 -- //////////////////////////////// config ////////////////////////////////
 

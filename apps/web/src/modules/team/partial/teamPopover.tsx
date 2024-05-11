@@ -21,9 +21,11 @@ export function TeamPopover({ teamId, ...restProps }: TeamPopoverProps) {
           Members
         </OpenModalLink>
       </Popover.Item>
-      <Popover.Item>
-        <Icon.Mapped type={"log"} size={"sm"} />
-        Audit Log
+      <Popover.Item asChild>
+        <OpenModalLink path={`/dashboard/${teamId}`} modal={"auditLog"}>
+          <Icon.Mapped type={"log"} size={"sm"} />
+          Audit Log
+        </OpenModalLink>
       </Popover.Item>
       <Popover.Divider />
       <Popover.Item color={"destructive"}>

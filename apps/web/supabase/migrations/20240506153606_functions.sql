@@ -29,6 +29,10 @@ begin
         raise exception 'Maximum number of books reached';
     end if;
 
+    insert into public.audit_log (team_id, performer_id, type, message)
+    values (target_team_id, auth.uid(), 'create'::audit_log_type,
+            'Created book with name "' || book_name || '"');
+
     return _book_id;
 end;
 $$ volatile language plpgsql
@@ -62,6 +66,10 @@ begin
     insert into public.team (name, plan_id, game_id)
     values (team_name, target_plan_id, target_game_id)
     returning id into _uid;
+
+    insert into public.audit_log (team_id, performer_id, type, message)
+    values (_uid, auth.uid(), 'create'::audit_log_type,
+            'Created team with name "' || team_name || '"');
 
     if (auth.uid() is null) then
         return _uid;

@@ -299,22 +299,27 @@ create index
 
 -- //////////////////////////////// audit_log ////////////////////////////////
 
-create type audit_log_type as enum ('error', 'delete', 'create', 'info');
+create type audit_log_type as enum ('create', 'update', 'delete', 'info');
 
 create table if not exists public.audit_log
 (
-    id         bigserial primary key,
-    team_id    uuid        not null references public.team (id)
-        on delete cascade
-        on update cascade,
-    profile_id uuid references public.profile (id)
+    id           bigserial primary key,
+    -- Team ID can be null, since an audit_log entry can be team independent
+    team_id      uuid references public.team (id)
         on delete no action
         on update cascade,
-    type       audit_log_type       default 'info'::audit_log_type,
-    message    text
+    -- Profile ID can be null, since null represents the system
+    performer_id uuid references public.profile (id)
+        on delete no action
+        on update cascade,
+    type         audit_log_type       default 'info'::audit_log_type,
+    message      text
         constraint message_length check (message is null or length(message) <= 128),
-    created_at timestamptz not null default now()
+    created_at   timestamptz not null default now()
 );
+
+alter table public.audit_log
+    enable row level security;
 
 -- //////////////////////////////// config ////////////////////////////////
 

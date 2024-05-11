@@ -27,6 +27,8 @@ export async function createTeam(team: CreateTeamSchema) {
   });
 
   if (create.error) {
+    console.log(create.error);
+
     let errorArray = new Array<string>(1);
     if (create.error.code === PostgresError.UNIQUE_VIOLATION)
       errorArray.push("Name must be unique");

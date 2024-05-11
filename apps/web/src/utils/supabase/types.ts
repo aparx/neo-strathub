@@ -69,6 +69,48 @@ export type Database = {
           },
         ]
       }
+      audit_log: {
+        Row: {
+          created_at: string
+          id: number
+          message: string | null
+          performer_id: string | null
+          team_id: string | null
+          type: Database["public"]["Enums"]["audit_log_type"] | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          message?: string | null
+          performer_id?: string | null
+          team_id?: string | null
+          type?: Database["public"]["Enums"]["audit_log_type"] | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          message?: string | null
+          performer_id?: string | null
+          team_id?: string | null
+          type?: Database["public"]["Enums"]["audit_log_type"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_log_performer_id_fkey"
+            columns: ["performer_id"]
+            isOneToOne: false
+            referencedRelation: "profile"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_log_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "team"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blueprint: {
         Row: {
           arena_id: number
@@ -529,6 +571,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_select_audit_log: {
+        Args: {
+          entry: unknown
+        }
+        Returns: boolean
+      }
       can_select_blueprint: {
         Args: {
           target: unknown
@@ -564,6 +612,7 @@ export type Database = {
       }
     }
     Enums: {
+      audit_log_type: "create" | "update" | "delete" | "info"
       bp_visibility: "public" | "private" | "unlisted"
       config_value_type: "boolean" | "numeric" | "date" | "text"
       game_object_type: "character" | "gadget" | "floor"

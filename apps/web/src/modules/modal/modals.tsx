@@ -1,5 +1,6 @@
 import { CreateBookModal } from "@/modules/book/modals";
 import {
+  AuditLogModal,
   CreateTeamModal,
   TeamMembersModal,
   TeamSettingsModal,
@@ -10,6 +11,7 @@ import { FC } from "react";
 export const MODAL_PAGES = {
   settings: () => <TeamSettingsModal />,
   members: () => <TeamMembersModal />,
+  auditLog: () => <AuditLogModal />,
   createTeam: () => <CreateTeamModal />,
   createBook: () => <CreateBookModal />,
 } as const satisfies Record<string, FC>;

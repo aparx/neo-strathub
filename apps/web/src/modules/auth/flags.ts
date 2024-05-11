@@ -19,6 +19,8 @@ export enum TeamMemberFlags {
   MODIFY_BOOKS = 2 ** 6,
   /** Allows to delete existing books */
   DELETE_BOOKS = 2 ** 7,
+  /** Allows to view audit log entries */
+  VIEW_AUDIT_LOG = 2 ** 8,
 
   /** All flags conjoined into one */
   ALL = VIEW_DOCUMENTS |
@@ -28,7 +30,8 @@ export enum TeamMemberFlags {
     EDIT_MEMBERS |
     KICK_MEMBERS |
     MODIFY_BOOKS |
-    DELETE_BOOKS,
+    DELETE_BOOKS |
+    VIEW_AUDIT_LOG,
 }
 
 export function hasFlag(mask: Nullish<number>, flag: number) {
