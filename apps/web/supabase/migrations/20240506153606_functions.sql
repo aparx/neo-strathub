@@ -44,8 +44,6 @@ revoke
     create_book(varchar, uuid, uuid)
     from public, anon, authenticated;
 
--- TODO create_team
-
 create or replace function create_team(
     team_name varchar, target_plan_id int, target_game_id int
 ) returns uuid as $$

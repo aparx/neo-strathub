@@ -1,0 +1,26 @@
+{
+  "name": "@repo/canvas",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    "./canvas": "./src/canvas/index.ts"
+  },
+  "dependencies": {
+    "@repo/theme": "workspace:^",
+    "@repo/typescript-config": "workspace:^",
+    "konva": "^9.3.6",
+    "react-konva": "^18.2.10",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/eslint": "^8.56.5",
+    "@types/node": "^20.11.24",
+    "@types/react": "^18.2.61",
+    "@types/react-dom": "^18.2.19",
+    "@types/uuid": "^9.0.8",
+    "eslint": "^8.57.0",
+    "next": "^14.2.3",
+    "react": "^18.2.0",
+    "typescript": "^5.3.3"
+  }
+}

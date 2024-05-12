@@ -86,6 +86,10 @@ begin
         values (_free_slot_id, new.id);
     end if;
 
+    insert into public.audit_log (team_id, performer_id, type, message)
+    values (new.team_id, new.profile_id, 'create'::audit_log_type,
+            'Joined the team');
+
     return new;
 end;
 $$ volatile language plpgsql
@@ -99,7 +103,7 @@ execute function on_create_team_member();
 
 -- //////////////////////////////// team_player_slot ////////////////////////////////
 
-create or replace function create_team_player_slot_index()
+create or replace function on_create_team_player_slot_index()
     returns trigger as $$
 declare
     _max_index int;
@@ -122,11 +126,46 @@ create trigger trigger_update_team_player_slot_index
     before insert
     on public.team_player_slot
     for each row
-execute function create_team_player_slot_index();
+execute function on_create_team_player_slot_index();
+
+-- //////////////////////////////// player_slot_assign ////////////////////////////////
+
+create or replace function on_create_player_slot_assign()
+    returns trigger as $$
+declare
+    _slot     record;
+    _username text;
+begin
+    -- Insert assignment into audit log
+
+    select team_id, slot_index
+    from public.team_player_slot
+    where id = new.slot_id
+    into _slot;
+
+    select public.profile.username
+    into _username
+    from public.team_member
+             left join public.profile on team_member.profile_id = profile.id
+    where team_member.id = new.member_id;
+
+    insert into public.audit_log (team_id, performer_id, type, message)
+    values (_slot.team_id, auth.uid(), 'update',
+            'Assigned ' || coalesce(_username, '(Unknown)') || ' to slot #' ||
+            (1 + _slot.slot_index));
+
+    return new;
+end;
+$$ language plpgsql security definer;
+
+create trigger trigger_create_player_slot_assign
+    after insert
+    on public.player_slot_assign
+    for each row
+execute function on_create_player_slot_assign();
 
 -- //////////////////////////////// team ////////////////////////////////
 
--- This function assigns
 create or replace function on_create_team()
     returns trigger as $$
 declare

@@ -173,7 +173,7 @@ begin
         where team_id = entry.team_id
           and profile_id = auth.uid();
         -- Check if user is member and their flags contains VIEW_AUDIT_LOG
-        return _member_flags is not null and _member_flags & (2 ** 8) != 0;
+        return _member_flags is not null and (_member_flags & 256) != 0;
     end if;
 
     return false;
