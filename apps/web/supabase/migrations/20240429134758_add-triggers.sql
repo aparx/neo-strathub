@@ -198,3 +198,47 @@ create trigger trigger_create_sample_book
     on public.team
     for each row
 execute function on_create_team();
+
+-- //////////////////////////////// arena ////////////////////////////////
+
+create or replace function on_arena_create()
+    returns trigger as $$
+declare
+    _newest_date timestamptz;
+begin
+    if (new.outdated is not null) then
+        -- Do nothing, since the insert has manually set the `outdated` column
+        return new;
+    end if;
+
+    -- Check if the newly inserted arena outdates anything other equivalent arena
+    select max(created_at)
+    into _newest_date
+    from public.arena
+    where game_id = new.game_id
+      and name = new.name
+      and outdated = false;
+
+    if (new.created_at < _newest_date) then
+        -- The newly inserted is outdated (version is older than any equivalent)
+        new.outdated = true;
+        return new;
+    end if;
+
+    -- The newly inserted arena is the newest, outdate any predecessors
+    update public.arena
+    set outdated = true
+    where game_id = new.game_id
+      and name = new.name
+      and created_at <= new.created_at;
+    new.outdated = false;
+    return new;
+end;
+$$ volatile language plpgsql
+   security definer;
+
+create trigger trigger_create_arena
+    before insert
+    on public.arena
+    for each row
+execute function on_arena_create();

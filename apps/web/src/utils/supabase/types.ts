@@ -41,6 +41,7 @@ export type Database = {
           id: number
           metadata: Json
           name: string
+          outdated: boolean | null
           updated_at: string
         }
         Insert: {
@@ -49,6 +50,7 @@ export type Database = {
           id?: number
           metadata?: Json
           name: string
+          outdated?: boolean | null
           updated_at?: string
         }
         Update: {
@@ -57,6 +59,7 @@ export type Database = {
           id?: number
           metadata?: Json
           name?: string
+          outdated?: boolean | null
           updated_at?: string
         }
         Relationships: [

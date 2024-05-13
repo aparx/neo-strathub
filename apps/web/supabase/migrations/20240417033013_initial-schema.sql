@@ -28,6 +28,8 @@ alter table public.game
 
 -- //////////////////////////////// arena ////////////////////////////////
 
+-- We can have multiple equally named arenas for a game to ensure backwards compatibility.
+-- If an arena is outdated, it is marked `outdated`
 create table if not exists public.arena
 (
     id         serial primary key,
@@ -38,16 +40,12 @@ create table if not exists public.arena
         constraint name_length check (length(name) >= 2 and length(name) <= 32),
     metadata   jsonb       not null default '{}'::jsonb,
     created_at timestamptz not null default now(),
-    updated_at timestamptz not null default now()
+    updated_at timestamptz not null default now(),
+    outdated   boolean              default null -- <- default for seeding purposes
 );
 
 alter table public.arena
     enable row level security;
-
--- duplicate arena names per game is forbidden
-create unique index
-    if not exists uidx_arena_name
-    on public.arena (game_id, name);
 
 -- //////////////////////////////// profile ////////////////////////////////
 
