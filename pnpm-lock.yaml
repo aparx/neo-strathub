@@ -207,6 +207,9 @@ importers:
       '@repo/typescript-config':
         specifier: workspace:^
         version: link:../typescript-config
+      '@repo/utils':
+        specifier: workspace:^
+        version: link:../utils
       konva:
         specifier: ^9.3.6
         version: 9.3.6

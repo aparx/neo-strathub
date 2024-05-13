@@ -2,12 +2,11 @@
   "name": "@repo/canvas",
   "version": "0.0.0",
   "private": true,
-  "exports": {
-    "./canvas": "./src/canvas/index.ts"
-  },
+  "main": "./src/index.ts",
   "dependencies": {
     "@repo/theme": "workspace:^",
     "@repo/typescript-config": "workspace:^",
+    "@repo/utils": "workspace:^",
     "konva": "^9.3.6",
     "react-konva": "^18.2.10",
     "uuid": "^9.0.1"
