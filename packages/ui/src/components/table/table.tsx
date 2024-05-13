@@ -18,7 +18,9 @@ export const Root = forwardRef<HTMLDivElement, TableProps>(
         className={mergeClassNames(css.root, className)}
         {...restProps}
       >
-        <table className={css.table}>{children}</table>
+        <table className={css.table} cellSpacing={0} cellPadding={0}>
+          {children}
+        </table>
       </Text>
     );
   },

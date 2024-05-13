@@ -20,7 +20,7 @@ export const root = style({
 });
 
 export const table = style({
-  borderCollapse: "collapse",
+  border: "none",
   width: "100%",
 });
 

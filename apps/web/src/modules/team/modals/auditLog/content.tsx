@@ -114,7 +114,7 @@ function LogEntryRow({
           "System"
         )}
       </Table.Cell>
-      <Table.Cell style={{ maxWidth: "40ch" }}>{message}</Table.Cell>
+      <Table.Cell style={{ maxWidth: "45ch" }}>{message}</Table.Cell>
     </Table.Row>
   );
 }

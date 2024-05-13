@@ -271,6 +271,26 @@ alter table public.player_slot_assign
 create unique index uidx_unique_member_per_slot
     on public.player_slot_assign (slot_id, member_id);
 
+-- //////////////////////////////// blueprint_character ////////////////////////////////
+
+-- Table containing character picks for a blueprint, that links to a player slot
+create table if not exists public.blueprint_character
+(
+    id        uuid primary key default gen_random_uuid(),
+    -- The target character object (being a game_object)
+    object_id public.game_object references public.game_object (id)
+        on delete set null
+        on update cascade,
+    slot_id   uuid references public.team_player_slot (id)
+        on delete set null
+        on update cascade,
+    index     int2
+        constraint positive_index check (index >= 0)
+);
+
+create unique index uidx_unique_character_index
+    on public.blueprint_character (index, object_id);
+
 -- //////////////////////////////// game_object ////////////////////////////////
 
 create type game_object_type as enum ('character', 'gadget', 'floor');
@@ -304,11 +324,11 @@ create table if not exists public.audit_log
     id           bigserial primary key,
     -- Team ID can be null, since an audit_log entry can be team independent
     team_id      uuid references public.team (id)
-        on delete no action
+        on delete set null
         on update cascade,
     -- Profile ID can be null, since null represents the system
     performer_id uuid references public.profile (id)
-        on delete no action
+        on delete set null
         on update cascade,
     type         audit_log_type       default 'info'::audit_log_type,
     message      text
@@ -362,4 +382,4 @@ alter table public.config
 
 insert into public.config
 (name, type, boolean_value, numeric_value, date_value, text_value)
-values ('max_teams_per_user', 'numeric'::config_value_type, null, 50, null, null)
+values ('max_teams_per_user', 'numeric'::config_value_type, null, 50, null, null);
