@@ -2,6 +2,7 @@
 import { Canvas } from "@repo/canvas";
 import { useSharedState } from "@repo/utils/hooks";
 import type Konva from "konva";
+import { useWindowSize } from "usehooks-ts";
 
 const initialNodes: Konva.RectConfig[] = [
   {
@@ -31,8 +32,12 @@ const initialNodes: Konva.RectConfig[] = [
 ];
 
 export default function EditorPage() {
+  const windowSize = useWindowSize();
+
   return (
     <Canvas
+      width={windowSize.width}
+      height={windowSize.height}
       elements={useSharedState(initialNodes)}
       imageBackground={"https://svgshare.com/i/1602.svg"}
     />

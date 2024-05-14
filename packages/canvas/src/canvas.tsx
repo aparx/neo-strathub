@@ -1,7 +1,7 @@
 "use client";
 import { SharedState, useSharedState } from "@repo/utils/hooks";
 import Konva from "konva";
-import { TouchEvent, useEffect, useRef, useState } from "react";
+import { TouchEvent, useEffect, useMemo, useRef, useState } from "react";
 import { Image as KonvaImage, Layer, Rect, Stage } from "react-konva";
 import { CanvasContext, CanvasContextProvider } from "./canvas.context";
 import { CanvasTransformer } from "./canvas.transformer";
@@ -15,11 +15,8 @@ function Rectangle({
   shapeProps: Konva.RectConfig;
   onChange: (data: Konva.RectConfig) => any;
 }) {
-  const shapeRef = useRef<Konva.Rect>(null);
-
   return (
     <Rect
-      ref={shapeRef}
       {...shapeProps}
       draggable
       onDragEnd={(e) => {
@@ -30,24 +27,25 @@ function Rectangle({
         });
       }}
       onTransformEnd={(e) => {
+        console.log("transform end");
         // transformer is changing scale of the node
         // and NOT its width or height
         // but in the store we have only width and height
         // to match the data better we will reset scale on transform end
-        const node = shapeRef.current!;
-        const scaleX = node.scaleX();
-        const scaleY = node.scaleY();
+        const scaleX = e.target.scaleX();
+        const scaleY = e.target.scaleY();
 
         // we will reset it back
-        node.scaleX(1);
-        node.scaleY(1);
+        e.target.scaleX(1);
+        e.target.scaleY(1);
         onChange({
           ...shapeProps,
-          x: node.x(),
-          y: node.y(),
+          x: e.target.x(),
+          y: e.target.y(),
           // set minimal value
-          width: Math.max(5, node.width() * scaleX),
-          height: Math.max(node.height() * scaleY),
+          width: Math.max(5, e.target.width() * scaleX),
+          height: Math.max(e.target.height() * scaleY),
+          rotation: e.target.rotation(),
         });
       }}
     />
@@ -64,13 +62,19 @@ export interface Selection {
 
 const STARTING_POS: Readonly<Vector2d> = { x: 0, y: 0 } as const;
 
-export function Canvas({
-  elements,
-  imageBackground,
-}: {
+export interface CanvasProps {
+  width: number;
+  height: number;
   elements: SharedState<Konva.NodeConfig[]>;
   imageBackground: string;
-}) {
+}
+
+export function Canvas({
+  elements,
+  width,
+  height,
+  imageBackground,
+}: CanvasProps) {
   const [position, setPosition] = useState<Readonly<Vector2d>>(STARTING_POS);
   const [draggingStage, setDraggingStage] = useState(false);
   const stageRef = useRef<Konva.Stage>(null);
@@ -210,23 +214,28 @@ export function Canvas({
     return () => setImageObj(undefined);
   }, []);
 
+  const imageScale = useMemo(() => {
+    if (!imageObj) return 1;
+    // Determine the proper image scale so that if fills most screens
+    return Math.min(800 / imageObj.height, 1200 / imageObj.width);
+  }, [imageObj]);
+
   return (
     <CanvasContextProvider value={context}>
-      <CanvasKeyboardHandler
-        style={{
-          cursor: draggingStage ? "grabbing" : "default",
-        }}
-      >
+      <CanvasKeyboardHandler>
         <Stage
           ref={stageRef}
-          width={window.innerWidth}
-          height={window.innerHeight}
+          width={width}
+          height={height}
           x={position.x}
           y={position.y}
           onMouseDown={onMouseDown}
           onMouseUp={onMouseUp}
           onMouseMove={onMouseMove}
           onClick={onSingleSelect}
+          style={{
+            cursor: draggingStage ? "grabbing" : "default",
+          }}
         >
           <Layer ref={layerRef}>
             <Rect
@@ -237,7 +246,7 @@ export function Canvas({
             {imageObj && (
               <KonvaImage
                 listening={false}
-                scale={{ x: 5, y: 5 }}
+                scale={{ x: imageScale, y: imageScale }}
                 image={imageObj}
                 width={imageObj.width}
                 height={imageObj.height}
@@ -248,7 +257,7 @@ export function Canvas({
                 key={index}
                 shapeProps={rect}
                 onChange={(newAttribs) => {
-                  const newElements = elements.state.slice();
+                  const newElements = [...elements.state];
                   newElements[index] = newAttribs;
                   elements.update(newElements);
                   // TODO synchronize with server data
