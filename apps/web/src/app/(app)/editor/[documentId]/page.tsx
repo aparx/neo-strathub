@@ -41,7 +41,7 @@ function createInitialNodes(): CanvasNodeData[] {
         fill: "blue",
         id: Math.random().toString(),
       },
-      className: "Rect",
+      className: "Circle",
     },
   ];
 }
@@ -76,6 +76,7 @@ export default function EditorPage() {
     <Canvas
       width={dimensions.width}
       height={dimensions.height}
+      modifiable
       levelDimensions={{ x: 1200, y: height }}
       data={data}
       editable

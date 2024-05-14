@@ -1,24 +1,24 @@
 import { KeyboardEventHandler } from "react";
 
 interface Keys {
-  code: string;
+  codes: string[];
   alt?: boolean;
   ctrl?: boolean;
   shift?: boolean;
 }
 
 export const CANVAS_KEY_MAP = {
-  moveLeft: { code: "ArrowLeft" },
-  moveRight: { code: "ArrowRight" },
-  moveTop: { code: "ArrowUp" },
-  moveBottom: { code: "ArrowDown" },
-  delete: { code: "Delete" },
-  duplicate: { code: "KeyD", ctrl: true },
-  snap: { code: "ShiftLeft" },
-  selectAll: { code: "KeyA", ctrl: true },
-  copy: { code: "KeyC", ctrl: true },
-  cut: { code: "KeyX", ctrl: true },
-  paste: { code: "KeyV", ctrl: true },
+  moveLeft: { codes: ["ArrowLeft"] },
+  moveRight: { codes: ["ArrowRight"] },
+  moveTop: { codes: ["ArrowUp"] },
+  moveBottom: { codes: ["ArrowDown"] },
+  delete: { codes: ["Delete", "Backspace"] },
+  duplicate: { codes: ["KeyD"], ctrl: true },
+  snap: { codes: ["ShiftLeft"] },
+  selectAll: { codes: ["KeyA"], ctrl: true },
+  copy: { codes: ["KeyC"], ctrl: true },
+  cut: { codes: ["KeyX"], ctrl: true },
+  paste: { codes: ["KeyV"], ctrl: true },
 } satisfies Readonly<Record<string, Keys>>;
 
 export type KeymapKey = keyof typeof CANVAS_KEY_MAP;
@@ -30,5 +30,5 @@ export function isPressed(key: KeymapKey, e: KeyboardEvent) {
   if (mapping.ctrl && !e.ctrlKey) return false;
   if (mapping.alt && !e.altKey) return false;
   if (mapping.shift && !e.shiftKey) return false;
-  return mapping.code === e.code;
+  return mapping.codes.includes(e.code);
 }

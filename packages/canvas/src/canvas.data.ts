@@ -48,7 +48,7 @@ export class CanvasData<T extends CanvasNodeData>
     return result;
   }
 
-  update(fn: (layer: CanvasLevelNode<T>, previous: T[]) => any): void {
+  update(fn: (level: CanvasLevelNode<T>, previous: T[]) => any): void {
     for (const level of this.levels()) {
       this.dataMap.get(level.id)?.children.update((prev) => fn(level, prev));
     }
