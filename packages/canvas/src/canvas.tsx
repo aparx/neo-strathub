@@ -72,7 +72,7 @@ export function Canvas({
   imageBackground: string;
 }) {
   const [position, setPosition] = useState<Readonly<Vector2d>>(STARTING_POS);
-  const moveCanvas = useRef(false);
+  const [draggingStage, setDraggingStage] = useState(false);
   const stageRef = useRef<Konva.Stage>(null);
   const layerRef = useRef<Konva.Layer>(null);
   const trRef = useRef<Konva.Transformer>(null);
@@ -117,7 +117,7 @@ export function Canvas({
       selection.current.x2 = pos.x;
       selection.current.y2 = pos.y;
       updateSelectionRect();
-    } else if (moveCanvas.current) {
+    } else if (draggingStage) {
       setPosition((oldPos) => ({
         x: oldPos.x + e.evt.movementX,
         y: oldPos.y + e.evt.movementY,
@@ -128,14 +128,17 @@ export function Canvas({
   function onMouseDown(e: Konva.KonvaEventObject<MouseEvent>) {
     switch (e.evt.button) {
       case 1 /* MIDDLE_MOUSE_BUTTON */:
-        moveCanvas.current = true;
+        if (stageRef.current !== e.target) return;
+        setDraggingStage(true);
         break;
 
       case 0 /* LEFT_MOUSE_BUTTON */:
         // Update the selection
-        const isElement = e.target.findAncestor(".elements-container");
-        const isTransformer = e.target.findAncestor("Transformer");
-        if (isElement || isTransformer) return;
+        if (
+          e.target.findAncestor(".elements-container") ||
+          e.target.findAncestor("Transformer")
+        )
+          return;
         const pos = e.target.getStage()!.getRelativePointerPosition()!;
         selection.current.x1 = selection.current.x2 = pos.x;
         selection.current.y1 = selection.current.y2 = pos.y;
@@ -144,12 +147,12 @@ export function Canvas({
         updateSelectionRect();
       // fallthrough
       default:
-        moveCanvas.current = false;
+        setDraggingStage(false);
     }
   }
 
   function onMouseUp(e: Konva.KonvaEventObject<MouseEvent>) {
-    if (e.evt.button === 1) moveCanvas.current = false;
+    if (e.evt.button === 1) setDraggingStage(false);
     if (!selection.current.active) return;
     if (e.evt.button !== 0) return;
     // Find all elements that fall within the selection area and transform them
@@ -209,7 +212,11 @@ export function Canvas({
 
   return (
     <CanvasContextProvider value={context}>
-      <CanvasKeyboardHandler>
+      <CanvasKeyboardHandler
+        style={{
+          cursor: draggingStage ? "grabbing" : "default",
+        }}
+      >
         <Stage
           ref={stageRef}
           width={window.innerWidth}
