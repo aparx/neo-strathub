@@ -29,6 +29,8 @@ function Rectangle({
   onChange: (data: Konva.RectConfig) => any;
 }) {
   const shapeRef = useRef<Konva.Rect>(null);
+  const level = useCanvasLevel();
+  const layerRef = level.ref;
 
   return (
     <Rect
@@ -40,7 +42,18 @@ function Rectangle({
           ...shapeProps,
           x: e.target.x(),
           y: e.target.y(),
+          rotation: e.target.rotation(),
         });
+      }}
+      onDragMove={(e) => {
+        if (!layerRef.current) return;
+        const layer = layerRef.current;
+        const maxX = layer.width() - e.target.width();
+        const maxY = layer.height() - e.target.height();
+
+        e.target.x(Math.max(Math.min(e.target.x(), maxX), 0));
+        e.target.y(Math.max(Math.min(e.target.y(), maxY), 0));
+        console.log(e.target.x());
       }}
       onTransformEnd={(e) => {
         // transformer is changing scale of the node
@@ -61,6 +74,7 @@ function Rectangle({
           // set minimal value
           width: Math.max(5, node.width() * scaleX),
           height: Math.max(node.height() * scaleY),
+          rotation: e.target.rotation(),
         });
       }}
     />

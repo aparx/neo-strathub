@@ -170,9 +170,10 @@ export const CanvasStage = forwardRef<Konva.Stage, CanvasStageProps>(
           const deltaMultiplier = scale.x * 0.4;
           const deltaX = e.evt.deltaX * -deltaMultiplier;
           const deltaY = e.evt.deltaY * -deltaMultiplier;
+
           setPosition((oldPos) => ({
-            x: oldPos.x + deltaX,
-            y: oldPos.y + deltaY,
+            x: oldPos.x + (e.evt.shiftKey ? -deltaY : deltaX),
+            y: oldPos.y + (e.evt.shiftKey ? deltaX : deltaY),
           }));
           return;
         }

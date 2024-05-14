@@ -1,5 +1,6 @@
+import { mergeRefs } from "@repo/utils";
 import Konva from "konva";
-import React, { forwardRef, useEffect, useMemo, useState } from "react";
+import React, { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import { Image as KonvaImage, Layer, Rect } from "react-konva";
 import { CanvasLevelContextProvider } from "./canvas.context";
 import { CanvasLevelNode } from "./canvas.data";
@@ -19,6 +20,8 @@ export const CanvasLevel = forwardRef<Konva.Layer, CanvasLevelProps>(
   function CanvasLevel(props, ref) {
     const { width, height, children, level, ...restProps } = props;
     const [image, setImage] = useState<HTMLImageElement>();
+    const layerRef = useRef<Konva.Layer>(null);
+
     useEffect(() => {
       const image = new Image();
       image.src = level.imageUrl;
@@ -36,21 +39,29 @@ export const CanvasLevel = forwardRef<Konva.Layer, CanvasLevelProps>(
     return (
       <Layer
         name={"level"}
-        ref={ref}
+        ref={mergeRefs(ref, layerRef)}
         width={width}
         height={height}
         x={level.position.x}
         y={level.position.y}
         {...restProps}
       >
-        <CanvasLevelContextProvider value={level}>
+        <CanvasLevelContextProvider value={{ ...level, ref: layerRef }}>
           <Rect
             width={width}
             height={height}
             listening={false}
             fill={"rgb(218,218,218)"}
+            stroke={"rgba(255, 255, 255, .5)"}
+            strokeWidth={2}
+            cornerRadius={10}
           />
-          <KonvaImage listening={false} image={image} scale={imageScale} />
+          <KonvaImage
+            listening={false}
+            image={image}
+            scale={imageScale}
+            cornerRadius={2}
+          />
           {children}
         </CanvasLevelContextProvider>
       </Layer>

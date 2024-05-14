@@ -71,7 +71,7 @@ export class CanvasLevelNode<E extends Konva.NodeConfig>
     public readonly id: string,
     public readonly imageUrl: string,
     public readonly position: Vector2d,
-    public children: SharedState<E[]>,
+    public readonly children: SharedState<E[]>,
   ) {}
 
   find(predicate: (node: E, index: number) => any): E | undefined {
