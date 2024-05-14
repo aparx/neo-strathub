@@ -40,7 +40,7 @@ function handleCanvasKeyPress(e: KeyboardEvent, ctx: CanvasRootContext) {
   } else if (isPressed("paste", e)) {
     pasteClipboard(ctx);
   } else if (isPressed("selectAll", e)) {
-    selectAll(ctx);
+    selectAll(ctx, e.shiftKey || e.altKey);
   } else if (e.code === "Escape" || e.code === "Enter") {
     ctx.selected.update([]);
     // TODO call undo immediately after for Escape?
@@ -51,15 +51,19 @@ function handleCanvasKeyRelease(e: KeyboardEvent, ctx: CanvasRootContext) {
   if (ctx.snapping.state && isPressed("snap", e)) ctx.snapping.update(false);
 }
 
-// prettier-ignore
-function selectAll({ selected, data }: CanvasRootContext) {
-  selected.update(data.deepNodes().map((x) => x.attrs.id).filter(nonNull));
+function selectAll(
+  { selected, data, focusedLevel }: CanvasRootContext,
+  global: boolean,
+) {
+  const level = focusedLevel.state && data.getLevel(focusedLevel.state);
+  const nodes = global || !level ? data.deepNodes() : level.children.state;
+  selected.update(nodes.map((x) => x.attrs.id).filter(nonNull));
 }
 
 function copyIntoClipboard({ stage, isSelected }: CanvasRootContext) {
   const targets = stage()
     .find((node: Konva.Node) => isSelected(node.id()))
-    .map((node) => node.toJSON());
+    .map((node) => node.toObject());
   if (!targets.length) return;
   const type = "text/plain";
   const blob = new Blob([JSON.stringify(targets)], { type });
@@ -74,11 +78,10 @@ function pasteClipboard({ data, selected, focusedLevel }: CanvasRootContext) {
     const item = items[0];
     if (!item) return;
     const blob = await item.getType("text/plain");
-    const data = JSON.parse(await blob.text()) as string[];
-    const elements = data.map((x) => {
-      const config: CanvasNodeData = JSON.parse(x);
-      config.attrs.id = uuidv4();
-      return config;
+    const data = JSON.parse(await blob.text()) as CanvasNodeData[];
+    const elements = data.map((node) => {
+      node.attrs.id = uuidv4();
+      return node;
     });
     level.children.update((prev) => [...prev, ...elements]);
     selected.update(elements.map((x) => x.attrs.id).filter(nonNull));

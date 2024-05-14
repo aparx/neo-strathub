@@ -4,6 +4,7 @@
   "private": true,
   "main": "./src/index.ts",
   "dependencies": {
+    "@radix-ui/react-slot": "^1.0.2",
     "@repo/theme": "workspace:^",
     "@repo/typescript-config": "workspace:^",
     "@repo/utils": "workspace:^",

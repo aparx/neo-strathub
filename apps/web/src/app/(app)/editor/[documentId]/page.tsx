@@ -51,9 +51,9 @@ export default function EditorPage() {
 
   const data = new CanvasData([
     new CanvasLevelNode(
-      "floor_1",
-      "https://svgshare.com/i/1602.svg",
-      { x: 0, y: 0 },
+      "floor_3",
+      "https://svgshare.com/i/161z.svg",
+      { x: 0, y: 2 * (height + 50) },
       useSharedState(createInitialNodes),
     ),
     new CanvasLevelNode(
@@ -63,9 +63,9 @@ export default function EditorPage() {
       useSharedState(createInitialNodes),
     ),
     new CanvasLevelNode(
-      "floor_3",
-      "https://svgshare.com/i/161z.svg",
-      { x: 0, y: 2 * (height + 50) },
+      "floor_1",
+      "https://svgshare.com/i/1602.svg",
+      { x: 0, y: 0 },
       useSharedState(createInitialNodes),
     ),
   ]);
