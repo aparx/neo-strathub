@@ -7,6 +7,7 @@ import { CanvasContext, CanvasContextProvider } from "./canvas.context";
 import { CanvasTransformer } from "./canvas.transformer";
 import { CanvasKeyboardHandler } from "./keyboard";
 import Vector2d = Konva.Vector2d;
+import KonvaEventObject = Konva.KonvaEventObject;
 
 function Rectangle({
   shapeProps,
@@ -60,7 +61,7 @@ export interface Selection {
   y2: number;
 }
 
-const STARTING_POS: Readonly<Vector2d> = { x: 0, y: 0 } as const;
+const ZERO_VECTOR_2D: Readonly<Vector2d> = { x: 0, y: 0 } as const;
 
 export interface CanvasProps {
   width: number;
@@ -75,7 +76,7 @@ export function Canvas({
   height,
   imageBackground,
 }: CanvasProps) {
-  const [position, setPosition] = useState<Readonly<Vector2d>>(STARTING_POS);
+  const [position, setPosition] = useState<Readonly<Vector2d>>(ZERO_VECTOR_2D);
   const [draggingStage, setDraggingStage] = useState(false);
   const stageRef = useRef<Konva.Stage>(null);
   const layerRef = useRef<Konva.Layer>(null);
@@ -196,6 +197,29 @@ export function Canvas({
     else selected.update([targetId]);
   }
 
+  const [scale, setScale] = useState<Vector2d>({ x: 1, y: 1 });
+
+  function onWheel(e: KonvaEventObject<WheelEvent>) {
+    if (!e.evt.ctrlKey) return;
+    e.evt.preventDefault();
+    const stage = stageRef.current!;
+    const pointer = stage.getPointerPosition()!;
+    const oldScale = stage.scaleX();
+    const scaleBy = 1.1;
+    const pointTo = {
+      x: (pointer.x - stage.x()) / oldScale,
+      y: (pointer.y - stage.y()) / oldScale,
+    } satisfies Vector2d;
+
+    const direction = e.evt.deltaY > 0 ? 1 : -1;
+    const newScale = direction < 0 ? oldScale * scaleBy : oldScale / scaleBy;
+    setScale({ x: newScale, y: newScale });
+    setPosition({
+      x: pointer.x - pointTo.x * newScale,
+      y: pointer.y - pointTo.y * newScale,
+    });
+  }
+
   const context = {
     elements,
     selected,
@@ -233,6 +257,8 @@ export function Canvas({
           onMouseUp={onMouseUp}
           onMouseMove={onMouseMove}
           onClick={onSingleSelect}
+          onWheel={onWheel}
+          scale={scale}
           style={{
             cursor: draggingStage ? "grabbing" : "default",
           }}
