@@ -284,7 +284,7 @@ create table if not exists public.blueprint_character
     slot_id   uuid references public.team_player_slot (id)
         on delete set null
         on update cascade,
-    index     int2
+    index     int2 not null
         constraint positive_index check (index >= 0)
 );
 

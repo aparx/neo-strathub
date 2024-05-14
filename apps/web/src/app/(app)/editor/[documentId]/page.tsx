@@ -1,7 +1,7 @@
 "use client";
 import { Canvas } from "@repo/canvas";
 import { useSharedState } from "@repo/utils/hooks";
-import Konva from "konva";
+import type Konva from "konva";
 
 const initialNodes: Konva.RectConfig[] = [
   {

@@ -177,6 +177,9 @@ importers:
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
+      konva:
+        specifier: ^9.3.6
+        version: 9.3.6
       lorem-ipsum:
         specifier: ^2.0.8
         version: 2.0.8
@@ -7436,7 +7439,6 @@ packages:
 
   /konva@9.3.6:
     resolution: {integrity: sha512-dqR8EbcM0hjuilZCBP6xauQ5V3kH3m9kBcsDkqPypQuRgsXbcXUrxqYxhNbdvKZpYNW8Amq94jAD/C0NY3qfBQ==}
-    dev: false
 
   /language-subtag-registry@0.3.22:
     resolution: {integrity: sha512-tN0MCzyWnoz/4nHS6uxdlFWoUZT7ABptwKPQ52Ea7URk6vll88bWBVhodtnlfEuCcKWNGoc+uGbw1cwa9IKh/w==}

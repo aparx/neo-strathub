@@ -52,6 +52,7 @@
     "@types/react-dom": "^18.2.19",
     "@vanilla-extract/next-plugin": "^2.4.0",
     "eslint": "^8.57.0",
+    "konva": "^9.3.6",
     "lorem-ipsum": "^2.0.8",
     "pg-error-enum": "^0.7.1",
     "postgres": "^3.4.4",
