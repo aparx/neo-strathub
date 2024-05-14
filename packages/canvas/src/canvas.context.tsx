@@ -1,28 +1,44 @@
 import { SharedState } from "@repo/utils/hooks";
 import Konva from "konva";
 import { createContext, useContext } from "react";
+import { CanvasData, CanvasLevelNode } from "./canvas.data";
 
-export interface CanvasContext {
-  elements: SharedState<Konva.NodeConfig[]>;
+// ROOT CONTEXT
+
+export interface CanvasRootContext<
+  TNode extends Konva.NodeConfig = Konva.NodeConfig,
+> {
   selected: SharedState<string[]>;
   snapping: SharedState<boolean>;
+  data: CanvasData<TNode>;
 
-  /** Returns the canvas layer reference */
-  layer(): Konva.Layer;
-
-  /** Returns the canvas stage reference */
-  stage(): Konva.Stage;
-
-  /** Returns true if `id` is marked selected */
   isSelected(id: string): boolean;
+
+  stage(): Konva.Stage;
 }
 
-const canvasContext = createContext<CanvasContext | null>(null);
+const canvasRootContext = createContext<CanvasRootContext<any> | null>(null);
 
-export function useCanvasContext() {
-  const context = useContext(canvasContext);
-  if (!context) throw new Error("Missing CanvasContext");
-  return context;
+export const CanvasRootContextProvider = canvasRootContext.Provider;
+
+export function useCanvas<
+  TNode extends Konva.NodeConfig = Konva.NodeConfig,
+>(): CanvasRootContext<TNode> {
+  const ctx = useContext(canvasRootContext);
+  if (!ctx) throw new Error("Missing CanvasRootContext");
+  return ctx;
 }
 
-export const CanvasContextProvider = canvasContext.Provider;
+// LEVEL CONTEXT
+
+const canvasLevelContext = createContext<CanvasLevelNode<any> | null>(null);
+
+export const CanvasLevelContextProvider = canvasLevelContext.Provider;
+
+export function useCanvasLevel<
+  TNode extends Konva.NodeConfig = Konva.NodeConfig,
+>(): CanvasLevelNode<TNode> {
+  const ctx = useContext(canvasLevelContext);
+  if (!ctx) throw new Error("Missing CanvasLevelContext");
+  return ctx;
+}

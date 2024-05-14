@@ -1,7 +1,7 @@
 import Konva from "konva";
 import { forwardRef, useMemo } from "react";
 import { Transformer } from "react-konva";
-import { useCanvasContext } from "./canvas.context";
+import { useCanvas } from "./canvas.context";
 
 function createRotationPoints(parts: number) {
   return Array.from({ length: parts }, (_, i) => {
@@ -9,7 +9,7 @@ function createRotationPoints(parts: number) {
   });
 }
 
-export interface CanvasTransformerProps {
+export interface CanvasTransformerProps extends Konva.TransformerConfig {
   /** The amount of rotation snaps there are (angle being `θ = 360/x`) */
   snapRotationParts: number;
 }
@@ -18,22 +18,26 @@ export const CanvasTransformer = forwardRef<
   Konva.Transformer,
   CanvasTransformerProps
 >(function CanvasTransformer(props, ref) {
-  const ctx = useCanvasContext();
+  const { snapRotationParts, ...restProps } = props;
+
+  const ctx = useCanvas();
   const rotationSnaps = useMemo(() => {
     if (!ctx.snapping.state) return [];
-    return createRotationPoints(props.snapRotationParts);
-  }, [props.snapRotationParts, ctx.snapping.state]);
+    return createRotationPoints(snapRotationParts);
+  }, [snapRotationParts, ctx.snapping.state]);
 
   return (
     <Transformer
       ref={ref}
       rotationSnaps={rotationSnaps}
       keepRatio={false}
+      rotationSnapTolerance={10}
       anchorCornerRadius={2}
       boundBoxFunc={(oldBox, newBox) => {
         // Limit the size to at least 5x5 px on resize
         return oldBox.width >= 5 && newBox.width >= 5 ? newBox : oldBox;
       }}
+      {...restProps}
     />
   );
 });

@@ -1,11 +1,11 @@
 import Konva from "konva";
 import { ComponentPropsWithoutRef } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { CanvasContext, useCanvasContext } from "../canvas.context";
+import { CanvasRootContext, useCanvas } from "../canvas.context";
 import { KeyboardEvent, isPressed } from "./keyMap";
 
 export function CanvasKeyboardHandler(props: ComponentPropsWithoutRef<"div">) {
-  const ctx = useCanvasContext();
+  const ctx = useCanvas();
   return (
     <div
       {...props}
@@ -16,7 +16,7 @@ export function CanvasKeyboardHandler(props: ComponentPropsWithoutRef<"div">) {
   );
 }
 
-function handleCanvasKeyPress(e: KeyboardEvent, ctx: CanvasContext) {
+function handleCanvasKeyPress(e: KeyboardEvent, ctx: CanvasRootContext) {
   e.preventDefault();
   const moveSpeed = e.shiftKey ? 20 : 5;
   if (isPressed("delete", e)) {
@@ -36,36 +36,38 @@ function handleCanvasKeyPress(e: KeyboardEvent, ctx: CanvasContext) {
   }
 }
 
-function handleCanvasKeyRelease(e: KeyboardEvent, ctx: CanvasContext) {
+function handleCanvasKeyRelease(e: KeyboardEvent, ctx: CanvasRootContext) {
   if (ctx.snapping.state && isPressed("snap", e)) ctx.snapping.update(false);
 }
 
-function deleteSelected({ elements, selected, isSelected }: CanvasContext) {
-  elements.update((old) => old.filter((x) => !x.id || !isSelected(x.id)));
+function deleteSelected({ data, selected, isSelected }: CanvasRootContext) {
+  data.update((_, old) => old.filter((x) => !x.id || !isSelected(x.id)));
   selected.update((old) => old.filter((x) => !isSelected(x)));
 }
 
 function deltaMoveSelected(
-  { layer, isSelected }: CanvasContext,
+  { stage, isSelected }: CanvasRootContext,
   deltaX: number,
   deltaY: number,
 ) {
-  const targetLayer = layer();
-  targetLayer.children.forEach((child) => {
-    if (!isSelected(child.id())) return;
-    child.x(child.x() + deltaX);
-    child.y(child.y() + deltaY);
-  });
-  targetLayer.batchDraw();
+  const target = stage();
+  target
+    .find((x) => isSelected(x.id()))
+    .forEach((node) => {
+      node.x(node.x() + deltaX);
+      node.y(node.y() + deltaY);
+    });
+  target.batchDraw();
 }
 
-function duplicateSelected({ elements, selected, isSelected }: CanvasContext) {
+function duplicateSelected({ data, selected, isSelected }: CanvasRootContext) {
   const selectIds = new Array<string>(selected.state.length);
-  elements.update((old) => [
-    ...old,
-    ...old
-      .filter((x) => x.id && isSelected(x.id))
-      .map((config) => {
+  data.update((_, old) => {
+    const filtered = old.filter((x) => x.id && isSelected(x.id));
+    if (!filtered.length) return old;
+    return [
+      ...old,
+      ...filtered.map((config) => {
         const duplicate = {
           ...config,
           id: uuidv4(),
@@ -75,6 +77,7 @@ function duplicateSelected({ elements, selected, isSelected }: CanvasContext) {
         selectIds.push(duplicate.id);
         return duplicate;
       }),
-  ]);
+    ];
+  });
   selected.update(selectIds);
 }
