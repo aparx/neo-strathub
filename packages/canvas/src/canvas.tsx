@@ -7,13 +7,13 @@ import {
   CanvasRootContextProvider,
   useCanvasLevel,
 } from "./canvas.context";
-import { CanvasData } from "./canvas.data";
+import { BaseNodeConfig, CanvasData, CanvasNodeData } from "./canvas.data";
 import { CanvasLevel } from "./canvas.level";
 import { CanvasStage, CanvasStageBaseProps } from "./canvas.stage";
 import { CanvasKeyboardHandler } from "./keyboard";
 import Vector2d = Konva.Vector2d;
 
-export interface CanvasProps<TNodes extends Konva.NodeConfig>
+export interface CanvasProps<TNodes extends CanvasNodeData>
   extends CanvasStageBaseProps {
   levelDimensions: Vector2d;
   data: CanvasData<TNodes>;
@@ -80,10 +80,13 @@ function ExampleShape({
   return (
     <Rectangle
       shapeProps={shapeProps}
-      onChange={(newData) => {
-        level.children.update((elements) => {
-          const newElements = [...elements];
-          newElements[index] = newData as any;
+      onChange={(newConfig) => {
+        level.children.update((oldElements) => {
+          const newElements = [...oldElements];
+          newElements[index] = {
+            ...(oldElements[index] as CanvasNodeData),
+            attrs: newConfig as BaseNodeConfig,
+          };
           return newElements;
         });
       }}
@@ -91,7 +94,7 @@ function ExampleShape({
   );
 }
 
-export function Canvas<TNode extends Konva.NodeConfig>({
+export function Canvas<TNode extends CanvasNodeData>({
   levelDimensions,
   data,
   children,
@@ -101,9 +104,9 @@ export function Canvas<TNode extends Konva.NodeConfig>({
   const selected = useSharedState(new Array<string>());
 
   const context = {
-    ref: stageRef,
     selected,
     snapping: useSharedState(false),
+    focusedLevel: useSharedState(),
     stage: () => stageRef.current!,
     data: data,
     isSelected: (id) => selected.state.includes(id),
@@ -120,9 +123,12 @@ export function Canvas<TNode extends Konva.NodeConfig>({
               width={levelDimensions.x}
               height={levelDimensions.y}
               level={level}
+              focused={context.focusedLevel.state === level.id}
+              onFocus={() => context.focusedLevel.update(level.id)}
+              onBlur={() => context.focusedLevel.update(undefined)}
             >
               {level.map((node, index) => (
-                <ExampleShape index={index} {...node} />
+                <ExampleShape index={index} {...node.attrs} />
               ))}
             </CanvasLevel>
           ))}

@@ -1,34 +1,47 @@
 "use client";
-import { Canvas, CanvasData, CanvasLevelNode } from "@repo/canvas";
+import {
+  Canvas,
+  CanvasData,
+  CanvasLevelNode,
+  CanvasNodeData,
+} from "@repo/canvas";
 import { useSharedState } from "@repo/utils/hooks";
-import type Konva from "konva";
 import { useWindowSize } from "usehooks-ts";
 
-function createInitialNodes(): Konva.RectConfig[] {
+function createInitialNodes(): CanvasNodeData[] {
   return [
     {
-      x: 10,
-      y: 10,
-      width: 100,
-      height: 100,
-      fill: "red",
-      id: Math.random().toString(),
+      attrs: {
+        x: 10,
+        y: 10,
+        width: 100,
+        height: 100,
+        fill: "red",
+        id: Math.random().toString(),
+      },
+      className: "Rect",
     },
     {
-      x: 150,
-      y: 150,
-      width: 100,
-      height: 100,
-      fill: "green",
-      id: Math.random().toString(),
+      attrs: {
+        x: 150,
+        y: 150,
+        width: 100,
+        height: 100,
+        fill: "green",
+        id: Math.random().toString(),
+      },
+      className: "Rect",
     },
     {
-      x: 200,
-      y: 200,
-      width: 50,
-      height: 50,
-      fill: "blue",
-      id: Math.random().toString(),
+      attrs: {
+        x: 200,
+        y: 200,
+        width: 50,
+        height: 50,
+        fill: "blue",
+        id: Math.random().toString(),
+      },
+      className: "Rect",
     },
   ];
 }

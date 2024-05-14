@@ -75,7 +75,12 @@ export const CanvasStage = forwardRef<Konva.Stage, CanvasStageProps>(
     const mouseDown = useCallback((e: Konva.KonvaEventObject<MouseEvent>) => {
       switch (e.evt.button) {
         case 1 /* MIDDLE */:
-          if (stageRef.current !== e.target || !movable) break;
+          if (
+            (stageRef.current !== e.target &&
+              !e.target.hasName("background")) ||
+            !movable
+          )
+            break;
           setDragging(true);
           break;
         case 0 /* LEFT */:
@@ -104,8 +109,8 @@ export const CanvasStage = forwardRef<Konva.Stage, CanvasStageProps>(
           // Select all elements within the selected area
           const selectedElementIds = new Array<string>();
           const selectBox = selectionRectRef.current!.getClientRect();
-          stageRef.current.children.forEach((layer) => {
-            if (!layer.hasName("level")) return;
+          stageRef.current!.children.forEach((layer) => {
+            if (!layer.hasName("level") && !layer.hasName("background")) return;
             layer.children.forEach((node) => {
               const isVisible = node.isVisible();
               const isListening = node.isListening();
@@ -146,7 +151,7 @@ export const CanvasStage = forwardRef<Konva.Stage, CanvasStageProps>(
         // The selection has expanded, thus this is not a single click
         return;
 
-      if (e.target === e.target.getStage())
+      if (e.target === e.target.getStage() || e.target.hasName("background"))
         // Selected empty space, thus deselect all
         return selected.update([]);
 

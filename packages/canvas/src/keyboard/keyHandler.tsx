@@ -3,6 +3,7 @@ import Konva from "konva";
 import { ComponentPropsWithoutRef } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { CanvasRootContext, useCanvas } from "../canvas.context";
+import { CanvasNodeData } from "../canvas.data";
 import { KeyboardEvent, isPressed } from "./keyMap";
 
 export function CanvasKeyboardHandler(props: ComponentPropsWithoutRef<"div">) {
@@ -35,16 +36,11 @@ function handleCanvasKeyPress(e: KeyboardEvent, ctx: CanvasRootContext) {
   } else if (isPressed("snap", e)) {
     ctx.snapping.update(true);
   } else if (isPressed("copy", e)) {
-    // TODO copy selected objects
-    copySelected(ctx);
+    copyIntoClipboard(ctx);
+  } else if (isPressed("paste", e)) {
+    pasteClipboard(ctx);
   } else if (isPressed("selectAll", e)) {
-    // Get current level by checking if mouse cursor is over it
-    ctx.selected.update(
-      ctx.data
-        .deepNodes()
-        .map((x) => x.id)
-        .filter(nonNull),
-    );
+    selectAll(ctx);
   } else if (e.code === "Escape" || e.code === "Enter") {
     ctx.selected.update([]);
     // TODO call undo immediately after for Escape?
@@ -55,26 +51,45 @@ function handleCanvasKeyRelease(e: KeyboardEvent, ctx: CanvasRootContext) {
   if (ctx.snapping.state && isPressed("snap", e)) ctx.snapping.update(false);
 }
 
-function copySelected({ stage, data, isSelected }: CanvasRootContext) {
+// prettier-ignore
+function selectAll({ selected, data }: CanvasRootContext) {
+  selected.update(data.deepNodes().map((x) => x.attrs.id).filter(nonNull));
+}
+
+function copyIntoClipboard({ stage, isSelected }: CanvasRootContext) {
   const targets = stage()
     .find((node: Konva.Node) => isSelected(node.id()))
     .map((node) => node.toJSON());
-
   if (!targets.length) return;
-
-  navigator.clipboard
-    .writeText(JSON.stringify(targets))
-    .catch((e) => console.error("Could not copy objects", e));
-  // TODO toast?
+  const type = "text/plain";
+  const blob = new Blob([JSON.stringify(targets)], { type });
+  const item = new ClipboardItem({ [type]: blob });
+  navigator.clipboard.write([item]).catch(console.error);
 }
 
-function paste({ stage, isSelected }: CanvasRootContext) {
-  // TODO determine in what level to paste. This is possible by creating a state
-  //   in `CanvasRootContext` that is being updated on mouse move & click
+function pasteClipboard({ data, selected, focusedLevel }: CanvasRootContext) {
+  const level = focusedLevel.state && data.getLevel(focusedLevel.state);
+  if (!level) return;
+  navigator.clipboard.read().then(async (items) => {
+    const item = items[0];
+    if (!item) return;
+    const blob = await item.getType("text/plain");
+    const data = JSON.parse(await blob.text()) as string[];
+    const elements = data.map((x) => {
+      const config: CanvasNodeData = JSON.parse(x);
+      config.attrs.id = uuidv4();
+      return config;
+    });
+    level.children.update((prev) => [...prev, ...elements]);
+    selected.update(elements.map((x) => x.attrs.id).filter(nonNull));
+  });
+  return;
 }
 
 function deleteSelected({ data, selected, isSelected }: CanvasRootContext) {
-  data.update((_, old) => old.filter((x) => !x.id || !isSelected(x.id)));
+  data.update((_, old) =>
+    old.filter((x) => !x.attrs.id || !isSelected(x.attrs.id)),
+  );
   selected.update((old) => old.filter((x) => !isSelected(x)));
 }
 
@@ -96,18 +111,21 @@ function deltaMoveSelected(
 function duplicateSelected({ data, selected, isSelected }: CanvasRootContext) {
   const selectIds = new Array<string>(selected.state.length);
   data.update((_, old) => {
-    const filtered = old.filter((x) => x.id && isSelected(x.id));
+    const filtered = old.filter((x) => x.attrs.id && isSelected(x.attrs.id));
     if (!filtered.length) return old;
     return [
       ...old,
-      ...filtered.map((config) => {
+      ...filtered.map((node) => {
         const duplicate = {
-          ...config,
-          id: uuidv4(),
-          x: (config.x ?? 0) + 20,
-          y: (config.y ?? 0) + 20,
-        } satisfies Konva.NodeConfig;
-        selectIds.push(duplicate.id);
+          ...node,
+          attrs: {
+            ...node.attrs,
+            id: uuidv4(),
+            x: (node.attrs.x ?? 0) + 20,
+            y: (node.attrs.y ?? 0) + 20,
+          },
+        } satisfies CanvasNodeData;
+        selectIds.push(duplicate.attrs.id);
         return duplicate;
       }),
     ];

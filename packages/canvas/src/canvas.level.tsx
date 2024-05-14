@@ -3,22 +3,33 @@ import Konva from "konva";
 import React, { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import { Image as KonvaImage, Layer, Rect } from "react-konva";
 import { CanvasLevelContextProvider } from "./canvas.context";
-import { CanvasLevelNode } from "./canvas.data";
+import { CanvasLevelNode, CanvasNodeData } from "./canvas.data";
 import Vector2d = Konva.Vector2d;
 
-export interface CanvasLevelProps<
-  TNode extends Konva.NodeConfig = Konva.NodeConfig,
-> extends Konva.LayerConfig {
+export interface CanvasLevelProps<TNode extends CanvasNodeData = CanvasNodeData>
+  extends Konva.LayerConfig {
   width: number;
   height: number;
   level: CanvasLevelNode<TNode>;
   /** The elements shown in this level, besides the background image */
   children: React.ReactNode;
+  focused: boolean;
+  onFocus: () => any;
+  onBlur: () => any;
 }
 
 export const CanvasLevel = forwardRef<Konva.Layer, CanvasLevelProps>(
   function CanvasLevel(props, ref) {
-    const { width, height, children, level, ...restProps } = props;
+    const {
+      width,
+      height,
+      children,
+      level,
+      focused,
+      onFocus,
+      onBlur,
+      ...restProps
+    } = props;
     const [image, setImage] = useState<HTMLImageElement>();
     const layerRef = useRef<Konva.Layer>(null);
 
@@ -44,17 +55,20 @@ export const CanvasLevel = forwardRef<Konva.Layer, CanvasLevelProps>(
         height={height}
         x={level.position.x}
         y={level.position.y}
+        onClick={() => onFocus()}
+        onMouseEnter={() => onFocus()}
         {...restProps}
       >
         <CanvasLevelContextProvider
           value={{ ...(level as any), ref: layerRef }}
         >
           <Rect
+            name={"background"}
             width={width}
             height={height}
-            listening={false}
             fill={"rgb(218,218,218)"}
-            stroke={"rgba(255, 255, 255, .5)"}
+            strokeScaleEnabled={false}
+            stroke={focused ? "rgb(0, 200, 255)" : "rgba(255, 255, 255, .5)"}
             strokeWidth={2}
             cornerRadius={10}
           />

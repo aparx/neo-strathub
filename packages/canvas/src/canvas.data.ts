@@ -3,25 +3,34 @@ import { SharedState } from "@repo/utils/hooks";
 import Konva from "konva";
 import Vector2d = Konva.Vector2d;
 
-type FindPredicate<T extends Konva.NodeConfig> = (
+export interface BaseNodeConfig extends Konva.NodeConfig {
+  characterId?: string;
+}
+
+export type CanvasNodeData<TConfig extends BaseNodeConfig = BaseNodeConfig> = {
+  attrs: TConfig;
+  className: string;
+};
+
+type FindPredicate<T extends CanvasNodeData> = (
   node: T,
   index: number,
   level?: Nullish<CanvasLevelNode<T>>,
 ) => any;
 
-type ForEachCallback<T extends Konva.NodeConfig> = (
+type ForEachCallback<T extends CanvasNodeData> = (
   node: T,
   index: number,
   level?: Nullish<CanvasLevelNode<T>>,
 ) => any;
 
-interface CanvasGroupNode<T extends Konva.NodeConfig> {
+interface CanvasGroupNode<T extends CanvasNodeData> {
   find(predicate: FindPredicate<T>): T | undefined;
 
   forEach(callback: ForEachCallback<T>): void;
 }
 
-export class CanvasData<T extends Konva.NodeConfig>
+export class CanvasData<T extends CanvasNodeData>
   implements CanvasGroupNode<T>
 {
   private readonly dataMap = new Map<string, CanvasLevelNode<T>>();
@@ -59,6 +68,10 @@ export class CanvasData<T extends Konva.NodeConfig>
     }
   }
 
+  getLevel(level: string): CanvasLevelNode<T> | undefined {
+    return this.dataMap.get(level);
+  }
+
   levels() {
     return this.dataMap.values();
   }
@@ -73,7 +86,7 @@ export class CanvasData<T extends Konva.NodeConfig>
   }
 }
 
-export class CanvasLevelNode<E extends Konva.NodeConfig>
+export class CanvasLevelNode<E extends CanvasNodeData>
   implements CanvasGroupNode<E>
 {
   constructor(
