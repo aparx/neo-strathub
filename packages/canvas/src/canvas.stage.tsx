@@ -167,7 +167,7 @@ export const CanvasStage = forwardRef<Konva.Stage, CanvasStageProps>(
         e.evt.preventDefault();
         if (!e.evt.ctrlKey && !e.evt.metaKey) {
           // Scroll in canvas
-          const deltaMultiplier = scale.x * 0.4;
+          const deltaMultiplier = scale.x * (e.evt.altKey ? 0.8 : 0.4);
           const deltaX = e.evt.deltaX * -deltaMultiplier;
           const deltaY = e.evt.deltaY * -deltaMultiplier;
 
@@ -177,6 +177,7 @@ export const CanvasStage = forwardRef<Konva.Stage, CanvasStageProps>(
           }));
           return;
         }
+        // Zoom into the stage
         const pointer = stageRef.current!.getPointerPosition()!;
         const oldScale = stageRef.current!.scaleX();
         const scaleBy = e.evt.altKey ? 1.15 : 1.05;
@@ -234,6 +235,7 @@ function redrawSelectionRect(rect: Konva.Rect, selection: SelectionData) {
     fill: "rgba(0, 150, 255, 0.33)",
     strokeEnabled: true,
     strokeWidth: 1,
+    strokeScaleEnabled: false,
     stroke: "rgba(255, 255, 255, .3)",
   } satisfies Konva.RectConfig);
   rect.getLayer()?.batchDraw();

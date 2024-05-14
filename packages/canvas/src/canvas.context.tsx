@@ -11,10 +11,8 @@ export interface CanvasRootContext<
   selected: SharedState<string[]>;
   snapping: SharedState<boolean>;
   data: CanvasData<TNode>;
-
-  isSelected(id: string): boolean;
-
-  stage(): Konva.Stage;
+  isSelected: (id: string) => boolean;
+  stage: () => Konva.Stage;
 }
 
 const canvasRootContext = createContext<CanvasRootContext<any> | null>(null);
@@ -26,7 +24,7 @@ export function useCanvas<
 >(): CanvasRootContext<TNode> {
   const ctx = useContext(canvasRootContext);
   if (!ctx) throw new Error("Missing CanvasRootContext");
-  return ctx;
+  return ctx as CanvasRootContext<any>;
 }
 
 // LEVEL CONTEXT
@@ -37,7 +35,7 @@ export interface CanvasLevelContext<
   ref: RefObject<Konva.Layer>;
 }
 
-const canvasLevelContext = createContext<CanvasLevelContext | null>(null);
+const canvasLevelContext = createContext<CanvasLevelContext<any> | null>(null);
 
 export const CanvasLevelContextProvider = canvasLevelContext.Provider;
 
@@ -46,5 +44,5 @@ export function useCanvasLevel<
 >(): CanvasLevelContext<TNode> {
   const ctx = useContext(canvasLevelContext);
   if (!ctx) throw new Error("Missing CanvasLevelContext");
-  return ctx;
+  return ctx as CanvasLevelContext<any>;
 }

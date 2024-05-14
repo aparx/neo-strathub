@@ -15,6 +15,10 @@ export const CANVAS_KEY_MAP = {
   delete: { code: "Delete" },
   duplicate: { code: "KeyD", ctrl: true },
   snap: { code: "ShiftLeft" },
+  selectAll: { code: "KeyA", ctrl: true },
+  copy: { code: "KeyC", ctrl: true },
+  cut: { code: "KeyX", ctrl: true },
+  paste: { code: "KeyV", ctrl: true },
 } satisfies Readonly<Record<string, Keys>>;
 
 export type KeymapKey = keyof typeof CANVAS_KEY_MAP;

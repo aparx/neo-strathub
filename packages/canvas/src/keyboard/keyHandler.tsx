@@ -1,3 +1,4 @@
+import { nonNull } from "@repo/utils";
 import Konva from "konva";
 import { ComponentPropsWithoutRef } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -33,11 +34,43 @@ function handleCanvasKeyPress(e: KeyboardEvent, ctx: CanvasRootContext) {
     deltaMoveSelected(ctx, 0, moveSpeed);
   } else if (isPressed("snap", e)) {
     ctx.snapping.update(true);
+  } else if (isPressed("copy", e)) {
+    // TODO copy selected objects
+    copySelected(ctx);
+  } else if (isPressed("selectAll", e)) {
+    // Get current level by checking if mouse cursor is over it
+    ctx.selected.update(
+      ctx.data
+        .deepNodes()
+        .map((x) => x.id)
+        .filter(nonNull),
+    );
+  } else if (e.code === "Escape" || e.code === "Enter") {
+    ctx.selected.update([]);
+    // TODO call undo immediately after for Escape?
   }
 }
 
 function handleCanvasKeyRelease(e: KeyboardEvent, ctx: CanvasRootContext) {
   if (ctx.snapping.state && isPressed("snap", e)) ctx.snapping.update(false);
+}
+
+function copySelected({ stage, data, isSelected }: CanvasRootContext) {
+  const targets = stage()
+    .find((node: Konva.Node) => isSelected(node.id()))
+    .map((node) => node.toJSON());
+
+  if (!targets.length) return;
+
+  navigator.clipboard
+    .writeText(JSON.stringify(targets))
+    .catch((e) => console.error("Could not copy objects", e));
+  // TODO toast?
+}
+
+function paste({ stage, isSelected }: CanvasRootContext) {
+  // TODO determine in what level to paste. This is possible by creating a state
+  //   in `CanvasRootContext` that is being updated on mouse move & click
 }
 
 function deleteSelected({ data, selected, isSelected }: CanvasRootContext) {
@@ -52,7 +85,7 @@ function deltaMoveSelected(
 ) {
   const target = stage();
   target
-    .find((x) => isSelected(x.id()))
+    .find((x: Konva.Node) => isSelected(x.id()))
     .forEach((node) => {
       node.x(node.x() + deltaX);
       node.y(node.y() + deltaY);

@@ -9,7 +9,12 @@ export function mergeClassNames(...names: Nullish<string | boolean>[]) {
 }
 
 export function mergeRefs<T>(
-  ...refs: Nullish<React.MutableRefObject<T | null>>[]
+  ...refs: React.ForwardedRef<T>[]
 ): React.RefCallback<T> {
-  return (node) => refs.forEach((ref) => ref && (ref.current = node));
+  return function _mergedRefs(node) {
+    refs.forEach((ref) => {
+      if (typeof ref === "function") ref(node);
+      else if (ref) ref.current = node;
+    });
+  };
 }

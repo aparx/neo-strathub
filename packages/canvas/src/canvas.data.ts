@@ -62,6 +62,15 @@ export class CanvasData<T extends Konva.NodeConfig>
   levels() {
     return this.dataMap.values();
   }
+
+  /** Returns an array of all deep nodes (`T`) */
+  deepNodes(): T[] {
+    const array = new Array<T>();
+    for (const [_, node] of this.dataMap) {
+      array.push(...node.children.state);
+    }
+    return array;
+  }
 }
 
 export class CanvasLevelNode<E extends Konva.NodeConfig>

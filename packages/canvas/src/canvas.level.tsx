@@ -46,7 +46,9 @@ export const CanvasLevel = forwardRef<Konva.Layer, CanvasLevelProps>(
         y={level.position.y}
         {...restProps}
       >
-        <CanvasLevelContextProvider value={{ ...level, ref: layerRef }}>
+        <CanvasLevelContextProvider
+          value={{ ...(level as any), ref: layerRef }}
+        >
           <Rect
             width={width}
             height={height}
