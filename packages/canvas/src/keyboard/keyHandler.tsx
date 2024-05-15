@@ -30,6 +30,9 @@ export function CanvasKeyboardHandler(props: ComponentPropsWithoutRef<"div">) {
       copyIntoClipboard(ctx);
     } else if (isPressed("paste", e)) {
       pasteClipboard(ctx);
+    } else if (isPressed("cut", e)) {
+      copyIntoClipboard(ctx);
+      deleteSelected(ctx);
     } else if (isPressed("selectAll", e)) {
       selectAll(ctx, e.shiftKey || e.altKey);
     } else if (e.code === "Escape" || e.code === "Enter") {
