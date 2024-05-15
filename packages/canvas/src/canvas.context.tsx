@@ -8,6 +8,7 @@ import { CanvasData, CanvasLevelNode, CanvasNodeData } from "./canvas.data";
 export interface CanvasRootContext<
   TNode extends CanvasNodeData = CanvasNodeData,
 > {
+  scale: SharedState<number>;
   selected: SharedState<string[]>;
   snapping: SharedState<boolean>;
   focusedLevel: SharedState<string | undefined>;

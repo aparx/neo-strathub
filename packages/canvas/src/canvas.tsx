@@ -33,6 +33,7 @@ export function Canvas<TNode extends CanvasNodeData>({
 
   const context = {
     selected,
+    scale: useSharedState(1),
     snapping: useSharedState(false),
     focusedLevel: useSharedState(),
     stage: () => stageRef.current!,

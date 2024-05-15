@@ -9,7 +9,7 @@ import { KeyboardEvent, isPressed } from "./keyMap";
 export function CanvasKeyboardHandler(props: ComponentPropsWithoutRef<"div">) {
   const ctx = useCanvas();
 
-  function keyPress(e: KeyboardEvent, ctx: CanvasRootContext) {
+  function keyPress(e: KeyboardEvent) {
     e.preventDefault();
     const moveSpeed = e.shiftKey ? 20 : 5;
     if (isPressed("delete", e)) {
@@ -65,8 +65,8 @@ export function CanvasKeyboardHandler(props: ComponentPropsWithoutRef<"div">) {
     <div
       {...props}
       tabIndex={1}
-      onKeyDown={(e) => keyPress(e, ctx)}
-      onKeyUp={(e) => keyRelease(e, ctx)}
+      onKeyDown={(e) => keyPress(e)}
+      onKeyUp={(e) => keyRelease(e)}
     />
   );
 }

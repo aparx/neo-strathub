@@ -10,7 +10,7 @@ import React, {
 } from "react";
 import { Layer, Rect, Stage } from "react-konva";
 import { useCanvas } from "./canvas.context";
-import { CanvasTransformer } from "./canvas.transformer";
+import { DefaultTransformer } from "./transformers";
 import Vector2d = Konva.Vector2d;
 
 export interface CanvasStageBaseProps {
@@ -27,7 +27,6 @@ export interface CanvasStageProps extends CanvasStageBaseProps {
 }
 
 const ZERO_VECTOR = { x: 0, y: 0 } as const satisfies Vector2d;
-const ONE_VECTOR = { x: 1, y: 1 } as const satisfies Vector2d;
 
 interface SelectionData {
   active: boolean;
@@ -40,9 +39,9 @@ interface SelectionData {
 export const CanvasStage = forwardRef<Konva.Stage, CanvasStageProps>(
   function CanvasStage(props, ref) {
     const { children, editable, movable, ...restProps } = props;
-    const { selected, isSelected } = useCanvas();
+    const { selected, isSelected, scale } = useCanvas();
     const stageRef = useRef<Konva.Stage>(null);
-    const transformerRef = useRef<Konva.Transformer>(null);
+    const multiTransformerRef = useRef<Konva.Transformer>(null);
     const selectionRectRef = useRef<Konva.Rect>(null);
     const selectionArea = useRef<SelectionData>({
       active: false,
@@ -53,7 +52,6 @@ export const CanvasStage = forwardRef<Konva.Stage, CanvasStageProps>(
     });
     const [dragging, setDragging] = useState(false);
     const [position, setPosition] = useState<Vector2d>(ZERO_VECTOR);
-    const [scale, setScale] = useState<Vector2d>(ONE_VECTOR);
 
     const updateSelectionRect = useCallback(() => {
       const rect = selectionRectRef.current;
@@ -67,8 +65,10 @@ export const CanvasStage = forwardRef<Konva.Stage, CanvasStageProps>(
       const nodes = (selected.state as string[])
         .map((id) => stageRef.current!.findOne("#" + id))
         .filter((x): x is NonNullable<typeof x> => x != null);
-      transformerRef.current!.nodes(nodes);
-      transformerRef.current!.getStage()!.batchDraw();
+      multiTransformerRef.current!.nodes(
+        selected.state.length > 1 ? nodes : [],
+      );
+      multiTransformerRef.current!.getLayer()!.batchDraw();
     }, [selected.state]);
 
     /** Event callback, called whenever a mouse button was pressed on the stage */
@@ -85,6 +85,7 @@ export const CanvasStage = forwardRef<Konva.Stage, CanvasStageProps>(
           break;
         case 0 /* LEFT */:
           if (e.target.findAncestor("Transformer") || !editable) return;
+          if (e.target.hasName("Transformer")) return;
           // Restrict the selected area to the just clicked point
           const pos = e.target.getStage()!.getRelativePointerPosition()!;
           selectionArea.current.x1 = selectionArea.current.x2 = pos.x;
@@ -151,9 +152,10 @@ export const CanvasStage = forwardRef<Konva.Stage, CanvasStageProps>(
         // The selection has expanded, thus this is not a single click
         return;
 
-      if (e.target === e.target.getStage() || e.target.hasName("background"))
+      if (e.target === e.target.getStage() || e.target.hasName("background")) {
         // Selected empty space, thus deselect all
         return selected.update([]);
+      }
 
       const targetId = e.target.id();
       const altPressed = e.evt.metaKey || e.evt.shiftKey || e.evt.altKey;
@@ -172,7 +174,7 @@ export const CanvasStage = forwardRef<Konva.Stage, CanvasStageProps>(
         e.evt.preventDefault();
         if (!e.evt.ctrlKey && !e.evt.metaKey) {
           // Scroll in canvas
-          const deltaMultiplier = scale.x * (e.evt.altKey ? 0.8 : 0.4);
+          const deltaMultiplier = scale.state * (e.evt.altKey ? 0.8 : 0.4);
           const deltaX = e.evt.deltaX * -deltaMultiplier;
           const deltaY = e.evt.deltaY * -deltaMultiplier;
 
@@ -194,13 +196,13 @@ export const CanvasStage = forwardRef<Konva.Stage, CanvasStageProps>(
         let newScale =
           e.evt.deltaY < 0 ? oldScale * scaleBy : oldScale / scaleBy;
         newScale = Math.max(Math.min(newScale, 10), 0.1);
-        setScale({ x: newScale, y: newScale });
+        scale.update(newScale);
         setPosition({
           x: pointer.x - pointTo.x * newScale,
           y: pointer.y - pointTo.y * newScale,
         });
       },
-      [scale],
+      [scale.state],
     );
 
     return (
@@ -211,7 +213,8 @@ export const CanvasStage = forwardRef<Konva.Stage, CanvasStageProps>(
         onMouseMove={mouseMove}
         onClick={mouseClick}
         onWheel={wheelUpdate}
-        scale={scale}
+        scaleX={scale.state}
+        scaleY={scale.state}
         x={position.x}
         y={position.y}
         style={{ cursor: dragging ? "grabbing" : "default" }}
@@ -219,10 +222,7 @@ export const CanvasStage = forwardRef<Konva.Stage, CanvasStageProps>(
       >
         {children}
         <Layer>
-          <CanvasTransformer
-            ref={transformerRef}
-            snapRotationParts={8 /* 45 deg */}
-          />
+          <DefaultTransformer ref={multiTransformerRef} />
           <Rect listening={false} ref={selectionRectRef} />
         </Layer>
       </Stage>

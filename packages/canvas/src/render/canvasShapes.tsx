@@ -1,56 +1,20 @@
+import { nonNull } from "@repo/utils";
 import Konva from "konva";
-import { forwardRef } from "react";
-import * as ReactKonva from "react-konva";
-import { CanvasNodeConfig } from "../canvas.data";
-import { CanvasObjectProps } from "./canvasObjectRenderer";
+import { RefObject, useEffect } from "react";
+import { Arrow, Circle, Line, Rect } from "./shapes";
 
-export const Rect = forwardRef<
-  Konva.Rect,
-  CanvasObjectProps<CanvasNodeConfig<Konva.RectConfig>>
->(({ data, modifiable, ...restProps }, ref) => (
-  <ReactKonva.Rect
-    ref={ref}
-    draggable={modifiable}
-    {...data.attrs}
-    {...restProps}
-  />
-));
-
-export const Circle = forwardRef<
-  Konva.Circle,
-  CanvasObjectProps<CanvasNodeConfig<Konva.CircleConfig>>
->(({ data, modifiable, ...restProps }, ref) => (
-  <ReactKonva.Circle
-    ref={ref}
-    draggable={modifiable}
-    {...data.attrs}
-    {...restProps}
-  />
-));
-
-export const Arrow = forwardRef<
-  Konva.Arrow,
-  CanvasObjectProps<CanvasNodeConfig<Konva.ArrowConfig>>
->(({ data, modifiable, ...restProps }, ref) => (
-  <ReactKonva.Arrow
-    ref={ref}
-    draggable={modifiable}
-    {...data.attrs}
-    {...restProps}
-  />
-));
-
-export const Line = forwardRef<
-  Konva.Line,
-  CanvasObjectProps<CanvasNodeConfig<Konva.LineConfig>>
->(({ data, modifiable, ...restProps }, ref) => (
-  <ReactKonva.Line
-    ref={ref}
-    draggable={modifiable}
-    {...data.attrs}
-    {...restProps}
-  />
-));
+export function useNodesIntoTransformer(
+  insertNodes: boolean,
+  transformer: RefObject<Konva.Transformer>,
+  ...nodes: RefObject<Konva.Node>[]
+) {
+  useEffect(() => {
+    if (insertNodes && nodes.length)
+      transformer.current?.nodes(nodes.map((x) => x.current).filter(nonNull));
+    else transformer.current?.nodes([]);
+    transformer.current?.getLayer()?.batchDraw();
+  }, [insertNodes]);
+}
 
 export const PRIMITIVE_CANVAS_SHAPES = {
   Rect,

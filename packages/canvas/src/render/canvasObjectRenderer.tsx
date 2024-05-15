@@ -7,7 +7,7 @@ import React, {
   useRef,
 } from "react";
 import { KonvaNodeEvents } from "react-konva";
-import { useCanvasLevel } from "../canvas.context";
+import { useCanvas, useCanvasLevel } from "../canvas.context";
 import { CanvasNodeConfig, CanvasNodeData } from "../canvas.data";
 import {
   CanvasRendererLookupTable,
@@ -35,6 +35,9 @@ export interface CanvasObjectProps<
 > extends CanvasObjectBaseProps<TConfig>,
     KonvaNodeEvents {
   onChange: (newConfig: TConfig) => any;
+  /** Boolean flag that is true, when the individual transformer of a canvas object
+   *  should be used (is only true, when the object is actually selected) */
+  useSingleTransformer: boolean;
 }
 
 interface ObjectWrapperProps<
@@ -52,7 +55,7 @@ export function CanvasObjectRenderer<TConfig extends CanvasNodeConfig>({
   return children.state.map((data, index) => {
     if (!isShapeClassNameSupported(lookupTable, data.className)) {
       // TODO display toast that given canvas is invalid?
-      console.error(`Missing renderer for class ${data.className}`);
+      console.error(`Class name '${data.className}' is unsupported`);
       children.update((x) => x.filter((y) => y.className !== data.className));
       return null;
     }
@@ -62,7 +65,7 @@ export function CanvasObjectRenderer<TConfig extends CanvasNodeConfig>({
         data={data}
         index={index}
         modifiable={modifiable}
-        renderer={lookupTable[data.className]}
+        renderer={lookupTable[data.className] as CanvasShapeRenderer<any>}
       />
     );
   });
@@ -75,12 +78,12 @@ function CanvasObject<TConfig extends CanvasNodeConfig>({
   modifiable,
   renderer,
 }: CanvasObjectBaseProps<TConfig> & {
-  renderer: CanvasShapeRenderer;
+  renderer: CanvasShapeRenderer<TConfig>;
 }) {
   return useMemo(
     () => (
       <ObjectWrapper data={data} index={index}>
-        {React.createElement(renderer, { ...data, index, modifiable } as any)}
+        {React.createElement(renderer, { index, modifiable } as any)}
       </ObjectWrapper>
     ),
     [renderer, data, index, modifiable],
@@ -88,11 +91,12 @@ function CanvasObject<TConfig extends CanvasNodeConfig>({
 }
 
 /** Additional component that wraps around an object directly, to apply events */
-function ObjectWrapper<TConfig extends CanvasNodeData>({
+function ObjectWrapper<TConfig extends CanvasNodeConfig>({
   data,
   index,
   children,
 }: ObjectWrapperProps<TConfig>) {
+  const ctx = useCanvas();
   const level = useCanvasLevel();
   const childRef = useRef<Konva.Node>(null);
 
@@ -119,6 +123,10 @@ function ObjectWrapper<TConfig extends CanvasNodeData>({
       data={data}
       index={index}
       onChange={onChange}
+      useSingleTransformer={
+        ctx.selected.state.length === 1 &&
+        ctx.selected.state[0] === data.attrs.id
+      }
       onDragMove={(e) => {
         // TODO limit object to the level's display
       }}

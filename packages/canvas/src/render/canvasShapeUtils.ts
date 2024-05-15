@@ -51,6 +51,6 @@ export function createShapeData<
 
 export function isShapeClassNameSupported<
   const TLookupTable extends CanvasRendererLookupTable,
->(table: TLookupTable, key: string): key is keyof TLookupTable {
-  return key in table && table[key] != null;
+>(table: TLookupTable, key: any): key is keyof TLookupTable {
+  return typeof key === "string" && key in table && table[key] != null;
 }

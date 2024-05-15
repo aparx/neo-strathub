@@ -14,20 +14,12 @@ const shapeRenderers = PRIMITIVE_CANVAS_SHAPES;
 
 function createInitialNodes(): CanvasNodeData[] {
   return [
-    createShapeData(shapeRenderers, "Rect", {
-      x: 0,
-      y: 0,
-      width: 100,
-      height: 100,
-      fill: "red",
-    }),
-    createShapeData(shapeRenderers, "Arrow", {
-      points: [10, 10, 100, 10],
+    createShapeData(shapeRenderers, "Line", {
+      points: [10, 10, 100, 50, 200, 0],
       fill: "red",
       stroke: "red",
       tension: 1,
-      pointerLength: 10,
-      pointerWidth: 12,
+      strokeWidth: 5,
       x: 0,
       y: 0,
     }),

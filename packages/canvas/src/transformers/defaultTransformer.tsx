@@ -1,7 +1,7 @@
 import Konva from "konva";
 import { forwardRef, useMemo } from "react";
 import { Transformer } from "react-konva";
-import { useCanvas } from "./canvas.context";
+import { useCanvas } from "../canvas.context";
 
 function createRotationPoints(parts: number) {
   return Array.from({ length: parts }, (_, i) => {
@@ -11,14 +11,15 @@ function createRotationPoints(parts: number) {
 
 export interface CanvasTransformerProps extends Konva.TransformerConfig {
   /** The amount of rotation snaps there are (angle being `θ = 360/x`) */
-  snapRotationParts: number;
+  snapRotationParts?: number;
 }
 
-export const CanvasTransformer = forwardRef<
+/** Transformer handling (multiple) selected elements primitively */
+export const DefaultTransformer = forwardRef<
   Konva.Transformer,
   CanvasTransformerProps
->(function CanvasTransformer(props, ref) {
-  const { snapRotationParts, ...restProps } = props;
+>(function DefaultTransformer(props, ref) {
+  const { snapRotationParts = 8 /* 45deg */, ...restProps } = props;
 
   const ctx = useCanvas();
   const rotationSnaps = useMemo(() => {
@@ -33,6 +34,7 @@ export const CanvasTransformer = forwardRef<
       useSingleNodeRotation={true}
       keepRatio={false}
       rotationSnapTolerance={10}
+      shouldOverdrawWholeArea={true}
       anchorCornerRadius={2}
       boundBoxFunc={(oldBox, newBox) => {
         // Limit the size to at least 5x5 px on resize
