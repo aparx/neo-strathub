@@ -51,19 +51,19 @@ export default function EditorPage() {
 
   const data = new CanvasData([
     new CanvasLevelNode(
-      "floor_3",
+      "stage_1_floor_3",
       "https://svgshare.com/i/161z.svg",
       { x: 0, y: 2 * (height + 50) },
       useSharedState(createInitialNodes),
     ),
     new CanvasLevelNode(
-      "floor_2",
+      "stage_1_floor_2",
       "https://svgshare.com/i/162B.svg",
       { x: 0, y: height + 50 },
       useSharedState(createInitialNodes),
     ),
     new CanvasLevelNode(
-      "floor_1",
+      "stage_1_floor_1",
       "https://svgshare.com/i/1602.svg",
       { x: 0, y: 0 },
       useSharedState(createInitialNodes),

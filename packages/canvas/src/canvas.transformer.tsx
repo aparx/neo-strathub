@@ -30,6 +30,8 @@ export const CanvasTransformer = forwardRef<
     <Transformer
       ref={ref}
       rotationSnaps={rotationSnaps}
+      useSingleNodeRotation={true}
+      rotateEnabled={false}
       keepRatio={false}
       rotationSnapTolerance={10}
       anchorCornerRadius={2}

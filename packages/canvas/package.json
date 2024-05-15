@@ -10,6 +10,7 @@
     "@repo/utils": "workspace:^",
     "konva": "^9.3.6",
     "react-konva": "^18.2.10",
+    "react-konva-utils": "^1.0.6",
     "uuid": "^9.0.1"
   },
   "devDependencies": {

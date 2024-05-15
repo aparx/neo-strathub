@@ -1,21 +1,29 @@
 import { Slot } from "@radix-ui/react-slot";
 import Konva from "konva";
-import React, { FC, useMemo } from "react";
-import { KonvaNodeEvents } from "react-konva/ReactKonvaCore";
+import React, {
+  ForwardRefExoticComponent,
+  RefAttributes,
+  useMemo,
+  useRef,
+} from "react";
+import { KonvaNodeEvents } from "react-konva";
 import { useCanvasLevel } from "../canvas.context";
 import { BaseNodeConfig, CanvasNodeData } from "../canvas.data";
+import Vector2d = Konva.Vector2d;
 
-type ObjectDeepRendererFn = FC<CanvasObjectProps>;
+type ObjectDeepRendererFn = React.ForwardRefExoticComponent<
+  CanvasObjectProps & RefAttributes<Konva.Node>
+>;
 
-export type CanvasObjectRegister = Map<string, ObjectDeepRendererFn>;
+export type CanvasRendererRegister = Map<string, ObjectDeepRendererFn>;
 
 export interface CanvasObjectRendererProps {
-  register: CanvasObjectRegister;
+  register: CanvasRendererRegister;
   modifiable?: boolean;
 }
 
 interface BaseObjectProps {
-  node: CanvasNodeData;
+  data: CanvasNodeData;
   index: number;
   modifiable?: boolean;
 }
@@ -34,17 +42,18 @@ export function CanvasObjectRenderer({
 }: CanvasObjectRendererProps) {
   const level = useCanvasLevel();
   const children = level.children;
-  return children.state.map((node, index) => {
-    const renderer = register.get(node.className);
+  return children.state.map((data, index) => {
+    const renderer = register.get(data.className);
     if (!renderer) {
       // TODO display toast that given canvas is invalid?
-      console.error(`Missing renderer for class ${node.className}`);
-      children.update((x) => x.filter((y) => y.className !== node.className));
+      console.error(`Missing renderer for class ${data.className}`);
+      children.update((x) => x.filter((y) => y.className !== data.className));
       return null;
     }
     return (
       <CanvasObject
-        node={node}
+        key={data.attrs.id}
+        data={data}
         index={index}
         modifiable={modifiable}
         renderer={renderer}
@@ -55,7 +64,7 @@ export function CanvasObjectRenderer({
 
 /** Component renders the actual node as a canvas object */
 function CanvasObject({
-  node,
+  data,
   index,
   modifiable,
   renderer,
@@ -64,17 +73,18 @@ function CanvasObject({
 }) {
   return useMemo(
     () => (
-      <ObjectWrapper key={node.attrs.id} node={node} index={index}>
-        {React.createElement(renderer, { ...node, index, modifiable } as any)}
+      <ObjectWrapper data={data} index={index}>
+        {React.createElement(renderer, { ...data, index, modifiable } as any)}
       </ObjectWrapper>
     ),
-    [renderer, node, index, modifiable],
+    [renderer, data, index, modifiable],
   );
 }
 
 /** Additional component that wraps around an object directly, to apply events */
-function ObjectWrapper({ node, index, children }: ObjectWrapperProps) {
+function ObjectWrapper({ data, index, children }: ObjectWrapperProps) {
   const level = useCanvasLevel();
+  const childRef = useRef<Konva.Node>(null);
 
   function onChange(newConfig: BaseNodeConfig) {
     level.children.update((oldElements) => {
@@ -87,18 +97,24 @@ function ObjectWrapper({ node, index, children }: ObjectWrapperProps) {
     });
   }
 
-  const OnChild = Slot as any as FC<
-    CanvasObjectProps & Pick<ObjectWrapperProps, "children">
+  const OnChild = Slot as any as ForwardRefExoticComponent<
+    CanvasObjectProps &
+      Pick<ObjectWrapperProps, "children"> &
+      RefAttributes<Konva.Node>
   >;
 
   return (
     <OnChild
-      node={node}
+      ref={childRef}
+      data={data}
       index={index}
       onChange={onChange}
+      onDragMove={(e) => {
+        // TODO limit object to the level's display
+      }}
       onDragEnd={(e) => {
         onChange({
-          ...node.attrs,
+          ...data.attrs,
           x: e.target.x(),
           y: e.target.y(),
           rotation: e.target.rotation(),
