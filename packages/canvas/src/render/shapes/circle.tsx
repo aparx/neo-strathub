@@ -32,12 +32,12 @@ export const Circle = forwardRef<
             x: node.x(),
             y: node.y(),
             width: Math.max(5, node.width() * scaleX),
-            height: Math.max(5, node.width() * scaleY),
+            height: Math.max(5, node.height() * scaleY),
             radius: undefined,
           });
         }}
       />
-      {useSingleTransformer && <DefaultTransformer ref={trRef} />}
+      {useSingleTransformer && <DefaultTransformer keepRatio ref={trRef} />}
     </>
   );
 });
