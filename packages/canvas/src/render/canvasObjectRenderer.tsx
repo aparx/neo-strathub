@@ -9,19 +9,22 @@ import React, {
 import { KonvaNodeEvents } from "react-konva";
 import { useCanvasLevel } from "../canvas.context";
 import { CanvasNodeConfig, CanvasNodeData } from "../canvas.data";
+import {
+  CanvasRendererLookupTable,
+  CanvasShapeRenderer,
+  isShapeClassNameSupported,
+} from "./canvasShapeUtils";
 
-type ObjectDeepRendererFn = React.ForwardRefExoticComponent<
-  CanvasObjectProps & RefAttributes<Konva.Node>
->;
-
-export type CanvasRendererRegister = Map<string, ObjectDeepRendererFn>;
-
-export interface CanvasObjectRendererProps {
-  register: CanvasRendererRegister;
+export interface CanvasObjectRendererProps<
+  TConfig extends CanvasNodeConfig = CanvasNodeConfig,
+> {
+  lookupTable: CanvasRendererLookupTable<TConfig>;
   modifiable?: boolean;
 }
 
-interface BaseObjectProps<TConfig extends CanvasNodeConfig = CanvasNodeConfig> {
+interface CanvasObjectBaseProps<
+  TConfig extends CanvasNodeConfig = CanvasNodeConfig,
+> {
   data: CanvasNodeData<TConfig>;
   index: number;
   modifiable?: boolean;
@@ -29,24 +32,25 @@ interface BaseObjectProps<TConfig extends CanvasNodeConfig = CanvasNodeConfig> {
 
 export interface CanvasObjectProps<
   TConfig extends CanvasNodeConfig = CanvasNodeConfig,
-> extends BaseObjectProps<TConfig>,
+> extends CanvasObjectBaseProps<TConfig>,
     KonvaNodeEvents {
   onChange: (newConfig: TConfig) => any;
 }
 
-interface ObjectWrapperProps extends Omit<BaseObjectProps, "modifiable"> {
+interface ObjectWrapperProps<
+  TConfig extends CanvasNodeConfig = CanvasNodeConfig,
+> extends Omit<CanvasObjectBaseProps<TConfig>, "modifiable"> {
   children: React.ReactNode;
 }
 
-export function CanvasObjectRenderer({
+export function CanvasObjectRenderer<TConfig extends CanvasNodeConfig>({
   modifiable,
-  register,
-}: CanvasObjectRendererProps) {
+  lookupTable,
+}: CanvasObjectRendererProps<TConfig>) {
   const level = useCanvasLevel();
   const children = level.children;
   return children.state.map((data, index) => {
-    const renderer = register.get(data.className);
-    if (!renderer) {
+    if (!isShapeClassNameSupported(lookupTable, data.className)) {
       // TODO display toast that given canvas is invalid?
       console.error(`Missing renderer for class ${data.className}`);
       children.update((x) => x.filter((y) => y.className !== data.className));
@@ -58,20 +62,20 @@ export function CanvasObjectRenderer({
         data={data}
         index={index}
         modifiable={modifiable}
-        renderer={renderer}
+        renderer={lookupTable[data.className]}
       />
     );
   });
 }
 
 /** Component renders the actual node as a canvas object */
-function CanvasObject({
+function CanvasObject<TConfig extends CanvasNodeConfig>({
   data,
   index,
   modifiable,
   renderer,
-}: BaseObjectProps & {
-  renderer: ObjectDeepRendererFn;
+}: CanvasObjectBaseProps<TConfig> & {
+  renderer: CanvasShapeRenderer;
 }) {
   return useMemo(
     () => (
@@ -84,7 +88,11 @@ function CanvasObject({
 }
 
 /** Additional component that wraps around an object directly, to apply events */
-function ObjectWrapper({ data, index, children }: ObjectWrapperProps) {
+function ObjectWrapper<TConfig extends CanvasNodeData>({
+  data,
+  index,
+  children,
+}: ObjectWrapperProps<TConfig>) {
   const level = useCanvasLevel();
   const childRef = useRef<Konva.Node>(null);
 

@@ -5,20 +5,23 @@ import {
   CanvasLevelNode,
   CanvasNodeData,
 } from "@repo/canvas";
-import { createShapeData } from "@repo/canvas/src/render/canvasShapes";
+import { createShapeData } from "@repo/canvas/src/render";
+import { PRIMITIVE_CANVAS_SHAPES } from "@repo/canvas/src/render/canvasShapes";
 import { useSharedState } from "@repo/utils/hooks";
 import { useWindowSize } from "usehooks-ts";
 
+const shapeRenderers = PRIMITIVE_CANVAS_SHAPES;
+
 function createInitialNodes(): CanvasNodeData[] {
   return [
-    createShapeData("Rect", {
+    createShapeData(shapeRenderers, "Rect", {
       x: 0,
       y: 0,
       width: 100,
       height: 100,
       fill: "red",
     }),
-    createShapeData("Arrow", {
+    createShapeData(shapeRenderers, "Arrow", {
       points: [10, 10, 100, 10],
       fill: "red",
       stroke: "red",
@@ -28,10 +31,10 @@ function createInitialNodes(): CanvasNodeData[] {
       x: 0,
       y: 0,
     }),
-    createShapeData("Circle", {
-      radius: 100,
-      x: 200,
-      y: 200,
+    createShapeData(shapeRenderers, "Circle", {
+      radius: 25,
+      x: 50,
+      y: 50,
       fill: "green",
     }),
   ];
@@ -69,6 +72,7 @@ export default function EditorPage() {
       height={dimensions.height}
       modifiable
       levelDimensions={{ x: 1200, y: height }}
+      lookupTable={shapeRenderers}
       data={data}
       editable
       movable
