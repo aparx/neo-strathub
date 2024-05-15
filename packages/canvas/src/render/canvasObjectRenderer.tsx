@@ -8,8 +8,7 @@ import React, {
 } from "react";
 import { KonvaNodeEvents } from "react-konva";
 import { useCanvasLevel } from "../canvas.context";
-import { BaseNodeConfig, CanvasNodeData } from "../canvas.data";
-import Vector2d = Konva.Vector2d;
+import { CanvasNodeConfig, CanvasNodeData } from "../canvas.data";
 
 type ObjectDeepRendererFn = React.ForwardRefExoticComponent<
   CanvasObjectProps & RefAttributes<Konva.Node>
@@ -22,14 +21,17 @@ export interface CanvasObjectRendererProps {
   modifiable?: boolean;
 }
 
-interface BaseObjectProps {
-  data: CanvasNodeData;
+interface BaseObjectProps<TConfig extends CanvasNodeConfig = CanvasNodeConfig> {
+  data: CanvasNodeData<TConfig>;
   index: number;
   modifiable?: boolean;
 }
 
-export interface CanvasObjectProps extends BaseObjectProps, KonvaNodeEvents {
-  onChange: (newConfig: BaseNodeConfig) => any;
+export interface CanvasObjectProps<
+  TConfig extends CanvasNodeConfig = CanvasNodeConfig,
+> extends BaseObjectProps<TConfig>,
+    KonvaNodeEvents {
+  onChange: (newConfig: TConfig) => any;
 }
 
 interface ObjectWrapperProps extends Omit<BaseObjectProps, "modifiable"> {
@@ -86,12 +88,12 @@ function ObjectWrapper({ data, index, children }: ObjectWrapperProps) {
   const level = useCanvasLevel();
   const childRef = useRef<Konva.Node>(null);
 
-  function onChange(newConfig: BaseNodeConfig) {
+  function onChange(newConfig: CanvasNodeConfig) {
     level.children.update((oldElements) => {
       const newElements = [...oldElements];
       newElements[index] = {
         ...(oldElements[index] as CanvasNodeData),
-        attrs: newConfig as BaseNodeConfig,
+        attrs: newConfig as CanvasNodeConfig,
       };
       return newElements;
     });

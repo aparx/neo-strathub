@@ -1,16 +1,17 @@
 import { useSharedState } from "@repo/utils/hooks";
 import Konva from "konva";
-import React, { forwardRef, useRef } from "react";
-import { Rect } from "react-konva";
+import React, { ForwardRefExoticComponent, useRef } from "react";
 import { CanvasRootContext, CanvasRootContextProvider } from "./canvas.context";
 import { CanvasData, CanvasNodeData } from "./canvas.data";
 import { CanvasLevel } from "./canvas.level";
 import { CanvasStage, CanvasStageBaseProps } from "./canvas.stage";
 import { CanvasKeyboardHandler } from "./keyboard";
 import {
+  CanvasObjectProps,
   CanvasObjectRenderer,
   CanvasRendererRegister,
-} from "./render/canvasObjectRenderer";
+} from "./render";
+import { CANVAS_SHAPES } from "./render/canvasShapes";
 import Vector2d = Konva.Vector2d;
 
 export interface CanvasProps<TNodes extends CanvasNodeData>
@@ -24,17 +25,10 @@ export interface CanvasProps<TNodes extends CanvasNodeData>
 }
 
 const register: CanvasRendererRegister = new Map();
-register.set(
-  "Rect",
-  forwardRef(({ data, modifiable, ...restProps }, ref) => (
-    <Rect
-      ref={ref as any}
-      draggable={modifiable}
-      {...data.attrs}
-      {...restProps}
-    />
-  )),
-);
+Object.keys(CANVAS_SHAPES).forEach((className) => {
+  const fn = CANVAS_SHAPES[className as keyof typeof CANVAS_SHAPES];
+  register.set(className, fn as ForwardRefExoticComponent<CanvasObjectProps>);
+});
 
 export function Canvas<TNode extends CanvasNodeData>({
   modifiable,

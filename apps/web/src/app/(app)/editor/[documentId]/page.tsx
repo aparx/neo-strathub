@@ -5,44 +5,35 @@ import {
   CanvasLevelNode,
   CanvasNodeData,
 } from "@repo/canvas";
+import { createShapeData } from "@repo/canvas/src/render/canvasShapes";
 import { useSharedState } from "@repo/utils/hooks";
 import { useWindowSize } from "usehooks-ts";
 
 function createInitialNodes(): CanvasNodeData[] {
   return [
-    {
-      attrs: {
-        x: 10,
-        y: 10,
-        width: 100,
-        height: 100,
-        fill: "red",
-        id: Math.random().toString(),
-      },
-      className: "Rect",
-    },
-    {
-      attrs: {
-        x: 150,
-        y: 150,
-        width: 100,
-        height: 100,
-        fill: "green",
-        id: Math.random().toString(),
-      },
-      className: "Rect",
-    },
-    {
-      attrs: {
-        x: 200,
-        y: 200,
-        width: 50,
-        height: 50,
-        fill: "blue",
-        id: Math.random().toString(),
-      },
-      className: "Circle",
-    },
+    createShapeData("Rect", {
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      fill: "red",
+    }),
+    createShapeData("Arrow", {
+      points: [10, 10, 100, 10],
+      fill: "red",
+      stroke: "red",
+      tension: 1,
+      pointerLength: 10,
+      pointerWidth: 12,
+      x: 0,
+      y: 0,
+    }),
+    createShapeData("Circle", {
+      radius: 100,
+      x: 200,
+      y: 200,
+      fill: "green",
+    }),
   ];
 }
 

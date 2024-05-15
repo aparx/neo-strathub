@@ -3,11 +3,13 @@ import { SharedState } from "@repo/utils/hooks";
 import Konva from "konva";
 import Vector2d = Konva.Vector2d;
 
-export interface BaseNodeConfig extends Konva.NodeConfig {
+export type CanvasNodeConfig<T = Konva.NodeConfig> = T & {
   characterId?: string;
-}
+};
 
-export type CanvasNodeData<TConfig extends BaseNodeConfig = BaseNodeConfig> = {
+export type CanvasNodeData<
+  TConfig extends CanvasNodeConfig = CanvasNodeConfig,
+> = {
   attrs: TConfig;
   className: string;
 };
