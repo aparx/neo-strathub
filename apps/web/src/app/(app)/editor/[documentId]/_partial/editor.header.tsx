@@ -1,6 +1,13 @@
 import { PopoverExpand } from "@/components";
 import { getBlueprint } from "@/modules/blueprint/actions/getBlueprint";
-import { Breadcrumbs, Flexbox, Popover, Text } from "@repo/ui/components";
+import {
+  Breadcrumbs,
+  Button,
+  Flexbox,
+  Icon,
+  Popover,
+  Text,
+} from "@repo/ui/components";
 import { InferAsync } from "@repo/utils";
 import * as css from "./editor.header.css";
 
@@ -20,7 +27,12 @@ export async function EditorHeader({ blueprintId }: { blueprintId: string }) {
         <div className={css.headerItem({ side: "center" })}>
           <BlueprintTitle blueprint={blueprint.data} />
         </div>
-        <div className={css.headerItem({ side: "right" })}>World</div>
+        <div className={css.headerItem({ side: "right" })}>
+          <Button appearance={"cta"} color={"cta"}>
+            Preview
+            <Icon.Mapped type={"next"} />
+          </Button>
+        </div>
       </div>
     </Text>
   );

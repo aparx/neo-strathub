@@ -4,8 +4,8 @@ import {
   CanvasData,
   CanvasLevelNode,
   CanvasNodeData,
+  createShapeData,
 } from "@repo/canvas";
-import { createShapeData } from "@repo/canvas/src/render";
 import { PRIMITIVE_CANVAS_SHAPES } from "@repo/canvas/src/render/canvasShapes";
 import { useSharedState } from "@repo/utils/hooks";
 import { useWindowSize } from "usehooks-ts";
@@ -32,7 +32,7 @@ function createInitialNodes(): CanvasNodeData[] {
   ];
 }
 
-export default function EditorPage() {
+export function EditorContent() {
   const height = 800;
 
   const data = new CanvasData([
