@@ -39,7 +39,7 @@ interface SelectionData {
 export const CanvasStage = forwardRef<Konva.Stage, CanvasStageProps>(
   function CanvasStage(props, ref) {
     const { children, editable, movable, ...restProps } = props;
-    const { selected, isSelected, scale } = useCanvas();
+    const { selected, isSelected, scale, cursor } = useCanvas();
     const stageRef = useRef<Konva.Stage>(null);
     const multiTransformerRef = useRef<Konva.Transformer>(null);
     const selectionRectRef = useRef<Konva.Rect>(null);
@@ -52,6 +52,15 @@ export const CanvasStage = forwardRef<Konva.Stage, CanvasStageProps>(
     });
     const [dragging, setDragging] = useState(false);
     const [position, setPosition] = useState<Vector2d>(ZERO_VECTOR);
+
+    // Update the cursor when grabbing
+    useEffect(() => {
+      cursor.update((previousCursor) => {
+        if (dragging) return "grabbing";
+        else if (previousCursor === "grabbing") return undefined;
+        return previousCursor;
+      });
+    }, [dragging]);
 
     const updateSelectionRect = useCallback(() => {
       const rect = selectionRectRef.current;
@@ -217,7 +226,6 @@ export const CanvasStage = forwardRef<Konva.Stage, CanvasStageProps>(
         scaleY={scale.state}
         x={position.x}
         y={position.y}
-        style={{ cursor: dragging ? "grabbing" : "default" }}
         {...restProps}
       >
         {children}

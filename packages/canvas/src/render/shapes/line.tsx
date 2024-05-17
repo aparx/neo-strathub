@@ -2,6 +2,7 @@ import { DeepReadonly, mergeRefs } from "@repo/utils";
 import Konva from "konva";
 import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import * as ReactKonva from "react-konva";
+import { KonvaNodeEvents } from "react-konva";
 import { useCanvas } from "../../canvas.context";
 import { CanvasNodeConfig } from "../../canvas.data";
 import { CanvasObjectProps } from "../canvasObjectRenderer";
@@ -23,6 +24,9 @@ export const Line = forwardRef<
     ...restProps
   } = props;
 
+  const canvas = useCanvas();
+  const anchorScale = 1 / canvas.scale.state;
+
   const shapeRef = useRef<Konva.Line>(null);
   const shapeSelectionRef = useRef<Konva.Line>(null);
   const points = data.attrs.points;
@@ -35,18 +39,12 @@ export const Line = forwardRef<
     }));
   }, [points]);
 
-  function updatePoint(
-    index: number,
-    mapper: (x: number, y: number) => Vector2d,
-  ) {
+  function updatePoint(index: number, vector: Vector2d) {
     const shape = shapeRef.current!;
     const newPoints = [...shape.points()];
     const beginIndex = Math.max(2 * index, 0);
-    const oldX = newPoints[beginIndex]!;
-    const oldY = newPoints[1 + beginIndex]!;
-    const { x: newX, y: newY } = mapper(oldX, oldY);
-    newPoints[beginIndex] = newX;
-    newPoints[1 + beginIndex] = newY;
+    newPoints[beginIndex] = vector.x;
+    newPoints[1 + beginIndex] = vector.y;
     shape.points(newPoints);
     shapeSelectionRef.current?.points(newPoints);
     shape.getLayer()?.batchDraw();
@@ -65,6 +63,7 @@ export const Line = forwardRef<
         draggable={modifiable}
         {...data.attrs}
         {...restProps}
+        listening
         lineJoin={"round"}
         lineCap={"round"}
         onDragMove={(e) => {
@@ -86,43 +85,42 @@ export const Line = forwardRef<
       )}
       {useSingleTransformer &&
         coordinates?.map((coordinate, index) => (
-          <LineAnchor
-            key={index}
+          <AnchorPoint
+            key={index /* OK */}
+            scale={anchorScale}
             x={coordinate.x + shapePos.x}
             y={coordinate.y + shapePos.y}
-            updatePoint={(mapper) => updatePoint(index, mapper)}
-            saveChanges={() =>
+            draggable
+            onDragEnd={() => {
               onChange({
                 ...data.attrs,
                 points: shapeRef.current!.points(),
-              })
-            }
+              });
+            }}
+            onDragMove={(e) => {
+              const pos = e.target.getLayer()!.getRelativePointerPosition()!;
+              updatePoint(index, {
+                x: pos.x - shapePos.x,
+                y: pos.y - shapePos.y,
+              });
+            }}
           />
         ))}
     </>
   );
 });
 
-function LineAnchor({
-  x,
-  y,
-  updatePoint,
-  saveChanges,
-}: {
-  x: number;
-  y: number;
-  updatePoint?: (mapper: (x: number, y: number) => Vector2d) => void;
-  saveChanges?: () => void;
-}) {
-  const canvas = useCanvas();
-  const scale = 1 / canvas.scale.state;
-
+function AnchorPoint({
+  scale,
+  ...restProps
+}: Omit<Konva.CircleConfig, "scaleX" | "scaleY"> &
+  KonvaNodeEvents & {
+    scale: number;
+  }) {
   return (
     <ReactKonva.Circle
       name={"Transformer"}
-      x={x}
-      y={y}
-      radius={5}
+      radius={4}
       scaleX={scale}
       scaleY={scale}
       fill={"white"}
@@ -130,14 +128,7 @@ function LineAnchor({
       strokeWidth={1}
       strokeEnabled
       strokeScaleEnabled={false}
-      draggable
-      onDragEnd={() => saveChanges?.()}
-      onDragMove={(e) =>
-        updatePoint?.((x, y) => ({
-          x: x + e.evt.movementX * scale,
-          y: y + e.evt.movementY * scale,
-        }))
-      }
+      {...restProps}
     />
   );
 }

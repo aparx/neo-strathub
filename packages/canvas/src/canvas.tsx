@@ -33,6 +33,7 @@ export function Canvas<TNode extends CanvasNodeData>({
 
   const context = {
     selected,
+    cursor: useSharedState(),
     scale: useSharedState(1),
     snapping: useSharedState(false),
     focusedLevel: useSharedState(),
@@ -43,7 +44,7 @@ export function Canvas<TNode extends CanvasNodeData>({
 
   return (
     <CanvasRootContextProvider value={context}>
-      <CanvasKeyboardHandler>
+      <CanvasKeyboardHandler style={{ cursor: context.cursor.state }}>
         <CanvasStage ref={stageRef} {...restProps}>
           {data.map((level) => (
             <CanvasLevel

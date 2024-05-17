@@ -1,6 +1,6 @@
 import { SharedState } from "@repo/utils/hooks";
 import Konva from "konva";
-import { createContext, RefObject, useContext } from "react";
+import { createContext, CSSProperties, RefObject, useContext } from "react";
 import { CanvasData, CanvasLevelNode, CanvasNodeData } from "./canvas.data";
 
 // ROOT CONTEXT
@@ -8,6 +8,7 @@ import { CanvasData, CanvasLevelNode, CanvasNodeData } from "./canvas.data";
 export interface CanvasRootContext<
   TNode extends CanvasNodeData = CanvasNodeData,
 > {
+  cursor: SharedState<CSSProperties["cursor"]>;
   scale: SharedState<number>;
   selected: SharedState<string[]>;
   snapping: SharedState<boolean>;
