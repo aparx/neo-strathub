@@ -10,9 +10,11 @@ import {
 } from "@repo/canvas";
 import { PRIMITIVE_CANVAS_SHAPES } from "@repo/canvas/src/render/canvasShapes";
 import { useSharedState } from "@repo/utils/hooks";
+import Konva from "konva";
 import { useEffect, useRef } from "react";
 import { useDebouncedCallback } from "use-debounce";
-import { useWindowSize } from "usehooks-ts";
+import { useLocalStorage, useWindowSize } from "usehooks-ts";
+import Vector2d = Konva.Vector2d;
 
 const shapeRenderers = PRIMITIVE_CANVAS_SHAPES;
 
@@ -62,32 +64,22 @@ export function EditorContent({ params }: { params: { documentId: string } }) {
 
   const dimensions = useWindowSize();
   const canvasRef = useRef<CanvasRef>(null);
+  const [zoom, setZoom] = useLocalStorage<number | null>("canvas_zoom", null);
+  const [pos, setPos] = useLocalStorage<Vector2d | null>("canvas_pos", null);
 
   useEffect(() => {
     // Apply local storage position and zoom
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const zoomStr = localStorage.getItem("canvas_zoom");
-    if (zoomStr) canvas.scale.update(Number(zoomStr));
-    const posStr = localStorage.getItem("canvas_pos");
-    if (posStr) canvas.position.update(JSON.parse(posStr));
+    if (zoom) canvasRef.current?.scale.update(zoom);
+    if (pos) canvasRef.current?.position.update(pos);
   }, []);
-
-  const storeZoom = useDebouncedCallback((scale: number) => {
-    localStorage.setItem("canvas_zoom", scale);
-  }, 250);
-
-  const storePos = useDebouncedCallback((pos: { x: number; y: number }) => {
-    localStorage.setItem("canvas_pos", JSON.stringify(pos));
-  }, 250);
 
   return (
     <main>
       <div className={css.fadeInRect} />
       <Canvas
         ref={canvasRef}
-        onMove={storePos}
-        onZoom={storeZoom}
+        onMove={useDebouncedCallback((pos: Vector2d) => setPos(pos), 250)}
+        onZoom={useDebouncedCallback((zoom: number) => setZoom(zoom), 250)}
         width={dimensions.width}
         height={dimensions.height}
         modifiable
