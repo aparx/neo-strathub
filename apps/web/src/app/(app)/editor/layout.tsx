@@ -1,5 +1,5 @@
 "use client";
-import { useDenyZoom } from "@/hooks/useDenyZoom";
+import { usePreventZoom } from "@/hooks";
 import { FiberProvider } from "its-fine";
 
 export default function EditorLayout({
@@ -7,7 +7,6 @@ export default function EditorLayout({
 }: {
   children: React.ReactNode;
 }) {
-  useDenyZoom();
-
+  usePreventZoom(); // Always deny zooming in the editor
   return <FiberProvider>{children}</FiberProvider>;
 }

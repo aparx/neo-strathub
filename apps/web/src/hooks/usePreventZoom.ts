@@ -1,12 +1,19 @@
+import { useRef } from "react";
 import { useEventListener } from "usehooks-ts";
 
-export function useDenyZoom() {
+/**
+ * Captures and prevents the `wheel` and `keydown` events that would potentially
+ * trigger a change in scale (thus zoom) on the page.
+ */
+export function usePreventZoom() {
+  const docRef = useRef<Document>(document);
+
   // prettier-ignore
   useEventListener("wheel", (e: WheelEvent) => {
     if (!e.ctrlKey && !e.metaKey) return;
     e.preventDefault();
     e.stopPropagation();
-  }, window, { passive: false });
+  }, docRef, { passive: false });
 
   // prettier-ignore
   useEventListener("keydown", (e: KeyboardEvent) => {
@@ -14,5 +21,5 @@ export function useDenyZoom() {
     if (!["+", "-", "="].includes(e.key)) return;
     e.preventDefault();
     e.stopPropagation();
-  }, window, { passive: false });
+  }, docRef, { passive: false });
 }
