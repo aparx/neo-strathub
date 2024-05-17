@@ -1,1 +1,2 @@
-export * from "./editor.header";
+export * from "./characters";
+export * from "./header";

@@ -20,13 +20,15 @@ export interface CanvasStageBaseProps {
   editable?: boolean;
   /** True if the canvas can be moved around, zoomed in, etc. */
   movable?: boolean;
+  /** Called when the stage is moved (implicitly or explicitly) */
+  onMove?: (newPos: Vector2d) => void;
+  /** Called when the zoom changes of the stage (the scale) */
+  onZoom?: (scale: number) => void;
 }
 
 export interface CanvasStageProps extends CanvasStageBaseProps {
   children?: React.ReactNode;
 }
-
-const ZERO_VECTOR = { x: 0, y: 0 } as const satisfies Vector2d;
 
 interface SelectionData {
   active: boolean;
@@ -38,8 +40,8 @@ interface SelectionData {
 
 export const CanvasStage = forwardRef<Konva.Stage, CanvasStageProps>(
   function CanvasStage(props, ref) {
-    const { children, editable, movable, ...restProps } = props;
-    const { selected, isSelected, scale, cursor } = useCanvas();
+    const { children, editable, movable, onMove, onZoom, ...restProps } = props;
+    const { selected, isSelected, scale, cursor, position } = useCanvas();
     const stageRef = useRef<Konva.Stage>(null);
     const multiTransformerRef = useRef<Konva.Transformer>(null);
     const selectionRectRef = useRef<Konva.Rect>(null);
@@ -51,7 +53,10 @@ export const CanvasStage = forwardRef<Konva.Stage, CanvasStageProps>(
       y2: 0,
     });
     const [dragging, setDragging] = useState(false);
-    const [position, setPosition] = useState<Vector2d>(ZERO_VECTOR);
+
+    // Call event handlers passed as props
+    useEffect(() => onMove?.(position.state), [position.state]);
+    useEffect(() => onZoom?.(scale.state), [scale.state]);
 
     // Update the cursor when grabbing
     useEffect(() => {
@@ -146,7 +151,7 @@ export const CanvasStage = forwardRef<Konva.Stage, CanvasStageProps>(
           selectionArea.current.y2 = pos.y;
           updateSelectionRect();
         } else if (dragging) {
-          setPosition((oldPos) => ({
+          position.update((oldPos) => ({
             x: oldPos.x + e.evt.movementX,
             y: oldPos.y + e.evt.movementY,
           }));
@@ -187,7 +192,7 @@ export const CanvasStage = forwardRef<Konva.Stage, CanvasStageProps>(
           const deltaX = e.evt.deltaX * -deltaMultiplier;
           const deltaY = e.evt.deltaY * -deltaMultiplier;
 
-          setPosition((oldPos) => ({
+          position.update((oldPos) => ({
             x: oldPos.x + (e.evt.shiftKey ? -deltaY : deltaX),
             y: oldPos.y + (e.evt.shiftKey ? deltaX : deltaY),
           }));
@@ -206,7 +211,7 @@ export const CanvasStage = forwardRef<Konva.Stage, CanvasStageProps>(
           e.evt.deltaY < 0 ? oldScale * scaleBy : oldScale / scaleBy;
         newScale = Math.max(Math.min(newScale, 10), 0.1);
         scale.update(newScale);
-        setPosition({
+        position.update({
           x: pointer.x - pointTo.x * newScale,
           y: pointer.y - pointTo.y * newScale,
         });
@@ -224,8 +229,8 @@ export const CanvasStage = forwardRef<Konva.Stage, CanvasStageProps>(
         onWheel={wheelUpdate}
         scaleX={scale.state}
         scaleY={scale.state}
-        x={position.x}
-        y={position.y}
+        x={position.state.x}
+        y={position.state.y}
         {...restProps}
       >
         {children}

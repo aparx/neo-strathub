@@ -1,6 +1,6 @@
 import { useSharedState } from "@repo/utils/hooks";
 import Konva from "konva";
-import React, { useRef } from "react";
+import React, { forwardRef, useImperativeHandle, useRef } from "react";
 import { CanvasRootContext, CanvasRootContextProvider } from "./canvas.context";
 import { CanvasData, CanvasNodeData } from "./canvas.data";
 import { CanvasLevel } from "./canvas.level";
@@ -9,7 +9,7 @@ import { CanvasKeyboardHandler } from "./keyboard";
 import { CanvasObjectRenderer, CanvasRendererLookupTable } from "./render";
 import Vector2d = Konva.Vector2d;
 
-export interface CanvasProps<TNodes extends CanvasNodeData>
+export interface CanvasProps<TNodes extends CanvasNodeData = CanvasNodeData>
   extends CanvasStageBaseProps {
   modifiable?: boolean;
   levelDimensions: Vector2d;
@@ -20,51 +20,61 @@ export interface CanvasProps<TNodes extends CanvasNodeData>
   lookupTable: CanvasRendererLookupTable;
 }
 
-export function Canvas<TNode extends CanvasNodeData>({
-  modifiable,
-  levelDimensions,
-  data,
-  children,
-  lookupTable,
-  ...restProps
-}: CanvasProps<TNode>) {
-  const stageRef = useRef<Konva.Stage>(null);
-  const selected = useSharedState(new Array<string>());
+export type CanvasRef<TNode extends CanvasNodeData = CanvasNodeData> =
+  CanvasRootContext<TNode>;
 
-  const context = {
-    selected,
-    cursor: useSharedState(),
-    scale: useSharedState(1),
-    snapping: useSharedState(false),
-    focusedLevel: useSharedState(),
-    stage: () => stageRef.current!,
-    data: data,
-    isSelected: (id) => selected.state.includes(id),
-  } satisfies CanvasRootContext<TNode>;
+export const Canvas = forwardRef<CanvasRef, CanvasProps>(
+  function Canvas(props, ref) {
+    const {
+      modifiable,
+      levelDimensions,
+      data,
+      children,
+      lookupTable,
+      ...restProps
+    } = props;
 
-  return (
-    <CanvasRootContextProvider value={context}>
-      <CanvasKeyboardHandler style={{ cursor: context.cursor.state }}>
-        <CanvasStage ref={stageRef} {...restProps}>
-          {data.map((level) => (
-            <CanvasLevel
-              key={level.id}
-              id={level.id}
-              width={levelDimensions.x}
-              height={levelDimensions.y}
-              level={level}
-              focused={context.focusedLevel.state === level.id}
-              onFocus={() => context.focusedLevel.update(level.id)}
-              onBlur={() => context.focusedLevel.update(undefined)}
-            >
-              <CanvasObjectRenderer
-                modifiable={modifiable}
-                lookupTable={lookupTable}
-              />
-            </CanvasLevel>
-          ))}
-        </CanvasStage>
-      </CanvasKeyboardHandler>
-    </CanvasRootContextProvider>
-  );
-}
+    const stageRef = useRef<Konva.Stage>(null);
+    const selected = useSharedState(new Array<string>());
+
+    const context = {
+      selected,
+      data: data,
+      cursor: useSharedState(),
+      scale: useSharedState(1),
+      snapping: useSharedState(false),
+      position: useSharedState({ x: 0, y: 0 }),
+      focusedLevel: useSharedState(),
+      stage: () => stageRef.current!,
+      isSelected: (id) => selected.state.includes(id),
+    } satisfies CanvasRootContext;
+
+    useImperativeHandle(ref, () => context, [data, selected]);
+
+    return (
+      <CanvasRootContextProvider value={context}>
+        <CanvasKeyboardHandler style={{ cursor: context.cursor.state }}>
+          <CanvasStage ref={stageRef} {...restProps}>
+            {data.map((level) => (
+              <CanvasLevel
+                key={level.id}
+                id={level.id}
+                width={levelDimensions.x}
+                height={levelDimensions.y}
+                level={level}
+                focused={context.focusedLevel.state === level.id}
+                onFocus={() => context.focusedLevel.update(level.id)}
+                onBlur={() => context.focusedLevel.update(undefined)}
+              >
+                <CanvasObjectRenderer
+                  modifiable={modifiable}
+                  lookupTable={lookupTable}
+                />
+              </CanvasLevel>
+            ))}
+          </CanvasStage>
+        </CanvasKeyboardHandler>
+      </CanvasRootContextProvider>
+    );
+  },
+);

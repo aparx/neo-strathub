@@ -1,3 +1,4 @@
+import { BackButton } from "@/app/(app)/editor/[documentId]/_partial/header/components";
 import { PopoverExpand } from "@/components";
 import { getBlueprint } from "@/modules/blueprint/actions/getBlueprint";
 import {
@@ -22,8 +23,10 @@ export async function EditorHeader({ blueprintId }: { blueprintId: string }) {
 
   return (
     <Text>
-      <div className={css.headerBackground}>
-        <div className={css.headerItem({ side: "left" })}>Hello</div>
+      <div className={css.headerContainer}>
+        <div className={css.headerItem({ side: "left" })}>
+          <BackButton />
+        </div>
         <div className={css.headerItem({ side: "center" })}>
           <BlueprintTitle blueprint={blueprint.data} />
         </div>

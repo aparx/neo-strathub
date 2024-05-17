@@ -45,7 +45,7 @@ export const BlueprintCard = forwardRef<HTMLDivElement, BlueprintCardProps>(
       return `${pathname}?${newQuery.toString()}`;
     }, [pathname, searchParams]);
 
-    const editLink = `/app/edit/${documentId}?`;
+    const editLink = `/editor/${documentId}?`;
     const previewLink = `/app/preview/${documentId}`;
 
     return (

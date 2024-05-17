@@ -2,6 +2,7 @@ import { SharedState } from "@repo/utils/hooks";
 import Konva from "konva";
 import { createContext, CSSProperties, RefObject, useContext } from "react";
 import { CanvasData, CanvasLevelNode, CanvasNodeData } from "./canvas.data";
+import Vector2d = Konva.Vector2d;
 
 // ROOT CONTEXT
 
@@ -12,6 +13,7 @@ export interface CanvasRootContext<
   scale: SharedState<number>;
   selected: SharedState<string[]>;
   snapping: SharedState<boolean>;
+  position: SharedState<Vector2d>;
   focusedLevel: SharedState<string | undefined>;
   data: CanvasData<TNode>;
   isSelected: (id: string) => boolean;
