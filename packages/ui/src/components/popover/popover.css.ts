@@ -22,6 +22,7 @@ const popoverBase = style({
   animationTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
   willChange: "transform, opacity, scale",
   minWidth: 150,
+  zIndex: 9999,
 });
 
 export const popover = style([sprinkles({ outline: "card" }), popoverBase]);

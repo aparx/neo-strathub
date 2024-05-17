@@ -1,16 +1,24 @@
-import { mergeClassNames } from "@repo/utils";
-import { ComponentPropsWithoutRef } from "react";
+import { mergeClassNames, Nullish } from "@repo/utils";
+import { ComponentPropsWithoutRef, ReactElement } from "react";
 import { Text } from "../text";
 import * as css from "./breadcrumbs.css";
 
 type BreadcrumbsBaseProps = Omit<ComponentPropsWithoutRef<"div">, "children">;
 
+type BreadcrumbNode =
+  | ReactElement
+  | string
+  | number
+  | boolean
+  | Nullish
+  | BreadcrumbNode[];
+
 export interface BreadcrumbsProps extends BreadcrumbsBaseProps {
-  crumbs: React.ReactNode[];
+  children: BreadcrumbNode;
 }
 
 export function Breadcrumbs({
-  crumbs,
+  children,
   className,
   ...restProps
 }: BreadcrumbsProps) {
@@ -23,16 +31,20 @@ export function Breadcrumbs({
       {...restProps}
     >
       <ol>
-        {crumbs.map((breadcrumb, index) => (
-          <li
-            key={index /* OK */}
-            className={css.breadcrumb({
-              active: index === crumbs.length - 1,
-            })}
-          >
-            {breadcrumb}
-          </li>
-        ))}
+        {!Array.isArray(children) ? (
+          <li className={css.breadcrumb({ active: true })}>{children}</li>
+        ) : (
+          children.filter(Boolean).map((breadcrumb, index) => (
+            <li
+              key={index /* OK */}
+              className={css.breadcrumb({
+                active: index === children.length - 1,
+              })}
+            >
+              {breadcrumb}
+            </li>
+          ))
+        )}
       </ol>
     </Text>
   );

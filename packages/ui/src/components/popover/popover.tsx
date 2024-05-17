@@ -12,6 +12,8 @@ export const Trigger = Primitive.Trigger;
 
 export const Close = Primitive.Close;
 
+export type PopoverTriggerProps = Primitive.PopoverTriggerProps;
+
 export type PopoverContentProps = Omit<
   Primitive.PopoverContentProps,
   "asChild"

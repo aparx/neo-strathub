@@ -1,12 +1,11 @@
 "use client";
+import { PopoverExpand } from "@/components";
 import { useTeam } from "@/modules/team/clientActions";
 import { TeamPopover } from "@/modules/team/partial";
 import { vars } from "@repo/theme";
 import {
   Breadcrumbs,
   BreadcrumbsProps,
-  Icon,
-  IconButton,
   Popover,
   Skeleton,
   Text,
@@ -14,8 +13,7 @@ import {
 import { calc } from "@vanilla-extract/css-utils";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useMemo, useState } from "react";
-import { MdExpandMore } from "react-icons/md";
+import { useMemo } from "react";
 import * as css from "./layout.header.css";
 
 export function LayoutHeader() {
@@ -32,7 +30,7 @@ function Navigation() {
   const { teamId } = useParams<{ teamId?: string }>();
 
   const breadcrumbs = useMemo(() => {
-    const array: BreadcrumbsProps["crumbs"] = [];
+    const array: BreadcrumbsProps["children"] = [];
     array.push(<Link href={"/dashboard"}>Dashboard</Link>);
     if (teamId)
       // TODO replace `display: teamId` with a custom component (+ dropdown)
@@ -42,14 +40,13 @@ function Navigation() {
 
   return (
     <nav style={{ overflow: "hidden" }}>
-      <Breadcrumbs crumbs={breadcrumbs} />
+      <Breadcrumbs>{breadcrumbs}</Breadcrumbs>
     </nav>
   );
 }
 
 function TeamButton({ teamId }: { teamId: string }) {
   const { data } = useTeam(teamId);
-  const [state, setState] = useState(false);
   const name = data?.name;
   if (!name?.length)
     return (
@@ -62,24 +59,8 @@ function TeamButton({ teamId }: { teamId: string }) {
       />
     );
   return (
-    <Popover.Root onOpenChange={setState}>
-      <Popover.Trigger asChild>
-        <IconButton
-          className={css.teamButtonShell}
-          style={{
-            color: vars.colors.emphasis.high,
-            fontWeight: "inherit",
-          }}
-        >
-          {name}
-          <Icon.Custom
-            className={css.teamButtonIcon}
-            style={{ rotate: state ? "-180deg" : "unset" }}
-          >
-            <MdExpandMore />
-          </Icon.Custom>
-        </IconButton>
-      </Popover.Trigger>
+    <Popover.Root>
+      <PopoverExpand>{name}</PopoverExpand>
       {data != null && (
         <TeamPopover teamId={data.id} style={{ minWidth: 250 }} />
       )}

@@ -32,7 +32,7 @@ export function BlueprintVisibility({
     <Tooltip.Provider>
       <Tooltip.Root>
         <Tooltip.Trigger asChild>
-          <span style={{ color }}>
+          <span style={{ color, lineHeight: 0 }}>
             <Icon.Custom alt={alt} {...restProps}>
               {iconMap[type]}
             </Icon.Custom>

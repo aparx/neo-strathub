@@ -27,7 +27,10 @@ export function TeamSettingsModalContent({ team }: TeamSettingsModalProps) {
     <Modal.Content minWidth={500}>
       <div className={css.gradient({ color: "primary" })} />
       <Modal.Title>
-        <Breadcrumbs crumbs={[team.name, "Settings"]} />
+        <Breadcrumbs>
+          {team.name}
+          Settings
+        </Breadcrumbs>
         <Modal.Exit />
       </Modal.Title>
 

@@ -259,12 +259,12 @@ begin
                      from public.blueprint
                               left join public.book on book.id = blueprint.book_id
                      where blueprint.id = new.blueprint_id);
-    if (_gadget_count is not null) then
-        for _ in 1.._gadget_count loop
-            insert into public.character_gadget (character_id)
-            values (new.id);
-        end loop;
-    end if;
+
+    -- Automatically insert character_gadget slots for given blueprint_character
+    for _ in 1..coalesce(_gadget_count, 0) loop
+        insert into public.character_gadget (character_id)
+        values (new.id);
+    end loop;
 
     return new;
 end;

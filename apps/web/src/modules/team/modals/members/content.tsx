@@ -101,7 +101,10 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
   return (
     <Modal.Content minWidth={700}>
       <Modal.Title>
-        <Breadcrumbs crumbs={[team.name, "Members"]} />
+        <Breadcrumbs>
+          {team.name}
+          Members
+        </Breadcrumbs>
         <Modal.Exit />
       </Modal.Title>
 

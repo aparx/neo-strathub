@@ -63,7 +63,10 @@ export function AuditLogModalContent({ team }: AuditLogModalContentProps) {
   return (
     <Modal.Content>
       <Modal.Title>
-        <Breadcrumbs crumbs={[team.name, "Audit Log"]} />
+        <Breadcrumbs>
+          {team.name}
+          Audit Log
+        </Breadcrumbs>
         <Modal.Exit />
       </Modal.Title>
       <Table.Root style={{ maxHeight: 400 }}>

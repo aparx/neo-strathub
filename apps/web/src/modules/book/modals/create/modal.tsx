@@ -20,15 +20,6 @@ import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-function BreadcrumbTitle() {
-  return (
-    <Flexbox gap={"md"}>
-      <Icon.Mapped type={"book"} />
-      New Stratbook
-    </Flexbox>
-  );
-}
-
 const formSchema = createBookSchema.pick({ name: true });
 type FormSchema = z.infer<typeof formSchema>;
 
@@ -65,7 +56,13 @@ export function CreateBookModal() {
       <Flexbox asChild orient={"vertical"} gap={"lg"}>
         <form onSubmit={handleSubmit(submit)}>
           <Modal.Title>
-            <Breadcrumbs crumbs={[team.data?.name, <BreadcrumbTitle />]} />
+            <Breadcrumbs>
+              {team.data?.name}
+              <Flexbox gap={"md"}>
+                <Icon.Mapped type={"book"} />
+                New Stratbook
+              </Flexbox>
+            </Breadcrumbs>
             <Modal.Exit />
           </Modal.Title>
           <TextField
