@@ -243,6 +243,38 @@ create trigger trigger_create_arena
     for each row
 execute function on_arena_create();
 
+-- //////////////////////////////// blueprint ////////////////////////////////
+
+create or replace function on_blueprint_create()
+    returns trigger as $$
+declare
+    _game_player_count int;
+begin
+    -- Get the game off the book of this blueprint to get the player count
+    select (public.game.metadata ->> 'player_count')::int
+    into _game_player_count
+    from public.team
+             left join game on game.id = team.game_id
+    where team.id = (select team_id
+                     from public.book
+                     where book.id = new.book_id);
+
+    for i in 1..coalesce(_game_player_count, 1) loop
+        insert into public.blueprint_character (blueprint_id, index)
+        values (new.id, i - 1);
+    end loop;
+
+    return new;
+end;
+$$ volatile language plpgsql
+   security definer;
+
+create trigger trigger_blueprint_create
+    after insert
+    on public.blueprint
+    for each row
+execute function on_blueprint_create();
+
 -- //////////////////////////////// blueprint_character ////////////////////////////////
 
 create or replace function on_blueprint_character_create()

@@ -14,7 +14,7 @@ export default async function EditorLayout({
   return (
     <div className={css.content}>
       <EditorHeader blueprintId={params.documentId} />
-      <EditorCharacters />
+      <EditorCharacters blueprintId={params.documentId} />
       {children}
     </div>
   );
