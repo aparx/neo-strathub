@@ -1,4 +1,5 @@
 "use client";
+import { useDenyZoom } from "@/hooks/useDenyZoom";
 import { FiberProvider } from "its-fine";
 
 export default function EditorLayout({
@@ -6,6 +7,7 @@ export default function EditorLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // the canvas requires a `FiberProvider`
+  useDenyZoom();
+
   return <FiberProvider>{children}</FiberProvider>;
 }
