@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import { useEventListener } from "usehooks-ts";
 
 /**
@@ -6,14 +5,12 @@ import { useEventListener } from "usehooks-ts";
  * trigger a change in scale (thus zoom) on the page.
  */
 export function usePreventZoom() {
-  const docRef = useRef<Document>(document);
-
   // prettier-ignore
   useEventListener("wheel", (e: WheelEvent) => {
     if (!e.ctrlKey && !e.metaKey) return;
     e.preventDefault();
     e.stopPropagation();
-  }, docRef, { passive: false });
+  }, undefined, { passive: false });
 
   // prettier-ignore
   useEventListener("keydown", (e: KeyboardEvent) => {
@@ -21,5 +18,5 @@ export function usePreventZoom() {
     if (!["+", "-", "="].includes(e.key)) return;
     e.preventDefault();
     e.stopPropagation();
-  }, docRef, { passive: false });
+  }, undefined, { passive: false });
 }
