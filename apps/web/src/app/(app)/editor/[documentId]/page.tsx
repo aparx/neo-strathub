@@ -18,7 +18,7 @@ function createInitialNodes(): CanvasNodeData[] {
       points: [10, 10, 100, 50, 200, 0],
       fill: "red",
       stroke: "red",
-      tension: 1,
+      tension: 0,
       strokeWidth: 5,
       x: 0,
       y: 0,

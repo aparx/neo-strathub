@@ -271,26 +271,6 @@ alter table public.player_slot_assign
 create unique index uidx_unique_member_per_slot
     on public.player_slot_assign (slot_id, member_id);
 
--- //////////////////////////////// blueprint_character ////////////////////////////////
-
--- Table containing character picks for a blueprint, that links to a player slot
-create table if not exists public.blueprint_character
-(
-    id        uuid primary key default gen_random_uuid(),
-    -- The target character object (being a game_object)
-    object_id public.game_object references public.game_object (id)
-        on delete set null
-        on update cascade,
-    slot_id   uuid references public.team_player_slot (id)
-        on delete set null
-        on update cascade,
-    index     int2 not null
-        constraint positive_index check (index >= 0)
-);
-
-create unique index uidx_unique_character_index
-    on public.blueprint_character (index, object_id);
-
 -- //////////////////////////////// game_object ////////////////////////////////
 
 create type game_object_type as enum ('character', 'gadget', 'floor');
@@ -314,6 +294,51 @@ alter table public.game_object
 create index
     if not exists idx_game_type
     on public.game_object (game_id, type, name);
+
+-- //////////////////////////////// blueprint_character ////////////////////////////////
+
+-- Table containing character picks for a blueprint, that links to a player slot
+create table if not exists public.blueprint_character
+(
+    id           uuid primary key     default gen_random_uuid(),
+    -- The target character object (being a game_object)
+    object_id    int references public.game_object (id)
+        on delete set null
+        on update cascade,
+    blueprint_id uuid        not null references public.blueprint (id)
+        on delete cascade
+        on update cascade,
+    slot_id      uuid references public.team_player_slot (id)
+        on delete set null
+        on update cascade,
+    index        int2        not null
+        constraint positive_index check (index >= 0),
+    created_at   timestamptz not null default now()
+);
+
+alter table public.blueprint_character
+    enable row level security;
+
+create unique index uidx_unique_character_index
+    on public.blueprint_character (index, object_id);
+
+-- //////////////////////////////// character_gadget ////////////////////////////////
+
+-- Join table for gadget slots that can be assigned to blueprint characters
+create table if not exists public.character_gadget
+(
+    id           serial primary key,
+    object_id    int references public.game_object (id)
+        on delete set null
+        on update cascade,
+    character_id uuid        not null references public.blueprint_character (id)
+        on delete cascade
+        on update cascade,
+    created_at   timestamptz not null default now()
+);
+
+alter table public.character_gadget
+    enable row level security;
 
 -- //////////////////////////////// audit_log ////////////////////////////////
 

@@ -81,7 +81,7 @@ async function main() {
       fillFn: () => ({
         name: generateUnique(nameContext, nameGenerator),
         icon: "https://svgshare.com/i/15iw.svg",
-        metadata: { player_count: 5 },
+        metadata: { player_count: 5, gadgets_per_character: 2 },
         hidden: false,
       }),
     });

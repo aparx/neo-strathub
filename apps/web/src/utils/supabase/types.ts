@@ -162,6 +162,55 @@ export type Database = {
           },
         ]
       }
+      blueprint_character: {
+        Row: {
+          blueprint_id: string
+          created_at: string
+          id: string
+          index: number
+          object_id: number | null
+          slot_id: string | null
+        }
+        Insert: {
+          blueprint_id: string
+          created_at?: string
+          id?: string
+          index: number
+          object_id?: number | null
+          slot_id?: string | null
+        }
+        Update: {
+          blueprint_id?: string
+          created_at?: string
+          id?: string
+          index?: number
+          object_id?: number | null
+          slot_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blueprint_character_blueprint_id_fkey"
+            columns: ["blueprint_id"]
+            isOneToOne: false
+            referencedRelation: "blueprint"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blueprint_character_object_id_fkey"
+            columns: ["object_id"]
+            isOneToOne: false
+            referencedRelation: "game_object"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blueprint_character_slot_id_fkey"
+            columns: ["slot_id"]
+            isOneToOne: false
+            referencedRelation: "team_player_slot"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blueprint_stage: {
         Row: {
           blueprint_id: string
@@ -225,6 +274,42 @@ export type Database = {
             columns: ["team_id"]
             isOneToOne: false
             referencedRelation: "team"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      character_gadget: {
+        Row: {
+          character_id: string
+          created_at: string
+          id: number
+          object_id: number | null
+        }
+        Insert: {
+          character_id: string
+          created_at?: string
+          id?: number
+          object_id?: number | null
+        }
+        Update: {
+          character_id?: string
+          created_at?: string
+          id?: number
+          object_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "character_gadget_character_id_fkey"
+            columns: ["character_id"]
+            isOneToOne: false
+            referencedRelation: "blueprint_character"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "character_gadget_object_id_fkey"
+            columns: ["object_id"]
+            isOneToOne: false
+            referencedRelation: "game_object"
             referencedColumns: ["id"]
           },
         ]

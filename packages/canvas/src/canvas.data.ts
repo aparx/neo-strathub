@@ -88,7 +88,7 @@ export class CanvasData<T extends CanvasNodeData>
   }
 }
 
-export class CanvasLevelNode<E extends CanvasNodeData>
+export class CanvasLevelNode<E extends CanvasNodeData = CanvasNodeData>
   implements CanvasGroupNode<E>
 {
   constructor(

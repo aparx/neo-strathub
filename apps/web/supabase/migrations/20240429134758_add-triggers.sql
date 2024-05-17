@@ -242,3 +242,37 @@ create trigger trigger_create_arena
     on public.arena
     for each row
 execute function on_arena_create();
+
+-- //////////////////////////////// blueprint_character ////////////////////////////////
+
+create or replace function on_blueprint_character_create()
+    returns trigger as $$
+declare
+    _gadget_count int;
+begin
+    -- Determine how many gadget slots to generate automatically
+    select public.game.metadata ->> 'gadgets_per_character'
+    into _gadget_count
+    from public.team
+             left join public.game on game.id = team.game_id
+    where team.id = (select public.book.team_id
+                     from public.blueprint
+                              left join public.book on book.id = blueprint.book_id
+                     where blueprint.id = new.blueprint_id);
+    if (_gadget_count is not null) then
+        for _ in 1.._gadget_count loop
+            insert into public.character_gadget (character_id)
+            values (new.id);
+        end loop;
+    end if;
+
+    return new;
+end;
+$$ volatile language plpgsql
+   security definer;
+
+create trigger trigger_create_bp_char
+    after insert
+    on public.blueprint_character
+    for each row
+execute function on_blueprint_character_create();
