@@ -8,6 +8,7 @@ import { CanvasObjectProps } from "../canvasObjectRenderer";
 import Vector2d = Konva.Vector2d;
 
 const ZERO_VECTOR_2D = { x: 0, y: 0 } as const satisfies Vector2d;
+const ANCHOR_OUTLINE = "rgba(0, 155, 255)";
 
 export const Line = forwardRef<
   Konva.Line,
@@ -22,7 +23,8 @@ export const Line = forwardRef<
     ...restProps
   } = props;
 
-  const shapeRef = useRef<Konva.Arrow>(null);
+  const shapeRef = useRef<Konva.Line>(null);
+  const shapeSelectionRef = useRef<Konva.Line>(null);
   const points = data.attrs.points;
   const [shapePos, setShapePos] = useState<Readonly<Vector2d>>(ZERO_VECTOR_2D);
   const coordinates = useMemo<DeepReadonly<Vector2d[]>>(() => {
@@ -46,6 +48,7 @@ export const Line = forwardRef<
     newPoints[beginIndex] = newX;
     newPoints[1 + beginIndex] = newY;
     shape.points(newPoints);
+    shapeSelectionRef.current?.points(newPoints);
     shape.getLayer()?.batchDraw();
   }
 
@@ -62,11 +65,25 @@ export const Line = forwardRef<
         draggable={modifiable}
         {...data.attrs}
         {...restProps}
+        lineJoin={"round"}
+        lineCap={"round"}
         onDragMove={(e) => {
           onDragMove?.(e);
           setShapePos({ x: e.target.x(), y: e.target.y() });
         }}
       />
+      {useSingleTransformer && (
+        <ReactKonva.Line
+          ref={shapeSelectionRef}
+          listening={false}
+          {...data.attrs}
+          x={shapePos.x}
+          y={shapePos.y}
+          stroke={ANCHOR_OUTLINE}
+          strokeWidth={1}
+          strokeScaleEnabled={false}
+        />
+      )}
       {useSingleTransformer &&
         coordinates?.map((coordinate, index) => (
           <LineAnchor
@@ -109,7 +126,7 @@ function LineAnchor({
       scaleX={scale}
       scaleY={scale}
       fill={"white"}
-      stroke={"rgba(0, 155, 255)"}
+      stroke={ANCHOR_OUTLINE}
       strokeWidth={1}
       strokeEnabled
       strokeScaleEnabled={false}

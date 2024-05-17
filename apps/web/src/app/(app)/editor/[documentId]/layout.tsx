@@ -1,4 +1,3 @@
-"use server";
 import { EditorHeader } from "@/app/(app)/editor/[documentId]/_partial";
 import * as css from "./layout.css";
 
