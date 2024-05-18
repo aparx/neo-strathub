@@ -20,7 +20,7 @@ export const headerContainer = style([
     paddingRight: vars.spacing.lg,
     animation: `${keyframes({
       from: { opacity: 0, transform: "translateY(-50%)" },
-    })} 1s`,
+    })} .5s`,
     borderBottom: `1px solid ${vars.colors.outline.card}`,
   },
 ]);

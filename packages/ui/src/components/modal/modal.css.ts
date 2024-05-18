@@ -11,6 +11,7 @@ export const content = style([
   {
     overflow: "hidden",
     position: "absolute",
+    zIndex: 9999,
     left: "50%",
     top: "50%",
     transform: "translate(-50%, -50%)",
@@ -30,6 +31,7 @@ export const content = style([
 
 export const scrim = style({
   position: "absolute",
+  zIndex: 9998,
   inset: 0,
   background: vars.colors.scrim,
   filter: "blur(10px)",

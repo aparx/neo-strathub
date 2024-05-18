@@ -16,5 +16,5 @@ export const fadeInRect = style({
   animation: `${keyframes({
     from: { opacity: 1, background: vars.colors.accents[0] },
     to: { opacity: 0, display: "none" },
-  })} 2s`,
+  })} 1.5s`,
 });

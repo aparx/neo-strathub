@@ -291,9 +291,9 @@ create table if not exists public.game_object
 alter table public.game_object
     enable row level security;
 
-create index
-    if not exists idx_game_type
-    on public.game_object (game_id, type, name);
+create unique index
+    if not exists uidx_game_object_name_url
+    on public.game_object (game_id, type, name, url);
 
 -- //////////////////////////////// blueprint_character ////////////////////////////////
 
@@ -339,6 +339,7 @@ create table if not exists public.character_gadget
 
 alter table public.character_gadget
     enable row level security;
+
 
 -- //////////////////////////////// audit_log ////////////////////////////////
 

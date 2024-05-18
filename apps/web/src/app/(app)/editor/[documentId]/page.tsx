@@ -4,11 +4,11 @@ import dynamic from "next/dynamic";
 import * as css from "./page.css";
 
 export default dynamic(async () => (await import("./content")).EditorContent, {
-  loading: () => <Loading />,
+  loading: () => <FullPageEditorSpinner />,
   ssr: false,
 });
 
-function Loading() {
+export function FullPageEditorSpinner() {
   return (
     <div className={css.loadingContainer}>
       <Spinner size={"2em"} />

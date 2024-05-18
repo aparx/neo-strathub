@@ -21,12 +21,13 @@ export const list = style([
     gap: vars.spacing.lg,
     animation: `${keyframes({
       from: { opacity: 0, transform: "translate(-50%, 50%)" },
-    })} 1s`,
+    })} .5s`,
   },
 ]);
 
-export const characterShell = style({
-  listStyle: "none",
+export const characterButton = style({
+  background: "unset",
+  border: "unset",
   display: "flex",
   gap: 3,
 });
