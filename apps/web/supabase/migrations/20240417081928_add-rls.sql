@@ -8,7 +8,6 @@ create policy "public read access"
 
 -- //////////////////////////////// arena ////////////////////////////////
 
-
 create policy "public read access"
     on public.arena as permissive
     for select to authenticated
@@ -69,6 +68,12 @@ create policy "public read access"
     on public.book as permissive
     for select to authenticated
     using (can_select_book(book));
+
+-- //////////////////////////////// game_object ////////////////////////////////
+
+create policy "public read access"
+    on public.game_object as permissive
+    for select to authenticated using (true);
 
 -- //////////////////////////////// team_member_role ////////////////////////////////
 

@@ -18,6 +18,7 @@ export const characterBox = recipe({
     sprinkles({ outline: "card" }),
     {
       position: "relative",
+      padding: vars.spacing.md,
       width: CHARACTER_BOX_SIZE,
       height: CHARACTER_BOX_SIZE,
       borderRadius: vars.roundness.sm,

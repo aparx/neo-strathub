@@ -8,7 +8,6 @@ import { useQuery, UseQueryResult } from "@tanstack/react-query";
 export interface UseFetchObjectsFilters {
   gameId?: number;
   type?: Enums<"game_object_type">;
-  name?: string;
 }
 
 async function fetchObjects(filters: UseFetchObjectsFilters) {
@@ -24,5 +23,7 @@ export function useFetchObjects(
   return useQuery({
     queryKey: ["gameObjects", JSON.stringify(filters)],
     queryFn: async () => fetchObjects(filters),
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
   });
 }

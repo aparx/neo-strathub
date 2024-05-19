@@ -6,6 +6,7 @@ import {
 } from "@/modules/blueprint/characters/actions";
 import { Icon, Modal } from "@repo/ui/components";
 import { useSharedState } from "@repo/utils/hooks";
+import Image from "next/image";
 import { RxQuestionMarkCircled } from "react-icons/rx";
 import * as css from "./editorCharacter.css";
 
@@ -21,8 +22,9 @@ interface GadgetSlotProps {
 
 export function EditorCharacter({ data, slots }: EditorCharacterProps) {
   const sharedState = useSharedState(data);
-  const active = data.game_object?.url != null;
-  const color = data.team_player_slot?.color ?? "transparent";
+  const object = sharedState.state.game_object;
+  const active = object?.url != null;
+  const color = sharedState.state.team_player_slot?.color ?? "transparent";
 
   return (
     <Modal.Root>
@@ -37,7 +39,16 @@ export function EditorCharacter({ data, slots }: EditorCharacterProps) {
               className={css.characterBox({ active })}
               style={{ boxShadow: `inset 0 0 0 2px ${color}` }}
             >
-              <RxQuestionMarkCircled size={"1em"} />
+              {object ? (
+                <Image
+                  src={object.url}
+                  alt={object.name ?? "Game object"}
+                  fill
+                  style={{ objectFit: "contain" }}
+                />
+              ) : (
+                <RxQuestionMarkCircled size={"1em"} />
+              )}
             </div>
             <ol className={css.gadgetList}>
               {slots.map((gadget) => (
