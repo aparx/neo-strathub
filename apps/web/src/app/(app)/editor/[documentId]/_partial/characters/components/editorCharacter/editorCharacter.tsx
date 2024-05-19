@@ -73,9 +73,16 @@ export function EditorCharacter({ data, slots }: EditorCharacterProps) {
 }
 
 function GadgetSlot({ data }: GadgetSlotProps) {
+  const { channel } = useEditorContext();
   const gadget = useSharedState(data);
   const object = gadget.state.game_object;
   const active = object?.url != null;
+
+  useEffect(() => {
+    channel.register("updateGadget", (payload) => {
+      if (payload.id === data.id) gadget.update(payload);
+    });
+  }, []);
 
   return (
     <Modal.Root>

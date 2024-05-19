@@ -1,4 +1,7 @@
-import { BlueprintCharacterData } from "@/modules/blueprint/characters/actions";
+import {
+  BlueprintCharacterData,
+  CharacterGadgetSlotData,
+} from "@/modules/blueprint/characters/actions";
 import {
   RealtimeChannel,
   RealtimeChannelSendResponse,
@@ -7,6 +10,7 @@ import { v4 as uuidv4 } from "uuid";
 
 export interface EditorRealtimeEvents {
   updateCharacter: BlueprintCharacterData;
+  updateGadget: CharacterGadgetSlotData;
 }
 
 export type EditorRealtimeEventType = keyof EditorRealtimeEvents;

@@ -9,7 +9,7 @@ export function GadgetModal({
 }: {
   gadget: SharedState<CharacterGadgetSlotData>;
 }) {
-  const { blueprint } = useEditorContext();
+  const { blueprint, channel } = useEditorContext();
 
   return (
     <Modal.Content minWidth={600}>
@@ -21,10 +21,11 @@ export function GadgetModal({
         filters={{ type: "gadget", gameId: blueprint.arena.game_id }}
         activeObjectId={gadget.state.game_object?.id}
         setActiveObject={(newObject) =>
-          gadget.update((prev) => ({
-            ...prev,
-            game_object: newObject,
-          }))
+          gadget.update((prev) => {
+            const newGadget = { ...prev, game_object: newObject };
+            channel.broadcast("updateGadget", newGadget);
+            return newGadget;
+          })
         }
       />
     </Modal.Content>
