@@ -26,7 +26,10 @@ export function EditorContextProvider({
     });
     channel.updateChannel(realtimeChannel);
     realtimeChannel.subscribe();
-    return () => channel.clear();
+    return () => {
+      channel.clear();
+      realtimeChannel.unsubscribe(); // TODO <- check if this leads to issues on latency
+    };
   }, []);
 
   return (

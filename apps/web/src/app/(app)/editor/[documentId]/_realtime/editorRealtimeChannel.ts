@@ -22,9 +22,6 @@ type EditorRealtimeListenerMap = {
 export class EditorRealtimeChannel {
   private _listeners: EditorRealtimeListenerMap = {};
   private _channel: RealtimeChannel | undefined;
-  private _populators: Array<
-    (channel: this) => EditorRealtimeEventHandler<any>
-  > = [];
 
   channel(): RealtimeChannel | undefined {
     return this._channel;
