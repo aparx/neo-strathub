@@ -1,8 +1,8 @@
 "use client";
-import { EditorRealtimeChannel } from "@/app/(app)/editor/[documentId]/_realtime/editorRealtimeChannel";
 import type { DefaultBlueprintData } from "@/modules/blueprint/actions/getBlueprint";
 import { createClient } from "@/utils/supabase/client";
 import { createContext, useContext, useEffect, useMemo } from "react";
+import { EditorRealtimeChannel } from "../_utils";
 
 export interface EditorContext {
   blueprint: DefaultBlueprintData;
@@ -21,10 +21,8 @@ export function EditorContextProvider({
 
   // Setup a channel immediately
   useEffect(() => {
-    const realtimeChannel = createClient().channel(`bp_${blueprint.id}`, {
-      config: { broadcast: { self: true } },
-    });
-    channel.updateChannel(realtimeChannel);
+    const realtimeChannel = createClient().channel(`bp_${blueprint.id}`);
+    channel.initialize(realtimeChannel);
     realtimeChannel.subscribe();
     return () => {
       channel.clear();

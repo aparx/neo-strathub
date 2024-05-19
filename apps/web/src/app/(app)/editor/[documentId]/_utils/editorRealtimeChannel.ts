@@ -27,7 +27,7 @@ export class EditorRealtimeChannel {
     return this._channel;
   }
 
-  updateChannel(channel: RealtimeChannel) {
+  initialize(channel: RealtimeChannel) {
     this._channel = channel;
     channel.on("broadcast", { event: "*" }, (data) => {
       if (!this._contains(data.event)) return;
