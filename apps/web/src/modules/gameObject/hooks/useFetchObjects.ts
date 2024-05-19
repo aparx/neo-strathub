@@ -4,6 +4,7 @@ import { createClient } from "@/utils/supabase/client";
 import { Enums } from "@/utils/supabase/types";
 import { InferAsync } from "@repo/utils";
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
+import { DeepInferUseQueryResult } from "@/utils/generic/types";
 
 export interface UseFetchObjectsFilters {
   gameId?: number;
@@ -27,3 +28,5 @@ export function useFetchObjects(
     refetchInterval: false,
   });
 }
+
+export type GameObjectData = DeepInferUseQueryResult<typeof useFetchObjects>;

@@ -76,7 +76,7 @@ async function main() {
     });
 
     return generateArray({
-      range: [10, 15],
+      range: [30, 50],
       fillFn: () => ({
         name: generateUnique(nameContext, nameGenerator),
         url: "https://svgshare.com/i/16EY.svg",

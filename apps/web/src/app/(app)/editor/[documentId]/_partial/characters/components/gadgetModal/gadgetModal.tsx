@@ -1,34 +1,27 @@
-"use client";
 import { useEditorContext } from "@/app/(app)/editor/[documentId]/_context";
 import { ObjectGrid } from "@/app/(app)/editor/[documentId]/_partial/characters/components/objectGrid";
-import { BlueprintCharacterData } from "@/modules/blueprint/characters/actions";
-import { vars } from "@repo/theme";
+import { CharacterGadgetSlotData } from "@/modules/blueprint/characters/actions";
 import { Modal } from "@repo/ui/components";
 import { SharedState } from "@repo/utils/hooks";
 
-export function CharacterModal({
-  character,
+export function GadgetModal({
+  gadget,
 }: {
-  character: SharedState<BlueprintCharacterData>;
+  gadget: SharedState<CharacterGadgetSlotData>;
 }) {
   const { blueprint } = useEditorContext();
 
   return (
     <Modal.Content minWidth={600}>
       <Modal.Title>
-        <span>
-          Manage character{" "}
-          <span style={{ color: vars.colors.emphasis.medium }}>
-            #{1 + character.state.index}
-          </span>
-        </span>
+        Manage gadget
         <Modal.Exit />
       </Modal.Title>
       <ObjectGrid
-        filters={{ type: "character", gameId: blueprint.arena.game_id }}
-        activeObjectId={character.state.game_object?.id}
+        filters={{ type: "gadget", gameId: blueprint.arena.game_id }}
+        activeObjectId={gadget.state.game_object?.id}
         setActiveObject={(newObject) =>
-          character.update((prev) => ({
+          gadget.update((prev) => ({
             ...prev,
             game_object: newObject,
           }))

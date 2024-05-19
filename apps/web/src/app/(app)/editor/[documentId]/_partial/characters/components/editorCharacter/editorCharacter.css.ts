@@ -8,6 +8,7 @@ import { recipe } from "@vanilla-extract/recipes";
 
 export const characterButton = style({
   background: "unset",
+  padding: 0,
   border: "unset",
   display: "flex",
   gap: 3,
@@ -53,6 +54,10 @@ export const characterBox = recipe({
   defaultVariants: {
     active: false,
   },
+});
+
+export const characterImage = style({
+  objectFit: "contain",
 });
 
 export const gadgetList = style({

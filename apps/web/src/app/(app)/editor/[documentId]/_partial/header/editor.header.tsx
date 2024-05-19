@@ -6,9 +6,11 @@ import {
   Button,
   Flexbox,
   Icon,
+  IconButton,
   Popover,
   Text,
 } from "@repo/ui/components";
+import Link from "next/link";
 import * as css from "./editor.header.css";
 
 export async function EditorHeader({
@@ -42,7 +44,12 @@ function BlueprintTitle({ blueprint }: { blueprint: DefaultBlueprintData }) {
       <Text asChild type={"body"}>
         <h2>
           <Breadcrumbs>
-            {blueprint.book.team.name}
+            {/* TODO only include this link if authorized member is part of team */}
+            <IconButton asChild>
+              <Link href={`/dashboard/${blueprint.book.team.id}`}>
+                {blueprint.book.team.name}
+              </Link>
+            </IconButton>
             <PopoverExpand>
               <Flexbox align={"center"} gap={"md"}>
                 {blueprint.name}

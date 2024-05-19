@@ -18,8 +18,9 @@ export async function EditorCharacters({
   return (
     <ol className={css.list} aria-label={"Picked Characters"}>
       {characters.map((character) => (
-        // TODO Suspense Fallback?
-        <Character key={character.id} {...character} />
+        <li key={character.id}>
+          <Character {...character} />
+        </li>
       ))}
     </ol>
   );

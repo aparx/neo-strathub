@@ -1,5 +1,6 @@
 "use client";
 import { CharacterModal } from "@/app/(app)/editor/[documentId]/_partial/characters/components";
+import { GadgetModal } from "@/app/(app)/editor/[documentId]/_partial/characters/components/gadgetModal";
 import {
   BlueprintCharacterData,
   CharacterGadgetSlotData,
@@ -17,60 +18,75 @@ export interface EditorCharacterProps {
 
 interface GadgetSlotProps {
   data: CharacterGadgetSlotData;
-  color: string;
 }
 
 export function EditorCharacter({ data, slots }: EditorCharacterProps) {
-  const sharedState = useSharedState(data);
-  const object = sharedState.state.game_object;
+  const character = useSharedState(data);
+  const object = character.state.game_object;
   const active = object?.url != null;
-  const color = sharedState.state.team_player_slot?.color ?? "transparent";
+  const color = character.state.team_player_slot?.color ?? "transparent";
 
   return (
     <Modal.Root>
-      <Modal.Trigger asChild>
-        <li style={{ listStyle: "none" }}>
+      <article
+        data-character-id={character.state.id}
+        className={css.characterButton}
+      >
+        <Modal.Trigger asChild>
           <button
-            data-character-id={sharedState.state.id}
-            className={css.characterButton}
-            aria-label={"Gadgets used"}
+            className={css.characterBox({ active })}
+            style={{ boxShadow: `inset 0 0 0 2px ${color}` }}
           >
-            <div
-              className={css.characterBox({ active })}
-              style={{ boxShadow: `inset 0 0 0 2px ${color}` }}
-            >
-              {object ? (
-                <Image
-                  src={object.url}
-                  alt={object.name ?? "Game object"}
-                  fill
-                  style={{ objectFit: "contain" }}
-                />
-              ) : (
-                <RxQuestionMarkCircled size={"1em"} />
-              )}
-            </div>
-            <ol className={css.gadgetList}>
-              {slots.map((gadget) => (
-                <GadgetSlot key={gadget.id} data={gadget} color={color} />
-              ))}
-            </ol>
+            {object ? (
+              <Image
+                src={object.url}
+                alt={object.name ?? "Game object"}
+                fill
+                className={css.characterImage}
+              />
+            ) : (
+              <RxQuestionMarkCircled size={"1em"} />
+            )}
           </button>
-        </li>
-      </Modal.Trigger>
-      <CharacterModal character={sharedState} />
+        </Modal.Trigger>
+        <ol className={css.gadgetList}>
+          {slots.map((gadget) => (
+            <li key={gadget.id}>
+              <GadgetSlot key={gadget.id} data={gadget} />
+            </li>
+          ))}
+        </ol>
+      </article>
+      <CharacterModal character={character} />
     </Modal.Root>
   );
 }
 
-function GadgetSlot({ data, color }: GadgetSlotProps) {
+function GadgetSlot({ data }: GadgetSlotProps) {
+  const gadget = useSharedState(data);
+  const object = gadget.state.game_object;
+  const active = object?.url != null;
+
   return (
-    <li
-      key={data.id}
-      data-gadget-id={data.id}
-      className={css.gadgetBox({ active: false })}
-    >
-      <Icon.Mapped type={"add"} />
-    </li>
+    <Modal.Root>
+      <Modal.Trigger asChild>
+        <button
+          data-gadget-id={data.id}
+          className={css.gadgetBox({ active: false })}
+        >
+          {active ? (
+            <Image
+              src={object.url}
+              alt={object.name ?? "Gadget"}
+              fill
+              style={{ objectFit: "contain" }}
+            />
+          ) : (
+            <Icon.Mapped type={"add"} />
+          )}
+        </button>
+      </Modal.Trigger>
+      <GadgetModal gadget={gadget} />
+    </Modal.Root>
   );
 }
