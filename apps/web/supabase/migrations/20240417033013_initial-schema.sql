@@ -282,7 +282,7 @@ create table if not exists public.game_object
     game_id  int              not null references public.game (id)
         on delete restrict
         on update cascade,
-    type     game_object_type not null,
+    type     public.game_object_type not null,
     name     varchar(64),
     url      varchar          not null,
     metadata jsonb
@@ -292,7 +292,7 @@ alter table public.game_object
     enable row level security;
 
 create unique index
-    if not exists uidx_game_object_name_url
+    if not exists uidx_game_object_url
     on public.game_object (game_id, type, name, url);
 
 -- //////////////////////////////// blueprint_character ////////////////////////////////

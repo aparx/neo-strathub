@@ -15,9 +15,9 @@ import * as css from "./removeMemberButton.css";
 type RemoveMemberButtonBaseProps = Omit<IconButtonProps, "children">;
 
 export interface RemoveMemberButtonProps extends RemoveMemberButtonBaseProps {
-  /** Field displayed in modal showing the user and their name */
+  /** Field displayed in characterModal showing the user and their name */
   userField: React.ReactNode;
-  /** Callback called whenever the removal is confirmed (e.g. through a modal) */
+  /** Callback called whenever the removal is confirmed (e.g. through a characterModal) */
   onConfirm: () => any;
 }
 

@@ -68,6 +68,22 @@ async function main() {
 
   await seed.$resetDatabase();
 
+  function generateGameObjects() {
+    const nameContext = new Set<string>();
+    const nameGenerator = createSentenceGenerator({
+      words: [1, 3],
+      maxLength: 32,
+    });
+
+    return generateArray({
+      range: [10, 15],
+      fillFn: () => ({
+        name: generateUnique(nameContext, nameGenerator),
+        url: "https://svgshare.com/i/16EY.svg",
+      }),
+    });
+  }
+
   /** Generates an array of unique game names (wrapped) */
   function generateGames() {
     const nameContext = new Set<string>();
@@ -83,6 +99,7 @@ async function main() {
         icon: "https://svgshare.com/i/15iw.svg",
         metadata: { player_count: 5, gadgets_per_character: 2 },
         hidden: false,
+        game_object: generateGameObjects,
       }),
     });
   }

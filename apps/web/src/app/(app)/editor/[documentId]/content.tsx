@@ -38,7 +38,7 @@ function createInitialNodes(): CanvasNodeData[] {
   ];
 }
 
-export function EditorContent({ params }: { params: { documentId: string } }) {
+export function EditorContent() {
   const height = 800;
 
   const data = new CanvasData([

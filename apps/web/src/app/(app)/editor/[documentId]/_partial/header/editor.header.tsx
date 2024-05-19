@@ -1,6 +1,6 @@
 import { BackButton } from "@/app/(app)/editor/[documentId]/_partial/header/components";
 import { PopoverExpand } from "@/components";
-import { getBlueprint } from "@/modules/blueprint/actions/getBlueprint";
+import { DefaultBlueprintData } from "@/modules/blueprint/actions/getBlueprint";
 import {
   Breadcrumbs,
   Button,
@@ -9,18 +9,13 @@ import {
   Popover,
   Text,
 } from "@repo/ui/components";
-import { InferAsync } from "@repo/utils";
 import * as css from "./editor.header.css";
 
-type BlueprintData = NonNullable<
-  InferAsync<ReturnType<typeof getBlueprint>>["data"]
->;
-
-export async function EditorHeader({ blueprintId }: { blueprintId: string }) {
-  const blueprint = await getBlueprint(blueprintId);
-  if (blueprint.state === "error") throw new Error(blueprint.error.message);
-  if (!blueprint.data) throw new Error("Could not find blueprint");
-
+export async function EditorHeader({
+  blueprint,
+}: {
+  blueprint: DefaultBlueprintData;
+}) {
   return (
     <Text>
       <div className={css.headerContainer}>
@@ -28,7 +23,7 @@ export async function EditorHeader({ blueprintId }: { blueprintId: string }) {
           <BackButton />
         </div>
         <div className={css.headerItem({ side: "center" })}>
-          <BlueprintTitle blueprint={blueprint.data} />
+          <BlueprintTitle blueprint={blueprint} />
         </div>
         <div className={css.headerItem({ side: "right" })}>
           <Button appearance={"cta"} color={"cta"}>
@@ -41,7 +36,7 @@ export async function EditorHeader({ blueprintId }: { blueprintId: string }) {
   );
 }
 
-function BlueprintTitle({ blueprint }: { blueprint: BlueprintData }) {
+function BlueprintTitle({ blueprint }: { blueprint: DefaultBlueprintData }) {
   return (
     <Popover.Root>
       <Text asChild type={"body"}>
