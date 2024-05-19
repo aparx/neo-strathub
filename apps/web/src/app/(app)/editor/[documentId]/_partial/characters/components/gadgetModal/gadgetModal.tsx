@@ -1,8 +1,9 @@
+"use client";
 import { useEditorContext } from "@/app/(app)/editor/[documentId]/_context";
-import { ObjectGrid } from "@/app/(app)/editor/[documentId]/_partial/characters/components/objectGrid";
 import { CharacterGadgetSlotData } from "@/modules/blueprint/characters/actions";
 import { Modal } from "@repo/ui/components";
 import { SharedState } from "@repo/utils/hooks";
+import { ObjectGrid } from "../objectGrid";
 
 export function GadgetModal({
   gadget,
@@ -14,7 +15,7 @@ export function GadgetModal({
   return (
     <Modal.Content minWidth={600}>
       <Modal.Title>
-        Manage gadget
+        Assign a gadget or ability
         <Modal.Exit />
       </Modal.Title>
       <ObjectGrid

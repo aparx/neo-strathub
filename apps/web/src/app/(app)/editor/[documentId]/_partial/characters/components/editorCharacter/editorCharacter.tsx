@@ -1,11 +1,16 @@
 "use client";
 import { useEditorContext } from "@/app/(app)/editor/[documentId]/_context";
-import { CharacterModal } from "@/app/(app)/editor/[documentId]/_partial/characters/components";
+import { CharacterModal } from "@/app/(app)/editor/[documentId]/_partial/characters/components/characterModal";
 import { GadgetModal } from "@/app/(app)/editor/[documentId]/_partial/characters/components/gadgetModal";
+import {
+  useRealtimeEditorHandle,
+  useRealtimeEditorIntercept,
+} from "@/app/(app)/editor/[documentId]/_utils";
 import {
   BlueprintCharacterData,
   CharacterGadgetSlotData,
 } from "@/modules/blueprint/characters/actions";
+import { createClient } from "@/utils/supabase/client";
 import { Icon, Modal } from "@repo/ui/components";
 import { useSharedState } from "@repo/utils/hooks";
 import Image from "next/image";
@@ -29,12 +34,19 @@ export function EditorCharacter({ data, slots }: EditorCharacterProps) {
   const active = object?.url != null;
   const color = character.state.team_player_slot?.color ?? "transparent";
 
-  useEffect(() => {
-    return ctx.channel.register("updateCharacter", (payload) => {
-      if (payload.id !== data.id) return;
+  useRealtimeEditorHandle(ctx.channel, "updateCharacter", (payload) => {
+    if (payload.id === payload.id)
       character.update((prev) => ({ ...prev, ...payload }));
-    });
-  }, []);
+  });
+
+  useRealtimeEditorIntercept(ctx.channel, "updateCharacter", (payload) => {
+    if (payload.id !== data.id) return payload;
+    createClient()
+      .from("blueprint_character")
+      .update(payload)
+      .eq("id", data.id);
+    return payload;
+  });
 
   return (
     <Modal.Root>

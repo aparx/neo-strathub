@@ -1,3 +1,4 @@
+import { UpdateInterceptor } from "@/app/(app)/editor/[documentId]/_partial/characters/components";
 import { EditorCharacter } from "@/app/(app)/editor/[documentId]/_partial/characters/components/editorCharacter";
 import { DefaultBlueprintData } from "@/modules/blueprint/actions/getBlueprint";
 import {
@@ -17,6 +18,7 @@ export async function EditorCharacters({
 
   return (
     <ol className={css.list} aria-label={"Picked Characters"}>
+      <UpdateInterceptor />
       {characters.map((character) => (
         <li key={character.id}>
           <Character {...character} />

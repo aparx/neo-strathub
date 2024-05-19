@@ -21,7 +21,7 @@ export function EditorContextProvider({
 
   // Setup a channel immediately
   useEffect(() => {
-    const realtimeChannel = createClient().channel(`bp_${blueprint.id}`);
+    const realtimeChannel = createClient().channel(`blueprint_${blueprint.id}`);
     channel.initialize(realtimeChannel);
     realtimeChannel.subscribe();
     return () => {

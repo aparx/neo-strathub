@@ -1,10 +1,10 @@
 "use client";
 import { useEditorContext } from "@/app/(app)/editor/[documentId]/_context";
-import { ObjectGrid } from "@/app/(app)/editor/[documentId]/_partial/characters/components/objectGrid";
 import { BlueprintCharacterData } from "@/modules/blueprint/characters/actions";
 import { vars } from "@repo/theme";
 import { Modal } from "@repo/ui/components";
 import { SharedState } from "@repo/utils/hooks";
+import { ObjectGrid } from "../objectGrid";
 
 export function CharacterModal({
   character,
@@ -28,11 +28,9 @@ export function CharacterModal({
         filters={{ type: "character", gameId: blueprint.arena.game_id }}
         activeObjectId={character.state.game_object?.id}
         setActiveObject={(newObject) => {
-          character.update((prev) => {
-            const newCharacter = { ...prev, game_object: newObject };
-            channel.broadcast("updateCharacter", newCharacter);
-            return newCharacter;
-          });
+          const newCharacter = { ...character.state, game_object: newObject };
+          channel.broadcast("updateCharacter", newCharacter);
+          character.update(newCharacter);
         }}
       />
     </Modal.Content>
