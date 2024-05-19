@@ -1,4 +1,5 @@
 "use client";
+import { useEditorContext } from "@/app/(app)/editor/[documentId]/_context";
 import { CharacterModal } from "@/app/(app)/editor/[documentId]/_partial/characters/components";
 import { GadgetModal } from "@/app/(app)/editor/[documentId]/_partial/characters/components/gadgetModal";
 import {
@@ -8,6 +9,7 @@ import {
 import { Icon, Modal } from "@repo/ui/components";
 import { useSharedState } from "@repo/utils/hooks";
 import Image from "next/image";
+import { useEffect } from "react";
 import { RxQuestionMarkCircled } from "react-icons/rx";
 import * as css from "./editorCharacter.css";
 
@@ -21,10 +23,18 @@ interface GadgetSlotProps {
 }
 
 export function EditorCharacter({ data, slots }: EditorCharacterProps) {
+  const ctx = useEditorContext();
   const character = useSharedState(data);
   const object = character.state.game_object;
   const active = object?.url != null;
   const color = character.state.team_player_slot?.color ?? "transparent";
+
+  useEffect(() => {
+    return ctx.channel.register("updateCharacter", (payload) => {
+      if (payload.id !== data.id) return;
+      character.update((prev) => ({ ...prev, ...payload }));
+    });
+  }, []);
 
   return (
     <Modal.Root>

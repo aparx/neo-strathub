@@ -48,7 +48,7 @@ export function Avatar({
           alt={alt}
           fill
           style={{ opacity: loaded ? 1 : 0 }}
-          onLoadingComplete={() => setLoaded(true)}
+          onLoad={() => setLoaded(true)}
         />
       )}
     </div>

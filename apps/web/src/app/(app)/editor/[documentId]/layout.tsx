@@ -33,6 +33,7 @@ async function Content({
   if (document.state === "error") throw new Error(document.error.message);
   if (!document.data) throw new Error("Could not find blueprint");
   const blueprint = document.data;
+
   return (
     <EditorContextProvider blueprint={blueprint}>
       <div className={css.content}>

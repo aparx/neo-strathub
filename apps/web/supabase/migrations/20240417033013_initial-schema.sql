@@ -279,12 +279,12 @@ create type game_object_type as enum ('character', 'gadget', 'floor');
 create table if not exists public.game_object
 (
     id       serial primary key,
-    game_id  int              not null references public.game (id)
+    game_id  int                     not null references public.game (id)
         on delete restrict
         on update cascade,
     type     public.game_object_type not null,
     name     varchar(64),
-    url      varchar          not null,
+    url      varchar                 not null,
     metadata jsonb
 );
 

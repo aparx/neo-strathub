@@ -146,6 +146,9 @@ importers:
       usehooks-ts:
         specifier: ^3.1.0
         version: 3.1.0(react@18.2.0)
+      uuid:
+        specifier: ^9.0.1
+        version: 9.0.1
       zod:
         specifier: ^3.23.3
         version: 3.23.3
@@ -180,6 +183,9 @@ importers:
       '@types/react-dom':
         specifier: ^18.2.19
         version: 18.2.19
+      '@types/uuid':
+        specifier: ^9.0.8
+        version: 9.0.8
       '@vanilla-extract/next-plugin':
         specifier: ^2.4.0
         version: 2.4.0(@types/node@20.11.24)(next@14.2.2)(webpack@5.91.0)

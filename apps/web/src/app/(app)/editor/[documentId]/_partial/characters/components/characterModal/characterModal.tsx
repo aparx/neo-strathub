@@ -11,7 +11,7 @@ export function CharacterModal({
 }: {
   character: SharedState<BlueprintCharacterData>;
 }) {
-  const { blueprint } = useEditorContext();
+  const { blueprint, channel } = useEditorContext();
 
   return (
     <Modal.Content minWidth={600}>
@@ -27,12 +27,13 @@ export function CharacterModal({
       <ObjectGrid
         filters={{ type: "character", gameId: blueprint.arena.game_id }}
         activeObjectId={character.state.game_object?.id}
-        setActiveObject={(newObject) =>
-          character.update((prev) => ({
-            ...prev,
-            game_object: newObject,
-          }))
-        }
+        setActiveObject={(newObject) => {
+          character.update((prev) => {
+            const newCharacter = { ...prev, game_object: newObject };
+            channel.broadcast("updateCharacter", newCharacter);
+            return newCharacter;
+          });
+        }}
       />
     </Modal.Content>
   );

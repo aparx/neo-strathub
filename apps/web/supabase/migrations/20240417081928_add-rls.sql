@@ -81,6 +81,7 @@ create policy "public read access"
     on public.team_member_role as permissive
     for select to authenticated using (true);
 
+
 -- //////////////////////////////// team_member ////////////////////////////////
 
 create or replace function can_select_team_member(target team_member)
