@@ -12,7 +12,7 @@ export function CharacterModal({
   onSave,
 }: {
   character: SharedState<BlueprintCharacterData>;
-  onSave: (object: GameObjectData | null) => Promise<any>;
+  onSave: (object: GameObjectData | null) => Promise<boolean>;
 }) {
   const { blueprint, channel } = useEditorContext();
 
@@ -31,12 +31,14 @@ export function CharacterModal({
         filters={{ type: "character", gameId: blueprint.arena.game_id }}
         activeObjectId={character.state.game_object?.id}
         setActiveObject={async (newObject) => {
-          const beforeCharacter = character.state;
-          const newCharacter = { ...character.state, game_object: newObject };
-          character.update(newCharacter);
-          onSave(newObject)
-            .then(() => channel.broadcast("updateCharacter", newCharacter))
-            .catch(() => character.update(beforeCharacter) /* TODO sync */);
+          const characterBefore = character.state;
+          const newChar = { ...character.state, game_object: newObject };
+          character.update(newChar);
+
+          const handleError = () => character.update(characterBefore);
+          const result = await onSave(newObject).catch(handleError);
+          if (result) channel.broadcast("updateCharacter", newChar);
+          else handleError();
         }}
       />
     </Modal.Content>

@@ -7,6 +7,7 @@ import {
   BlueprintCharacterData,
   CharacterGadgetSlotData,
 } from "@/modules/blueprint/characters/actions";
+import { GameObjectData } from "@/modules/gameObject/hooks";
 import { createClient } from "@/utils/supabase/client";
 import { Icon, Modal } from "@repo/ui/components";
 import { useSharedState } from "@repo/utils/hooks";
@@ -35,6 +36,13 @@ export function EditorCharacter({ data, slots }: EditorCharacterProps) {
     if (payload.id === data.id)
       character.update((prev) => ({ ...prev, ...payload }));
   });
+
+  function updateToObject(object: GameObjectData | null) {
+    return createClient().rpc("update_character_object", {
+      character_id: data.id,
+      object_id: object?.id ?? (null as any),
+    });
+  }
 
   return (
     <Modal.Root>
@@ -69,13 +77,7 @@ export function EditorCharacter({ data, slots }: EditorCharacterProps) {
       </article>
       <CharacterModal
         character={character}
-        onSave={async (obj) =>
-          await createClient()
-            .from("blueprint_character")
-            .update({ object_id: obj?.id ?? null })
-            .eq("id", data.id)
-            .throwOnError()
-        }
+        onSave={async (obj) => Boolean((await updateToObject(obj))?.data)}
       />
     </Modal.Root>
   );
@@ -92,6 +94,13 @@ function GadgetSlot({ data }: GadgetSlotProps) {
       if (payload.id === data.id) gadget.update(payload);
     });
   }, []);
+
+  async function updateToObject(object: GameObjectData | null) {
+    return createClient().rpc("update_gadget_object", {
+      gadget_id: data.id,
+      object_id: object?.id ?? (null as any),
+    });
+  }
 
   return (
     <Modal.Root>
@@ -114,15 +123,7 @@ function GadgetSlot({ data }: GadgetSlotProps) {
       </Modal.Trigger>
       <GadgetModal
         gadget={gadget}
-        onSave={async (obj) =>
-          console.log(
-            await createClient()
-              .from("character_gadget")
-              .update({ object_id: obj?.id ?? null })
-              .eq("id", data.id)
-              .throwOnError(),
-          )
-        }
+        onSave={async (obj) => Boolean((await updateToObject(obj))?.data)}
       />
     </Modal.Root>
   );

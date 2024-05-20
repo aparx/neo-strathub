@@ -1,4 +1,8 @@
 -- noinspection SqlResolveForFile
+begin;
+drop publication if exists supabase_realtime;
+create publication supabase_realtime;
+commit;
 
 create type public.profile_role as enum ('admin', 'user');
 create type public.bp_visibility as enum ('public', 'private', 'unlisted');
@@ -8,7 +12,7 @@ create type public.pay_interval as enum ('monthly', 'yearly');
 
 create table if not exists public.game
 (
-    id         smallserial primary key,
+    id         serial2 primary key,
     name       text        not null unique
         constraint name_length check (length(name) >= 2 and length(name) <= 32),
     alias      varchar(32),
@@ -33,7 +37,7 @@ alter table public.game
 create table if not exists public.arena
 (
     id         serial primary key,
-    game_id    smallint    not null references public.game (id)
+    game_id    int2        not null references public.game (id)
         on delete cascade
         on update cascade,
     name       text        not null
@@ -69,7 +73,7 @@ alter table public.profile
 
 create table if not exists public.plan
 (
-    id               smallserial primary key,
+    id               serial2 primary key,
     name             text           not null unique
         constraint name_length check (length(name) <= 32),
     pricing          decimal(10, 2) not null,
@@ -90,10 +94,10 @@ create table if not exists public.team
     id         uuid primary key     default gen_random_uuid(),
     name       text        not null unique
         constraint name_length check (length(name) >= 3 and length(name) <= 20),
-    plan_id    smallint references public.plan
+    plan_id    int2 references public.plan
         on delete set null
         on update cascade,
-    game_id    smallint    not null references public.game (id)
+    game_id    int2        not null references public.game (id)
         on delete restrict -- restrict to prevent accidental deletion
         on update cascade,
     created_at timestamptz not null default now(),
@@ -153,7 +157,7 @@ create table if not exists public.team_member
     team_id    uuid        not null references public.team (id)
         on delete cascade
         on update cascade,
-    role_id    smallint    not null references public.team_member_role (id)
+    role_id    int2        not null references public.team_member_role (id)
         on delete restrict
         on update cascade,
     created_at timestamptz not null default now(),
@@ -278,7 +282,7 @@ create type game_object_type as enum ('character', 'gadget', 'floor');
 -- A game object is an object that is related to a game and can be used in a blueprint
 create table if not exists public.game_object
 (
-    id       serial primary key,
+    id       serial8 primary key,
     game_id  int                     not null references public.game (id)
         on delete restrict
         on update cascade,
@@ -300,9 +304,9 @@ create unique index
 -- Table containing character picks for a blueprint, that links to a player slot
 create table if not exists public.blueprint_character
 (
-    id           uuid primary key     default gen_random_uuid(),
+    id           serial8 primary key,
     -- The target character object (being a game_object)
-    object_id    int references public.game_object (id)
+    object_id    int8 references public.game_object (id)
         on delete set null
         on update cascade,
     blueprint_id uuid        not null references public.blueprint (id)
@@ -327,11 +331,11 @@ create unique index uidx_unique_character_index
 -- Join table for gadget slots that can be assigned to blueprint characters
 create table if not exists public.character_gadget
 (
-    id           serial primary key,
-    object_id    int references public.game_object (id)
+    id           serial8 primary key,
+    object_id    int8 references public.game_object (id)
         on delete set null
         on update cascade,
-    character_id uuid        not null references public.blueprint_character (id)
+    character_id int8        not null references public.blueprint_character (id)
         on delete cascade
         on update cascade,
     created_at   timestamptz not null default now()
@@ -340,14 +344,13 @@ create table if not exists public.character_gadget
 alter table public.character_gadget
     enable row level security;
 
-
 -- //////////////////////////////// audit_log ////////////////////////////////
 
 create type audit_log_type as enum ('create', 'update', 'delete', 'info');
 
 create table if not exists public.audit_log
 (
-    id           bigserial primary key,
+    id           serial8 primary key,
     -- Team ID can be null, since an audit_log entry can be team independent
     team_id      uuid references public.team (id)
         on delete set null

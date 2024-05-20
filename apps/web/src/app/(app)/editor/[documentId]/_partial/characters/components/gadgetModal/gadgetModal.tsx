@@ -11,7 +11,7 @@ export function GadgetModal({
   onSave,
 }: {
   gadget: SharedState<CharacterGadgetSlotData>;
-  onSave: (object: GameObjectData | null) => Promise<any>;
+  onSave: (object: GameObjectData | null) => Promise<boolean>;
 }) {
   const { blueprint, channel } = useEditorContext();
 
@@ -25,12 +25,14 @@ export function GadgetModal({
         filters={{ type: "gadget", gameId: blueprint.arena.game_id }}
         activeObjectId={gadget.state.game_object?.id}
         setActiveObject={async (newObject) => {
-          const beforeGadget = gadget.state;
+          const gadgetBefore = gadget.state;
           const newGadget = { ...gadget.state, game_object: newObject };
           gadget.update(newGadget);
-          onSave(newObject)
-            .then(() => channel.broadcast("updateGadget", newGadget))
-            .catch(() => gadget.update(beforeGadget) /* TODO sync */);
+
+          const handleError = () => gadget.update(gadgetBefore);
+          const result = await onSave(newObject).catch(handleError);
+          if (result) channel.broadcast("updateGadget", newGadget);
+          else handleError();
         }}
       />
     </Modal.Content>

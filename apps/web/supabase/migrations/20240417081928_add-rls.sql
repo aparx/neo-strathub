@@ -131,28 +131,6 @@ create policy "public read access"
 
 -- //////////////////////////////// blueprint ////////////////////////////////
 
-create or replace function can_modify_blueprint(blueprint_id uuid)
-    returns boolean as $$
-declare
-    _flags int8;
-begin
-    if (blueprint_id is null) then
-        return false;
-    end if;
-
-    select public.team_member_role.flags
-    into _flags
-    from public.team_member
-             inner join team_member_role on team_member.role_id = team_member_role.id
-    where team_member.profile_id = auth.uid()
-      and team_member.team_id = (select public.book.team_id
-                                 from public.blueprint
-                                          inner join book on book.id = blueprint.book_id
-                                 where blueprint.id = $1);
-    return _flags is not null and (_flags & 2 /* MODIFY_DOCUMENTS */) != 0;
-end;
-$$ language plpgsql security definer;
-
 create or replace function can_select_blueprint(target blueprint)
     returns boolean as $$
 declare
@@ -183,52 +161,6 @@ create policy "read access"
     on public.blueprint as permissive
     for select to authenticated
     using (can_select_blueprint(blueprint));
-
--- //////////////////////////////// blueprint_character ////////////////////////////////
-
-create policy "update access"
-    on public.blueprint_character as permissive
-    for update to authenticated
-    using (true)
-    with check (can_modify_blueprint(blueprint_character.blueprint_id));
-
-create policy "read access"
-    on public.blueprint_character as permissive
-    for select to authenticated
-    using (exists(select 1
-                  from public.blueprint
-                  where id = blueprint_id));
-
--- //////////////////////////////// character_gadget ////////////////////////////////
-
-create or replace function can_update_character_gadget(data character_gadget)
-    returns boolean as $$
-declare
-    _blueprint_id uuid;
-begin
-    select blueprint_id
-    into _blueprint_id
-    from public.blueprint_character
-    where id = data.character_id;
-
-    return can_modify_blueprint(_blueprint_id);
-end;
-$$ language plpgsql security definer;
-
-create policy "update access"
-    on public.character_gadget as permissive
-    for update to authenticated
-    using (true)
-    with check (can_update_character_gadget(character_gadget));
-
-create policy "read access"
-    on public.character_gadget as permissive
-    for select to authenticated
-    using (exists(select 1
-                  from public.blueprint
-                  where id = (select blueprint_id
-                              from public.blueprint_character
-                              where id = character_gadget.character_id)));
 
 -- //////////////////////////////// audit_log ////////////////////////////////
 

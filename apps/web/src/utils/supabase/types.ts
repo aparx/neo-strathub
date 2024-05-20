@@ -166,7 +166,7 @@ export type Database = {
         Row: {
           blueprint_id: string
           created_at: string
-          id: string
+          id: number
           index: number
           object_id: number | null
           slot_id: string | null
@@ -174,7 +174,7 @@ export type Database = {
         Insert: {
           blueprint_id: string
           created_at?: string
-          id?: string
+          id?: number
           index: number
           object_id?: number | null
           slot_id?: string | null
@@ -182,7 +182,7 @@ export type Database = {
         Update: {
           blueprint_id?: string
           created_at?: string
-          id?: string
+          id?: number
           index?: number
           object_id?: number | null
           slot_id?: string | null
@@ -280,19 +280,19 @@ export type Database = {
       }
       character_gadget: {
         Row: {
-          character_id: string
+          character_id: number
           created_at: string
           id: number
           object_id: number | null
         }
         Insert: {
-          character_id: string
+          character_id: number
           created_at?: string
           id?: number
           object_id?: number | null
         }
         Update: {
-          character_id?: string
+          character_id?: number
           created_at?: string
           id?: number
           object_id?: number | null
@@ -659,12 +659,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      can_handle_broadcast: {
-        Args: {
-          requireflag?: number
-        }
-        Returns: boolean
-      }
       can_select_audit_log: {
         Args: {
           entry: unknown
@@ -704,6 +698,27 @@ export type Database = {
           target_game_id: number
         }
         Returns: string
+      }
+      get_perms_on_blueprint: {
+        Args: {
+          blueprint_id: string
+          user_id: string
+        }
+        Returns: number
+      }
+      update_character_object: {
+        Args: {
+          character_id: number
+          object_id: number
+        }
+        Returns: boolean
+      }
+      update_gadget_object: {
+        Args: {
+          gadget_id: number
+          object_id: number
+        }
+        Returns: boolean
       }
     }
     Enums: {

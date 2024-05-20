@@ -277,6 +277,43 @@ execute function on_blueprint_create();
 
 -- //////////////////////////////// blueprint_character ////////////////////////////////
 
+create or replace function verify_blueprint_character()
+    returns trigger as
+$$
+declare
+    _slot_team_id uuid;
+begin
+    -- Verify the slot is in the same team as the character
+    select team_id
+    into _slot_team_id
+    from public.team_player_slot
+    where id = new.slot_id;
+
+    if (_slot_team_id is null) then
+        return new; -- Do nothing
+    end if;
+
+    if (_slot_team_id != new.team_id) then
+        raise exception 'Team ID of slot and character are mismatching';
+    end if;
+
+    return new;
+end;
+$$ volatile language plpgsql
+   security definer;
+
+create trigger trigger_verify_blueprint_character_update
+    before update of slot_id
+    on public.blueprint_character
+    for each row
+execute function verify_blueprint_character();
+
+create trigger trigger_verify_blueprint_character_insert
+    before insert
+    on public.blueprint_character
+    for each row
+execute function verify_blueprint_character();
+
 create or replace function on_blueprint_character_create()
     returns trigger as $$
 declare

@@ -116,3 +116,106 @@ revoke
     execute on function
     create_team(varchar, int, int)
     from public, anon;
+
+create or replace function get_perms_on_blueprint(blueprint_id uuid, user_id uuid)
+    returns int8 as $$
+declare
+    _flags   int8;
+    _team_id uuid;
+begin
+    -- Determine the identifier of the team
+    select public.book.team_id
+    into _team_id
+    from public.blueprint
+             inner join public.book on blueprint.book_id = book.id
+    where blueprint.id = blueprint_id;
+
+    if (_team_id is null) then
+        return null;
+    end if;
+
+    -- Determine the flags of the authenticated user
+    select public.team_member_role.flags
+    into _flags
+    from public.team_member
+             inner join public.team_member_role
+                        on team_member.role_id = team_member_role.id
+    where team_member.profile_id = user_id
+      and team_member.team_id = _team_id;
+
+    if (_flags is null) then
+        return null;
+    end if;
+
+    return _flags;
+end;
+$$
+    language plpgsql
+    security definer;
+
+revoke
+    execute on function
+    get_perms_on_blueprint(uuid, uuid)
+    from public, anon, authenticated;
+
+create or replace function update_character_object(
+    character_id int8, object_id int8
+) returns boolean as $$
+declare
+    _blueprint_id uuid;
+    _flags        int8;
+begin
+    select blueprint_id
+    into _blueprint_id
+    from public.blueprint_character
+    where id = character_id;
+
+    if (_blueprint_id is null) then
+        return false;
+    end if;
+
+    _flags := get_perms_on_blueprint(_blueprint_id, auth.uid());
+    if (_flags is null or (_flags & 2 /* MODIFY_DOCUMENTS */) = 0) then
+        return false; -- No permission
+    end if;
+
+    update public.blueprint_character
+    set object_id = $2
+    where id = character_id;
+
+    return true;
+end;
+$$ volatile language plpgsql
+   security definer;
+
+create or replace function update_gadget_object(
+    gadget_id int8, object_id int8
+) returns boolean as $$
+declare
+    _blueprint_id uuid;
+    _flags        int8;
+begin
+    select public.blueprint_character.blueprint_id
+    into _blueprint_id
+    from public.character_gadget
+             inner join public.blueprint_character
+                        on character_gadget.character_id = blueprint_character.id
+    where character_gadget.id = gadget_id;
+
+    if (_blueprint_id is null) then
+        return false;
+    end if;
+
+    _flags := get_perms_on_blueprint(_blueprint_id, auth.uid());
+    if (_flags is null or (_flags & 2 /* MODIFY_DOCUMENTS */) = 0) then
+        return false; -- No permission
+    end if;
+
+    update public.character_gadget
+    set object_id = $2
+    where id = gadget_id;
+
+    return true;
+end;
+$$ volatile language plpgsql
+   security definer;
