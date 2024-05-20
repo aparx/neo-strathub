@@ -659,6 +659,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_handle_broadcast: {
+        Args: {
+          requireflag?: number
+        }
+        Returns: boolean
+      }
       can_select_audit_log: {
         Args: {
           entry: unknown

@@ -1,3 +1,4 @@
+"use server";
 import { getServiceServer } from "@/utils/supabase/actions";
 import { InferAsync } from "@repo/utils";
 import { cookies } from "next/headers";

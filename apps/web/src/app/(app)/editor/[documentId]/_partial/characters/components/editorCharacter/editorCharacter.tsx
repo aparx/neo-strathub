@@ -2,10 +2,7 @@
 import { useEditorContext } from "@/app/(app)/editor/[documentId]/_context";
 import { CharacterModal } from "@/app/(app)/editor/[documentId]/_partial/characters/components/characterModal";
 import { GadgetModal } from "@/app/(app)/editor/[documentId]/_partial/characters/components/gadgetModal";
-import {
-  useRealtimeEditorHandle,
-  useRealtimeEditorIntercept,
-} from "@/app/(app)/editor/[documentId]/_utils";
+import { useRealtimeEditorHandle } from "@/app/(app)/editor/[documentId]/_utils";
 import {
   BlueprintCharacterData,
   CharacterGadgetSlotData,
@@ -34,18 +31,9 @@ export function EditorCharacter({ data, slots }: EditorCharacterProps) {
   const active = object?.url != null;
   const color = character.state.team_player_slot?.color ?? "transparent";
 
-  useRealtimeEditorHandle(ctx.channel, "updateCharacter", (payload) => {
-    if (payload.id === payload.id)
+  useRealtimeEditorHandle(ctx.channel, "updateCharacter", async (payload) => {
+    if (payload.id === data.id)
       character.update((prev) => ({ ...prev, ...payload }));
-  });
-
-  useRealtimeEditorIntercept(ctx.channel, "updateCharacter", (payload) => {
-    if (payload.id !== data.id) return payload;
-    createClient()
-      .from("blueprint_character")
-      .update(payload)
-      .eq("id", data.id);
-    return payload;
   });
 
   return (
@@ -79,7 +67,16 @@ export function EditorCharacter({ data, slots }: EditorCharacterProps) {
           ))}
         </ol>
       </article>
-      <CharacterModal character={character} />
+      <CharacterModal
+        character={character}
+        onSave={async (obj) =>
+          await createClient()
+            .from("blueprint_character")
+            .update({ object_id: obj?.id ?? null })
+            .eq("id", data.id)
+            .throwOnError()
+        }
+      />
     </Modal.Root>
   );
 }
@@ -115,7 +112,18 @@ function GadgetSlot({ data }: GadgetSlotProps) {
           )}
         </button>
       </Modal.Trigger>
-      <GadgetModal gadget={gadget} />
+      <GadgetModal
+        gadget={gadget}
+        onSave={async (obj) =>
+          console.log(
+            await createClient()
+              .from("character_gadget")
+              .update({ object_id: obj?.id ?? null })
+              .eq("id", data.id)
+              .throwOnError(),
+          )
+        }
+      />
     </Modal.Root>
   );
 }

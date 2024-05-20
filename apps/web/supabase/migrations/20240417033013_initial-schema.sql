@@ -1,13 +1,5 @@
 -- noinspection SqlResolveForFile
 
-begin;
-
-drop publication if exists supabase_realtime;
-
-create publication supabase_realtime;
-
-commit;
-
 create type public.profile_role as enum ('admin', 'user');
 create type public.bp_visibility as enum ('public', 'private', 'unlisted');
 create type public.pay_interval as enum ('monthly', 'yearly');
@@ -329,8 +321,6 @@ alter table public.blueprint_character
 
 create unique index uidx_unique_character_index
     on public.blueprint_character (index, object_id);
-
-alter publication supabase_realtime add table blueprint_character;
 
 -- //////////////////////////////// character_gadget ////////////////////////////////
 
