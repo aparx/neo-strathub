@@ -324,7 +324,7 @@ alter table public.blueprint_character
     enable row level security;
 
 create unique index uidx_unique_character_index
-    on public.blueprint_character (index, object_id);
+    on public.blueprint_character (blueprint_id, index, object_id);
 
 -- //////////////////////////////// character_gadget ////////////////////////////////
 
