@@ -3,7 +3,7 @@ import { InferAsync } from "@repo/utils";
 import { cookies } from "next/headers";
 import { cache } from "react";
 
-/** Returns a member (Warning: bypasses RLS by using the SERVICE_KEY) */
+/** Returns a actions (Warning: bypasses RLS by using the SERVICE_KEY) */
 export const getMember = cache(async (profileId: string, teamId: string) => {
   return (
     await getServiceServer(cookies())

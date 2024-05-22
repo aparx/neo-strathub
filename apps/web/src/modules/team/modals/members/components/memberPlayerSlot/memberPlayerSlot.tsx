@@ -4,14 +4,19 @@ import { vars } from "@repo/theme";
 import { Icon, Skeleton, Text } from "@repo/ui/components";
 import { blendColors } from "@repo/ui/utils";
 import { useQuery } from "@tanstack/react-query";
+import { ComponentPropsWithoutRef } from "react";
 import { FiExternalLink } from "react-icons/fi";
 import * as css from "./memberPlayerSlot.css";
 
-export interface MemberPlayerSlotProps {
+export interface MemberPlayerSlotProps
+  extends ComponentPropsWithoutRef<"button"> {
   memberId: number;
 }
 
-export function MemberPlayerSlot({ memberId }: MemberPlayerSlotProps) {
+export function MemberPlayerSlot({
+  memberId,
+  ...restProps
+}: MemberPlayerSlotProps) {
   const { data, isLoading } = useQuery({
     queryKey: ["playerSlot", memberId],
     queryFn: async () =>
@@ -28,6 +33,7 @@ export function MemberPlayerSlot({ memberId }: MemberPlayerSlotProps) {
   const slotNumber = 1 + (slot?.slot_index ?? 0);
   return (
     <Text
+      asChild
       type={"label"}
       size={"md"}
       data={{ weight: 500 }}
@@ -37,24 +43,26 @@ export function MemberPlayerSlot({ memberId }: MemberPlayerSlotProps) {
         background: slot ? blendColors(slot.color, "black 80%") : undefined,
       }}
     >
-      <Text
-        type={"label"}
-        size={"md"}
-        data={{ weight: 700 }}
-        className={css.number}
-        style={{
-          background: slot ? slot.color : vars.colors.accents[5],
-          color: slot ? vars.colors.accents[0] : vars.colors.emphasis.low,
-        }}
-      >
-        {slot ? slotNumber : "#"}
-      </Text>
-      {slot ? "Player" : "Assign slot"}
-      <div className={css.arrow}>
-        <Icon.Custom size={"sm"}>
-          <FiExternalLink />
-        </Icon.Custom>
-      </div>
+      <button {...restProps}>
+        <Text
+          type={"label"}
+          size={"md"}
+          data={{ weight: 700 }}
+          className={css.number}
+          style={{
+            background: slot ? slot.color : vars.colors.accents[5],
+            color: slot ? vars.colors.accents[0] : vars.colors.emphasis.low,
+          }}
+        >
+          {slot ? slotNumber : "#"}
+        </Text>
+        {slot ? "Player" : "Assign slot"}
+        <div className={css.arrow}>
+          <Icon.Custom size={"sm"}>
+            <FiExternalLink />
+          </Icon.Custom>
+        </div>
+      </button>
     </Text>
   );
 }

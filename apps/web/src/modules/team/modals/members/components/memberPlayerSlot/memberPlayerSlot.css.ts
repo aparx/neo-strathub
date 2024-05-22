@@ -7,6 +7,7 @@ const slotBase = style({
   display: "flex",
   gap: vars.spacing.md,
   alignItems: "center",
+  padding: "unset",
   paddingRight: vars.spacing.sm,
   width: 100,
   borderRadius: vars.roundness.sm,

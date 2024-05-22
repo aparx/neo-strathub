@@ -31,7 +31,7 @@ export function RemoveMemberButton({
     <Modal.Root>
       <Modal.Trigger asChild>
         <IconButton
-          aria-label={"Remove member"}
+          aria-label={"Remove actions"}
           className={mergeClassNames(className, css.trigger)}
           {...restProps}
         >

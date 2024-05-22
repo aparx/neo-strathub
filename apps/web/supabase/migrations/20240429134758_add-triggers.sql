@@ -174,7 +174,7 @@ begin
     insert into public.book (name, team_id)
     values ('Example Stratbook', new.id);
 
-    -- Try to insert as many member roles as there are players per team for given game
+    -- Try to insert as many actions roles as there are players per team for given game
     select (public.game.metadata ->> 'player_count')::int
     into _game_player_count
     from public.team

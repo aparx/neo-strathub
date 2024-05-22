@@ -14,7 +14,7 @@ export const getBlueprint = cache(async (id: string) => {
     .select(
       `id, visibility, name, tags,
        book!inner(id, name, team!inner(id, name)), 
-       arena!inner(id, name, game_id)`,
+       arena!inner(id, name, game_id, outdated)`,
     )
     .eq("id", id)
     .maybeSingle();

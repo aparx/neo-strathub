@@ -29,7 +29,7 @@ export const ROLE_SELECT_HEIGHT = calc.add(
   calc.multiply(2, vars.spacing.sm),
 );
 
-/** Hook that fetches all possible team member roles */
+/** Hook that fetches all possible team actions roles */
 function useGetRoles() {
   return useQuery({
     queryKey: ["teamRoles"],

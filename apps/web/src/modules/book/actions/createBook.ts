@@ -6,7 +6,7 @@ import {
   CreateBookSchema,
   createBookSchema,
 } from "@/modules/book/actions/createBook.schema";
-import { getMember } from "@/modules/team/actions/member/getMember";
+import { getMember } from "@/modules/team/modals/members/actions/getMember";
 import { getServiceServer } from "@/utils/supabase/actions";
 import { cookies } from "next/headers";
 import { PostgresError } from "pg-error-enum";
@@ -25,7 +25,7 @@ export async function createBook(inputData: CreateBookSchema) {
 
   // Check if user is even authorized to create this book
   const selfMember = await getMember(user.id, validated.teamId);
-  if (!selfMember) throw new Error("Not a member of this team");
+  if (!selfMember) throw new Error("Not a actions of this team");
 
   if (!hasFlag(selfMember.team_member_role.flags, TeamMemberFlags.MODIFY_BOOKS))
     throw new Error("Missing the permission to create a book");

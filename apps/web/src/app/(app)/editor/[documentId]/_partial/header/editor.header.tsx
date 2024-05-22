@@ -19,8 +19,8 @@ export async function EditorHeader({
   blueprint: DefaultBlueprintData;
 }) {
   return (
-    <Text>
-      <div className={css.headerContainer}>
+    <Text asChild>
+      <header className={css.headerContainer}>
         <div className={css.headerItem({ side: "left" })}>
           <BackButton />
         </div>
@@ -33,7 +33,7 @@ export async function EditorHeader({
             <Icon.Mapped type={"next"} />
           </Button>
         </div>
-      </div>
+      </header>
     </Text>
   );
 }
@@ -44,7 +44,7 @@ function BlueprintTitle({ blueprint }: { blueprint: DefaultBlueprintData }) {
       <Text asChild type={"body"}>
         <h2>
           <Breadcrumbs>
-            {/* TODO only include this link if authorized member is part of team */}
+            {/* TODO only include this link if authorized actions is part of team */}
             <IconButton asChild>
               <Link href={`/dashboard/${blueprint.book.team.id}`}>
                 {blueprint.book.team.name}

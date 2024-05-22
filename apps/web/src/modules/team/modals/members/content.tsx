@@ -3,7 +3,7 @@ import { UserField } from "@/modules/auth/components";
 import { useUserContext } from "@/modules/auth/context";
 import { TeamMemberFlags, hasFlag } from "@/modules/auth/flags";
 import { deleteMember, getTeam } from "@/modules/team/actions";
-import { updateMember } from "@/modules/team/actions/member/updateMember";
+import { updateMember } from "@/modules/team/modals/members/actions/updateMember";
 import {
   ROLE_SELECT_HEIGHT,
   RemoveMemberButton,
@@ -11,8 +11,11 @@ import {
   RoleSelectProps,
 } from "@/modules/team/modals/members/components";
 import { MemberPlayerSlot } from "@/modules/team/modals/members/components/memberPlayerSlot";
-import { DeepInferUseQueryResult } from "@/utils/generic/types";
-import { createClient } from "@/utils/supabase/client";
+import {
+  TeamMemberData,
+  useGetMembers,
+} from "@/modules/team/modals/members/hooks";
+import { AssignSlotModal } from "@/modules/team/modals/members/modals";
 import { Tables } from "@/utils/supabase/types";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { vars } from "@repo/theme";
@@ -24,7 +27,6 @@ import {
   Table,
 } from "@repo/ui/components";
 import { InferAsync, Nullish } from "@repo/utils";
-import { useQuery } from "@tanstack/react-query";
 import moment from "moment";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import * as css from "./content.css";
@@ -33,23 +35,7 @@ interface TeamMembersModalProps {
   team: NonNullable<InferAsync<ReturnType<typeof getTeam>>["data"]>;
 }
 
-function useGetMembers(profileId: string, teamId: string) {
-  return useQuery({
-    queryKey: ["teamMembers", teamId],
-    queryFn: async () =>
-      createClient()
-        .from("team_member")
-        .select(
-          "*, profile!inner(id, username, avatar), team_member_role!inner(id, flags)",
-        )
-        .eq("team_id", teamId),
-    refetchOnWindowFocus: false,
-  });
-}
-
-type TeamMember = DeepInferUseQueryResult<typeof useGetMembers>;
-
-function sortMembers(members: Nullish<TeamMember[]>) {
+function sortMembers(members: Nullish<TeamMemberData[]>) {
   return members?.sort((a, b) => {
     return b.team_member_role.flags - a.team_member_role.flags;
   });
@@ -57,16 +43,16 @@ function sortMembers(members: Nullish<TeamMember[]>) {
 
 export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
   const { user } = useUserContext();
-  const { isLoading, data, refetch } = useGetMembers(user!.id, team.id);
+  const { isLoading, data, refetch } = useGetMembers(team.id);
 
   const [members, setMembers] = useState(data?.data);
 
   useEffect(() => setMembers(sortMembers(data?.data)), [data?.data]);
 
-  const removeMember = useCallback(async (member: TeamMember) => {
+  const removeMember = useCallback(async (member: TeamMemberData) => {
     console.debug("#_removeMember", "invoke", member);
 
-    // Optimistic update, remove the member first
+    // Optimistic update, remove the actions first
     setMembers((current) => {
       const newMembers = current ? [...current] : [];
       const index = newMembers.indexOf(member);
@@ -82,7 +68,7 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
   }, []);
 
   const updateRole = useCallback(
-    async (member: TeamMember, role: Tables<"team_member_role">) => {
+    async (member: TeamMemberData, role: Tables<"team_member_role">) => {
       console.debug("#_updateMember", "invoke", member, role);
 
       await updateMember(member, role.id).catch((e) => {
@@ -159,9 +145,9 @@ function MemberSlot({
   onRemove,
   onUpdate,
 }: {
-  member: TeamMember;
-  /** The user themselves as a member, can be null when they are site admins */
-  self: Nullish<TeamMember>;
+  member: TeamMemberData;
+  /** The user themselves as a actions, can be null when they are site admins */
+  self: Nullish<TeamMemberData>;
   onRemove: () => any;
   onUpdate: RoleSelectProps["onSelect"];
 }) {
@@ -201,7 +187,7 @@ function MemberRow({
   onRemove,
   onUpdate,
 }: {
-  member: TeamMember;
+  member: TeamMemberData;
   canKick?: boolean;
   canModify?: boolean;
   onRemove: () => any;
@@ -215,7 +201,12 @@ function MemberRow({
         <UserField profile={member.profile} />
       </Table.Cell>
       <Table.Cell>
-        <MemberPlayerSlot memberId={member.id} />
+        <Modal.Root>
+          <Modal.Trigger asChild>
+            <MemberPlayerSlot memberId={member.id} />
+          </Modal.Trigger>
+          <AssignSlotModal member={member} />
+        </Modal.Root>
       </Table.Cell>
       <Table.Cell>
         <RoleSelect

@@ -31,7 +31,7 @@ export const content = style([
 
 export const scrim = style({
   position: "absolute",
-  zIndex: 9998,
+  zIndex: 9999,
   inset: 0,
   background: vars.colors.scrim,
   filter: "blur(10px)",

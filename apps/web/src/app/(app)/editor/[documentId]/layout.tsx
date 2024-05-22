@@ -39,7 +39,7 @@ async function Content({
       <div className={css.content}>
         <EditorHeader blueprint={blueprint} />
         <EditorCharacters blueprint={blueprint} />
-        {children}
+        <main>{children}</main>
       </div>
     </EditorContextProvider>
   );

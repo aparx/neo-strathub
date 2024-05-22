@@ -254,7 +254,7 @@ alter table public.team_player_slot
 create unique index uidx_unique_slot_index_per_team
     on public.team_player_slot (team_id, slot_index);
 
--- team_player_slot & member join table that enables multiple members for a single slot
+-- team_player_slot & actions join table that enables multiple members for a single slot
 create table if not exists public.player_slot_assign
 (
     slot_id    uuid        not null references public.team_player_slot (id)

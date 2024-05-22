@@ -4,7 +4,7 @@ import { getUser } from "@/modules/auth/actions";
 import {
   getMember,
   TeamMemberBase,
-} from "@/modules/team/actions/member/getMember";
+} from "@/modules/team/modals/members/actions/getMember";
 import { createServiceServer } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 
@@ -13,9 +13,9 @@ export async function deleteMember(target: TeamMemberBase) {
   const user = await getUser(cookies());
   if (!user) throw new Error("Unauthorized");
 
-  // Authorize if user is able to delete given member
+  // Authorize if user is able to delete given actions
   const selfMember = await getMember(user.id, target.team_id);
-  if (!selfMember) throw new Error("Not a member of this team");
+  if (!selfMember) throw new Error("Not a actions of this team");
 
   if (selfMember.profile_id === target.profile_id)
     // Always allow a user to remove themselves from a team
@@ -27,7 +27,7 @@ export async function deleteMember(target: TeamMemberBase) {
   if (selfMember.team_member_role.flags <= targetMember.team_member_role.flags)
     throw new Error("Cannot remove users with higher or equal role");
 
-  // Delete the given member
+  // Delete the given actions
   return deleteRecord(target.profile_id, target.team_id);
 }
 

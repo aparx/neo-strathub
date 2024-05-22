@@ -32,7 +32,7 @@ export async function createProfile(lastState: any, formData: FormData) {
   console.log(process.env.NODE_ENV);
 
   if (process.env.NODE_ENV === "development") {
-    // For testing purposes give this member some random teams
+    // For testing purposes give this actions some random teams
     const teamCount = Math.round(Math.random() * 2) + 1;
     const { data: teams } = await service
       .from("team")

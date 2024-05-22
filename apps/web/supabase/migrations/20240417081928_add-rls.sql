@@ -43,14 +43,14 @@ create policy "public read access"
 create or replace function can_select_book(book book)
     returns boolean as $$
 begin
-    -- only allow the book to be seen when the user is a member of the team or there
+    -- only allow the book to be seen when the user is a actions of the team or there
     -- is any publicly accessible blueprint within that book.
 
     if (exists(select profile_id
                from public.team_member
                where profile_id = auth.uid()
                  and team_id = book.team_id)) then
-        -- user is member of the team, thus automatically allow
+        -- user is actions of the team, thus automatically allow
         return true;
     end if;
 
@@ -92,7 +92,7 @@ create or replace function can_select_team_member(target team_member)
     returns boolean as $$
 begin
     -- TODO exclude site admins from this function
-    -- only allow select if authenticated user is in a team with target member
+    -- only allow select if authenticated user is in a team with target actions
     return exists(select profile_id
                   from public.team_member
                   where team_id = target.team_id
@@ -109,7 +109,7 @@ create policy "public read access"
 -- //////////////////////////////// team_player_slot ////////////////////////////////
 
 -- Public read access for team_player_slot, only then, when the authenticated user
--- is a member of that team or can see a book (thus has any exposed blueprint)
+-- is a actions of that team or can see a book (thus has any exposed blueprint)
 create policy "public read access"
     on public.team_player_slot as permissive
     for select to authenticated
@@ -175,14 +175,14 @@ begin
     end if;
 
     if (entry.team_id is not null) then
-        -- Authenticated user must be a member of the team
+        -- Authenticated user must be a actions of the team
         select public.team_member_role.flags
         into _member_flags
         from team_member
                  left join team_member_role on team_member_role.id = team_member.role_id
         where team_id = entry.team_id
           and profile_id = auth.uid();
-        -- Check if user is member and their flags contains VIEW_AUDIT_LOG
+        -- Check if user is actions and their flags contains VIEW_AUDIT_LOG
         return _member_flags is not null and (_member_flags & 256) != 0;
     end if;
 

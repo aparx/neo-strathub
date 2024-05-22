@@ -2,7 +2,7 @@
 
 import { getUser } from "@/modules/auth/actions";
 import { hasFlag, TeamMemberFlags } from "@/modules/auth/flags";
-import { getMember } from "@/modules/team/actions/member/getMember";
+import { getMember } from "@/modules/team/modals/members/actions/getMember";
 import { getServer, getServiceServer } from "@/utils/supabase/actions";
 import { cookies } from "next/headers";
 
@@ -24,7 +24,7 @@ export async function deleteBook(id: string) {
 
   // Check if user is even authorized to create this book
   const selfMember = await getMember(user.id, book.team_id);
-  if (!selfMember) return createError("Not a member of this team");
+  if (!selfMember) return createError("Not a actions of this team");
 
   if (!hasFlag(selfMember.team_member_role.flags, TeamMemberFlags.DELETE_BOOKS))
     return createError("Missing the permission to delete a book");
