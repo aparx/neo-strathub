@@ -4,13 +4,14 @@ import { useUserContext } from "@/modules/auth/context";
 import { TeamMemberFlags, hasFlag } from "@/modules/auth/flags";
 import { getTeam } from "@/modules/team/actions";
 import {
+  PlayerSlotTrigger,
   ROLE_SELECT_HEIGHT,
   RemoveMemberButton,
   RoleSelect,
   RoleSelectProps,
 } from "@/modules/team/modals/members/components";
-import { MemberPlayerSlot } from "@/modules/team/modals/members/components/memberPlayerSlot";
 import {
+  MemberSlotData,
   TeamMemberData,
   useGetMembers,
 } from "@/modules/team/modals/members/hooks";
@@ -27,8 +28,15 @@ import {
   Table,
 } from "@repo/ui/components";
 import { InferAsync, Nullish } from "@repo/utils";
+import { useQuery } from "@tanstack/react-query";
 import moment from "moment";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useTransition,
+} from "react";
 import * as css from "./content.css";
 
 interface TeamMembersModalProps {
@@ -154,7 +162,9 @@ function MemberSlot({
   const isUserThemselves = self?.profile_id === member.profile_id;
   const selfFlags = self?.member_role?.flags;
   const targetFlags = member.member_role?.flags;
-  let canModify = hasFlag(selfFlags, TeamMemberFlags.EDIT_MEMBERS);
+  const canModifyBase = hasFlag(selfFlags, TeamMemberFlags.EDIT_MEMBERS);
+
+  let canModify = canModifyBase;
   let canKick = hasFlag(selfFlags, TeamMemberFlags.KICK_MEMBERS);
 
   if (selfFlags && targetFlags) {
@@ -174,7 +184,8 @@ function MemberSlot({
       onRemove={onRemove}
       onUpdate={onUpdate}
       member={member}
-      canModify={canModify}
+      canModifySecurely={canModify}
+      canModifyBasic={canModifyBase}
       canKick={canKick}
     />
   );
@@ -183,13 +194,15 @@ function MemberSlot({
 function MemberRow({
   member,
   canKick,
-  canModify,
+  canModifySecurely,
+  canModifyBasic,
   onRemove,
   onUpdate,
 }: {
   member: TeamMemberData;
   canKick?: boolean;
-  canModify?: boolean;
+  canModifySecurely?: boolean;
+  canModifyBasic?: boolean;
   onRemove: () => any;
   onUpdate: RoleSelectProps["onSelect"];
 }) {
@@ -201,27 +214,17 @@ function MemberRow({
         <UserField profile={member.profile} />
       </Table.Cell>
       <Table.Cell>
-        <Modal.Root>
-          <Modal.Trigger asChild>
-            <MemberPlayerSlot memberId={member.id} />
-          </Modal.Trigger>
-          <AssignSlotModal member={member} />
-        </Modal.Root>
+        <MemberSlotButton member={member} disabled={!canModifyBasic} />
       </Table.Cell>
       <Table.Cell>
         <RoleSelect
           width={100}
           initialRoleId={role_id}
           onSelect={onUpdate}
-          disabled={!canModify}
+          disabled={!canModifySecurely}
         />
       </Table.Cell>
-      <Table.Cell>
-        {useMemo(
-          () => moment(created_at).format("YYYY-MM-DD HH:mm"),
-          [created_at],
-        )}
-      </Table.Cell>
+      <Table.Cell>{moment(created_at).format("YYYY-MM-DD HH:mm")}</Table.Cell>
       <Table.Cell>
         <RemoveMemberButton
           disabled={!canKick}
@@ -235,6 +238,65 @@ function MemberRow({
         />
       </Table.Cell>
     </Table.Row>
+  );
+}
+
+function MemberSlotButton({
+  member,
+  disabled,
+}: {
+  member: TeamMemberData;
+  disabled?: boolean;
+}) {
+  const [isPending, startTransition] = useTransition();
+  const [rootOpen, setRootOpen] = useState(false);
+
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ["playerSlot", member.id],
+    queryFn: async () =>
+      await createClient()
+        .from("member_to_player_slot")
+        .select("player_slot!inner(color, index)")
+        .eq("member_id", member.id)
+        .maybeSingle(),
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
+  });
+
+  const tmpSlot = data?.data?.player_slot;
+  const [slot, setSlot] = useState<typeof tmpSlot | null>(tmpSlot);
+  useEffect(() => setSlot(tmpSlot), [tmpSlot]);
+
+  if (isLoading) return <Skeleton width={120} height={26} />;
+
+  async function selectSlot(data: MemberSlotData | null) {
+    // Optimistic update
+    startTransition(async () => {
+      setSlot(data ? { color: data.color, index: data.index } : null);
+      const { error } = await createClient().rpc("assign_member_to_slot", {
+        member_id: member.id,
+        slot_id: (data?.id as NonNullable<(typeof data & {})["id"]>) ?? null,
+        try_swap: false, // TODO SWAP MECHANIC THROUGH MODAL
+      });
+      setRootOpen(false);
+      if (error) {
+        console.error("#_selectSlot", error);
+        refetch().then(({ data }) => setSlot(data?.data?.player_slot));
+      }
+    });
+  }
+
+  return (
+    <Modal.Root open={rootOpen} onOpenChange={setRootOpen}>
+      <Modal.Trigger asChild>
+        <PlayerSlotTrigger slot={slot} disabled={disabled} />
+      </Modal.Trigger>
+      <AssignSlotModal
+        member={member}
+        onSelect={selectSlot}
+        isLoading={isPending}
+      />
+    </Modal.Root>
   );
 }
 

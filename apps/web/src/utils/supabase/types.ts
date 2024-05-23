@@ -665,6 +665,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      assign_member_to_slot: {
+        Args: {
+          member_id: number
+          slot_id: number
+          try_swap: boolean
+        }
+        Returns: undefined
+      }
       can_select_audit_log: {
         Args: {
           entry: unknown

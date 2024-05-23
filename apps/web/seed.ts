@@ -137,7 +137,7 @@ async function main() {
     });
 
     return generateArray({
-      range: [10, 20],
+      range: [2, 2],
       fillFn: () => ({
         name: generateUnique(nameContext, nameGenerator),
         book: generateBooks(),

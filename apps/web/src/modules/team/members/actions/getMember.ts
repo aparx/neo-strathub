@@ -1,5 +1,4 @@
 import { getServiceServer } from "@/utils/supabase/actions";
-import { InferAsync } from "@repo/utils";
 import { cookies } from "next/headers";
 import { cache } from "react";
 import "server-only";
@@ -14,5 +13,3 @@ export const getMember = cache(async (profileId: string, teamId: string) => {
       .single()
   ).data;
 });
-
-export type TeamMember = NonNullable<InferAsync<ReturnType<typeof getMember>>>;

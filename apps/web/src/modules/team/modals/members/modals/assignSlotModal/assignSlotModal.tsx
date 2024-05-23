@@ -11,17 +11,34 @@ import { DragScrollArea, Modal, Text } from "@repo/ui/components";
 import { blendColors } from "@repo/ui/utils";
 import * as css from "./assignSlotModal.css";
 
-export function AssignSlotModal({ member }: { member: TeamMemberData }) {
+export function AssignSlotModal({
+  member,
+  onSelect,
+  isLoading,
+}: {
+  member: TeamMemberData;
+  onSelect: (slot: MemberSlotData | null) => any;
+  isLoading?: boolean;
+}) {
   const { data } = useGetMemberSlots(member.team_id);
 
-  // TODO fetch slots
   return (
     <Modal.Content style={{ maxWidth: 450 }}>
-      <Modal.Title>Assign slot to {member.profile.name}</Modal.Title>
+      <Modal.Title>
+        Assign slot to {member.profile.name}
+        <Modal.Exit />
+      </Modal.Title>
       <ol className={css.slotList}>
+        <li>
+          <NoSlotRow onSelect={() => onSelect(null)} />
+        </li>
         {data?.data?.map((slot) => (
           <li key={slot.id}>
-            <SlotRow {...slot} />
+            <SlotRow
+              slot={slot}
+              onSelect={() => onSelect(slot)}
+              disabled={isLoading}
+            />
           </li>
         ))}
       </ol>
@@ -29,16 +46,58 @@ export function AssignSlotModal({ member }: { member: TeamMemberData }) {
   );
 }
 
-function SlotRow({ id, index, color }: MemberSlotData) {
+function NoSlotRow({
+  onSelect,
+  disabled,
+}: {
+  onSelect: () => void;
+  disabled?: boolean;
+}) {
+  const background = vars.colors.accents[4];
+  const color = vars.colors.emphasis.medium;
+
+  return (
+    <button
+      className={css.slot({ disabled: disabled })}
+      style={{ background, color }}
+      onClick={onSelect}
+      disabled={disabled}
+      data-disabled={disabled}
+    >
+      <Text
+        className={css.index({ mode: "empty" })}
+        style={{ color: background, background: color }}
+      />
+      <Text>No Slot</Text>
+    </button>
+  );
+}
+
+function SlotRow({
+  slot,
+  onSelect,
+  disabled,
+}: {
+  slot: MemberSlotData;
+  onSelect: () => void;
+  disabled?: boolean;
+}) {
+  const { id, color, index } = slot;
   const { data } = useGetMembersForSlot(id);
 
   const background = blendColors(color, "black 80%");
 
   return (
-    <article className={css.slot} style={{ background, color }}>
+    <button
+      className={css.slot({ disabled: disabled })}
+      style={{ background, color }}
+      onClick={onSelect}
+      disabled={disabled}
+      data-disabled={disabled}
+    >
       <Text
         data={{ weight: 800 }}
-        className={css.index}
+        className={css.index({ mode: "number" })}
         style={{ color: background, background: color }}
       >
         #{1 + (index ?? 0)}
@@ -55,7 +114,7 @@ function SlotRow({ id, index, color }: MemberSlotData) {
         ) : (
           <ul
             className={css.playerList}
-            aria-label={"users assigned to this slot"}
+            aria-label={"Users assigned to this slot"}
           >
             {data?.data?.map((x) => (
               <li className={css.player} key={x.member_id}>
@@ -65,6 +124,6 @@ function SlotRow({ id, index, color }: MemberSlotData) {
           </ul>
         )}
       </DragScrollArea>
-    </article>
+    </button>
   );
 }

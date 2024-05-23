@@ -16,7 +16,7 @@ type TextBaseProps = TypographyProps &
   Omit<HTMLProps<HTMLDivElement>, keyof TypographyProps>;
 
 export interface TextProps extends TextBaseProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   asChild?: boolean;
 }
 
