@@ -1,9 +1,5 @@
 -- noinspection SqlResolveForFile
 
--- noinspection SqlResolveForFile @ routine/"channel_name"
-
--- noinspection SqlResolveForFile @ routine/"uid"
-
 -- //////////////////////////////// game ////////////////////////////////
 
 create policy "public read access"
@@ -79,10 +75,10 @@ create policy "public read access"
     on public.game_object as permissive
     for select to authenticated using (true);
 
--- //////////////////////////////// team_member_role ////////////////////////////////
+-- //////////////////////////////// member_role ////////////////////////////////
 
 create policy "public read access"
-    on public.team_member_role as permissive
+    on public.member_role as permissive
     for select to authenticated using (true);
 
 
@@ -106,28 +102,28 @@ create policy "public read access"
     using (auth.uid() = team_member.profile_id or
            can_select_team_member(team_member));
 
--- //////////////////////////////// team_player_slot ////////////////////////////////
+-- //////////////////////////////// player_slot ////////////////////////////////
 
--- Public read access for team_player_slot, only then, when the authenticated user
+-- Public read access for player_slot, only then, when the authenticated user
 -- is a actions of that team or can see a book (thus has any exposed blueprint)
 create policy "public read access"
-    on public.team_player_slot as permissive
+    on public.player_slot as permissive
     for select to authenticated
     using (exists(select id
                   from team_member
-                  where team_member.team_id = team_player_slot.team_id
+                  where team_member.team_id = player_slot.team_id
                     and profile_id = auth.uid())
     or exists(select id
               from book
-              where book.team_id = team_player_slot.team_id));
+              where book.team_id = player_slot.team_id));
 
--- //////////////////////////////// player_slot_assign ////////////////////////////////
+-- //////////////////////////////// member_to_player_slot ////////////////////////////////
 create policy "public read access"
-    on public.player_slot_assign as permissive
+    on public.member_to_player_slot as permissive
     for select to authenticated
     using (exists(select id
-                  from team_player_slot
-                  where id = player_slot_assign.slot_id));
+                  from player_slot
+                  where id = member_to_player_slot.slot_id));
 
 -- //////////////////////////////// blueprint ////////////////////////////////
 
@@ -176,10 +172,10 @@ begin
 
     if (entry.team_id is not null) then
         -- Authenticated user must be a actions of the team
-        select public.team_member_role.flags
+        select public.member_role.flags
         into _member_flags
         from team_member
-                 left join team_member_role on team_member_role.id = team_member.role_id
+                 left join member_role on member_role.id = team_member.role_id
         where team_id = entry.team_id
           and profile_id = auth.uid();
         -- Check if user is actions and their flags contains VIEW_AUDIT_LOG

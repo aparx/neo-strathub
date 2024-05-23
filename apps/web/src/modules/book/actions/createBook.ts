@@ -6,7 +6,7 @@ import {
   CreateBookSchema,
   createBookSchema,
 } from "@/modules/book/actions/createBook.schema";
-import { getMember } from "@/modules/team/modals/members/actions/getMember";
+import { getMember } from "@/modules/team/members/actions/getMember";
 import { getServiceServer } from "@/utils/supabase/actions";
 import { cookies } from "next/headers";
 import { PostgresError } from "pg-error-enum";
@@ -27,7 +27,7 @@ export async function createBook(inputData: CreateBookSchema) {
   const selfMember = await getMember(user.id, validated.teamId);
   if (!selfMember) throw new Error("Not a actions of this team");
 
-  if (!hasFlag(selfMember.team_member_role.flags, TeamMemberFlags.MODIFY_BOOKS))
+  if (!hasFlag(selfMember.member_role.flags, TeamMemberFlags.MODIFY_BOOKS))
     throw new Error("Missing the permission to create a book");
 
   const create = await getServiceServer(cookies()).rpc("create_book", {

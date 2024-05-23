@@ -2,8 +2,7 @@ import { HelpButton } from "@/components";
 import { UserField } from "@/modules/auth/components";
 import { useUserContext } from "@/modules/auth/context";
 import { TeamMemberFlags, hasFlag } from "@/modules/auth/flags";
-import { deleteMember, getTeam } from "@/modules/team/actions";
-import { updateMember } from "@/modules/team/modals/members/actions/updateMember";
+import { getTeam } from "@/modules/team/actions";
 import {
   ROLE_SELECT_HEIGHT,
   RemoveMemberButton,
@@ -16,6 +15,7 @@ import {
   useGetMembers,
 } from "@/modules/team/modals/members/hooks";
 import { AssignSlotModal } from "@/modules/team/modals/members/modals";
+import { createClient } from "@/utils/supabase/client";
 import { Tables } from "@/utils/supabase/types";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { vars } from "@repo/theme";
@@ -37,7 +37,7 @@ interface TeamMembersModalProps {
 
 function sortMembers(members: Nullish<TeamMemberData[]>) {
   return members?.sort((a, b) => {
-    return b.team_member_role.flags - a.team_member_role.flags;
+    return b.member_role.flags - a.member_role.flags;
   });
 }
 
@@ -50,8 +50,6 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
   useEffect(() => setMembers(sortMembers(data?.data)), [data?.data]);
 
   const removeMember = useCallback(async (member: TeamMemberData) => {
-    console.debug("#_removeMember", "invoke", member);
-
     // Optimistic update, remove the actions first
     setMembers((current) => {
       const newMembers = current ? [...current] : [];
@@ -60,20 +58,22 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
       return newMembers;
     });
 
-    await deleteMember(member).catch((e) => {
-      console.error("#_removeMember", "error", e);
+    const { error } = await createClient().rpc("kick_member", {
+      member_id: member.id,
+    });
+    if (error) {
+      console.error("#_removeMember", error);
       // Refetch to ensure displayed data synchronicity and authenticity
       refetch().then(({ data }) => setMembers(sortMembers(data?.data)));
-    });
+    }
   }, []);
 
   const updateRole = useCallback(
-    async (member: TeamMemberData, role: Tables<"team_member_role">) => {
-      console.debug("#_updateMember", "invoke", member, role);
-
-      await updateMember(member, role.id).catch((e) => {
-        console.error("#_updateMember", "error", e);
-        // TODO error handling, toast?
+    async (target: TeamMemberData, role: Tables<"member_role">) => {
+      await createClient().rpc("update_member_role", {
+        team_id: target.team_id,
+        new_role_id: role.id,
+        target_profile_id: target.profile_id,
       });
     },
     [],
@@ -152,8 +152,8 @@ function MemberSlot({
   onUpdate: RoleSelectProps["onSelect"];
 }) {
   const isUserThemselves = self?.profile_id === member.profile_id;
-  const selfFlags = self?.team_member_role?.flags;
-  const targetFlags = member.team_member_role?.flags;
+  const selfFlags = self?.member_role?.flags;
+  const targetFlags = member.member_role?.flags;
   let canModify = hasFlag(selfFlags, TeamMemberFlags.EDIT_MEMBERS);
   let canKick = hasFlag(selfFlags, TeamMemberFlags.KICK_MEMBERS);
 

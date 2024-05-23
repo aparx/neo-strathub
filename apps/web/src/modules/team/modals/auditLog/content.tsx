@@ -21,7 +21,7 @@ function useGetLogEntries(teamId: string) {
     queryFn: async (context) => {
       const queryBuilder = createClient()
         .from("audit_log")
-        .select("*, profile(id, username, avatar)")
+        .select("*, profile(id, name, avatar)")
         .eq("team_id", teamId)
         .order("id", { ascending: false })
         .limit(1 + LOG_PAGE_LIMIT);

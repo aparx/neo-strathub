@@ -1,6 +1,6 @@
 -- noinspection SqlResolveForFile
 
--- //////////////////////////////// profile ////////////////////////////////
+-- ---------------------------- profile ----------------------------
 create or replace function copy_avatar_from_user_update()
     returns trigger as $$
 begin
@@ -42,7 +42,7 @@ create trigger trigger_copy_avatar_on_profile_create
     for each row
 execute function get_avatar_on_profile_insert();
 
--- //////////////////////////////// team_member ////////////////////////////////
+-- ---------------------------- team_member ----------------------------
 
 create or replace function delete_team_if_empty()
     returns trigger as $$
@@ -68,21 +68,21 @@ create or replace function on_create_team_member()
     returns trigger as
 $$
 declare
-    _free_slot_id uuid;
+    _free_slot_id bigint;
 begin
-    -- Try to assign new team_member to a team_player_slot if any is free
+    -- Try to assign new team_member to a player_slot if any is free
     select id
     into _free_slot_id
-    from public.team_player_slot
-    where team_player_slot.team_id = new.team_id
+    from public.player_slot
+    where player_slot.team_id = new.team_id
       and not exists(select id
-                     from player_slot_assign
-                     where slot_id = team_player_slot.id)
-    order by slot_index
+                     from member_to_player_slot
+                     where slot_id = player_slot.id)
+    order by index
     limit 1;
 
     if (_free_slot_id is not null) then
-        insert into public.player_slot_assign (slot_id, member_id)
+        insert into public.member_to_player_slot (slot_id, member_id)
         values (_free_slot_id, new.id);
     end if;
 
@@ -101,70 +101,68 @@ create trigger trigger_create_team_member
     for each row
 execute function on_create_team_member();
 
--- //////////////////////////////// team_player_slot ////////////////////////////////
+-- ---------------------------- player_slot ----------------------------
 
-create or replace function on_create_team_player_slot_index()
+create or replace function on_create_player_index()
     returns trigger as $$
 declare
     _max_index int;
 begin
-    if (new.slot_index is not null) then
+    if (new.index is not null) then
         return new;
     end if;
 
-    select max(slot_index)
+    select max(index)
     into _max_index
-    from public.team_player_slot
+    from public.player_slot
     where team_id = new.team_id;
 
-    new.slot_index := (case when (_max_index is null) then 0 else 1 + _max_index end);
+    new.index := (case when (_max_index is null) then 0 else 1 + _max_index end);
     return new;
 end;
 $$ volatile language plpgsql;
 
-create trigger trigger_update_team_player_slot_index
+create trigger trigger_update_player_index
     before insert
-    on public.team_player_slot
+    on public.player_slot
     for each row
-execute function on_create_team_player_slot_index();
+execute function on_create_player_index();
 
--- //////////////////////////////// player_slot_assign ////////////////////////////////
+-- ---------------------------- member_to_player_slot ----------------------------
 
-create or replace function on_create_player_slot_assign()
+create or replace function on_create_member_to_player_slot()
     returns trigger as $$
 declare
-    _slot     record;
-    _username text;
+    _slot record;
+    _name text;
 begin
-    -- Insert assignment into audit log
-
-    select team_id, slot_index
-    from public.team_player_slot
+    select team_id, index
+    from public.player_slot
     where id = new.slot_id
     into _slot;
 
-    select public.profile.username
-    into _username
+    select public.profile.name
+    into _name
     from public.team_member
              left join public.profile on team_member.profile_id = profile.id
     where team_member.id = new.member_id;
 
     insert into public.audit_log (team_id, performer_id, type, message)
     values (_slot.team_id, auth.uid(), 'update',
-            'Assigned ' || coalesce(_username, '(Unknown)') || ' to slot #' ||
-            (1 + _slot.slot_index));
+            'Assigned ' || coalesce(_name, '(Unknown)') || ' to slot #' ||
+            (1 + _slot.index));
 
     return new;
 end;
 $$ language plpgsql security definer;
 
-create trigger trigger_create_player_slot_assign
+create trigger trigger_create_member_to_player_slot
     after insert
-    on public.player_slot_assign
+    on public.member_to_player_slot
     for each row
-execute function on_create_player_slot_assign();
+execute function on_create_member_to_player_slot();
 
--- //////////////////////////////// team ////////////////////////////////
+-- ---------------------------- team ----------------------------
 
 create or replace function on_create_team()
     returns trigger as $$
@@ -183,7 +181,7 @@ begin
 
     if (_game_player_count is not null) then
         for i in 1.._game_player_count loop
-            insert into public.team_player_slot (team_id, color, slot_index)
+            insert into public.player_slot (team_id, color, index)
             values (new.id, 'hsl(' || (((i - 1) * 60) % 360) || ', 75%, 75%)', i - 1);
         end loop;
     end if;
@@ -199,7 +197,7 @@ create trigger trigger_create_sample_book
     for each row
 execute function on_create_team();
 
--- //////////////////////////////// arena ////////////////////////////////
+-- ---------------------------- arena ----------------------------
 
 create or replace function on_arena_create()
     returns trigger as $$
@@ -243,7 +241,7 @@ create trigger trigger_create_arena
     for each row
 execute function on_arena_create();
 
--- //////////////////////////////// blueprint ////////////////////////////////
+-- ---------------------------- blueprint ----------------------------
 
 create or replace function on_blueprint_create()
     returns trigger as $$
@@ -275,7 +273,7 @@ create trigger trigger_blueprint_create
     for each row
 execute function on_blueprint_create();
 
--- //////////////////////////////// blueprint_character ////////////////////////////////
+-- ---------------------------- blueprint_character ----------------------------
 
 create or replace function verify_blueprint_character()
     returns trigger as
@@ -286,7 +284,7 @@ begin
     -- Verify the slot is in the same team as the character
     select team_id
     into _slot_team_id
-    from public.team_player_slot
+    from public.player_slot
     where id = new.slot_id;
 
     if (_slot_team_id is null) then

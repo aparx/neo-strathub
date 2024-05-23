@@ -21,7 +21,7 @@ export function SelectorHeader() {
     queryFn: async () =>
       await createClient()
         .from("team_member")
-        .select("team_member_role!inner(flags)")
+        .select("member_role!inner(flags)")
         .eq("team_id", params.teamId!)
         .eq("profile_id", user!.id)
         .single(),
@@ -32,7 +32,7 @@ export function SelectorHeader() {
   useEffect(() => {
     if (!selfMember?.data) return setAddable(params.teamId == null);
     // Only allow to be able to add new books if authorized to do so
-    const permissionFlags = selfMember.data.team_member_role.flags;
+    const permissionFlags = selfMember.data.member_role.flags;
     setAddable(hasFlag(permissionFlags, TeamMemberFlags.MODIFY_BOOKS));
   }, [selfMember]);
 

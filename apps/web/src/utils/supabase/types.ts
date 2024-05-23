@@ -169,7 +169,8 @@ export type Database = {
           id: number
           index: number
           object_id: number | null
-          slot_id: string | null
+          slot_id: number | null
+          updated_at: string
         }
         Insert: {
           blueprint_id: string
@@ -177,7 +178,8 @@ export type Database = {
           id?: number
           index: number
           object_id?: number | null
-          slot_id?: string | null
+          slot_id?: number | null
+          updated_at?: string
         }
         Update: {
           blueprint_id?: string
@@ -185,7 +187,8 @@ export type Database = {
           id?: number
           index?: number
           object_id?: number | null
-          slot_id?: string | null
+          slot_id?: number | null
+          updated_at?: string
         }
         Relationships: [
           {
@@ -206,7 +209,7 @@ export type Database = {
             foreignKeyName: "blueprint_character_slot_id_fkey"
             columns: ["slot_id"]
             isOneToOne: false
-            referencedRelation: "team_player_slot"
+            referencedRelation: "player_slot"
             referencedColumns: ["id"]
           },
         ]
@@ -216,24 +219,24 @@ export type Database = {
           blueprint_id: string
           created_at: string
           data: Json
-          id: string
-          stage: number
+          id: number
+          index: number
           updated_at: string
         }
         Insert: {
           blueprint_id: string
           created_at?: string
-          data?: Json
-          id?: string
-          stage: number
+          data: Json
+          id?: number
+          index: number
           updated_at?: string
         }
         Update: {
           blueprint_id?: string
           created_at?: string
           data?: Json
-          id?: string
-          stage?: number
+          id?: number
+          index?: number
           updated_at?: string
         }
         Relationships: [
@@ -350,6 +353,7 @@ export type Database = {
           id: number
           metadata: Json
           name: string
+          updated_at: string
         }
         Insert: {
           alias?: string | null
@@ -359,6 +363,7 @@ export type Database = {
           id?: number
           metadata?: Json
           name: string
+          updated_at?: string
         }
         Update: {
           alias?: string | null
@@ -368,6 +373,7 @@ export type Database = {
           id?: number
           metadata?: Json
           name?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -377,7 +383,7 @@ export type Database = {
           id: number
           metadata: Json | null
           name: string | null
-          type: Database["public"]["Enums"]["game_object_type"]
+          type: string
           url: string
         }
         Insert: {
@@ -385,7 +391,7 @@ export type Database = {
           id?: number
           metadata?: Json | null
           name?: string | null
-          type: Database["public"]["Enums"]["game_object_type"]
+          type: string
           url: string
         }
         Update: {
@@ -393,7 +399,7 @@ export type Database = {
           id?: number
           metadata?: Json | null
           name?: string | null
-          type?: Database["public"]["Enums"]["game_object_type"]
+          type?: string
           url?: string
         }
         Relationships: [
@@ -406,12 +412,66 @@ export type Database = {
           },
         ]
       }
+      member_role: {
+        Row: {
+          flags: number
+          id: number
+          name: string
+        }
+        Insert: {
+          flags: number
+          id?: number
+          name: string
+        }
+        Update: {
+          flags?: number
+          id?: number
+          name?: string
+        }
+        Relationships: []
+      }
+      member_to_player_slot: {
+        Row: {
+          created_at: string
+          member_id: number
+          slot_id: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          member_id: number
+          slot_id: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          member_id?: number
+          slot_id?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "member_to_player_slot_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "team_member"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "member_to_player_slot_slot_id_fkey"
+            columns: ["slot_id"]
+            isOneToOne: false
+            referencedRelation: "player_slot"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       plan: {
         Row: {
           config: Json
           created_at: string
+          default_plan: boolean
           id: number
-          is_default: boolean
           name: string
           pricing: number
           pricing_interval: Database["public"]["Enums"]["pay_interval"] | null
@@ -420,8 +480,8 @@ export type Database = {
         Insert: {
           config?: Json
           created_at?: string
+          default_plan?: boolean
           id?: number
-          is_default?: boolean
           name: string
           pricing: number
           pricing_interval?: Database["public"]["Enums"]["pay_interval"] | null
@@ -430,8 +490,8 @@ export type Database = {
         Update: {
           config?: Json
           created_at?: string
+          default_plan?: boolean
           id?: number
-          is_default?: boolean
           name?: string
           pricing?: number
           pricing_interval?: Database["public"]["Enums"]["pay_interval"] | null
@@ -439,38 +499,37 @@ export type Database = {
         }
         Relationships: []
       }
-      player_slot_assign: {
+      player_slot: {
         Row: {
+          color: string
           created_at: string
-          member_id: number
-          slot_id: string
+          id: number
+          index: number | null
+          team_id: string
           updated_at: string
         }
         Insert: {
+          color: string
           created_at?: string
-          member_id: number
-          slot_id: string
+          id?: number
+          index?: number | null
+          team_id: string
           updated_at?: string
         }
         Update: {
+          color?: string
           created_at?: string
-          member_id?: number
-          slot_id?: string
+          id?: number
+          index?: number | null
+          team_id?: string
           updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "player_slot_assign_member_id_fkey"
-            columns: ["member_id"]
+            foreignKeyName: "player_slot_team_id_fkey"
+            columns: ["team_id"]
             isOneToOne: false
-            referencedRelation: "team_member"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "player_slot_assign_slot_id_fkey"
-            columns: ["slot_id"]
-            isOneToOne: false
-            referencedRelation: "team_player_slot"
+            referencedRelation: "team"
             referencedColumns: ["id"]
           },
         ]
@@ -480,25 +539,22 @@ export type Database = {
           avatar: string | null
           created_at: string
           id: string
-          role: Database["public"]["Enums"]["profile_role"]
+          name: string
           updated_at: string
-          username: string
         }
         Insert: {
           avatar?: string | null
           created_at?: string
           id: string
-          role?: Database["public"]["Enums"]["profile_role"]
+          name: string
           updated_at?: string
-          username: string
         }
         Update: {
           avatar?: string | null
           created_at?: string
           id?: string
-          role?: Database["public"]["Enums"]["profile_role"]
+          name?: string
           updated_at?: string
-          username?: string
         }
         Relationships: [
           {
@@ -556,6 +612,7 @@ export type Database = {
         Row: {
           created_at: string
           id: number
+          privileged: boolean
           profile_id: string
           role_id: number
           team_id: string
@@ -564,6 +621,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: number
+          privileged?: boolean
           profile_id: string
           role_id: number
           team_id: string
@@ -572,6 +630,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: number
+          privileged?: boolean
           profile_id?: string
           role_id?: number
           team_id?: string
@@ -589,64 +648,11 @@ export type Database = {
             foreignKeyName: "team_member_role_id_fkey"
             columns: ["role_id"]
             isOneToOne: false
-            referencedRelation: "team_member_role"
+            referencedRelation: "member_role"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "team_member_team_id_fkey"
-            columns: ["team_id"]
-            isOneToOne: false
-            referencedRelation: "team"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      team_member_role: {
-        Row: {
-          flags: number
-          id: number
-          name: string
-        }
-        Insert: {
-          flags?: number
-          id?: number
-          name: string
-        }
-        Update: {
-          flags?: number
-          id?: number
-          name?: string
-        }
-        Relationships: []
-      }
-      team_player_slot: {
-        Row: {
-          color: string
-          created_at: string
-          id: string
-          slot_index: number | null
-          team_id: string
-          updated_at: string
-        }
-        Insert: {
-          color: string
-          created_at?: string
-          id?: string
-          slot_index?: number | null
-          team_id: string
-          updated_at?: string
-        }
-        Update: {
-          color?: string
-          created_at?: string
-          id?: string
-          slot_index?: number | null
-          team_id?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "team_player_slot_team_id_fkey"
             columns: ["team_id"]
             isOneToOne: false
             referencedRelation: "team"
@@ -706,6 +712,12 @@ export type Database = {
         }
         Returns: number
       }
+      kick_member: {
+        Args: {
+          member_id: number
+        }
+        Returns: undefined
+      }
       update_character_object: {
         Args: {
           character_id: number
@@ -720,14 +732,20 @@ export type Database = {
         }
         Returns: boolean
       }
+      update_member_role: {
+        Args: {
+          team_id: string
+          target_profile_id: string
+          new_role_id: number
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       audit_log_type: "create" | "update" | "delete" | "info"
       bp_visibility: "public" | "private" | "unlisted"
       config_value_type: "boolean" | "numeric" | "date" | "text"
-      game_object_type: "character" | "gadget" | "floor"
-      pay_interval: "monthly" | "yearly"
-      profile_role: "admin" | "user"
+      pay_interval: "monthly" | "annually"
     }
     CompositeTypes: {
       [_ in never]: never

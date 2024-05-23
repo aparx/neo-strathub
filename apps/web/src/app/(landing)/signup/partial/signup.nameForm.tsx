@@ -26,9 +26,9 @@ export function SignupNameForm({ user }: { user: User }) {
   let fieldError: Nullish | string[] | string;
 
   if (state?.state === "error") {
-    if (state.message) fieldError = state.message?.username;
+    if (state.message) fieldError = state.message?.name;
     else if (state.error?.code === PostgresError.UNIQUE_VIOLATION)
-      fieldError = "This username is already taken";
+      fieldError = "This name is already taken";
   }
 
   const router = useRouter();
@@ -51,10 +51,10 @@ export function SignupNameForm({ user }: { user: User }) {
   return (
     <form action={dispatch} className={css.formShell}>
       <Flexbox orient={"vertical"} gap={"sm"}>
-        <Text>Please choose a username</Text>
+        <Text>Please choose a name</Text>
         <TextField
-          name={"username"}
-          placeholder={"Username"}
+          name={"name"}
+          placeholder={"name"}
           defaultValue={user.user_metadata.name}
           error={fieldError}
           required

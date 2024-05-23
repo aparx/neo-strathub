@@ -30,7 +30,7 @@ export function EditorCharacter({ data, slots }: EditorCharacterProps) {
   const character = useSharedState(data);
   const object = character.state.game_object;
   const active = object?.url != null;
-  const color = character.state.team_player_slot?.color ?? "transparent";
+  const color = character.state.player_slot?.color ?? "transparent";
 
   useRealtimeEditorHandle(ctx.channel, "updateCharacter", async (payload) => {
     if (payload.id === data.id)

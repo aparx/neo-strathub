@@ -4,8 +4,8 @@ import { useQuery, UseQueryResult } from "@tanstack/react-query";
 
 async function fetchAssignedMemberSlots(slotId: string) {
   return createClient()
-    .from("player_slot_assign")
-    .select("*, team_member!inner(profile!inner(id, username, avatar))")
+    .from("member_to_player_slot")
+    .select("*, team_member!inner(profile!inner(id, name, avatar))")
     .eq("slot_id", slotId);
 }
 

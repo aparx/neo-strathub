@@ -1,4 +1,4 @@
-import { createAnonServer } from "@/utils/supabase/server";
+import { createAuthenticatedServer } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -8,7 +8,7 @@ export async function GET(request: Request) {
   const next = searchParams.get("next") ?? "/";
 
   if (code) {
-    const supabase = createAnonServer(cookies());
+    const supabase = createAuthenticatedServer(cookies());
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) return NextResponse.redirect(`${origin}${next}`);
   }

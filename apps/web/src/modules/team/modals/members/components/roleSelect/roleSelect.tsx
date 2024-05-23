@@ -20,7 +20,7 @@ type RoleSelectBaseProps = Omit<SelectProps, "value" | "onValueChange">;
 export interface RoleSelectProps extends RoleSelectBaseProps {
   width?: number | string;
   initialRoleId: number;
-  onSelect?: (newRole: Tables<"team_member_role">) => any;
+  onSelect?: (newRole: Tables<"member_role">) => any;
 }
 
 /** Referencing the height of the `RoleSelect` component */
@@ -33,7 +33,7 @@ export const ROLE_SELECT_HEIGHT = calc.add(
 function useGetRoles() {
   return useQuery({
     queryKey: ["teamRoles"],
-    queryFn: async () => await createClient().from("team_member_role").select(),
+    queryFn: async () => await createClient().from("member_role").select(),
     refetchOnWindowFocus: false,
     refetchInterval: false,
   });

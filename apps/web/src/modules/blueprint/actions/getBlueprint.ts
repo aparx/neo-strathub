@@ -1,5 +1,5 @@
 "use server";
-import { createAnonServer } from "@/utils/supabase/server";
+import { getServer } from "@/utils/supabase/actions";
 import { InferAsync } from "@repo/utils";
 import { cookies } from "next/headers";
 import { cache } from "react";
@@ -9,7 +9,7 @@ export type DefaultBlueprintData = NonNullable<
 >;
 
 export const getBlueprint = cache(async (id: string) => {
-  const { data, error } = await createAnonServer(cookies())
+  const { data, error } = await getServer(cookies())
     .from("blueprint")
     .select(
       `id, visibility, name, tags,

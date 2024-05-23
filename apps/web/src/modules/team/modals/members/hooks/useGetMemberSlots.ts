@@ -3,7 +3,7 @@ import { InferAsync } from "@repo/utils";
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
 
 async function fetchMemberSlots(teamId: string) {
-  return createClient().from("team_player_slot").select().eq("team_id", teamId);
+  return createClient().from("player_slot").select().eq("team_id", teamId);
 }
 
 type FetchMemberSlotsResult = InferAsync<ReturnType<typeof fetchMemberSlots>>;

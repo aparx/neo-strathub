@@ -21,16 +21,16 @@ export function MemberPlayerSlot({
     queryKey: ["playerSlot", memberId],
     queryFn: async () =>
       await createClient()
-        .from("player_slot_assign")
-        .select("team_player_slot!inner(id, color, slot_index)")
+        .from("member_to_player_slot")
+        .select("player_slot!inner(id, color, index)")
         .eq("member_id", memberId)
         .maybeSingle(),
   });
 
   if (isLoading) return <Skeleton width={120} height={26} />;
 
-  const slot = data?.data?.team_player_slot;
-  const slotNumber = 1 + (slot?.slot_index ?? 0);
+  const slot = data?.data?.player_slot;
+  const slotNumber = 1 + (slot?.index ?? 0);
   return (
     <Text
       asChild

@@ -17,7 +17,7 @@ export function AssignSlotModal({ member }: { member: TeamMemberData }) {
   // TODO fetch slots
   return (
     <Modal.Content style={{ maxWidth: 450 }}>
-      <Modal.Title>Assign slot to {member.profile.username}</Modal.Title>
+      <Modal.Title>Assign slot to {member.profile.name}</Modal.Title>
       <ol className={css.slotList}>
         {data?.data?.map((slot) => (
           <li key={slot.id}>
@@ -29,7 +29,7 @@ export function AssignSlotModal({ member }: { member: TeamMemberData }) {
   );
 }
 
-function SlotRow({ id, slot_index, color }: MemberSlotData) {
+function SlotRow({ id, index, color }: MemberSlotData) {
   const { data } = useGetMembersForSlot(id);
 
   const background = blendColors(color, "black 80%");
@@ -41,7 +41,7 @@ function SlotRow({ id, slot_index, color }: MemberSlotData) {
         className={css.index}
         style={{ color: background, background: color }}
       >
-        #{1 + (slot_index ?? 0)}
+        #{1 + (index ?? 0)}
       </Text>
       <DragScrollArea asChild>
         {data?.data?.length === 0 ? (

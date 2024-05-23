@@ -68,7 +68,7 @@ async function main() {
 
   await seed.$resetDatabase();
 
-  function generateGameObjects() {
+  function generateGameObjects(url: string, type: string) {
     const nameContext = new Set<string>();
     const nameGenerator = createSentenceGenerator({
       words: [1, 3],
@@ -79,7 +79,8 @@ async function main() {
       range: [30, 50],
       fillFn: () => ({
         name: generateUnique(nameContext, nameGenerator),
-        url: "https://svgshare.com/i/16EY.svg",
+        url,
+        type,
       }),
     });
   }
@@ -99,7 +100,13 @@ async function main() {
         icon: "https://svgshare.com/i/15iw.svg",
         metadata: { player_count: 5, gadgets_per_character: 2 },
         hidden: false,
-        game_object: generateGameObjects,
+        game_object: () => [
+          ...generateGameObjects(
+            "https://svgshare.com/i/16EY.svg",
+            "character",
+          ),
+          ...generateGameObjects("https://svgshare.com/i/16EY.svg", "gadget"),
+        ],
       }),
     });
   }
@@ -155,7 +162,7 @@ async function main() {
   const { book, plan } = await seed.plan(
     ["Essential", "Advanced", "Pro"].map((name, index) => ({
       name,
-      is_default: index === 0,
+      default_plan: index === 0,
       pricing: index === 0 ? 0 : undefined /* randomize */,
       team: generateTeams,
       config: {
@@ -173,7 +180,7 @@ async function main() {
     connect: { book, plan, arena, game },
   });
 
-  await seed.team_member_role([
+  await seed.member_role([
     {
       name: "owner",
       flags: TeamMemberFlags.ALL,

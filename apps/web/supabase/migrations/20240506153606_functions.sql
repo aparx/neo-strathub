@@ -1,5 +1,9 @@
 -- noinspection SqlResolveForFile
 
+-- //////////////////////////////////////////////////////////////////////
+--                                  BOOK
+-- //////////////////////////////////////////////////////////////////////
+
 create or replace function create_book(
     book_name varchar, target_team_id uuid, performer_id uuid
 ) returns uuid as $$
@@ -43,6 +47,10 @@ revoke
     execute on function
     create_book(varchar, uuid, uuid)
     from public, anon, authenticated;
+
+-- //////////////////////////////////////////////////////////////////////
+--                                  TEAM
+-- //////////////////////////////////////////////////////////////////////
 
 create or replace function create_team(
     team_name varchar, target_plan_id int, target_game_id int
@@ -95,16 +103,16 @@ begin
     -- Select the highest available role and assign the user to it
     select id
     into _highest_role_id
-    from public.team_member_role
+    from public.member_role
     order by flags desc
     limit 1;
 
     if (_highest_role_id is null) then
-        raise exception 'Could not find a fitting team_member_role';
+        raise exception 'Could not find a fitting member_role';
     end if;
 
-    insert into team_member (profile_id, team_id, role_id)
-    values (auth.uid(), _uid, _highest_role_id);
+    insert into team_member (profile_id, team_id, role_id, owner)
+    values (auth.uid(), _uid, _highest_role_id, true);
 
     return _uid;
 end;
@@ -117,10 +125,135 @@ revoke
     create_team(varchar, int, int)
     from public, anon;
 
-create or replace function get_perms_on_blueprint(blueprint_id uuid, user_id uuid)
-    returns int8 as $$
+-- //////////////////////////////////////////////////////////////////////
+--                              TEAM_MEMBER
+-- //////////////////////////////////////////////////////////////////////
+
+create or replace function kick_member(member_id bigint) returns void as $$
 declare
-    _flags   int8;
+    _target_member record;
+    _self_member   record;
+    _target_name   varchar;
+begin
+    select team_id, profile_id, public.member_role.flags
+    from public.team_member
+             left join public.member_role on team_member.role_id = member_role.id
+    where team_member.id = member_id
+    into _target_member;
+
+    if (_target_member is null) then
+        raise exception 'Target member is not existing';
+    end if;
+
+    if (_target_member.profile_id != auth.uid()) then
+        select id, owner, public.member_role.flags
+        from public.team_member
+                 inner join member_to_player_slot
+                            on team_member.id = member_to_player_slot.member_id
+        where team_member.profile_id = auth.uid()
+          and team_member.team_id = _target_member.team_id
+        into _self_member;
+
+        if ((_self_member.flags & 64 /* KICK_MEMBERS */) = 0) then
+            raise exception 'Missing permission to kick members';
+        end if;
+
+        if (_self_member.flags <= _target_member.flags) then
+            raise exception 'You have equal or less permissions than the target member';
+        end if;
+    end if;
+
+    select name
+    into _target_name
+    from public.profile
+    where id = _target_member.profile_id;
+
+    insert into public.audit_log (team_id, performer_id, type, message)
+    values (_target_member.team_id, auth.uid(), 'delete'::audit_log_type,
+            'Removed ' || _target_name || ' from the team');
+
+    -- This delete could cause the team to be deleted, thus do at the end (audit log)
+    delete from public.team_member where id = member_id;
+end;
+$$
+    volatile language plpgsql
+    security definer;
+
+create or replace function update_member_role(
+    team_id uuid, target_profile_id uuid, new_role_id bigint
+) returns void as $$
+declare
+    _self_member    record;
+    _target_member  record;
+    _new_role_flags bigint;
+begin
+    select id, owner, public.member_role.flags
+    from public.team_member
+             inner join member_to_player_slot
+                        on team_member.id = member_to_player_slot.member_id
+    where team_member.profile_id = auth.uid()
+      and team_member.team_id = $1
+    into _self_member;
+
+    select id, owner, public.member_role.flags
+    from public.team_member
+             inner join member_to_player_slot
+                        on team_member.id = member_to_player_slot.member_id
+    where team_member.profile_id = target_profile_id
+      and team_member.team_id = $1
+    into _target_member;
+
+    if (_self_member is null) then
+        raise exception 'You are not a member of target team';
+    end if;
+
+    if (_target_member is null) then
+        raise exception 'Target user not a member of target team';
+    end if;
+
+    if (_target_member.privileged and _target_member.id != _self_member.id) then
+        raise exception 'Target member is privileged and cannot be changed';
+    end if;
+
+    if (not _self_member.privileged) then
+        if ((_self_member.flags & 32 /* EDIT_MEMBERS */) = 0) then
+            raise exception 'Missing permission to edit members';
+        end if;
+
+        if (_self_member.flags <= _target_member.flags or _target_member.privileged) then
+            raise exception 'Target member has equal or higher permissions than you';
+        end if;
+
+        select flags
+        into _new_role_flags
+        from public.member_role
+        where id = new_role_id;
+
+        if (_new_role_flags is null or _new_role_flags >= _self_member.flags) then
+            raise exception 'Target role''s flags are higher or equal to yours';
+        end if;
+    end if;
+
+    update public.team_member
+    set role_id = new_role_id
+    where id = _target_member.id;
+end;
+$$ volatile language plpgsql
+   security definer;
+
+revoke
+    execute on function
+    update_member_role(uuid, uuid, bigint)
+    from public, anon;
+
+-- //////////////////////////////////////////////////////////////////////
+--                                BLUEPRINT
+-- //////////////////////////////////////////////////////////////////////
+
+create or replace function get_perms_on_blueprint(blueprint_id uuid, user_id uuid)
+    returns bigint as $$
+declare
+    _flags   bigint;
     _team_id uuid;
 begin
     -- Determine the identifier of the team
@@ -135,11 +268,11 @@ begin
     end if;
 
     -- Determine the flags of the authenticated user
-    select public.team_member_role.flags
+    select public.member_role.flags
     into _flags
     from public.team_member
-             inner join public.team_member_role
-                        on team_member.role_id = team_member_role.id
+             inner join public.member_role
+                        on team_member.role_id = member_role.id
     where team_member.profile_id = user_id
       and team_member.team_id = _team_id;
 
@@ -158,12 +291,16 @@ revoke
     get_perms_on_blueprint(uuid, uuid)
     from public, anon, authenticated;
 
+-- //////////////////////////////////////////////////////////////////////
+--                          BLUEPRINT_CHARACTER
+-- //////////////////////////////////////////////////////////////////////
+
 create or replace function update_character_object(
-    character_id int8, object_id int8
+    character_id bigint, object_id bigint
 ) returns boolean as $$
 declare
     _blueprint_id uuid;
-    _flags        int8;
+    _flags        bigint;
 begin
     select blueprint_id
     into _blueprint_id
@@ -188,12 +325,16 @@ end;
 $$ volatile language plpgsql
    security definer;
 
+-- //////////////////////////////////////////////////////////////////////
+--                            CHARACTER_GADGET
+-- //////////////////////////////////////////////////////////////////////
+
 create or replace function update_gadget_object(
-    gadget_id int8, object_id int8
+    gadget_id bigint, object_id bigint
 ) returns boolean as $$
 declare
     _blueprint_id uuid;
-    _flags        int8;
+    _flags        bigint;
 begin
     select public.blueprint_character.blueprint_id
     into _blueprint_id

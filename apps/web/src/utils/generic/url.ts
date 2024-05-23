@@ -14,7 +14,7 @@ export function getURL() {
 export function isIncludingURL(needle: URL, haystack: URL): boolean {
   if (needle.href === haystack.href) return true;
   // 1. Compare simple fields
-  if (needle.username !== haystack.username) return false;
+  if (needle.name !== haystack.name) return false;
   if (needle.password !== haystack.password) return false;
   if (needle.host !== haystack.host) return false;
   if (needle.hostname !== haystack.hostname) return false;

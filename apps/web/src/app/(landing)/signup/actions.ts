@@ -6,14 +6,14 @@ import { cookies } from "next/headers";
 import { z } from "zod";
 
 const createInputSchema = z.object({
-  username: z.string().min(3).max(20),
+  name: z.string().min(3).max(20),
 });
 
 export async function createProfile(lastState: any, formData: FormData) {
   const user = await getUser(cookies());
   if (!user) return { state: "unauthenticated" };
   const validated = createInputSchema.safeParse({
-    username: formData.get("username"),
+    name: formData.get("name"),
   });
   if (!validated.success)
     return {
@@ -25,11 +25,8 @@ export async function createProfile(lastState: any, formData: FormData) {
   const service = createServiceServer(cookies());
   const { error } = await service.from("profile").insert({
     id: user.id,
-    username: validated.data.username,
-    role: "user",
+    name: validated.data.name,
   });
-
-  console.log(process.env.NODE_ENV);
 
   if (process.env.NODE_ENV === "development") {
     // For testing purposes give this actions some random teams
@@ -38,7 +35,7 @@ export async function createProfile(lastState: any, formData: FormData) {
       .from("team")
       .select("id")
       .limit(2 * teamCount);
-    const { data: roles } = await service.from("team_member_role").select("id");
+    const { data: roles } = await service.from("member_role").select("id");
     if (teams && roles?.length)
       await service.from("team_member").insert(
         teams

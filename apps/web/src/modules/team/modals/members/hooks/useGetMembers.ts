@@ -7,8 +7,8 @@ async function fetchMembers(teamId: string) {
     .from("team_member")
     .select(
       `*, 
-       profile!inner(id, username, avatar), 
-       team_member_role!inner(id, flags)`,
+       profile!inner(id, name, avatar), 
+       member_role!inner(id, flags)`,
     )
     .eq("team_id", teamId);
 }

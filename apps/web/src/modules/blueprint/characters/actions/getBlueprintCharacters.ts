@@ -10,7 +10,7 @@ export const getBlueprintCharacters = cache(async (blueprintId: string) => {
     .from("blueprint_character")
     .select(
       `id, index,
-       team_player_slot(id, slot_index, color), 
+       player_slot(id, index, color), 
        game_object(id, name, url)`,
     )
     .order("index")

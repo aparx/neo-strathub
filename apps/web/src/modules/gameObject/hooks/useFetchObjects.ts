@@ -1,14 +1,13 @@
 "use client";
 
+import { DeepInferUseQueryResult } from "@/utils/generic/types";
 import { createClient } from "@/utils/supabase/client";
-import { Enums } from "@/utils/supabase/types";
 import { InferAsync } from "@repo/utils";
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
-import { DeepInferUseQueryResult } from "@/utils/generic/types";
 
 export interface UseFetchObjectsFilters {
   gameId?: number;
-  type?: Enums<"game_object_type">;
+  type?: "character" | "gadget";
 }
 
 async function fetchObjects(filters: UseFetchObjectsFilters) {

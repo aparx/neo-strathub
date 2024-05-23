@@ -1,5 +1,5 @@
 "use server";
-import { createAnonServer } from "@/utils/supabase/server";
+import { getServer } from "@/utils/supabase/actions";
 import { Enums } from "@/utils/supabase/types";
 import { Nullish } from "@repo/utils";
 import { cookies } from "next/headers";
@@ -19,7 +19,7 @@ const BLUEPRINTS_PAGE_LIMIT = 15;
 
 export async function getMyBlueprints(filters: GetMyBlueprintsFilters) {
   // prettier-ignore
-  const query = createAnonServer(cookies())
+  const query = getServer(cookies())
     .from("blueprint")
     .select(
       `
