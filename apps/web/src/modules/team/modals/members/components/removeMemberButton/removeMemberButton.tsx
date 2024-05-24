@@ -6,6 +6,7 @@ import {
   IconButtonProps,
   Modal,
 } from "@repo/ui/components";
+import { ExtractIterable } from "@repo/utils";
 import { IoMdRemoveCircle } from "react-icons/io";
 import { MdPersonRemove } from "react-icons/md";
 
@@ -16,14 +17,14 @@ type RemoveMemberButtonBaseProps = Omit<IconButtonProps, "children">;
 
 export interface RemoveMemberButtonProps extends RemoveMemberButtonBaseProps {
   /** Field displayed in characterModal showing the user and their name */
-  userField: React.ReactNode;
+  children?: ExtractIterable<React.ReactNode>;
   /** Callback called whenever the removal is confirmed (e.g. through a characterModal) */
   onConfirm: () => any;
 }
 
 export function RemoveMemberButton({
   onConfirm,
-  userField,
+  children,
   className,
   ...restProps
 }: RemoveMemberButtonProps) {
@@ -45,7 +46,7 @@ export function RemoveMemberButton({
         <Flexbox orient={"vertical"} gap={"md"}>
           <Flexbox gap={"md"} align={"center"}>
             You are about to kick
-            {userField}
+            {children}
             from the team.
           </Flexbox>
           A kicked member can always rejoin if you invite them to.

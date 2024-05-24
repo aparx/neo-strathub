@@ -59,11 +59,9 @@ export function SlotContextProvider({
     refetchOnWindowFocus: false,
     refetchInterval: false,
   });
+  const slotData = slotQuery.data?.data;
 
-  const slotIds = useMemo(
-    () => slotQuery.data?.data?.map((x) => x.id),
-    [slotQuery.data?.data],
-  );
+  const slotIds = useMemo(() => slotData?.map((x) => x.id), [slotData]);
 
   // Get a map of all members associated to their respective `slot_id`
   const memberQuery = useQuery({
@@ -72,28 +70,26 @@ export function SlotContextProvider({
     refetchOnWindowFocus: false,
     refetchInterval: false,
   });
+  const memberData = memberQuery.data?.data;
 
-  const slotQueryData = slotQuery.data?.data;
-  const memberQueryData = memberQuery.data?.data;
-
-  // The resulting array being put into the data cache
-  const dataArray = useMemo<SlotContextData>(
+  // The resulting array being put into the data cache (`SharedState`)
+  const dataValue = useMemo<SlotContextData>(
     () =>
-      slotQueryData?.map((slot) => ({
-        members: memberQueryData?.get(slot.id) ?? [],
+      slotData?.map((slot) => ({
+        members: memberData?.get(slot.id) ?? [],
         ...slot,
       })),
-    [slotQueryData, memberQueryData],
+    [slotData, memberData],
   );
 
-  const dataCache = useSharedState<SlotContextData>(dataArray);
-  useEffect(() => dataCache.update(dataArray), [dataArray]);
+  const dataCache = useSharedState<SlotContextData>(dataValue);
+  useEffect(() => dataCache.update(dataValue), [dataValue]);
 
   const context = useMemo<SlotContext>(
     () => ({
       data: dataCache,
       isFetching: memberQuery.isFetching || slotQuery.isFetching,
-      refetch: async () => await memberQuery.refetch(),
+      refetch: memberQuery.refetch,
     }),
     [dataCache, memberQuery, slotQuery],
   );

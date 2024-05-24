@@ -233,16 +233,12 @@ function MemberRow({
       </Table.Cell>
       <Table.Cell>{moment(created_at).format("YYYY-MM-DD HH:mm")}</Table.Cell>
       <Table.Cell>
-        <RemoveMemberButton
-          disabled={!canKick}
-          onConfirm={onRemove}
-          userField={
-            <UserField
-              profile={member.profile}
-              style={{ color: vars.colors.emphasis.high }}
-            />
-          }
-        />
+        <RemoveMemberButton disabled={!canKick} onConfirm={onRemove}>
+          <UserField
+            profile={member.profile}
+            style={{ color: vars.colors.emphasis.high }}
+          />
+        </RemoveMemberButton>
       </Table.Cell>
     </Table.Row>
   );
@@ -267,7 +263,7 @@ function MemberSlotButton({
     });
   }, [data?.state]);
 
-  if (isFetching) return <Skeleton width={120} height={26} />;
+  if (isFetching) return <Skeleton width={100} height={24} outline />;
 
   function doChangeSlot(trySwap: boolean) {
     const slot = newSlotRef.current;
