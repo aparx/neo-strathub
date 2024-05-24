@@ -121,7 +121,7 @@ create policy "public read access"
 create policy "public read access"
     on public.member_to_player_slot as permissive
     for select to authenticated
-    using (exists(select id
+    using (exists(select 1
                   from player_slot
                   where id = member_to_player_slot.slot_id));
 

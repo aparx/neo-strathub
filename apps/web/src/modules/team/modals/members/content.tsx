@@ -11,7 +11,11 @@ import {
   RoleSelectProps,
 } from "@/modules/team/modals/members/components";
 import {
-  MemberSlotData,
+  SlotContextProvider,
+  SlotContextSlot,
+  useSlotContext,
+} from "@/modules/team/modals/members/context/slotContext";
+import {
   TeamMemberData,
   useGetMembers,
 } from "@/modules/team/modals/members/hooks";
@@ -22,18 +26,19 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { vars } from "@repo/theme";
 import {
   Breadcrumbs,
+  Button,
   Flexbox,
   Modal,
   Skeleton,
   Table,
 } from "@repo/ui/components";
 import { InferAsync, Nullish } from "@repo/utils";
-import { useQuery } from "@tanstack/react-query";
 import moment from "moment";
 import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   useTransition,
 } from "react";
@@ -126,22 +131,24 @@ export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
             </Table.HeadCell>
           </Table.Row>
         </Table.Head>
-        <Table.Body>
-          {isLoading
-            ? Array.from({ length: 3 }, (_, index) => (
-                <MemberRowSkeleton key={index} />
-              ))
-            : null}
-          {members?.map((member) => (
-            <MemberSlot
-              key={member.profile_id}
-              member={member}
-              onRemove={() => removeMember(member)}
-              onUpdate={(newRole) => updateRole(member, newRole)}
-              self={self}
-            />
-          ))}
-        </Table.Body>
+        <SlotContextProvider teamId={team.id}>
+          <Table.Body>
+            {isLoading
+              ? Array.from({ length: 3 }, (_, index) => (
+                  <MemberRowSkeleton key={index} />
+                ))
+              : null}
+            {members?.map((member) => (
+              <MemberSlot
+                key={member.profile_id}
+                member={member}
+                onRemove={() => removeMember(member)}
+                onUpdate={(newRole) => updateRole(member, newRole)}
+                self={self}
+              />
+            ))}
+          </Table.Body>
+        </SlotContextProvider>
       </Table.Root>
     </Modal.Content>
   );
@@ -184,8 +191,8 @@ function MemberSlot({
       onRemove={onRemove}
       onUpdate={onUpdate}
       member={member}
-      canModifySecurely={canModify}
-      canModifyBasic={canModifyBase}
+      canModifyRole={canModify}
+      canModifySlot={canModifyBase}
       canKick={canKick}
     />
   );
@@ -194,15 +201,15 @@ function MemberSlot({
 function MemberRow({
   member,
   canKick,
-  canModifySecurely,
-  canModifyBasic,
+  canModifyRole,
+  canModifySlot,
   onRemove,
   onUpdate,
 }: {
   member: TeamMemberData;
   canKick?: boolean;
-  canModifySecurely?: boolean;
-  canModifyBasic?: boolean;
+  canModifyRole?: boolean;
+  canModifySlot?: boolean;
   onRemove: () => any;
   onUpdate: RoleSelectProps["onSelect"];
 }) {
@@ -214,14 +221,14 @@ function MemberRow({
         <UserField profile={member.profile} />
       </Table.Cell>
       <Table.Cell>
-        <MemberSlotButton member={member} disabled={!canModifyBasic} />
+        <MemberSlotButton member={member} disabled={!canModifySlot} />
       </Table.Cell>
       <Table.Cell>
         <RoleSelect
           width={100}
           initialRoleId={role_id}
           onSelect={onUpdate}
-          disabled={!canModifySecurely}
+          disabled={!canModifyRole}
         />
       </Table.Cell>
       <Table.Cell>{moment(created_at).format("YYYY-MM-DD HH:mm")}</Table.Cell>
@@ -248,41 +255,32 @@ function MemberSlotButton({
   member: TeamMemberData;
   disabled?: boolean;
 }) {
+  const { data, isFetching, refetch } = useSlotContext();
   const [isPending, startTransition] = useTransition();
   const [rootOpen, setRootOpen] = useState(false);
+  const [swapOpen, setSwapOpen] = useState(false);
+  const newSlotRef = useRef<SlotContextSlot | null>(null);
 
-  const { data, isLoading, refetch } = useQuery({
-    queryKey: ["playerSlot", member.id],
-    queryFn: async () =>
-      await createClient()
-        .from("member_to_player_slot")
-        .select("player_slot!inner(color, index)")
-        .eq("member_id", member.id)
-        .maybeSingle(),
-    refetchOnWindowFocus: false,
-    refetchInterval: false,
-  });
+  const slot = useMemo(() => {
+    return data.state?.find((x) => {
+      return x.members.find((y) => y.id === member.id);
+    });
+  }, [data?.state]);
 
-  const tmpSlot = data?.data?.player_slot;
-  const [slot, setSlot] = useState<typeof tmpSlot | null>(tmpSlot);
-  useEffect(() => setSlot(tmpSlot), [tmpSlot]);
+  if (isFetching) return <Skeleton width={120} height={26} />;
 
-  if (isLoading) return <Skeleton width={120} height={26} />;
-
-  async function selectSlot(data: MemberSlotData | null) {
-    // Optimistic update
+  function doChangeSlot(trySwap: boolean) {
+    const slot = newSlotRef.current;
     startTransition(async () => {
-      setSlot(data ? { color: data.color, index: data.index } : null);
       const { error } = await createClient().rpc("assign_member_to_slot", {
         member_id: member.id,
-        slot_id: (data?.id as NonNullable<(typeof data & {})["id"]>) ?? null,
-        try_swap: false, // TODO SWAP MECHANIC THROUGH MODAL
+        slot_id: (slot?.id as NonNullable<(typeof slot & {})["id"]>) ?? null,
+        try_swap: trySwap,
       });
+      // TODO toasts?
+      if (error) console.error("#_doChangeSlot", error);
       setRootOpen(false);
-      if (error) {
-        console.error("#_selectSlot", error);
-        refetch().then(({ data }) => setSlot(data?.data?.player_slot));
-      }
+      refetch();
     });
   }
 
@@ -293,9 +291,53 @@ function MemberSlotButton({
       </Modal.Trigger>
       <AssignSlotModal
         member={member}
-        onSelect={selectSlot}
+        onSelect={(data) => {
+          newSlotRef.current = data;
+          if (!data?.members.length || !slot) doChangeSlot(false);
+          else if (!data?.members.find((x) => x.id === member.id))
+            setSwapOpen(true);
+          else setRootOpen(false);
+        }}
         isLoading={isPending}
       />
+      <SwapModal
+        open={swapOpen}
+        onOpenChange={setSwapOpen}
+        onPerform={doChangeSlot}
+      />
+    </Modal.Root>
+  );
+}
+
+function SwapModal({
+  open,
+  onOpenChange,
+  onPerform,
+}: {
+  open: boolean;
+  onOpenChange: (value: boolean) => any;
+  onPerform: (trySwap: boolean) => any;
+}) {
+  return (
+    <Modal.Root open={open} onOpenChange={onOpenChange}>
+      <Modal.Content style={{ maxWidth: 500 }} minWidth={375}>
+        <Modal.Title>
+          Swap slots' players?
+          <Modal.Exit />
+        </Modal.Title>
+        You are about to change to a slot, that already has member(s) assigned.
+        Do you want to swap the slots' players or stack them?
+        <Flexbox gap={"md"} style={{ marginLeft: "auto" }}>
+          <Modal.Close asChild>
+            <Button onClick={() => onPerform(false)}>Stack</Button>
+          </Modal.Close>
+          <Modal.Close asChild>
+            <Button color={"cta"} onClick={() => onPerform(true)}>
+              Swap
+            </Button>
+          </Modal.Close>
+        </Flexbox>
+      </Modal.Content>
     </Modal.Root>
   );
 }

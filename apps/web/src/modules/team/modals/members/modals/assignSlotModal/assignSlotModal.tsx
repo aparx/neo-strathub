@@ -1,11 +1,10 @@
 "use client";
 import { UserField } from "@/modules/auth/components";
 import {
-  MemberSlotData,
-  TeamMemberData,
-  useGetMembersForSlot,
-  useGetMemberSlots,
-} from "@/modules/team/modals/members/hooks";
+  SlotContextSlot,
+  useSlotContext,
+} from "@/modules/team/modals/members/context/slotContext";
+import { TeamMemberData } from "@/modules/team/modals/members/hooks";
 import { vars } from "@repo/theme";
 import { DragScrollArea, Modal, Text } from "@repo/ui/components";
 import { blendColors } from "@repo/ui/utils";
@@ -17,10 +16,10 @@ export function AssignSlotModal({
   isLoading,
 }: {
   member: TeamMemberData;
-  onSelect: (slot: MemberSlotData | null) => any;
+  onSelect: (slot: SlotContextSlot | null) => any;
   isLoading?: boolean;
 }) {
-  const { data } = useGetMemberSlots(member.team_id);
+  const { data } = useSlotContext();
 
   return (
     <Modal.Content style={{ maxWidth: 450 }}>
@@ -32,7 +31,7 @@ export function AssignSlotModal({
         <li>
           <NoSlotRow onSelect={() => onSelect(null)} />
         </li>
-        {data?.data?.map((slot) => (
+        {data.state?.map((slot) => (
           <li key={slot.id}>
             <SlotRow
               slot={slot}
@@ -78,12 +77,11 @@ function SlotRow({
   onSelect,
   disabled,
 }: {
-  slot: MemberSlotData;
+  slot: SlotContextSlot;
   onSelect: () => void;
   disabled?: boolean;
 }) {
-  const { id, color, index } = slot;
-  const { data } = useGetMembersForSlot(id);
+  const { id, color, index, members } = slot;
 
   const background = blendColors(color, "black 80%");
 
@@ -103,7 +101,7 @@ function SlotRow({
         #{1 + (index ?? 0)}
       </Text>
       <DragScrollArea asChild>
-        {data?.data?.length === 0 ? (
+        {members?.length === 0 ? (
           <Text
             style={{
               color: vars.colors.emphasis.medium,
@@ -116,9 +114,9 @@ function SlotRow({
             className={css.playerList}
             aria-label={"Users assigned to this slot"}
           >
-            {data?.data?.map((x) => (
-              <li className={css.player} key={x.member_id}>
-                <UserField profile={x.team_member.profile} />
+            {members?.map((x) => (
+              <li className={css.player} key={x.id}>
+                <UserField profile={x.profile} />
               </li>
             ))}
           </ul>
