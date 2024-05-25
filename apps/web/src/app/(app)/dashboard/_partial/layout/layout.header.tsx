@@ -3,17 +3,10 @@ import { PopoverExpand } from "@/components";
 import { useTeam } from "@/modules/team/clientActions";
 import { TeamPopover } from "@/modules/team/partial";
 import { vars } from "@repo/theme";
-import {
-  Breadcrumbs,
-  BreadcrumbsProps,
-  Popover,
-  Skeleton,
-  Text,
-} from "@repo/ui/components";
+import { Breadcrumbs, Popover, Skeleton, Text } from "@repo/ui/components";
 import { calc } from "@vanilla-extract/css-utils";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useMemo } from "react";
 import * as css from "./layout.header.css";
 
 export function LayoutHeader() {
@@ -29,18 +22,12 @@ export function LayoutHeader() {
 function Navigation() {
   const { teamId } = useParams<{ teamId?: string }>();
 
-  const breadcrumbs = useMemo(() => {
-    const array: BreadcrumbsProps["children"] = [];
-    array.push(<Link href={"/dashboard"}>Dashboard</Link>);
-    if (teamId)
-      // TODO replace `display: teamId` with a custom component (+ dropdown)
-      array.push(<TeamButton teamId={teamId} />);
-    return array;
-  }, [teamId]);
-
   return (
     <nav style={{ overflow: "hidden" }}>
-      <Breadcrumbs>{breadcrumbs}</Breadcrumbs>
+      <Breadcrumbs>
+        <Link href={"/dashboard"}>Dashboard</Link>
+        {teamId && <TeamButton teamId={teamId} />}
+      </Breadcrumbs>
     </nav>
   );
 }
