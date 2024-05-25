@@ -13,10 +13,10 @@ export const Trigger = Primitive.Trigger;
 export const Close = Primitive.Close;
 export const Root = Primitive.Root;
 
-export function Exit() {
+export function Exit({ disabled }: { disabled?: boolean }) {
   return (
     <Close asChild>
-      <IconButton aria-label={"Close characterModal"}>
+      <IconButton aria-label={"Close characterModal"} disabled={disabled}>
         <Icon.Mapped type={"close"} />
       </IconButton>
     </Close>

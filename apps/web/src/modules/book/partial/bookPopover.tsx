@@ -1,7 +1,15 @@
 "use client";
 import { deleteBook } from "@/modules/book/actions/deleteBook";
 import { vars } from "@repo/theme";
-import { Button, Flexbox, Icon, Modal, Popover } from "@repo/ui/components";
+import {
+  Button,
+  Callout,
+  Flexbox,
+  Icon,
+  Modal,
+  Popover,
+  Spinner,
+} from "@repo/ui/components";
 import { useState, useTransition } from "react";
 
 export interface BookPopoverProps extends Popover.PopoverContentProps {
@@ -20,8 +28,6 @@ export function BookPopover({
   function confirmDelete() {
     startTransition(async () => {
       const result = await deleteBook(bookId);
-      console.log(result);
-
       // TODO show toast + error handling
       if (result.state === "success") setOpen(false);
     });
@@ -66,30 +72,31 @@ function ConfirmDeletionModalContent({
   return (
     <Modal.Content>
       <Modal.Title>
-        Deleting {bookName}
+        Delete {bookName}?
         <Modal.Exit />
       </Modal.Title>
-      <Flexbox orient={"vertical"} gap={"sm"}>
-        <Flexbox gap={"md"}>
-          You are about to delete
-          <Flexbox asChild gap={"sm"}>
-            <span style={{ color: vars.colors.emphasis.high }}>
-              <Icon.Mapped type={"book"} /> {bookName}
-            </span>
-          </Flexbox>
-          and all its blueprints!
+      <Flexbox gap={"md"}>
+        You are about to delete
+        <Flexbox asChild gap={"sm"}>
+          <span style={{ color: vars.colors.emphasis.high }}>
+            <Icon.Mapped type={"book"} /> {bookName}
+          </span>
         </Flexbox>
-        <p style={{ color: vars.colors.destructive.lighter }}>
-          This action is unrecoverable and permanent.
-        </p>
+        and all its blueprints!
       </Flexbox>
+      <Callout.Destructive>
+        <p>
+          This action is <strong>unrecoverable</strong> and thus{" "}
+          <strong>permanent</strong>.
+        </p>
+      </Callout.Destructive>
       <Flexbox gap={"md"} style={{ marginLeft: "auto" }}>
         <Modal.Close asChild disabled={isPending}>
           <Button>Cancel</Button>
         </Modal.Close>
         <Button color={"destructive"} onClick={onDelete} disabled={isPending}>
-          <Icon.Mapped type={"delete"} />
           Delete Forever
+          {isPending ? <Spinner /> : <Icon.Mapped type={"next"} />}
         </Button>
       </Flexbox>
     </Modal.Content>
