@@ -48,6 +48,48 @@ revoke
     create_book(varchar, uuid, uuid)
     from public, anon, authenticated;
 
+create or replace function rename_book(book_id uuid, name text)
+    returns void as $$
+declare
+    _team_id     uuid;
+    _self_flags bigint;
+begin
+    -- Check if user can modify the book in the first place
+    select team_id
+    into _team_id
+    from public.book
+    where id = book_id;
+
+    if (_team_id is null) then
+        raise exception 'Book does not exist';
+    end if;
+
+    select member_role.flags
+    into _self_flags
+    from public.team_member
+             inner join member_role on team_member.role_id = member_role.id
+    where profile_id = auth.uid()
+      and team_id = _team_id;
+
+    if (_self_flags is null) then
+        raise exception 'Not a member of the team';
+    end if;
+
+    if ((_self_flags & 64 /* MODIFY_BOOKS */) = 0) then
+        raise exception 'Missing permission to edit books';
+    end if;
+
+    update public.book
+    set name=$2
+    where id = book_id;
+end;
+$$ language plpgsql
+    security definer;
+
+revoke execute on function
+    rename_book(uuid, text)
+    from public, anon;
+
 -- //////////////////////////////////////////////////////////////////////
 --                                  TEAM
 -- //////////////////////////////////////////////////////////////////////
@@ -160,7 +202,7 @@ begin
     into _self_member;
 
     if (member_id != _self_member.id and not _self_member.privileged) then
-        if ((_self_member.flags & 64 /* KICK_MEMBERS */) = 0) then
+        if ((_self_member.flags & 32 /* KICK_MEMBERS */) = 0) then
             raise exception 'Missing permission to kick members';
         end if;
 
@@ -226,7 +268,7 @@ begin
     end if;
 
     if (not _self_member.privileged) then
-        if ((_self_member.flags & 32 /* EDIT_MEMBERS */) = 0) then
+        if ((_self_member.flags & 16 /* EDIT_MEMBERS */) = 0) then
             raise exception 'Missing permission to edit members';
         end if;
 
@@ -292,7 +334,7 @@ begin
         raise exception 'You are not a member of target team';
     end if;
 
-    if ((_self_member.flags & 32 /* EDIT_MEMBERS */) = 0) then
+    if ((_self_member.flags & 16 /* EDIT_MEMBERS */) = 0) then
         raise exception 'Missing permission to edit members';
     end if;
 

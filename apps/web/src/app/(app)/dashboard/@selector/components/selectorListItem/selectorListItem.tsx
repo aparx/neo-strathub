@@ -16,6 +16,7 @@ import * as css from "./selectorListItem.css";
 type BaseProps = Omit<HTMLAttributes<HTMLDivElement>, "children">;
 
 export interface SelectorListItemData {
+  id: string;
   icon?: React.ReactNode;
   popover?: React.ReactNode | null;
   text: string;

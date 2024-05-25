@@ -2,25 +2,25 @@ import { Nullish } from "@repo/utils";
 
 export enum TeamMemberFlags {
   /** Allows to view and interact with documents */
-  VIEW_DOCUMENTS = 2 ** 0,
+  VIEW_DOCUMENTS = 1,
   /** Allows to create and edit documents */
-  MODIFY_DOCUMENTS = 2 ** 1,
+  MODIFY_DOCUMENTS = 2,
   /** Allows to delete documents */
-  DELETE_DOCUMENTS = 2 ** 2,
+  DELETE_DOCUMENTS = 4,
 
   /** Allows to invite, thus add, members to a team */
-  ADD_MEMBERS = 2 ** 3,
+  ADD_MEMBERS = 8,
   /** Allows to edit members */
-  EDIT_MEMBERS = 2 ** 4,
+  EDIT_MEMBERS = 16,
   /** Allows to remove members (temporarily, until added again) */
-  KICK_MEMBERS = 2 ** 5,
+  KICK_MEMBERS = 32,
 
   /** Allows to create and edit books */
-  MODIFY_BOOKS = 2 ** 6,
+  MODIFY_BOOKS = 64,
   /** Allows to delete existing books */
-  DELETE_BOOKS = 2 ** 7,
+  DELETE_BOOKS = 128,
   /** Allows to view audit log entries */
-  VIEW_AUDIT_LOG = 2 ** 8,
+  VIEW_AUDIT_LOG = 256,
 
   /** All flags conjoined into one */
   ALL = VIEW_DOCUMENTS |

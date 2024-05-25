@@ -12,7 +12,7 @@ import { nonNull } from "@repo/utils";
 import { User } from "@supabase/supabase-js";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useSearchParams } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MdCollections } from "react-icons/md";
 
 /**
@@ -66,6 +66,7 @@ function TeamsProvider({
       .map((element) => element.team)
       .filter(nonNull)
       .map<SelectorListItemData>(({ id, name, game }) => ({
+        id,
         href: `/dashboard/${id}`,
         text: name,
         popover: <TeamPopover teamId={id} invokeExternal />,
@@ -109,23 +110,49 @@ function BooksProvider({
       refetch(); // Book does not exist in cache, try and refetch
   }, [bookParam]);
 
-  const elements = useMemo(() => {
-    if (!data) return [];
-    return data.map(({ id, name }) => {
-      const searchParams = new URLSearchParams();
-      searchParams.set(DASHBOARD_QUERY_PARAMS.book, id);
+  const [cache, setCache] = useState<SelectorListItemData[]>([]);
 
-      return {
-        href: `/dashboard/${teamId}?${searchParams.toString()}`,
-        text: name,
-        popover: <BookPopover bookId={id} bookName={name} />,
-        icon: <MdCollections />,
-      } satisfies SelectorListItemData;
-    });
-  }, [data]);
+  useEffect(() => {
+    if (!data) return setCache([]);
+    setCache(
+      data.map(({ id, name }) => {
+        const searchParams = new URLSearchParams();
+        searchParams.set(DASHBOARD_QUERY_PARAMS.book, id);
+
+        return {
+          id,
+          href: `/dashboard/${teamId}?${searchParams.toString()}`,
+          text: name,
+          popover: (
+            <BookPopover
+              id={id}
+              name={name}
+              update={(id, fn) => {
+                setCache((previousCache) => {
+                  const index = previousCache.findIndex((x) => x.id === id);
+                  const oldBook = previousCache[index];
+                  if (!oldBook) return previousCache;
+                  const newBook = fn({ id: oldBook.id, name: oldBook.text });
+                  if (!newBook) return previousCache.filter((x) => x.id !== id);
+                  const newCache = [...previousCache];
+                  newCache[index] = {
+                    ...oldBook,
+                    id: newBook.id,
+                    text: newBook.name,
+                  };
+                  return newCache;
+                });
+              }}
+            />
+          ),
+          icon: <MdCollections />,
+        } satisfies SelectorListItemData;
+      }),
+    );
+  }, [data, setCache]);
 
   return (
-    <SelectorItemContextProvider elements={elements} loading={isLoading}>
+    <SelectorItemContextProvider elements={cache} loading={isLoading}>
       {children}
     </SelectorItemContextProvider>
   );

@@ -726,6 +726,13 @@ export type Database = {
         }
         Returns: undefined
       }
+      rename_book: {
+        Args: {
+          book_id: string
+          name: string
+        }
+        Returns: undefined
+      }
       update_character_object: {
         Args: {
           character_id: number
