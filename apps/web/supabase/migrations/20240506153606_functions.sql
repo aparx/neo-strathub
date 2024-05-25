@@ -136,7 +136,10 @@ declare
     _self_member   record;
     _target_name   varchar;
 begin
-    select team_id, profile_id, privileged, public.member_role.flags
+    select team_member.team_id,
+           team_member.profile_id,
+           team_member.privileged,
+           public.member_role.flags
     from public.team_member
              left join public.member_role on team_member.role_id = member_role.id
     where team_member.id = member_id
@@ -146,10 +149,12 @@ begin
         raise exception 'Target member is not existing';
     end if;
 
-    select id, privileged, public.member_role.flags
+    select team_member.id,
+           team_member.privileged,
+           public.member_role.flags
     from public.team_member
-             inner join member_to_player_slot
-                        on team_member.id = member_to_player_slot.member_id
+             inner join public.member_role
+                        on team_member.role_id = member_role.id
     where team_member.profile_id = auth.uid()
       and team_member.team_id = _target_member.team_id
     into _self_member;

@@ -3,3 +3,7 @@
         transition: unset !important;
     }
 }
+
+strong {
+    font-weight: 600 !important;
+}

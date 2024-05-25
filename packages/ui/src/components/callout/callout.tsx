@@ -43,6 +43,12 @@ export function Warning(props: CalloutBaseProps) {
   return <Custom icon={<RiErrorWarningLine />} color={"warning"} {...props} />;
 }
 
+export function Destructive(props: CalloutBaseProps) {
+  return (
+    <Custom icon={<RiErrorWarningLine />} color={"destructive"} {...props} />
+  );
+}
+
 export function Info(props: CalloutBaseProps) {
   return <Custom icon={<MdInfoOutline />} color={"primary"} {...props} />;
 }

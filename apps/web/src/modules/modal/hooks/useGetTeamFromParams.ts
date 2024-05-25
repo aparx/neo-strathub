@@ -1,4 +1,4 @@
-import { ModalParameter } from "@/modules/modal/components";
+import { ModalParameter } from "@/modules/modal/components/modalController/modalController.utils";
 import { useTeam } from "@/modules/team/clientActions";
 import { Nullish } from "@repo/utils";
 import { useParams, useSearchParams } from "next/navigation";
