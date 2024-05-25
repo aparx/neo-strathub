@@ -39,8 +39,8 @@ async function fetchMembers(slotIds: number[]) {
   if (error) return { error } as const;
   const memberMap = new Map<number, SlotContextMember[]>();
   data?.forEach(({ team_member, slot_id }) => {
-    const arr = memberMap.get(slot_id) ?? [];
-    memberMap.set(slot_id, [...arr, team_member]);
+    const currentMembers = memberMap.get(slot_id) ?? [];
+    memberMap.set(slot_id, [...currentMembers, team_member]);
   });
   return { data: memberMap };
 }
@@ -60,7 +60,6 @@ export function SlotContextProvider({
     refetchInterval: false,
   });
   const slotData = slotQuery.data?.data;
-
   const slotIds = useMemo(() => slotData?.map((x) => x.id), [slotData]);
 
   // Get a map of all members associated to their respective `slot_id`
@@ -70,16 +69,15 @@ export function SlotContextProvider({
     refetchOnWindowFocus: false,
     refetchInterval: false,
   });
-  const memberData = memberQuery.data?.data;
 
   // The resulting array being put into the data cache (`SharedState`)
   const dataValue = useMemo<SlotContextData>(
     () =>
       slotData?.map((slot) => ({
-        members: memberData?.get(slot.id) ?? [],
+        members: memberQuery.data?.data?.get(slot.id) ?? [],
         ...slot,
       })),
-    [slotData, memberData],
+    [slotData, memberQuery.data?.data],
   );
 
   const dataCache = useSharedState<SlotContextData>(dataValue);

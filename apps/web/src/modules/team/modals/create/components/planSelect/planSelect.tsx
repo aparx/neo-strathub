@@ -35,7 +35,7 @@ export function PlanSelect<TFieldValues extends FieldValues>({
     <Controller
       {...restProps}
       render={({ field }) => <PlanGroup data={data.data} {...field} />}
-      defaultValue={defaultValue(data?.data?.find((x) => x.is_default)?.id)}
+      defaultValue={defaultValue(data?.data?.find((x) => x.default_plan)?.id)}
     />
   );
 }

@@ -8,6 +8,7 @@ import * as css from "./playerSlotTrigger.css";
 
 interface MemberPlayerSlotBaseProps {
   slot?: { color: string; index: number | null } | null;
+  disabled?: boolean;
 }
 
 export type MemberPlayerSlotProps = Omit<
@@ -18,6 +19,7 @@ export type MemberPlayerSlotProps = Omit<
 
 export function PlayerSlotTrigger({
   slot,
+  disabled,
   ...restProps
 }: MemberPlayerSlotProps) {
   return (
@@ -26,13 +28,13 @@ export function PlayerSlotTrigger({
       type={"label"}
       size={"md"}
       data={{ weight: 500 }}
-      className={css.slot({ active: slot != null })}
+      className={css.slot({ active: slot != null, disabled })}
       style={{
         color: slot ? slot.color : undefined,
         background: slot ? blendColors(slot.color, "black 80%") : undefined,
       }}
     >
-      <button {...restProps}>
+      <button {...restProps} disabled={disabled} data-disabled={disabled}>
         <Text
           type={"label"}
           size={"md"}

@@ -2,6 +2,7 @@
 import { DASHBOARD_QUERY_PARAMS } from "@/app/(app)/dashboard/_utils";
 import { createBook } from "@/modules/book/actions/createBook";
 import { createBookSchema } from "@/modules/book/actions/createBook.schema";
+import { ModalParameter } from "@/modules/modal/components";
 import { useGetTeamFromParams } from "@/modules/modal/hooks";
 import { useURL } from "@/utils/hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -43,7 +44,7 @@ export function CreateBookModal() {
       // Redirect user to the just created book, since success
       const newURL = new URL(url);
       const newId = newState.createdId;
-      newURL.searchParams.delete(DASHBOARD_QUERY_PARAMS.modal);
+      ModalParameter.deleteAll(newURL.searchParams);
       newURL.searchParams.set(DASHBOARD_QUERY_PARAMS.book, newId);
       await router.replace(newURL.href);
     });

@@ -7,5 +7,5 @@ export function AuditLogModal() {
   if (error) throw new Error(error);
   if (!data) return <Spinner />;
 
-  return <AuditLogModalContent team={data} />;
+  return <AuditLogModalContent {...data} />;
 }

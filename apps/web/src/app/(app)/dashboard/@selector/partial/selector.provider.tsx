@@ -68,7 +68,7 @@ function TeamsProvider({
       .map<SelectorListItemData>(({ id, name, game }) => ({
         href: `/dashboard/${id}`,
         text: name,
-        popover: <TeamPopover teamId={id} />,
+        popover: <TeamPopover teamId={id} invokeExternal />,
         icon: <SelectorGameImage src={game.icon} name={game.name} />,
       }));
   }, [data]);

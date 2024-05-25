@@ -5,11 +5,13 @@ import {
   TeamMembersModal,
   TeamSettingsModal,
 } from "@/modules/team/modals";
+import { TeamLeaveModal } from "@/modules/team/modals/leave/modal";
 import { Nullish } from "@repo/utils";
 import { FC } from "react";
 
 export const MODAL_PAGES = {
   settings: () => <TeamSettingsModal />,
+  leave: () => <TeamLeaveModal />,
   members: () => <TeamMembersModal />,
   auditLog: () => <AuditLogModal />,
   createTeam: () => <CreateTeamModal />,

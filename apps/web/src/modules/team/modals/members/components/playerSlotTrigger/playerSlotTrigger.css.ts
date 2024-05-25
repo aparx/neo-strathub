@@ -4,6 +4,7 @@ import { calc } from "@vanilla-extract/css-utils";
 import { recipe } from "@vanilla-extract/recipes";
 
 const slotBase = style({
+  position: "relative",
   display: "flex",
   gap: vars.spacing.md,
   alignItems: "center",
@@ -12,12 +13,26 @@ const slotBase = style({
   width: 100,
   borderRadius: vars.roundness.sm,
   overflow: "hidden",
-  cursor: "pointer",
 });
 
 export const slot = recipe({
   base: [sprinkles({ outline: "card" }), slotBase],
   variants: {
+    disabled: {
+      false: {
+        cursor: "pointer",
+        selectors: {
+          "&:hover::after": {
+            content: "",
+            position: "absolute",
+            inset: 0,
+            borderRadius: "inherit",
+            background: vars.colors.state.hover.color,
+          },
+        },
+      },
+      true: {},
+    },
     active: {
       true: {},
       false: {
@@ -28,6 +43,7 @@ export const slot = recipe({
   },
   defaultVariants: {
     active: false,
+    disabled: false,
   },
 });
 
@@ -46,7 +62,7 @@ export const arrow = style({
   opacity: 0,
 });
 
-globalStyle(`${slotBase}:hover ${arrow}`, {
+globalStyle(`${slotBase}:not([data-disabled='true']):hover ${arrow}`, {
   animation: `${keyframes({
     from: { transform: "translateY(2px)" },
     to: { opacity: 1 },

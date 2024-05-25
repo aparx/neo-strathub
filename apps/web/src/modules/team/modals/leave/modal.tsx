@@ -1,12 +1,11 @@
-"use client";
 import { useGetTeamFromParams } from "@/modules/modal/hooks";
-import { TeamSettingsModalContent } from "@/modules/team/modals/settings/content";
+import { TeamLeaveModalContent } from "@/modules/team/modals/leave/content";
 import { Spinner } from "@repo/ui/components";
 
-export function TeamSettingsModal() {
+export function TeamLeaveModal() {
   const { data, error } = useGetTeamFromParams();
   if (error) throw new Error(error);
   if (!data) return <Spinner />;
 
-  return <TeamSettingsModalContent {...data} />;
+  return <TeamLeaveModalContent {...data} />;
 }

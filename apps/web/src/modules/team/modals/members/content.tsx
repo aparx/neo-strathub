@@ -2,7 +2,7 @@ import { HelpButton } from "@/components";
 import { UserField } from "@/modules/auth/components";
 import { useUserContext } from "@/modules/auth/context";
 import { TeamMemberFlags, hasFlag } from "@/modules/auth/flags";
-import { getTeam } from "@/modules/team/actions";
+import { UseGetTeamFromParamsResultData } from "@/modules/modal/hooks";
 import {
   PlayerSlotTrigger,
   ROLE_SELECT_HEIGHT,
@@ -10,29 +10,18 @@ import {
   RoleSelect,
   RoleSelectProps,
 } from "@/modules/team/modals/members/components";
-import {
-  SlotContextProvider,
-  SlotContextSlot,
-  useSlotContext,
-} from "@/modules/team/modals/members/context/slotContext";
-import {
-  TeamMemberData,
-  useGetMembers,
-} from "@/modules/team/modals/members/hooks";
-import { AssignSlotModal } from "@/modules/team/modals/members/modals";
 import { createClient } from "@/utils/supabase/client";
 import { Tables } from "@/utils/supabase/types";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { vars } from "@repo/theme";
 import {
   Breadcrumbs,
-  Button,
   Flexbox,
   Modal,
   Skeleton,
   Table,
 } from "@repo/ui/components";
-import { InferAsync, Nullish } from "@repo/utils";
+import { Nullish } from "@repo/utils";
 import moment from "moment";
 import {
   useCallback,
@@ -43,18 +32,21 @@ import {
   useTransition,
 } from "react";
 import * as css from "./content.css";
-
-interface TeamMembersModalProps {
-  team: NonNullable<InferAsync<ReturnType<typeof getTeam>>["data"]>;
-}
+import {
+  SlotContextProvider,
+  SlotContextSlot,
+  useSlotContext,
+} from "./context";
+import { TeamMemberData, useGetMembers } from "./hooks";
+import { SelectSlotModal, SlotSwapModal } from "./modals";
 
 function sortMembers(members: Nullish<TeamMemberData[]>) {
-  return members?.sort((a, b) => {
-    return b.member_role.flags - a.member_role.flags;
-  });
+  return members?.sort((a, b) => b.member_role.flags - a.member_role.flags);
 }
 
-export function TeamMembersModalContent({ team }: TeamMembersModalProps) {
+export function TeamMembersModalContent(
+  team: NonNullable<UseGetTeamFromParamsResultData>,
+) {
   const { user } = useUserContext();
   const { isLoading, data, refetch } = useGetMembers(team.id);
 
@@ -257,26 +249,26 @@ function MemberSlotButton({
   const [swapOpen, setSwapOpen] = useState(false);
   const newSlotRef = useRef<SlotContextSlot | null>(null);
 
-  const slot = useMemo(() => {
-    return data.state?.find((x) => {
-      return x.members.find((y) => y.id === member.id);
-    });
-  }, [data?.state]);
+  const slot = useMemo(
+    () => data.state?.find((x) => x.members.find((y) => y.id === member.id)),
+    [data?.state],
+  );
 
   if (isFetching) return <Skeleton width={100} height={24} outline />;
 
-  function doChangeSlot(trySwap: boolean) {
+  function doChangeSlot(mode: "stack" | "swap") {
     const slot = newSlotRef.current;
     startTransition(async () => {
       const { error } = await createClient().rpc("assign_member_to_slot", {
         member_id: member.id,
         slot_id: (slot?.id as NonNullable<(typeof slot & {})["id"]>) ?? null,
-        try_swap: trySwap,
+        try_swap: mode === "swap",
       });
       // TODO toasts?
       if (error) console.error("#_doChangeSlot", error);
       setRootOpen(false);
-      refetch();
+      // noinspection ES6MissingAwait
+      refetch(); // <- this should finish outside the transition
     });
   }
 
@@ -285,55 +277,24 @@ function MemberSlotButton({
       <Modal.Trigger asChild>
         <PlayerSlotTrigger slot={slot} disabled={disabled} />
       </Modal.Trigger>
-      <AssignSlotModal
+      <SelectSlotModal
         member={member}
+        isLoading={isPending}
         onSelect={(data) => {
           newSlotRef.current = data;
-          if (!data?.members.length || !slot) doChangeSlot(false);
+          if (!data?.members.length || !slot) doChangeSlot("stack");
           else if (!data?.members.find((x) => x.id === member.id))
             setSwapOpen(true);
           else setRootOpen(false);
         }}
-        isLoading={isPending}
       />
-      <SwapModal
-        open={swapOpen}
-        onOpenChange={setSwapOpen}
-        onPerform={doChangeSlot}
-      />
-    </Modal.Root>
-  );
-}
-
-function SwapModal({
-  open,
-  onOpenChange,
-  onPerform,
-}: {
-  open: boolean;
-  onOpenChange: (value: boolean) => any;
-  onPerform: (trySwap: boolean) => any;
-}) {
-  return (
-    <Modal.Root open={open} onOpenChange={onOpenChange}>
-      <Modal.Content style={{ maxWidth: 500 }} minWidth={375}>
-        <Modal.Title>
-          Swap slots' players?
-          <Modal.Exit />
-        </Modal.Title>
-        You are about to change to a slot, that already has member(s) assigned.
-        Do you want to swap the slots' players or stack them?
-        <Flexbox gap={"md"} style={{ marginLeft: "auto" }}>
-          <Modal.Close asChild>
-            <Button onClick={() => onPerform(false)}>Stack</Button>
-          </Modal.Close>
-          <Modal.Close asChild>
-            <Button color={"cta"} onClick={() => onPerform(true)}>
-              Swap
-            </Button>
-          </Modal.Close>
-        </Flexbox>
-      </Modal.Content>
+      {swapOpen && (
+        <SlotSwapModal
+          open={true}
+          onOpenChange={setSwapOpen}
+          onSwap={doChangeSlot}
+        />
+      )}
     </Modal.Root>
   );
 }

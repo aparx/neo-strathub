@@ -8,9 +8,9 @@ import { TeamMemberData } from "@/modules/team/modals/members/hooks";
 import { vars } from "@repo/theme";
 import { DragScrollArea, Modal, Text } from "@repo/ui/components";
 import { blendColors } from "@repo/ui/utils";
-import * as css from "./assignSlotModal.css";
+import * as css from "./selectSlotModal.css";
 
-export function AssignSlotModal({
+export function SelectSlotModal({
   member,
   onSelect,
   isLoading,

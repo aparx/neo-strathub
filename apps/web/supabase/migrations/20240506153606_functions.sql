@@ -66,7 +66,7 @@ begin
                    from public.game
                    where id = target_game_id
                      and hidden = false)) then
-        raise exception 'Game not found or is hidden';
+        raise exception 'Game not found';
     end if;
 
     insert into public.team (name, plan_id, game_id)
@@ -111,7 +111,7 @@ begin
         raise exception 'Could not find a fitting member_role';
     end if;
 
-    insert into team_member (profile_id, team_id, role_id, owner)
+    insert into team_member (profile_id, team_id, role_id, privileged)
     values (auth.uid(), _uid, _highest_role_id, true);
 
     return _uid;

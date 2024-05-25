@@ -1,5 +1,5 @@
 import { UserField } from "@/modules/auth/components";
-import { useGetTeamFromParams } from "@/modules/modal/hooks";
+import { UseGetTeamFromParamsResultData } from "@/modules/modal/hooks";
 import { AuditLogType } from "@/modules/team/modals/auditLog/components";
 import { DeepInferUseQueryResult } from "@/utils/generic/types";
 import { createClient } from "@/utils/supabase/client";
@@ -7,10 +7,6 @@ import { Breadcrumbs, IconButton, Modal, Table } from "@repo/ui/components";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import moment from "moment";
 import { useMemo } from "react";
-
-export interface AuditLogModalContentProps {
-  team: NonNullable<ReturnType<typeof useGetTeamFromParams>["data"]>;
-}
 
 const LOG_PAGE_LIMIT = 10;
 
@@ -51,7 +47,9 @@ type AuditLogEntry = DeepInferUseQueryResult<
   typeof useGetLogEntries
 >["results"][number];
 
-export function AuditLogModalContent({ team }: AuditLogModalContentProps) {
+export function AuditLogModalContent(
+  team: NonNullable<UseGetTeamFromParamsResultData>,
+) {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useGetLogEntries(team.id);
 

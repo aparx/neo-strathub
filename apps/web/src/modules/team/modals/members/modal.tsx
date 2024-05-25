@@ -8,5 +8,5 @@ export function TeamMembersModal() {
   if (error) throw new Error(error);
   if (!data) return <Spinner />;
 
-  return <TeamMembersModalContent team={data} />;
+  return <TeamMembersModalContent {...data} />;
 }

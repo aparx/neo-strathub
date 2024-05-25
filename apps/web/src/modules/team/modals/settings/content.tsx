@@ -1,4 +1,4 @@
-import { getTeam } from "@/modules/team/actions";
+import { UseGetTeamFromParamsResultData } from "@/modules/modal/hooks";
 import {
   PlanOverview,
   SettingField,
@@ -12,14 +12,12 @@ import {
   Modal,
   TextField,
 } from "@repo/ui/components";
-import { InferAsync, capitalize } from "@repo/utils";
+import { capitalize } from "@repo/utils";
 import * as css from "./content.css";
 
-interface TeamSettingsModalProps {
-  team: NonNullable<InferAsync<ReturnType<typeof getTeam>>["data"]>;
-}
-
-export function TeamSettingsModalContent({ team }: TeamSettingsModalProps) {
+export function TeamSettingsModalContent(
+  team: NonNullable<UseGetTeamFromParamsResultData>,
+) {
   const pricing = team.plan?.pricing ?? 0;
   const priceTag = pricing > 0 ? `${formatCurrency(pricing)} / month` : "Free";
 
@@ -42,12 +40,12 @@ export function TeamSettingsModalContent({ team }: TeamSettingsModalProps) {
         canUpgrade
       />
 
-      <SettingsForm team={team} />
+      <SettingsForm {...team} />
     </Modal.Content>
   );
 }
 
-function SettingsForm({ team }: TeamSettingsModalProps) {
+function SettingsForm(team: NonNullable<UseGetTeamFromParamsResultData>) {
   return (
     <form
       style={{

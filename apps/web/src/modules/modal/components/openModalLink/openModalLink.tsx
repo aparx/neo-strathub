@@ -8,18 +8,19 @@ import { ComponentProps } from "react";
 type OpenModalLinkBaseProps = Omit<ComponentProps<"a">, "href">;
 
 export interface OpenModalLinkProps extends OpenModalLinkBaseProps {
-  path?: string;
+  href?: string | URL;
   modal: ModalPageKey;
 }
 
 export function OpenModalLink({
   children,
-  path,
+  href,
   modal,
   ...restProps
 }: OpenModalLinkProps) {
-  const url = useURL();
-  if (path != null) url.pathname = path;
+  let url = useURL();
+  if (typeof href === "string") url.pathname = href;
+  else if (typeof href === "object") url = href;
   url.searchParams.set(DASHBOARD_QUERY_PARAMS.modal, modal);
 
   return (
