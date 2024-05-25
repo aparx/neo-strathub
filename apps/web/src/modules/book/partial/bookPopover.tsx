@@ -8,11 +8,14 @@ interface BookData {
   name: string;
 }
 
-export interface BookPopoverProps extends Popover.PopoverContentProps {
+interface BookPopoverBaseProps {
   id: string;
   name: string;
   update: (id: string, mapper: (data: BookData) => BookData | null) => void;
 }
+
+export type BookPopoverProps = BookPopoverBaseProps &
+  Popover.PopoverContentProps;
 
 export function BookPopover({
   id,
@@ -20,43 +23,61 @@ export function BookPopover({
   update,
   ...restProps
 }: BookPopoverProps) {
-  const [deleteOpen, setDeleteOpen] = useState(false);
-  const [renameOpen, setRenameOpen] = useState(false);
   return (
     <Popover.Content {...restProps}>
-      <Modal.Root open={renameOpen} onOpenChange={setRenameOpen}>
-        <Modal.Trigger asChild>
-          <Popover.Item>
-            <Icon.Mapped type={"rename"} size={"sm"} />
-            Rename
-          </Popover.Item>
-        </Modal.Trigger>
+      <RenameButton id={id} name={name} update={update} />
+      <Popover.Divider />
+      <DeleteButton id={id} name={name} update={update} />
+    </Popover.Content>
+  );
+}
+
+function RenameButton({ id, name, update }: BookPopoverBaseProps) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Modal.Root open={open} onOpenChange={setOpen}>
+      <Modal.Trigger asChild>
+        <Popover.Item>
+          <Icon.Mapped type={"rename"} size={"sm"} />
+          Rename
+        </Popover.Item>
+      </Modal.Trigger>
+      {open && (
         <RenameBookModal
           id={id}
           name={name}
           onRename={(name) => {
-            setRenameOpen(false);
+            setOpen(false);
             update(id, (current) => ({ ...current, name }));
           }}
         />
-      </Modal.Root>
-      <Popover.Divider />
-      <Modal.Root open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <Modal.Trigger asChild>
-          <Popover.Item color={"destructive"}>
-            <Icon.Mapped type={"delete"} size={"sm"} />
-            Delete
-          </Popover.Item>
-        </Modal.Trigger>
+      )}
+    </Modal.Root>
+  );
+}
+
+function DeleteButton({ id, name, update }: BookPopoverBaseProps) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Modal.Root open={open} onOpenChange={setOpen}>
+      <Modal.Trigger asChild>
+        <Popover.Item color={"destructive"}>
+          <Icon.Mapped type={"delete"} size={"sm"} />
+          Delete
+        </Popover.Item>
+      </Modal.Trigger>
+      {open && (
         <DeleteBookModal
           id={id}
           name={name}
           onDelete={() => {
-            setDeleteOpen(false);
+            setOpen(false);
             update(id, () => null);
           }}
         />
-      </Modal.Root>
-    </Popover.Content>
+      )}
+    </Modal.Root>
   );
 }

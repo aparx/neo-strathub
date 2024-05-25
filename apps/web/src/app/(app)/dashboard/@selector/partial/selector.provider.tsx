@@ -12,7 +12,15 @@ import { nonNull } from "@repo/utils";
 import { User } from "@supabase/supabase-js";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import {
+  Dispatch,
+  RefObject,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { MdCollections } from "react-icons/md";
 
 /**
@@ -111,6 +119,8 @@ function BooksProvider({
   }, [bookParam]);
 
   const [cache, setCache] = useState<SelectorListItemData[]>([]);
+  const setCacheRef = useRef(setCache);
+  setCacheRef.current = setCache;
 
   useEffect(() => {
     if (!data) return setCache([]);
@@ -124,25 +134,10 @@ function BooksProvider({
           href: `/dashboard/${teamId}?${searchParams.toString()}`,
           text: name,
           popover: (
-            <BookPopover
+            <RecursiveBookPopover
               id={id}
               name={name}
-              update={(id, fn) => {
-                setCache((previousCache) => {
-                  const index = previousCache.findIndex((x) => x.id === id);
-                  const oldBook = previousCache[index];
-                  if (!oldBook) return previousCache;
-                  const newBook = fn({ id: oldBook.id, name: oldBook.text });
-                  if (!newBook) return previousCache.filter((x) => x.id !== id);
-                  const newCache = [...previousCache];
-                  newCache[index] = {
-                    ...oldBook,
-                    id: newBook.id,
-                    text: newBook.name,
-                  };
-                  return newCache;
-                });
-              }}
+              setCacheRef={setCacheRef}
             />
           ),
           icon: <MdCollections />,
@@ -155,5 +150,45 @@ function BooksProvider({
     <SelectorItemContextProvider elements={cache} loading={isLoading}>
       {children}
     </SelectorItemContextProvider>
+  );
+}
+
+function RecursiveBookPopover({
+  id,
+  name,
+  setCacheRef,
+}: {
+  id: string;
+  name: string;
+  setCacheRef: RefObject<Dispatch<SetStateAction<SelectorListItemData[]>>>;
+}) {
+  return (
+    <BookPopover
+      id={id}
+      name={name}
+      update={(id, fn) => {
+        setCacheRef.current?.((previousCache) => {
+          const index = previousCache.findIndex((x) => x.id === id);
+          const oldBook = previousCache[index];
+          if (!oldBook) return previousCache;
+          const newBook = fn({ id: oldBook.id, name: oldBook.text });
+          if (!newBook) return previousCache.filter((x) => x.id !== id);
+          const newCache = [...previousCache];
+          newCache[index] = {
+            ...oldBook,
+            popover: (
+              <RecursiveBookPopover
+                id={newBook.id}
+                name={newBook.name}
+                setCacheRef={setCacheRef}
+              />
+            ),
+            id: newBook.id,
+            text: newBook.name,
+          };
+          return newCache;
+        });
+      }}
+    />
   );
 }
