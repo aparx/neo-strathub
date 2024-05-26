@@ -15,4 +15,5 @@ export const trigger = style({
 
 export const content = style({
   maxWidth: "45ch",
+  zIndex: 99999,
 });
