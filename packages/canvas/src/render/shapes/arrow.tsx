@@ -30,6 +30,10 @@ export const Arrow = forwardRef<
     if (shape) setShapePos(shape.position());
   }, []);
 
+  function scalePoints(scaleX: number, scaleY: number, points: number[]) {
+    return points.map((x, i) => x * (i % 2 === 0 ? scaleX : scaleY));
+  }
+
   return (
     <>
       <ReactKonva.Arrow
@@ -40,6 +44,24 @@ export const Arrow = forwardRef<
         onDragMove={(e) => {
           onDragMove?.(e);
           setShapePos(e.target.position());
+        }}
+        onTransform={(e) => {
+          const node = e.target as Arrow;
+          const scaleX = node.scaleX();
+          const scaleY = node.scaleY();
+          node.scaleX(1);
+          node.scaleY(1);
+          const points = node.points() as number[];
+          node.points(scalePoints(scaleX, scaleY, points));
+        }}
+        onTransformEnd={(e) => {
+          const node = e.target as Arrow;
+          onChange({
+            ...node.attrs,
+            points: node.points(),
+            x: node.x(),
+            y: node.y(),
+          });
         }}
       />
       {useSingleTransformer && (
