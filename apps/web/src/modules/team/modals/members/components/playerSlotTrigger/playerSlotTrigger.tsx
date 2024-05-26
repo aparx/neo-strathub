@@ -45,7 +45,7 @@ export function PlayerSlotTrigger({
             color: slot ? vars.colors.accents[0] : vars.colors.emphasis.low,
           }}
         >
-          {slot ? 1 + (slot.index ?? 0) : "#"}
+          E{slot ? 1 + (slot.index ?? 0) : "#"}
         </Text>
         {slot ? "Player" : "Assign"}
         <div className={css.arrow}>

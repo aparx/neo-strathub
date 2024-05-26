@@ -69,7 +69,7 @@ export const CanvasLevel = forwardRef<Konva.Layer, CanvasLevelProps>(
             fill={"rgb(255,255,255)"}
             strokeScaleEnabled={false}
             stroke={focused ? "rgb(0, 200, 255)" : "rgba(255, 255, 255, .5)"}
-            strokeWidth={2}
+            strokeWidth={3}
             cornerRadius={10}
           />
           <KonvaImage

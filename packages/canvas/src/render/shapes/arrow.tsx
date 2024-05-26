@@ -5,7 +5,7 @@ import { CanvasNodeConfig } from "../../canvas.data";
 import * as ReactKonva from "react-konva";
 import { mergeRefs } from "@repo/utils";
 import { DefaultTransformer } from "../../transformers";
-import { useNodesIntoTransformer } from "../canvasShapes";
+import { usePutNodesIntoTransformer } from "../canvasShapes";
 
 export const Arrow = forwardRef<
   Konva.Arrow,
@@ -13,7 +13,7 @@ export const Arrow = forwardRef<
 >(({ data, modifiable, useSingleTransformer, ...restProps }, ref) => {
   const trRef = useRef<Konva.Transformer>(null);
   const shapeRef = useRef<Konva.Arrow>(null);
-  useNodesIntoTransformer(useSingleTransformer, trRef, shapeRef);
+  usePutNodesIntoTransformer(useSingleTransformer, trRef, shapeRef);
   return (
     <>
       <ReactKonva.Arrow

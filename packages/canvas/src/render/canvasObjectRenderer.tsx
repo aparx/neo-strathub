@@ -111,14 +111,14 @@ function ObjectWrapper<TConfig extends CanvasNodeConfig>({
     });
   }
 
-  const OnChild = Slot as any as ForwardRefExoticComponent<
+  const ShapeChild = Slot as any as ForwardRefExoticComponent<
     CanvasObjectProps &
       Pick<ObjectWrapperProps, "children"> &
       RefAttributes<Konva.Node>
   >;
 
   return (
-    <OnChild
+    <ShapeChild
       ref={childRef}
       data={data}
       index={index}
@@ -138,24 +138,8 @@ function ObjectWrapper<TConfig extends CanvasNodeConfig>({
           rotation: e.target.rotation(),
         });
       }}
-      onTransformEnd={(e) => {
-        const node = e.target as Konva.Node;
-        const scaleX = node.scaleX();
-        const scaleY = node.scaleY();
-        node.scaleX(1);
-        node.scaleY(1);
-        onChange({
-          ...node.attrs,
-          x: node.x(),
-          y: node.y(),
-          // set minimal value
-          width: Math.max(5, node.width() * scaleX),
-          height: Math.max(node.height() * scaleY),
-          rotation: e.target.rotation(),
-        });
-      }}
     >
       {children}
-    </OnChild>
+    </ShapeChild>
   );
 }

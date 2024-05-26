@@ -12,7 +12,7 @@ export const arrow = style({
 export const content = style({
   background: POPOVER_BACKGROUND,
   backdropFilter: POPOVER_BACKDROP_FILTER,
-  padding: vars.spacing.sm,
+  padding: vars.spacing.md,
   borderRadius: vars.roundness.sm,
   border: `1px solid ${vars.colors.outline.card}`,
   color: vars.colors.emphasis.high,

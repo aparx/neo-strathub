@@ -30,9 +30,17 @@ function createInitialNodes(): CanvasNodeData[] {
       y: 0,
     }),
     createShapeData(shapeRenderers, "Circle", {
-      radius: 25,
+      width: 30,
+      height: 30,
       x: 50,
       y: 50,
+      fill: "yellow",
+    }),
+    createShapeData(shapeRenderers, "Rect", {
+      width: 30,
+      height: 30,
+      x: 100,
+      y: 100,
       fill: "green",
     }),
   ];

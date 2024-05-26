@@ -5,7 +5,7 @@ import * as ReactKonva from "react-konva";
 import { CanvasNodeConfig } from "../../canvas.data";
 import { DefaultTransformer } from "../../transformers";
 import { CanvasObjectProps } from "../canvasObjectRenderer";
-import { useNodesIntoTransformer } from "../canvasShapes";
+import { usePutNodesIntoTransformer } from "../canvasShapes";
 
 export const Circle = forwardRef<
   Konva.Circle,
@@ -13,7 +13,7 @@ export const Circle = forwardRef<
 >(({ data, modifiable, useSingleTransformer, onChange, ...restProps }, ref) => {
   const trRef = useRef<Konva.Transformer>(null);
   const shapeRef = useRef<Konva.Circle>(null);
-  useNodesIntoTransformer(useSingleTransformer, trRef, shapeRef);
+  usePutNodesIntoTransformer(useSingleTransformer, trRef, shapeRef);
   return (
     <>
       <ReactKonva.Circle
@@ -22,22 +22,20 @@ export const Circle = forwardRef<
         {...data.attrs}
         {...restProps}
         onTransformEnd={(e) => {
+          // For circles, width and height equal the radius, thus scale must be used
           const node = e.target;
-          const scaleX = node.scaleX();
-          const scaleY = node.scaleY();
-          node.scaleX(1);
-          node.scaleY(1);
           onChange({
             ...node.attrs,
             x: node.x(),
             y: node.y(),
-            width: Math.max(5, node.width() * scaleX),
-            height: Math.max(5, node.height() * scaleY),
-            radius: undefined,
+            scaleX: node.scaleX(),
+            scaleY: node.scaleY(),
+            width: node.width(),
+            height: node.height(),
           });
         }}
       />
-      {useSingleTransformer && <DefaultTransformer keepRatio ref={trRef} />}
+      {useSingleTransformer && <DefaultTransformer ref={trRef} />}
     </>
   );
 });

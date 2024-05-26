@@ -56,6 +56,10 @@ export const Line = forwardRef<
     if (shape) setShapePos({ x: shape.x(), y: shape.y() });
   }, []);
 
+  function scalePoints(scaleX: number, scaleY: number, points: number[]) {
+    return points.map((x, i) => x * (i % 2 === 0 ? scaleX : scaleY));
+  }
+
   return (
     <>
       <ReactKonva.Line
@@ -69,6 +73,24 @@ export const Line = forwardRef<
         onDragMove={(e) => {
           onDragMove?.(e);
           setShapePos({ x: e.target.x(), y: e.target.y() });
+        }}
+        onTransform={(e) => {
+          const node = e.target as Line;
+          const scaleX = node.scaleX();
+          const scaleY = node.scaleY();
+          node.scaleX(1);
+          node.scaleY(1);
+          const points = node.points() as number[];
+          node.points(scalePoints(scaleX, scaleY, points));
+        }}
+        onTransformEnd={(e) => {
+          const node = e.target as Line;
+          onChange({
+            ...node.attrs,
+            points: node.points(),
+            x: node.x(),
+            y: node.y(),
+          });
         }}
       />
       {useSingleTransformer && (

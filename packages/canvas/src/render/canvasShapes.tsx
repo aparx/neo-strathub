@@ -3,7 +3,7 @@ import Konva from "konva";
 import { RefObject, useEffect } from "react";
 import { Arrow, Circle, Line, Rect } from "./shapes";
 
-export function useNodesIntoTransformer(
+export function usePutNodesIntoTransformer(
   insertNodes: boolean,
   transformer: RefObject<Konva.Transformer>,
   ...nodes: RefObject<Konva.Node>[]

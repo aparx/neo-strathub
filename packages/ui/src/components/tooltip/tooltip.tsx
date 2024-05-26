@@ -25,7 +25,7 @@ export function Content({
 }: TooltipContentProps) {
   return (
     <Primitive.Portal>
-      <Text asChild type={"label"} size={size}>
+      <Text asChild type={"label"} data={{ weight: 400 }} size={size}>
         <Primitive.Content
           className={mergeClassNames(css.content, className)}
           {...restProps}
