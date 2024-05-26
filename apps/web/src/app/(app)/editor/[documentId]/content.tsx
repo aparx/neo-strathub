@@ -36,11 +36,16 @@ function createInitialNodes(): CanvasNodeData[] {
       y: 50,
       fill: "yellow",
     }),
-    createShapeData(shapeRenderers, "Rect", {
+    createShapeData(shapeRenderers, "Arrow", {
       width: 30,
       height: 30,
       x: 100,
       y: 100,
+      strokeWidth: 1,
+      stroke: "green",
+      points: [100, 100, 180, 100],
+      pointerLength: 20,
+      pointerWidth: 20,
       fill: "green",
     }),
   ];

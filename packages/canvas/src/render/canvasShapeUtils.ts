@@ -49,7 +49,7 @@ export function createShapeData<
   };
 }
 
-export function isShapeClassNameSupported<
+export function isShapeIdSupported<
   const TLookupTable extends CanvasRendererLookupTable,
 >(table: TLookupTable, key: any): key is keyof TLookupTable {
   return typeof key === "string" && key in table && table[key] != null;

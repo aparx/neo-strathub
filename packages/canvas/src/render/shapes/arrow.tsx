@@ -1,19 +1,35 @@
-import { forwardRef, useRef } from "react";
-import Konva from "konva";
-import { CanvasObjectProps } from "../canvasObjectRenderer";
-import { CanvasNodeConfig } from "../../canvas.data";
-import * as ReactKonva from "react-konva";
 import { mergeRefs } from "@repo/utils";
-import { DefaultTransformer } from "../../transformers";
-import { usePutNodesIntoTransformer } from "../canvasShapes";
+import Konva from "konva";
+import { Vector2d } from "konva/lib/types";
+import { forwardRef, useEffect, useRef, useState } from "react";
+import * as ReactKonva from "react-konva";
+import { CanvasNodeConfig } from "../../canvas.data";
+import { LineTransformer, LineTransformerRef } from "../../transformers";
+import { CanvasObjectProps } from "../canvasObjectRenderer";
 
 export const Arrow = forwardRef<
   Konva.Arrow,
   CanvasObjectProps<CanvasNodeConfig<Konva.ArrowConfig>>
->(({ data, modifiable, useSingleTransformer, ...restProps }, ref) => {
-  const trRef = useRef<Konva.Transformer>(null);
+>((props, ref) => {
+  const {
+    data,
+    modifiable,
+    useSingleTransformer,
+    onDragMove,
+    onChange,
+    ...restProps
+  } = props;
+
+  const trRef = useRef<LineTransformerRef>(null);
   const shapeRef = useRef<Konva.Arrow>(null);
-  usePutNodesIntoTransformer(useSingleTransformer, trRef, shapeRef);
+
+  const [shapePos, setShapePos] = useState<Readonly<Vector2d>>({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const shape = shapeRef.current;
+    if (shape) setShapePos(shape.position());
+  }, []);
+
   return (
     <>
       <ReactKonva.Arrow
@@ -21,8 +37,25 @@ export const Arrow = forwardRef<
         draggable={modifiable}
         {...data.attrs}
         {...restProps}
+        onDragMove={(e) => {
+          onDragMove?.(e);
+          setShapePos(e.target.position());
+        }}
       />
-      {useSingleTransformer && <DefaultTransformer ref={trRef} />}
+      {useSingleTransformer && (
+        <LineTransformer
+          ref={trRef}
+          points={data.attrs.points}
+          position={shapePos}
+          updatePoints={(newPoints) => shapeRef.current?.points(newPoints)}
+          onDragComplete={() => {
+            onChange({
+              ...data.attrs,
+              points: shapeRef.current!.points(),
+            });
+          }}
+        />
+      )}
     </>
   );
 });

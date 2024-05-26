@@ -3,8 +3,11 @@ import { SharedState } from "@repo/utils/hooks";
 import Konva from "konva";
 import Vector2d = Konva.Vector2d;
 
+export const CHARACTER_ID_ATTRIBUTE = "characterId";
+
 export type CanvasNodeConfig<T = Konva.NodeConfig> = T & {
-  characterId?: string;
+  /** String identifying what custom shape to be used */
+  [CHARACTER_ID_ATTRIBUTE]?: string;
 };
 
 export type CanvasNodeData<

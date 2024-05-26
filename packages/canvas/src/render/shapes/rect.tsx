@@ -14,6 +14,7 @@ export const Rect = forwardRef<
   const trRef = useRef<Konva.Transformer>(null);
   const shapeRef = useRef<Konva.Rect>(null);
   usePutNodesIntoTransformer(useSingleTransformer, trRef, shapeRef);
+
   return (
     <>
       <ReactKonva.Rect
@@ -21,6 +22,7 @@ export const Rect = forwardRef<
         draggable={modifiable}
         {...data.attrs}
         {...restProps}
+        name={"Rect"}
         onTransformEnd={(e) => {
           // Scale back and use width and height instead of scale
           const node = e.target as Konva.Node;

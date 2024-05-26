@@ -12,7 +12,7 @@ import { CanvasNodeConfig, CanvasNodeData } from "../canvas.data";
 import {
   CanvasRendererLookupTable,
   CanvasShapeRenderer,
-  isShapeClassNameSupported,
+  isShapeIdSupported,
 } from "./canvasShapeUtils";
 
 export interface CanvasObjectRendererProps<
@@ -34,6 +34,7 @@ export interface CanvasObjectProps<
   TConfig extends CanvasNodeConfig = CanvasNodeConfig,
 > extends CanvasObjectBaseProps<TConfig>,
     KonvaNodeEvents {
+  /** Function that updates this object in the state (and thus also on the server) */
   onChange: (newConfig: TConfig) => any;
   /** Boolean flag that is true, when the individual transformer of a canvas object
    *  should be used (is only true, when the object is actually selected) */
@@ -53,10 +54,11 @@ export function CanvasObjectRenderer<TConfig extends CanvasNodeConfig>({
   const level = useCanvasLevel();
   const children = level.children;
   return children.state.map((data, index) => {
-    if (!isShapeClassNameSupported(lookupTable, data.className)) {
+    if (!isShapeIdSupported(lookupTable, data.className)) {
       // TODO display toast that given canvas is invalid?
-      console.error(`Class name '${data.className}' is unsupported`);
-      children.update((x) => x.filter((y) => y.className !== data.className));
+      const className = data.className;
+      console.error(`Shape className '${className}' is unsupported`);
+      children.update((prev) => prev.filter((x) => x.className !== className));
       return null;
     }
     return (

@@ -21,6 +21,7 @@ export const Circle = forwardRef<
         draggable={modifiable}
         {...data.attrs}
         {...restProps}
+        name={"Circle"}
         onTransformEnd={(e) => {
           // For circles, width and height equal the radius, thus scale must be used
           const node = e.target;
