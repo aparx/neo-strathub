@@ -1,31 +1,22 @@
 "use server";
-
-import { getUser } from "@/modules/auth/actions";
-import { createServiceServer } from "@/utils/supabase/server";
+import { getUser } from "@/modules/auth/actions.ts";
+import { createServiceServer } from "@/utils/supabase/server.ts";
 import { cookies } from "next/headers";
-import { z } from "zod";
+import {
+  CreateProfileSchema,
+  createProfileSchema,
+} from "./createProfile.schema.ts";
 
-const createInputSchema = z.object({
-  name: z.string().min(3).max(20),
-});
+export async function createProfile(inputData: CreateProfileSchema) {
+  const validated = createProfileSchema.parse(inputData);
 
-export async function createProfile(lastState: any, formData: FormData) {
   const user = await getUser(cookies());
-  if (!user) return { state: "unauthenticated" };
-  const validated = createInputSchema.safeParse({
-    name: formData.get("name"),
-  });
-  if (!validated.success)
-    return {
-      state: "error",
-      message: validated.error.flatten().fieldErrors,
-    } as const;
 
   // Profiles can only be created by the service due to potential requirements
   const service = createServiceServer(cookies());
   const { error } = await service.from("profile").insert({
     id: user.id,
-    name: validated.data.name,
+    name: validated.name,
   });
 
   if (process.env.NODE_ENV === "development") {
@@ -57,5 +48,6 @@ export async function createProfile(lastState: any, formData: FormData) {
 
   return {
     state: "success",
+    error: null,
   } as const;
 }

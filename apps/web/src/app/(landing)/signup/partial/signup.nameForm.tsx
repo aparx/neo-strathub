@@ -1,83 +1,94 @@
 "use client";
-import { DASHBOARD_QUERY_PARAMS } from "@/app/(app)/dashboard/_utils";
-import { createProfile } from "@/app/(landing)/signup/actions";
-import * as css from "@/app/(landing)/signup/page.css";
-import { AuthButton } from "@/modules/auth/components";
-import { ModalPageKey } from "@/modules/modal/modals";
-import { useURL } from "@/utils/hooks";
 import {
-  Button,
-  Flexbox,
-  Icon,
-  Spinner,
-  Text,
-  TextField,
-} from "@repo/ui/components";
-import { Nullish } from "@repo/utils";
+  CreateProfileSchema,
+  createProfileSchema,
+} from "@/app/(landing)/signup/actions/createProfile.schema.ts";
+import { createProfile } from "@/app/(landing)/signup/actions/createProfile.ts";
+import * as css from "@/app/(landing)/signup/page.css";
+import { AuthButton, Avatar } from "@/modules/auth/components";
+import {
+  MODAL_CONTROLLER_ID_PARAM,
+  ModalParameter,
+} from "@/modules/modal/components/index.ts";
+import { ModalPageKey } from "@/modules/modal/modals.tsx";
+import { useURL } from "@/utils/hooks";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button, Flexbox, Icon, Spinner, TextField } from "@repo/ui/components";
 import { User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 import { PostgresError } from "pg-error-enum";
-import { useEffect } from "react";
-import { useFormState, useFormStatus } from "react-dom";
+import { useEffect, useTransition } from "react";
+import { useForm } from "react-hook-form";
 
 export function SignupNameForm({ user }: { user: User }) {
-  const [state, dispatch] = useFormState(createProfile, null);
-
-  let fieldError: Nullish | string[] | string;
-
-  if (state?.state === "error") {
-    if (state.message) fieldError = state.message?.name;
-    else if (state.error?.code === PostgresError.UNIQUE_VIOLATION)
-      fieldError = "This name is already taken";
-  }
-
+  const [isPending, startTransition] = useTransition();
+  const { register, handleSubmit, formState, setError, setFocus } =
+    useForm<CreateProfileSchema>({
+      resolver: zodResolver(createProfileSchema),
+    });
   const router = useRouter();
   const url = useURL();
+  const metadata = user.user_metadata;
 
-  useEffect(() => {
-    if (state?.state !== "success") return;
-    const redirect = url.searchParams.get("redirect");
-    if (redirect && !["/home", "/dashboard"].includes(redirect))
-      return router.replace(redirect);
-    url.pathname = "/dashboard";
-    url.searchParams.forEach((_, key) => url.searchParams.delete(key));
-    url.searchParams.set(
-      DASHBOARD_QUERY_PARAMS.modal,
-      "createTeam" satisfies ModalPageKey,
-    );
-    router.replace(url.href);
-  }, [state]);
+  function submit(data: CreateProfileSchema) {
+    startTransition(async () => {
+      const { error } = await createProfile(data);
+      console.log(error);
+      if (error?.code === PostgresError.UNIQUE_VIOLATION) {
+        setError("name", { message: "Username exists already" });
+      } else if (error) {
+        setError("name", { message: error.message });
+      } else {
+        const redirect = url.searchParams.get("redirect");
+        if (redirect && !["/home", "/dashboard"].includes(redirect))
+          return router.replace(redirect);
+        url.pathname = "/dashboard";
+        url.searchParams.forEach((_, key) => url.searchParams.delete(key));
+        ModalParameter.apply(
+          url.searchParams,
+          MODAL_CONTROLLER_ID_PARAM,
+          "createTeam" satisfies ModalPageKey,
+        );
+        router.replace(url.href);
+      }
+    });
+  }
+
+  useEffect(() => setFocus("name"), []);
 
   return (
-    <form action={dispatch} className={css.formShell}>
-      <Flexbox orient={"vertical"} gap={"sm"}>
-        <Text>Please choose a name</Text>
+    <form className={css.formShell} onSubmit={handleSubmit(submit)}>
+      <Flexbox gap={"lg"}>
+        <Avatar size={"40px"} src={metadata.avatar_url} />
         <TextField
-          name={"name"}
-          placeholder={"name"}
-          defaultValue={user.user_metadata.name}
-          error={fieldError}
-          required
+          {...register("name")}
+          placeholder={"Choose a username"}
+          defaultValue={
+            process.env.NODE_ENV === "development"
+              ? metadata.name?.replaceAll(/\s/gi, "_")
+              : undefined
+          }
+          style={{ flexGrow: 1 }}
+          error={formState.errors.name?.message}
+          disabled={isPending}
+          autoComplete={false}
         />
       </Flexbox>
-      <Footer loading={state?.state === "success"} />
+      <footer className={css.footer}>
+        <AuthButton.SignOut disabled={isPending}>Sign out</AuthButton.SignOut>
+        <Button
+          type={"submit"}
+          color={"cta"}
+          disabled={isPending || !formState.isValid}
+        >
+          Continue
+          {isPending ? (
+            <Spinner color={"inherit"} />
+          ) : (
+            <Icon.Mapped type={"next"} />
+          )}
+        </Button>
+      </footer>
     </form>
-  );
-}
-
-function Footer({ loading }: { loading?: boolean }) {
-  const isPendingOrLoading = useFormStatus().pending || loading;
-  return (
-    <footer className={css.footer}>
-      <AuthButton.SignOut>Sign out</AuthButton.SignOut>
-      <Button type={"submit"} color={"cta"} disabled={isPendingOrLoading}>
-        Continue
-        {isPendingOrLoading ? (
-          <Spinner color={"inherit"} />
-        ) : (
-          <Icon.Mapped type={"next"} />
-        )}
-      </Button>
-    </footer>
   );
 }

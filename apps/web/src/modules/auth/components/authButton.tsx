@@ -30,7 +30,7 @@ export function SignIn({
 export function SignOut({
   children,
   asChild,
-  color = "destructive",
+  color = "default",
   ...restProps
 }: AuthButtonProps) {
   return (

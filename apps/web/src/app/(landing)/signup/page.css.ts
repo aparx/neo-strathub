@@ -9,6 +9,7 @@ export const shell = style({
   left: "50%",
   top: "50%",
   transform: "translate(-50%, -50%)",
+  maxWidth: 450,
 });
 
 export const shellTitle = style({

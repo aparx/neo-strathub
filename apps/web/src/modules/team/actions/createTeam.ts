@@ -4,7 +4,7 @@ import {
   CreateTeamSchema,
   createTeamSchema,
 } from "@/modules/team/actions/createTeam.schema";
-import { getServer } from "@/utils/supabase/actions";
+import { getServiceServer } from "@/utils/supabase/actions";
 import { cookies } from "next/headers";
 import { PostgresError } from "pg-error-enum";
 
@@ -22,7 +22,7 @@ export async function createTeam(team: CreateTeamSchema) {
 
   // TODO handle payments?
 
-  const create = await getServer(cookies()).rpc("create_team", {
+  const create = await getServiceServer(cookies()).rpc("create_team", {
     team_name: validatedFields.name.trim(),
     target_plan_id: validatedFields.planId,
     target_game_id: validatedFields.gameId,

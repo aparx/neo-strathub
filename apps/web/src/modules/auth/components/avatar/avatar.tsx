@@ -36,7 +36,7 @@ export function Avatar({
   return (
     <div
       className={mergeClassNames(className, css.avatar)}
-      style={{ width: size, ...style }}
+      style={{ width: size, height: size, ...style }}
       {...restProps}
     >
       {!loaded && <Skeleton width={"100%"} height={"100%"} />}
