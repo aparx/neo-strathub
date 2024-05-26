@@ -468,6 +468,7 @@ export type Database = {
       }
       plan: {
         Row: {
+          color: string
           config: Json
           created_at: string
           default_plan: boolean
@@ -478,6 +479,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          color: string
           config?: Json
           created_at?: string
           default_plan?: boolean
@@ -488,6 +490,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          color?: string
           config?: Json
           created_at?: string
           default_plan?: boolean

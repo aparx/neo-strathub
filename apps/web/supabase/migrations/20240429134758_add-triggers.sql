@@ -148,7 +148,7 @@ begin
     where team_member.id = new.member_id;
 
     insert into public.audit_log (team_id, performer_id, type, message)
-    values (_slot.team_id, auth.uid(), 'update',
+    values (_slot.team_id, auth.uid(), 'update'::audit_log_type,
             'Assigned ' || coalesce(_name, '(Unknown)') || ' to slot #' ||
             (1 + _slot.index));
 

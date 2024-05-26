@@ -1,5 +1,8 @@
 "use client";
-import { DASHBOARD_QUERY_PARAMS } from "@/app/(app)/dashboard/_utils";
+import {
+  MODAL_CONTROLLER_ID_PARAM,
+  ModalParameter,
+} from "@/modules/modal/components";
 import { ModalPageKey } from "@/modules/modal/modals";
 import { useURL } from "@/utils/hooks";
 import Link from "next/link";
@@ -21,7 +24,7 @@ export function OpenModalLink({
   let url = useURL();
   if (typeof href === "string") url.pathname = href;
   else if (typeof href === "object") url = href;
-  url.searchParams.set(DASHBOARD_QUERY_PARAMS.modal, modal);
+  ModalParameter.apply(url.searchParams, MODAL_CONTROLLER_ID_PARAM, modal);
 
   return (
     <Link href={url} {...restProps}>

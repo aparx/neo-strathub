@@ -1,11 +1,12 @@
 "use client";
-import { DASHBOARD_QUERY_PARAMS } from "@/app/(app)/dashboard/_utils";
 import { ModalParameter } from "@/modules/modal/components/modalController/modalController.utils";
 import { isModalPageKey, MODAL_PAGES } from "@/modules/modal/modals";
 import { useURL } from "@/utils/hooks";
 import { Modal } from "@repo/ui/components";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+
+export const MODAL_CONTROLLER_ID_PARAM = "id";
 
 export function ModalController() {
   const [opened, setOpened] = useState(false);
@@ -16,7 +17,7 @@ export function ModalController() {
   useEffect(() => setOpened(true), []);
 
   const searchParams = useSearchParams();
-  const modalType = searchParams.get(DASHBOARD_QUERY_PARAMS.modal);
+  const modalType = ModalParameter.get(searchParams, MODAL_CONTROLLER_ID_PARAM);
   if (!isModalPageKey(modalType)) return null;
 
   const PageModalContent = MODAL_PAGES[modalType];

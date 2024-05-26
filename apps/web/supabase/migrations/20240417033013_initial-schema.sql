@@ -77,6 +77,7 @@ create table if not exists public.plan
     name             varchar(128)   not null unique,
     pricing          decimal(10, 2) not null,
     pricing_interval public.pay_interval,
+    color            varchar(128)   not null,
     default_plan     boolean        not null default false,
     config           jsonb          not null default '{}'::jsonb,
     created_at       timestamptz    not null default now(),

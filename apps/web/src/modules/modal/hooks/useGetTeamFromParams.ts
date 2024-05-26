@@ -3,7 +3,7 @@ import { useTeam } from "@/modules/team/clientActions";
 import { Nullish } from "@repo/utils";
 import { useParams, useSearchParams } from "next/navigation";
 
-export const USE_GET_TEAM_SEARCH_PARAM = ModalParameter.createToken("teamId");
+export const USE_GET_TEAM_SEARCH_PARAM = ModalParameter.createKey("teamId");
 
 /** If possible, returns the team based off of the route or search parameters. */
 export function useGetTeamFromParams() {

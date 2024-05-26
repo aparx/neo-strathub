@@ -51,7 +51,7 @@ revoke
 create or replace function rename_book(book_id uuid, name text)
     returns void as $$
 declare
-    _team_id     uuid;
+    _team_id    uuid;
     _self_flags bigint;
 begin
     -- Check if user can modify the book in the first place
@@ -384,10 +384,6 @@ begin
         if (_slot_index is null) then
             raise exception 'Slot does not exist or is invalid';
         end if;
-
-        insert into public.audit_log (team_id, performer_id, type, message)
-        values (_target_member.team_id, auth.uid(), 'update'::audit_log_type,
-                'Assigned ' || _target_name || ' to slot #' || (1 + _slot_index));
 
         insert into public.member_to_player_slot (slot_id, member_id)
         values ($2, $1);

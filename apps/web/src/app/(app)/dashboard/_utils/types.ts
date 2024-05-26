@@ -1,7 +1,6 @@
 export const DASHBOARD_QUERY_PARAMS = {
   document: "documentId",
   book: "bookId",
-  modal: "modal",
 } as const satisfies Readonly<Record<string, string>>;
 
 export interface BaseContentPathProps {

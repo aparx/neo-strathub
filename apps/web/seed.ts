@@ -165,6 +165,11 @@ async function main() {
       default_plan: index === 0,
       pricing: index === 0 ? 0 : undefined /* randomize */,
       team: generateTeams,
+      color: [
+        "rgba(245, 245, 245, .7)",
+        "rgb(107, 185, 242)",
+        "rgb(224, 76, 85)",
+      ][index]!,
       config: {
         max_members: (1 + index) * 6,
         max_blueprints: (1 + index) * 100,
@@ -190,6 +195,7 @@ async function main() {
       flags:
         TeamMemberFlags.VIEW_DOCUMENTS |
         TeamMemberFlags.MODIFY_DOCUMENTS |
+        TeamMemberFlags.EDIT_MEMBERS |
         TeamMemberFlags.DELETE_DOCUMENTS,
     },
     {
