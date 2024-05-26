@@ -65,13 +65,6 @@ export const triggerExpand = style({
   lineHeight: 0.5,
 });
 
-export const itemIndicator = style({
-  width: "1em",
-  height: "1em",
-  background: "currentColor",
-  borderRadius: vars.roundness.full,
-});
-
 export const content = style([
   sprinkles({
     outline: "card",
@@ -83,6 +76,7 @@ export const content = style([
     animation: `${keyframes({
       from: { opacity: 0 },
     })} .15s`,
+    zIndex: 99999,
   },
 ]);
 

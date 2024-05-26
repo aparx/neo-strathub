@@ -59,7 +59,7 @@ export function SignupNameForm({ user }: { user: User }) {
   return (
     <form className={css.formShell} onSubmit={handleSubmit(submit)}>
       <Flexbox gap={"lg"}>
-        <Avatar size={"40px"} src={metadata.avatar_url} />
+        <Avatar size={40} src={metadata.avatar_url} />
         <TextField
           {...register("name")}
           placeholder={"Choose a username"}

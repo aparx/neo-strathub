@@ -7,13 +7,13 @@ import {
   PlayerSlotTrigger,
   ROLE_SELECT_HEIGHT,
   RemoveMemberButton,
+  RoleData,
   RoleSelect,
   RoleSelectProps,
 } from "@/modules/team/modals/members/components";
 import { createClient } from "@/utils/supabase/client";
 import { Tables } from "@/utils/supabase/types";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { vars } from "@repo/theme";
 import {
   Breadcrumbs,
   Flexbox,
@@ -84,7 +84,7 @@ export function TeamMembersModalContent(
     [],
   );
 
-  const self = useMemo(
+  const selfMember = useMemo(
     () => members?.find((x) => x.profile_id === user?.id),
     [members],
   );
@@ -136,7 +136,7 @@ export function TeamMembersModalContent(
                 member={member}
                 onRemove={() => removeMember(member)}
                 onUpdate={(newRole) => updateRole(member, newRole)}
-                self={self}
+                selfMember={selfMember}
               />
             ))}
           </Table.Body>
@@ -148,18 +148,18 @@ export function TeamMembersModalContent(
 
 function MemberSlot({
   member,
-  self,
+  selfMember,
   onRemove,
   onUpdate,
 }: {
   member: TeamMemberData;
   /** The user themselves as a actions, can be null when they are site admins */
-  self: Nullish<TeamMemberData>;
+  selfMember: Nullish | TeamMemberData;
   onRemove: () => any;
   onUpdate: RoleSelectProps["onSelect"];
 }) {
-  const isUserThemselves = self?.profile_id === member.profile_id;
-  const selfFlags = self?.member_role?.flags;
+  const isUserThemselves = selfMember?.profile_id === member.profile_id;
+  const selfFlags = selfMember?.member_role?.flags;
   const targetFlags = member.member_role?.flags;
   const canModifyBase = hasFlag(selfFlags, TeamMemberFlags.EDIT_MEMBERS);
 
@@ -176,13 +176,12 @@ function MemberSlot({
     canModify &&= !isUserThemselves;
   }
 
-  canKick ||= isUserThemselves;
-
   return (
     <MemberRow
       onRemove={onRemove}
       onUpdate={onUpdate}
       member={member}
+      selfMember={selfMember}
       canModifyRole={canModify}
       canModifySlot={canModifyBase}
       canKick={canKick}
@@ -192,6 +191,7 @@ function MemberSlot({
 
 function MemberRow({
   member,
+  selfMember,
   canKick,
   canModifyRole,
   canModifySlot,
@@ -199,6 +199,8 @@ function MemberRow({
   onUpdate,
 }: {
   member: TeamMemberData;
+  selfMember: Nullish | TeamMemberData;
+  isSelf?: boolean;
   canKick?: boolean;
   canModifyRole?: boolean;
   canModifySlot?: boolean;
@@ -206,6 +208,13 @@ function MemberRow({
   onUpdate: RoleSelectProps["onSelect"];
 }) {
   const { created_at, role_id } = member;
+
+  const filterRole = useCallback((role: RoleData) => {
+    if (!selfMember) return true;
+    if (role.flags < selfMember.member_role.flags) return true;
+    if (role.id === role_id && selfMember.id === member.id) return true;
+    return selfMember.protected;
+  }, []);
 
   return (
     <Table.Row>
@@ -219,18 +228,18 @@ function MemberRow({
         <RoleSelect
           width={100}
           initialRoleId={role_id}
+          shouldInclude={selfMember != null ? filterRole : undefined}
           onSelect={onUpdate}
           disabled={!canModifyRole}
         />
       </Table.Cell>
       <Table.Cell>{moment(created_at).format("YYYY-MM-DD HH:mm")}</Table.Cell>
       <Table.Cell>
-        <RemoveMemberButton disabled={!canKick} onConfirm={onRemove}>
-          <UserField
-            profile={member.profile}
-            style={{ color: vars.colors.emphasis.high }}
-          />
-        </RemoveMemberButton>
+        <RemoveMemberButton
+          disabled={!canKick}
+          onKick={onRemove}
+          member={member}
+        />
       </Table.Cell>
     </Table.Row>
   );

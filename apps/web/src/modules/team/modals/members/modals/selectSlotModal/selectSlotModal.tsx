@@ -24,7 +24,13 @@ export function SelectSlotModal({
   return (
     <Modal.Content style={{ maxWidth: 450 }}>
       <Modal.Title>
-        Assign slot to {member.profile.name}
+        <span>
+          Assign{" "}
+          <span style={{ color: vars.colors.emphasis.medium }}>
+            {member.profile.name}
+          </span>{" "}
+          to slot
+        </span>
         <Modal.Exit />
       </Modal.Title>
       <ol className={css.slotList}>

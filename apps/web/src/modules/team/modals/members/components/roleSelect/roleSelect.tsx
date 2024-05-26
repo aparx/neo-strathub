@@ -1,7 +1,6 @@
 "use client";
 import { DeepInferUseQueryResult } from "@/utils/generic/types";
 import { createClient } from "@/utils/supabase/client";
-import { Tables } from "@/utils/supabase/types";
 import * as Select from "@radix-ui/react-select";
 import { SelectProps } from "@radix-ui/react-select";
 import { vars } from "@repo/theme";
@@ -13,6 +12,8 @@ import { useEffect, useMemo, useState } from "react";
 import * as css from "./roleSelect.css";
 import { RoleSelectVariants } from "./roleSelect.css";
 
+export type RoleData = DeepInferUseQueryResult<typeof useGetRoles>;
+
 type RoleColor = NonNullable<RoleSelectVariants>["color"];
 
 type RoleSelectBaseProps = Omit<SelectProps, "value" | "onValueChange">;
@@ -20,7 +21,8 @@ type RoleSelectBaseProps = Omit<SelectProps, "value" | "onValueChange">;
 export interface RoleSelectProps extends RoleSelectBaseProps {
   width?: number | string;
   initialRoleId: number;
-  onSelect?: (newRole: Tables<"member_role">) => any;
+  onSelect?: (newRole: RoleData) => any;
+  shouldInclude?: (role: RoleData) => boolean;
 }
 
 /** Referencing the height of the `RoleSelect` component */
@@ -38,8 +40,6 @@ function useGetRoles() {
     refetchInterval: false,
   });
 }
-
-type RoleData = DeepInferUseQueryResult<typeof useGetRoles>;
 
 type RoleColorMap = Map<string, RoleColor>;
 
@@ -61,19 +61,26 @@ function useRoleColorMap(roles: Nullish<RoleData[]>) {
 export function RoleSelect({
   width,
   initialRoleId,
+  shouldInclude,
   onSelect,
   disabled,
   ...restProps
 }: RoleSelectProps) {
-  const [value, setValue] = useState<string>();
+  const [active, setActive] = useState<string>();
   const { data, isLoading } = useGetRoles();
-  const roles = data?.data;
+  const roles = useMemo(() => {
+    let newArray: Role[];
+    if (!shouldInclude) newArray = data?.data;
+    else newArray = data?.data?.filter(shouldInclude);
+    return newArray?.sort((a, b) => b.flags - a.flags);
+  }, [data?.data]);
+
   const colorMap = useRoleColorMap(roles);
 
-  useEffect(() => {
-    // Update the initial role
-    setValue(roles?.find((x) => x.id === initialRoleId)?.name);
-  }, [roles]);
+  useEffect(
+    () => setActive(roles?.find((x) => x.id === initialRoleId)?.name),
+    [roles],
+  );
 
   if (isLoading)
     return (
@@ -87,9 +94,9 @@ export function RoleSelect({
 
   return (
     <Select.Root
-      value={value}
+      value={active}
       onValueChange={(val) => {
-        setValue(val);
+        setActive(val);
         const newRole = roles?.find((x) => x.name === val);
         if (newRole) onSelect?.(newRole);
       }}
@@ -97,7 +104,7 @@ export function RoleSelect({
       {...restProps}
     >
       <Trigger
-        color={value ? colorMap.get(value) : null}
+        color={active ? colorMap.get(active) : null}
         width={width}
         disabled={disabled}
       />
