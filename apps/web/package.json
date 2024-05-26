@@ -10,7 +10,8 @@
     "sb:gen:local": "npx supabase gen types typescript --local > ./src/utils/supabase/types.ts",
     "sb:reseed": "npx tsx seed.ts > supabase/seed.sql && npx supabase db reset",
     "sb:reset": "pnpm run sb:reseed && pnpm run sb:gen:local",
-    "sb:restart": "npx supabase stop && npx supabase start"
+    "sb:restart": "npx supabase stop && npx supabase start",
+    "sb:serve": "npx supabase functions serve"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",

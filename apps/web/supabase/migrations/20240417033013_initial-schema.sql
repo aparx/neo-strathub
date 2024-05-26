@@ -115,6 +115,8 @@ create table if not exists public.book
     team_id    uuid         not null references public.team (id)
         on delete cascade
         on update cascade,
+    index      smallint              default 0
+        constraint index_positive check (index >= 0),
     created_at timestamptz  not null default now(),
     updated_at timestamptz  not null default now()
 );
@@ -155,8 +157,7 @@ create table if not exists public.team_member
     role_id    int         not null references public.member_role (id)
         on delete restrict
         on update cascade,
-    -- If true this member has privileged access (inception/owner status)
-    privileged boolean     not null default false,
+    protected  boolean     not null default false,
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );

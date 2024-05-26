@@ -1,52 +1,134 @@
 -- noinspection SqlResolveForFile
 
 -- //////////////////////////////////////////////////////////////////////
+--                                  TEAM
+-- //////////////////////////////////////////////////////////////////////
+
+create or replace function create_team(
+    team_name varchar, target_plan_id int, target_game_id int, creator_id uuid
+) returns uuid as $$
+declare
+    _uid             uuid;
+    _team_count      int;
+    _max_team_count  int;
+    _highest_role_id int;
+begin
+    -- Check if game is hidden, if so deny
+    if (not exists(select id
+                   from public.game
+                   where id = target_game_id
+                     and hidden = false)) then
+        raise exception 'Game not found';
+    end if;
+
+    insert into public.team (name, plan_id, game_id)
+    values (team_name, target_plan_id, target_game_id)
+    returning id into _uid;
+
+    if (creator_id is null) then
+        return _uid;
+    end if;
+
+    -- Check if the user is allowed to create any more teams in the first place
+    select count(team_id)
+    into _team_count
+    from public.team_member
+    where profile_id = creator_id;
+
+    select numeric_value
+    into _max_team_count
+    from public.config
+    where name = 'max_teams_per_user';
+
+    if (_max_team_count is null) then
+        raise exception 'Missing max_teams_per_user numeric config value';
+    end if;
+
+    if (_team_count >= _max_team_count) then
+        raise exception 'Reached maximum amount of teams';
+    end if;
+
+    -- Select the highest available role and assign the user to it
+    select id
+    into _highest_role_id
+    from public.member_role
+    order by flags desc
+    limit 1;
+
+    if (_highest_role_id is null) then
+        raise exception 'Could not find a fitting member_role';
+    end if;
+
+    insert into team_member (profile_id, team_id, role_id, protected)
+    values (creator_id, _uid, _highest_role_id, true);
+
+    return _uid;
+end;
+$$ volatile language plpgsql
+   security definer;
+
+-- Only allow the service to call this function, due to validation
+revoke
+    execute on function
+    create_team(varchar, int, int, uuid)
+    from public, anon, authenticated;
+
+-- //////////////////////////////////////////////////////////////////////
 --                                  BOOK
 -- //////////////////////////////////////////////////////////////////////
 
 create or replace function create_book(
-    book_name varchar, target_team_id uuid, performer_id uuid
+    book_name varchar, team_id uuid
 ) returns uuid as $$
 declare
     _book_id        varchar;
     _book_count     int;
     _max_book_count int;
+    _self_member    record;
 begin
-    -- TODO check if game is hidden
+    select member_role.flags
+    from public.team_member
+             inner join member_role on team_member.role_id = member_role.id
+    where team_member.team_id = $2
+      and team_member.profile_id = auth.uid()
+    into _self_member;
+
+    if (_self_member is null) then
+        raise exception 'Not a member of the team';
+    end if;
+
+    if ((_self_member.flags & 64) = 0) then
+        raise exception 'Missing permission to create books';
+    end if;
 
     insert into public.book (name, team_id)
-    values (book_name, target_team_id)
+    values (book_name, team_id)
     returning id into _book_id;
 
     select count(id)
     into _book_count
     from public.book
-    where team_id = target_team_id;
+    where book.team_id = $2;
 
     select (plan.config ->> 'max_books')::int
     into _max_book_count
     from public.team
              inner join plan on team.plan_id = plan.id
-    where team.id = target_team_id;
+    where team.id = team_id;
 
     if (_max_book_count is null or _book_count > _max_book_count) then
         raise exception 'Maximum number of books reached';
     end if;
-
-    insert into public.audit_log (team_id, performer_id, type, message)
-    values (target_team_id, performer_id, 'create'::audit_log_type,
-            'Created book "' || book_name || '"');
 
     return _book_id;
 end;
 $$ volatile language plpgsql
    security definer;
 
--- only the service and higher level roles can create a book, to ensure server side logic
 revoke
     execute on function
-    create_book(varchar, uuid, uuid)
-    from public, anon, authenticated;
+    create_book(varchar, uuid)
+    from public, anon;
 
 create or replace function rename_book(book_id uuid, name text)
     returns void as $$
@@ -90,81 +172,43 @@ revoke execute on function
     rename_book(uuid, text)
     from public, anon;
 
--- //////////////////////////////////////////////////////////////////////
---                                  TEAM
--- //////////////////////////////////////////////////////////////////////
-
-create or replace function create_team(
-    team_name varchar, target_plan_id int, target_game_id int
-) returns uuid as $$
+create or replace function delete_book(book_id uuid)
+    returns void as $$
 declare
-    _uid             uuid;
-    _team_count      int;
-    _max_team_count  int;
-    _highest_role_id int;
+    _team_id     uuid;
+    _self_member record;
 begin
-    -- Check if game is hidden, if so deny
-    if (not exists(select id
-                   from public.game
-                   where id = target_game_id
-                     and hidden = false)) then
-        raise exception 'Game not found';
+    select team_id
+    into _team_id
+    from public.book
+    where id = book_id;
+
+    if (_team_id is null) then
+        raise exception 'Book does not exist';
     end if;
 
-    insert into public.team (name, plan_id, game_id)
-    values (team_name, target_plan_id, target_game_id)
-    returning id into _uid;
-
-    insert into public.audit_log (team_id, performer_id, type, message)
-    values (_uid, auth.uid(), 'create'::audit_log_type,
-            'Created team "' || team_name || '"');
-
-    if (auth.uid() is null) then
-        return _uid;
-    end if;
-
-    -- Check if the user is allowed to create any more teams in the first place
-    select count(team_id)
-    into _team_count
+    select member_role.flags
     from public.team_member
-    where profile_id = auth.uid();
+             inner join member_role on team_member.role_id = member_role.id
+    where team_id = _team_id
+      and profile_id = auth.uid()
+    into _self_member;
 
-    select numeric_value
-    into _max_team_count
-    from public.config
-    where name = 'max_teams_per_user';
-
-    if (_max_team_count is null) then
-        raise exception 'Missing max_teams_per_user numeric config value';
+    if (_self_member is null) then
+        raise exception 'Not a member of the team';
     end if;
 
-    if (_team_count >= _max_team_count) then
-        raise exception 'Reached maximum amount of teams';
+    if ((_self_member.flags & 128 /* DELETE_BOOKS */) = 0) then
+        raise exception 'Missing permission to delete books';
     end if;
 
-    -- Select the highest available role and assign the user to it
-    select id
-    into _highest_role_id
-    from public.member_role
-    order by flags desc
-    limit 1;
-
-    if (_highest_role_id is null) then
-        raise exception 'Could not find a fitting member_role';
-    end if;
-
-    insert into team_member (profile_id, team_id, role_id, privileged)
-    values (auth.uid(), _uid, _highest_role_id, true);
-
-    return _uid;
+    delete from public.book where id = book_id;
 end;
-$$ volatile language plpgsql
-   security definer;
+$$ language plpgsql
+    security definer;
 
--- Only allow authenticated and higher users to create teams
-revoke
-    execute on function
-    create_team(varchar, int, int)
+revoke execute on function
+    delete_book(uuid)
     from public, anon;
 
 -- //////////////////////////////////////////////////////////////////////
@@ -180,7 +224,7 @@ declare
 begin
     select team_member.team_id,
            team_member.profile_id,
-           team_member.privileged,
+           team_member.protected,
            public.member_role.flags
     from public.team_member
              left join public.member_role on team_member.role_id = member_role.id
@@ -192,7 +236,7 @@ begin
     end if;
 
     select team_member.id,
-           team_member.privileged,
+           team_member.protected,
            public.member_role.flags
     from public.team_member
              inner join public.member_role
@@ -201,12 +245,12 @@ begin
       and team_member.team_id = _target_member.team_id
     into _self_member;
 
-    if (member_id != _self_member.id and not _self_member.privileged) then
+    if (member_id != _self_member.id and not _self_member.protected) then
         if ((_self_member.flags & 32 /* KICK_MEMBERS */) = 0) then
             raise exception 'Missing permission to kick members';
         end if;
 
-        if (_self_member.flags <= _target_member.flags or _target_member.privileged) then
+        if (_self_member.flags <= _target_member.flags or _target_member.protected) then
             raise exception 'You have equal or less permissions than the target member';
         end if;
     end if;
@@ -239,7 +283,7 @@ declare
     _target_member  record;
     _new_role_flags bigint;
 begin
-    select team_member.id, team_member.privileged, public.member_role.flags
+    select team_member.id, team_member.protected, public.member_role.flags
     from public.team_member
              inner join member_role
                         on team_member.role_id = member_role.id
@@ -247,7 +291,7 @@ begin
       and team_member.team_id = $1
     into _self_member;
 
-    select team_member.id, team_member.privileged, public.member_role.flags
+    select team_member.id, team_member.protected, public.member_role.flags
     from public.team_member
              inner join member_role
                         on team_member.role_id = member_role.id
@@ -263,16 +307,16 @@ begin
         raise exception 'Target user not a member of target team';
     end if;
 
-    if (_target_member.privileged and _target_member.id != _self_member.id) then
-        raise exception 'Target member is privileged and cannot be changed';
+    if (_target_member.protected and _target_member.id != _self_member.id) then
+        raise exception 'Target member is protected and cannot be changed';
     end if;
 
-    if (not _self_member.privileged) then
+    if (not _self_member.protected) then
         if ((_self_member.flags & 16 /* EDIT_MEMBERS */) = 0) then
             raise exception 'Missing permission to edit members';
         end if;
 
-        if (_self_member.flags <= _target_member.flags or _target_member.privileged) then
+        if (_self_member.flags <= _target_member.flags or _target_member.protected) then
             raise exception 'Target member has equal or higher permissions than you';
         end if;
 

@@ -1,4 +1,4 @@
-import { createBookSchema } from "@/modules/book/actions/createBook.schema";
+import { createBookSchema } from "@/modules/book/modals/createBook";
 import { createClient } from "@/utils/supabase/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -15,7 +15,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 const schema = createBookSchema.pick({ name: true });
-
 type FormSchema = z.infer<typeof schema>;
 
 export function RenameBookModal({

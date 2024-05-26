@@ -20,15 +20,16 @@ export async function createTeam(team: CreateTeamSchema) {
   const user = await getUser(cookies());
   if (!user) throw new Error("Unauthorized");
 
+  // TODO handle payments?
+
   const create = await getServer(cookies()).rpc("create_team", {
     team_name: validatedFields.name.trim(),
     target_plan_id: validatedFields.planId,
     target_game_id: validatedFields.gameId,
+    creator_id: user.id,
   });
 
   if (create.error) {
-    console.log(create.error);
-
     let errorArray = new Array<string>(1);
     if (create.error.code === PostgresError.UNIQUE_VIOLATION)
       errorArray.push("Name must be unique");

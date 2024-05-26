@@ -186,12 +186,16 @@ begin
         end loop;
     end if;
 
+    insert into public.audit_log (team_id, performer_id, type, message)
+    values (new.id, auth.uid(), 'create'::audit_log_type,
+            'Created team "' || new.name || '"');
+
     return new;
 end;
 $$ volatile language plpgsql
    security definer;
 
-create trigger trigger_create_sample_book
+create trigger trigger_create_team
     after insert
     on public.team
     for each row
@@ -240,6 +244,34 @@ create trigger trigger_create_arena
     on public.arena
     for each row
 execute function on_arena_create();
+
+-- ---------------------------- book ----------------------------
+
+create or replace function on_create_book()
+    returns trigger as $$
+declare
+    _max_index smallint;
+begin
+    select max(index)
+    into _max_index
+    from public.book
+    where team_id = new.team_id
+      and id != new.id;
+    new.index = 1 + _max_index;
+
+    insert into public.audit_log (team_id, performer_id, type, message)
+    values (new.team_id, auth.uid(), 'create'::audit_log_type,
+            'Created book "' || new.name || '"');
+
+    return new;
+end;
+$$ language plpgsql security definer;
+
+create trigger trigger_create_book
+    before insert
+    on public.book
+    for each row
+execute function on_create_book();
 
 -- ---------------------------- blueprint ----------------------------
 

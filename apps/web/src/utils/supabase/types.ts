@@ -253,6 +253,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          index: number | null
           name: string
           team_id: string
           updated_at: string
@@ -260,6 +261,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          index?: number | null
           name: string
           team_id: string
           updated_at?: string
@@ -267,6 +269,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          index?: number | null
           name?: string
           team_id?: string
           updated_at?: string
@@ -615,8 +618,8 @@ export type Database = {
         Row: {
           created_at: string
           id: number
-          privileged: boolean
           profile_id: string
+          protected: boolean
           role_id: number
           team_id: string
           updated_at: string
@@ -624,8 +627,8 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: number
-          privileged?: boolean
           profile_id: string
+          protected?: boolean
           role_id: number
           team_id: string
           updated_at?: string
@@ -633,8 +636,8 @@ export type Database = {
         Update: {
           created_at?: string
           id?: number
-          privileged?: boolean
           profile_id?: string
+          protected?: boolean
           role_id?: number
           team_id?: string
           updated_at?: string
@@ -703,8 +706,7 @@ export type Database = {
       create_book: {
         Args: {
           book_name: string
-          target_team_id: string
-          performer_id: string
+          team_id: string
         }
         Returns: string
       }
@@ -713,8 +715,15 @@ export type Database = {
           team_name: string
           target_plan_id: number
           target_game_id: number
+          creator_id: string
         }
         Returns: string
+      }
+      delete_book: {
+        Args: {
+          book_id: string
+        }
+        Returns: undefined
       }
       get_perms_on_blueprint: {
         Args: {

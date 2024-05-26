@@ -1,4 +1,4 @@
-import { deleteBook } from "@/modules/book/actions/deleteBook";
+import { createClient } from "@/utils/supabase/client";
 import { vars } from "@repo/theme";
 import {
   Button,
@@ -24,9 +24,12 @@ export function DeleteBookModal({
 
   function doDelete() {
     startTransition(async () => {
-      const result = await deleteBook(id);
+      const { error } = await createClient().rpc("delete_book", {
+        book_id: id,
+      });
       // TODO show toast + error handling
-      if (result.state === "success") onDelete?.();
+      if (!error) onDelete?.();
+      else console.error("#_doDelete", error);
     });
   }
 
