@@ -1,106 +1,209 @@
 import { useSharedState } from "@repo/utils/hooks";
 import Konva from "konva";
-import React, { forwardRef, useImperativeHandle, useRef } from "react";
-import { CanvasLevelEventCallback, CanvasRootContext, CanvasRootContextProvider } from "./canvas.context";
-import { CanvasData, CanvasLevelNode, CanvasNodeData } from "./canvas.data";
-import { CanvasLevel, CanvasLevelEventType } from "./canvas.level";
-import {
-  CanvasStage,
-  CanvasStageBaseProps,
-  CanvasStageEvents,
-} from "./canvas.stage";
-import { CanvasKeyboardHandler } from "./keyboard";
-import { CanvasObjectRenderer, CanvasRendererLookupTable } from "./render";
-import Vector2d = Konva.Vector2d;
+import { useRef } from "react";
+import * as ReactKonva from "react-konva";
+import { CanvasContext, CanvasContextProvider } from "./context/canvasContext";
+import { MouseButton, NodeTags } from "./utils";
 
-export interface CanvasEvents<TNodeData extends CanvasNodeData = CanvasNodeData>
-  extends CanvasStageEvents {
-  onEvent: CanvasLevelEventCallback<TNodeData>;
+// 1. Canvas
+//   1. Stage (Layer)
+//   2. Level (Group)
+
+export interface CanvasPreferences {
+  width: number;
+  height: number;
 }
 
-export interface CanvasProps<TNodeData extends CanvasNodeData = CanvasNodeData>
-  extends CanvasStageBaseProps,
-    CanvasEvents<TNodeData> {
-  data: CanvasData<TNodeData>;
-  /** The children, used for each level, being the render */
-  children?: React.ReactNode;
-  /** Map of custom renderable canvas objects */
-  lookupTable: CanvasRendererLookupTable;
+export interface CanvasProps {
   preferences: CanvasPreferences;
 }
 
-export interface CanvasPreferences {
-  canvasWidth: number;
-  canvasHeight: number;
-  levelWidth: number;
-  levelHeight: number;
-  /** Padding of a level canvas around a level image */
-  levelPadding: number;
+interface SelectionArea {
+  x0: number;
+  y0: number;
+  x1: number;
+  y1: number;
+  active: boolean;
 }
 
-export type CanvasRef<TNodeData extends CanvasNodeData = CanvasNodeData> =
-  CanvasRootContext<TNodeData>;
+const EMPTY_SELECTION_AREA = {
+  x0: 0,
+  x1: 0,
+  y0: 0,
+  y1: 0,
+  active: false,
+} as const satisfies SelectionArea;
 
-export const Canvas = forwardRef<CanvasRef, CanvasProps<any>>(
-  function Canvas(props, ref) {
-    const {
-      editable,
-      preferences,
-      data,
-      children,
-      lookupTable,
-      onEvent,
-      ...restProps
-    } = props;
+/**
+ * The canvas is the root element, containing different stages, that
+ * themselves are layers of the canvas. It is handling all specific
+ * things, such as keyboard input, movement, selection, and more.
+ */
+export function Canvas({ preferences }: CanvasProps) {
+  const context = {
+    position: useSharedState({ x: 0, y: 0 }),
+    scale: useSharedState(1),
+    cursor: useSharedState(),
+    selected: useSharedState(),
+  } satisfies CanvasContext;
 
-    const stageRef = useRef<Konva.Stage>(null);
-    const selected = useSharedState(new Array<string>());
+  const moveDragRef = useRef(false);
+  const selectionRef = useRef<Konva.Rect>(null);
+  const selectionAreaRef = useRef<SelectionArea>(EMPTY_SELECTION_AREA);
+  const stageRef = useRef<Konva.Stage>(null);
 
-    const context = {
-      selected,
-      data: data,
-      cursor: useSharedState(),
-      scale: useSharedState(1),
-      snapping: useSharedState(false),
-      position: useSharedState({ x: 0, y: 0 }),
-      focusedLevel: useSharedState(),
-      stage: () => stageRef.current!,
-      isSelected: (id) => selected.state.includes(id),
-      emit: onEvent
-    } satisfies CanvasRootContext;
+  function redrawSelection() {
+    const area = selectionAreaRef.current;
+    const selection = selectionRef.current;
+    if (!selection || !area) return;
+    selection.visible(area.active);
+    const minX = Math.min(area.x0, area.x1);
+    const maxX = Math.max(area.x0, area.x1);
+    const minY = Math.min(area.y0, area.y1);
+    const maxY = Math.max(area.y0, area.y1);
+    selection.width(maxX - minX);
+    selection.height(maxY - minY);
+    selection.x(minX);
+    selection.y(minY);
+  }
 
-    useImperativeHandle(ref, () => context, [data, selected]);
+  function mouseMove(e: Konva.KonvaEventObject<MouseEvent>) {
+    if (e.currentTarget !== stageRef.current) return;
+    if (moveDragRef.current) {
+      // Track mouse movement for canvas
+      context.position.update((pos) => ({
+        x: pos.x + e.evt.movementX,
+        y: pos.y + e.evt.movementY,
+      }));
+    } else if (selectionAreaRef.current.active) {
+      // Change size of selection
+      const stage = stageRef.current;
+      const pointer = stage.getRelativePointerPosition();
+      if (!pointer) return;
+      selectionAreaRef.current.x1 = pointer.x;
+      selectionAreaRef.current.y1 = pointer.y;
+      redrawSelection();
+    }
+  }
 
-    return (
-      <CanvasRootContextProvider value={context}>
-        <CanvasKeyboardHandler style={{ cursor: context.cursor.state }}>
-          <CanvasStage
-            ref={stageRef}
-            width={preferences.canvasWidth}
-            height={preferences.canvasHeight}
-            editable={editable}
-            {...restProps}
-          >
-            {data.map((level) => (
-              <CanvasLevel
-                key={level.id}
-                id={level.id}
-                level={level}
-                width={preferences.levelWidth}
-                height={preferences.levelHeight}
-                padding={preferences.levelPadding}
-                focused={context.focusedLevel.state === level.id}
-                onFocus={() => context.focusedLevel.update(level.id)}
-              >
-                <CanvasObjectRenderer
-                  editable={editable}
-                  lookupTable={lookupTable}
-                />
-              </CanvasLevel>
-            ))}
-          </CanvasStage>
-        </CanvasKeyboardHandler>
-      </CanvasRootContextProvider>
-    );
-  },
-);
+  function mouseUp(e: Konva.KonvaEventObject<MouseEvent>) {
+    if (moveDragRef.current) {
+      // Disable canvas movement
+      context.cursor.update(undefined);
+      moveDragRef.current = false;
+    }
+    if (selectionAreaRef.current.active) {
+      // Select elements
+      const area = selectionAreaRef.current;
+      const stage = stageRef.current;
+      const selected = new Array<string>();
+      stage?.children.forEach((layer) => {
+        const selection = selectionRef.current;
+        if (layer.hasName(NodeTags.NO_SELECT) || !selection) return;
+        const box = selection.getClientRect();
+        layer.children
+          .filter((x) => x.isVisible() && x.isListening() && x !== selection)
+          .filter((x) => Konva.Util.haveIntersection(x.getClientRect(), box))
+          .forEach((node) => selected.push(node.id()));
+      });
+      context.selected.update(selected);
+      area.active = false;
+      redrawSelection();
+    }
+  }
+
+  function mouseDown(e: Konva.KonvaEventObject<MouseEvent>) {
+    if (e.currentTarget !== stageRef.current) return;
+    const stage = stageRef.current;
+    const pointer = stage?.getRelativePointerPosition();
+    if (!stage || !pointer) return;
+    switch (e.evt.button) {
+      /** Begin selection */
+      case MouseButton.LEFT:
+        e.evt.preventDefault();
+        const area = selectionAreaRef.current;
+        area.x0 = area.x1 = pointer.x;
+        area.y0 = area.y1 = pointer.y;
+        area.active = true;
+        redrawSelection();
+        break;
+      /** Enable canvas movement */
+      case MouseButton.MIDDLE:
+        e.evt.preventDefault();
+        context.cursor.update("grabbing");
+        moveDragRef.current = true;
+      // fallthrough
+      default:
+        selectionAreaRef.current.active = false;
+        redrawSelection();
+    }
+  }
+
+  function wheelScroll(e: Konva.KonvaEventObject<WheelEvent>) {
+    const stage = stageRef.current;
+    const pointer = stage?.getPointerPosition();
+    if (!pointer || !stage) return;
+    if (!e.evt.ctrlKey && !e.evt.metaKey) {
+      // Scroll in canvas
+      const multiplier = context.scale.state * (e.evt.altKey ? 0.8 : 0.4);
+      context.position.update((oldPos) => ({
+        x: oldPos.x - e.evt.deltaX * multiplier,
+        y: oldPos.y - e.evt.deltaY * multiplier,
+      }));
+      return;
+    }
+    // Zoom into the canvas
+    context.scale.update((oldScale) => {
+      const scaleBy = e.evt.altKey ? 1.15 : 1.05;
+      const pointTo = {
+        x: (pointer.x - stage.x()) / oldScale,
+        y: (pointer.y - stage.y()) / oldScale,
+      } satisfies Konva.Vector2d;
+      let newScale = e.evt.deltaY < 0 ? oldScale * scaleBy : oldScale / scaleBy;
+      newScale = Math.min(10, Math.max(newScale, 0.1));
+      context.position.update({
+        x: pointer.x - pointTo.x * newScale,
+        y: pointer.y - pointTo.y * newScale,
+      });
+      return newScale;
+    });
+  }
+
+  return (
+    <div style={{ cursor: context.cursor.state }}>
+      <CanvasContextProvider value={context}>
+        <ReactKonva.Stage
+          ref={stageRef}
+          width={preferences.width}
+          height={preferences.height}
+          x={context.position.state.x}
+          y={context.position.state.y}
+          scaleX={context.scale.state}
+          scaleY={context.scale.state}
+          onMouseDown={mouseDown}
+          onPointerUp={(e) => console.log(e)}
+          onMouseMove={mouseMove}
+          onMouseUp={mouseUp}
+          onMouseLeave={mouseUp}
+          onWheel={wheelScroll}
+        >
+          <ReactKonva.Layer>
+            <ReactKonva.Group x={100}>
+              <ReactKonva.Rect width={100} height={100} fill="red" />
+            </ReactKonva.Group>
+          </ReactKonva.Layer>
+          <ReactKonva.Layer>
+            <ReactKonva.Rect
+              ref={selectionRef}
+              fill="rgba(93, 150, 240, .5)"
+              stroke="rgba(255, 255, 255, .3)"
+              strokeScaleEnabled={false}
+              strokeWidth={1}
+              strokeEnabled
+            />
+          </ReactKonva.Layer>
+        </ReactKonva.Stage>
+      </CanvasContextProvider>
+    </div>
+  );
+}

@@ -2,7 +2,6 @@ import { EditorContextProvider } from "@/app/(app)/editor/[documentId]/_context"
 import {
   EditorCharacters,
   EditorHeader,
-  EditorInspector,
 } from "@/app/(app)/editor/[documentId]/_partial";
 import { FullPageEditorSpinner } from "@/app/(app)/editor/[documentId]/page.tsx";
 import { getBlueprint } from "@/modules/blueprint/actions/getBlueprint";
@@ -40,7 +39,7 @@ async function Content({
       <div className={css.content}>
         <EditorHeader blueprint={blueprint} />
         <EditorCharacters blueprint={blueprint} />
-        <EditorInspector />
+        {/*<EditorInspector />*/}
         <main>{children}</main>
       </div>
     </EditorContextProvider>
