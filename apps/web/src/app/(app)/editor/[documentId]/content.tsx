@@ -1,17 +1,10 @@
 "use client";
 import * as css from "@/app/(app)/editor/[documentId]/layout.css";
-import {
-  Canvas,
-  CanvasData,
-  CanvasLevelNode,
-  CanvasNodeData,
-  CanvasRef,
-  createShapeData,
-} from "@repo/canvas";
+import { EditorStage } from "@/modules/editor/partial/editor.stage";
+import { CanvasNodeData, CanvasRef, createShapeData } from "@repo/canvas";
 import { PRIMITIVE_CANVAS_SHAPES } from "@repo/canvas/src/render/canvasShapes";
-import { useSharedState } from "@repo/utils/hooks";
 import Konva from "konva";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { useLocalStorage, useWindowSize } from "usehooks-ts";
 import Vector2d = Konva.Vector2d;
@@ -24,6 +17,8 @@ function createInitialNodes(): CanvasNodeData[] {
       points: [10, 10, 100, 50, 200, 0],
       fill: "red",
       stroke: "red",
+      lineCap: "round",
+      lineJoin: "round",
       tension: 0,
       strokeWidth: 5,
       x: 0,
@@ -41,7 +36,10 @@ function createInitialNodes(): CanvasNodeData[] {
       height: 30,
       x: 100,
       y: 100,
-      strokeWidth: 1,
+      strokeWidth: 5,
+      lineCap: "round",
+      lineJoin: "round",
+      tension: 0,
       stroke: "green",
       points: [100, 100, 180, 100],
       pointerLength: 20,
@@ -52,55 +50,63 @@ function createInitialNodes(): CanvasNodeData[] {
 }
 
 export function EditorContent() {
-  const height = 800;
-
-  const data = new CanvasData([
-    new CanvasLevelNode(
-      "stage_1_floor_3",
-      "https://svgshare.com/i/161z.svg",
-      { x: 0, y: 2 * (height + 50) },
-      useSharedState(createInitialNodes),
-    ),
-    new CanvasLevelNode(
-      "stage_1_floor_2",
-      "https://svgshare.com/i/162B.svg",
-      { x: 0, y: height + 50 },
-      useSharedState(createInitialNodes),
-    ),
-    new CanvasLevelNode(
-      "stage_1_floor_1",
-      "https://svgshare.com/i/1602.svg",
-      { x: 0, y: 0 },
-      useSharedState(createInitialNodes),
-    ),
-  ]);
-
-  const dimensions = useWindowSize();
+  const windowSize = useWindowSize();
   const canvasRef = useRef<CanvasRef>(null);
   const [zoom, setZoom] = useLocalStorage<number | null>("canvas_zoom", null);
   const [pos, setPos] = useLocalStorage<Vector2d | null>("canvas_pos", null);
 
   useEffect(() => {
+    const canvas = canvasRef.current;
     // Apply local storage position and zoom
-    if (zoom) canvasRef.current?.scale.update(zoom);
-    if (pos) canvasRef.current?.position.update(pos);
+    if (zoom) canvas?.scale.update(zoom);
+    if (pos) canvas?.position.update(pos);
   }, []);
 
   return (
     <main>
       <div className={css.fadeInRect} />
-      <Canvas
+      <EditorStage
         ref={canvasRef}
-        onMove={useDebouncedCallback((pos: Vector2d) => setPos(pos), 250)}
-        onZoom={useDebouncedCallback((zoom: number) => setZoom(zoom), 250)}
-        width={dimensions.width}
-        height={dimensions.height}
-        modifiable
-        levelDimensions={{ x: 1200, y: height }}
-        lookupTable={shapeRenderers}
-        data={data}
-        editable
         movable
+        editable
+        lookupTable={PRIMITIVE_CANVAS_SHAPES}
+        onMove={useDebouncedCallback(setPos, 250)}
+        onZoom={useDebouncedCallback(setZoom, 250)}
+        onLevelEvent={(level, type, nodes) => {
+          console.log("push update", level, type, nodes.length);
+        }}
+        preferences={{
+          canvasWidth: windowSize.width,
+          canvasHeight: windowSize.height,
+          levelPosMultipliers: [0, 1],
+          levelWidth: 1200,
+          levelHeight: 800,
+          levelPadding: 20,
+          levelGap: 50,
+        }}
+        stage={{
+          id: 1,
+          levels: useMemo(
+            () => [
+              {
+                id: 300,
+                image: "https://svgshare.com/i/161z.svg",
+                nodes: createInitialNodes(),
+              },
+              {
+                id: 301,
+                image: "https://svgshare.com/i/162B.svg",
+                nodes: createInitialNodes(),
+              },
+              {
+                id: 302,
+                image: "https://svgshare.com/i/1602.svg",
+                nodes: createInitialNodes(),
+              },
+            ],
+            [],
+          ),
+        }}
       />
     </main>
   );

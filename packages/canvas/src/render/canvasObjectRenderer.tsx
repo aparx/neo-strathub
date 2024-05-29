@@ -19,7 +19,7 @@ export interface CanvasObjectRendererProps<
   TConfig extends CanvasNodeConfig = CanvasNodeConfig,
 > {
   lookupTable: CanvasRendererLookupTable<TConfig>;
-  modifiable?: boolean;
+  editable?: boolean;
 }
 
 interface CanvasObjectBaseProps<
@@ -27,7 +27,7 @@ interface CanvasObjectBaseProps<
 > {
   data: CanvasNodeData<TConfig>;
   index: number;
-  modifiable?: boolean;
+  editable?: boolean;
 }
 
 export interface CanvasObjectProps<
@@ -48,7 +48,7 @@ interface ObjectWrapperProps<
 }
 
 export function CanvasObjectRenderer<TConfig extends CanvasNodeConfig>({
-  modifiable,
+  editable,
   lookupTable,
 }: CanvasObjectRendererProps<TConfig>) {
   const level = useCanvasLevel();
@@ -66,7 +66,7 @@ export function CanvasObjectRenderer<TConfig extends CanvasNodeConfig>({
         key={data.attrs.id}
         data={data}
         index={index}
-        modifiable={modifiable}
+        editable={editable}
         renderer={lookupTable[data.className] as CanvasShapeRenderer<any>}
       />
     );
@@ -77,7 +77,7 @@ export function CanvasObjectRenderer<TConfig extends CanvasNodeConfig>({
 function CanvasObject<TConfig extends CanvasNodeConfig>({
   data,
   index,
-  modifiable,
+  editable,
   renderer,
 }: CanvasObjectBaseProps<TConfig> & {
   renderer: CanvasShapeRenderer<TConfig>;
@@ -85,10 +85,10 @@ function CanvasObject<TConfig extends CanvasNodeConfig>({
   return useMemo(
     () => (
       <ObjectWrapper data={data} index={index}>
-        {React.createElement(renderer, { index, modifiable } as any)}
+        {React.createElement(renderer, { index, editable } as any)}
       </ObjectWrapper>
     ),
-    [renderer, data, index, modifiable],
+    [renderer, data, index, editable],
   );
 }
 
@@ -103,14 +103,16 @@ function ObjectWrapper<TConfig extends CanvasNodeConfig>({
   const childRef = useRef<Konva.Node>(null);
 
   function onChange(newConfig: CanvasNodeConfig) {
-    level.children.update((oldElements) => {
-      const newElements = [...oldElements];
-      newElements[index] = {
-        ...(oldElements[index] as CanvasNodeData),
-        attrs: newConfig as CanvasNodeConfig,
-      };
-      return newElements;
-    });
+    const oldNodes = level.children.state;
+    const node = oldNodes[index] as CanvasNodeData;
+    const newNode = {
+      ...node,
+      attrs: newConfig,
+    } satisfies CanvasNodeData;
+    level.emit("update", [newNode]);
+    const newNodes = [...oldNodes];
+    newNodes[index] = newNode;
+    level.children.update(newNodes);
   }
 
   const ShapeChild = Slot as any as ForwardRefExoticComponent<
@@ -129,9 +131,6 @@ function ObjectWrapper<TConfig extends CanvasNodeConfig>({
         ctx.selected.state.length === 1 &&
         ctx.selected.state[0] === data.attrs.id
       }
-      onDragMove={(e) => {
-        // TODO limit object to the level's display
-      }}
       onDragEnd={(e) => {
         onChange({
           ...data.attrs,

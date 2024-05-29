@@ -1,6 +1,7 @@
 -- noinspection SqlResolveForFile
 
 -- ---------------------------- profile ----------------------------
+
 create or replace function copy_avatar_from_user_update()
     returns trigger as $$
 begin
@@ -245,6 +246,30 @@ create trigger trigger_create_arena
     for each row
 execute function on_arena_create();
 
+-- ---------------------------- arena_level ----------------------------
+
+create or replace function on_create_arena_level()
+    returns trigger as $$
+declare
+    _max_index int;
+begin
+    select max(index)
+    into _max_index
+    from public.arena_level
+    where arena_id = new.arena_id;
+
+    new.index = 1 + coalesce(_max_index, -1);
+    return new;
+end;
+$$ volatile language plpgsql
+   security definer;
+
+create trigger trigger_create_arena_level
+    before insert
+    on public.arena_level
+    for each row
+execute function on_create_arena_level();
+
 -- ---------------------------- book ----------------------------
 
 create or replace function on_create_book()
@@ -375,3 +400,13 @@ create trigger trigger_create_bp_char
     on public.blueprint_character
     for each row
 execute function on_blueprint_character_create();
+
+-- ---------------------------- blueprint_object ----------------------------
+
+create or replace function verify_blueprint_object()
+    returns trigger as $$
+begin
+
+end;
+$$ volatile language plpgsql
+   security definer;

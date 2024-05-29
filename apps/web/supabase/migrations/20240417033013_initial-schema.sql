@@ -41,7 +41,6 @@ create table if not exists public.arena
         on delete cascade
         on update cascade,
     name       varchar(128) not null,
-    metadata   jsonb        not null default '{}'::jsonb,
     outdated   boolean               default null,
     created_at timestamptz  not null default now(),
     updated_at timestamptz  not null default now()
@@ -53,6 +52,26 @@ alter table public.arena
 create index
     if not exists arena__game_name_outdated
     on public.arena (game_id, name, outdated);
+
+-- -------------------------- arena_level --------------------------
+create table if not exists public.arena_level
+(
+    id         bigserial primary key,
+    index      int          not null default 0
+        constraint index_positive check (index >= 0),
+    arena_id   bigint       not null references public.arena (id)
+        on delete cascade
+        on update cascade,
+    image      varchar(256) not null,
+    created_at timestamptz           default now()
+);
+
+alter table public.arena_level
+    enable row level security;
+
+create index
+    if not exists arena_level__arena_index
+    on public.arena_level (arena_id, index desc);
 
 -- -------------------------- profile --------------------------
 create table if not exists public.profile
@@ -176,7 +195,7 @@ create table if not exists public.blueprint
     book_id    uuid          not null references public.book (id)
         on delete cascade
         on update cascade,
-    arena_id   int           not null references public.arena (id)
+    arena_id   bigint        not null references public.arena (id)
         on delete restrict
         on update cascade,
     visibility bp_visibility not null default 'private'::bp_visibility,
@@ -211,7 +230,6 @@ create table if not exists public.blueprint_stage
         on update cascade,
     index        smallint    not null
         constraint index_positive check (index >= 0),
-    data         jsonb       not null,
     created_at   timestamptz not null default now(),
     updated_at   timestamptz not null default now()
 );
@@ -318,6 +336,43 @@ create table if not exists public.character_gadget
 
 alter table public.character_gadget
     enable row level security;
+
+-- -------------------------- blueprint_object --------------------------
+-- A blueprint object is an inserted canvas object with metadata, describing
+-- how it should be serialized, deserialized and rendered on a canvas.
+create table if not exists public.blueprint_object
+(
+    id           uuid primary key      default gen_random_uuid(),
+    stage_id     bigint       not null references public.blueprint_stage (id)
+        on delete cascade
+        on update cascade,
+    level_id     bigint       not null references public.arena_level (id),
+    character_id bigint references public.blueprint_character (id)
+        on delete set null
+        on update cascade,
+    object_id    bigint references public.game_object (id)
+        on delete set null
+        on update cascade,
+    classname    varchar(128) not null,
+    attributes   jsonb        not null default '{}'::jsonb,
+    created_at   timestamptz  not null default now()
+);
+
+alter table public.blueprint_object
+    enable row level security;
+
+create index
+    if not exists blueprint_object__stage_character_classname_idx
+    on public.blueprint_object (stage_id, character_id, classname);
+
+comment on column public.blueprint_object.classname
+    is 'The object''s class name, defining the render strategy';
+
+comment on column public.blueprint_object.character_id
+    is 'To which character this object is assigned to (thus to what members)';
+
+comment on column public.blueprint_object.object_id
+    is 'The target object ID, that is equal to the one in `attributes`';
 
 -- -------------------------- audit_log --------------------------
 create table if not exists public.audit_log

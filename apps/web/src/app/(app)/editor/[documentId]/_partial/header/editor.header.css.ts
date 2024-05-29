@@ -1,4 +1,4 @@
-import { overlayBackground } from "@/app/(app)/editor/[documentId]/_partial/editor.css";
+import { overlayHeaderBackground } from "@/app/(app)/editor/[documentId]/_partial/editor.css";
 import { vars } from "@repo/theme";
 import { keyframes, style } from "@vanilla-extract/css";
 import { recipe } from "@vanilla-extract/recipes";
@@ -6,7 +6,7 @@ import { recipe } from "@vanilla-extract/recipes";
 export const HEADER_HEIGHT = 50;
 
 export const headerContainer = style([
-  overlayBackground,
+  overlayHeaderBackground,
   {
     position: "absolute",
     top: 0,

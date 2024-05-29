@@ -4,10 +4,13 @@ import Konva from "konva";
 import Vector2d = Konva.Vector2d;
 
 export const CHARACTER_ID_ATTRIBUTE = "characterId";
+export const OBJECT_ID_ATTRIBUTE = "objectId";
 
 export type CanvasNodeConfig<T = Konva.NodeConfig> = T & {
+  id: string;
   /** String identifying what custom shape to be used */
   [CHARACTER_ID_ATTRIBUTE]?: string;
+  [OBJECT_ID_ATTRIBUTE]?: string;
 };
 
 export type CanvasNodeData<
@@ -38,7 +41,7 @@ interface CanvasGroupNode<T extends CanvasNodeData> {
 export class CanvasData<T extends CanvasNodeData>
   implements CanvasGroupNode<T>
 {
-  private readonly dataMap = new Map<string, CanvasLevelNode<T>>();
+  private readonly dataMap = new Map<number, CanvasLevelNode<T>>();
 
   constructor(nodes: CanvasLevelNode<T>[]) {
     nodes.forEach((node) => this.dataMap.set(node.id, node));
@@ -73,7 +76,7 @@ export class CanvasData<T extends CanvasNodeData>
     }
   }
 
-  getLevel(level: string): CanvasLevelNode<T> | undefined {
+  getLevel(level: number): CanvasLevelNode<T> | undefined {
     return this.dataMap.get(level);
   }
 
@@ -95,7 +98,7 @@ export class CanvasLevelNode<E extends CanvasNodeData = CanvasNodeData>
   implements CanvasGroupNode<E>
 {
   constructor(
-    public readonly id: string,
+    public readonly id: number,
     public readonly imageUrl: string,
     public readonly position: Vector2d,
     public readonly children: SharedState<E[]>,

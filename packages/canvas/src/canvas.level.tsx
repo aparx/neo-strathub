@@ -6,28 +6,41 @@ import { CanvasLevelContextProvider } from "./canvas.context";
 import { CanvasLevelNode, CanvasNodeData } from "./canvas.data";
 import Vector2d = Konva.Vector2d;
 
-export interface CanvasLevelProps<TNode extends CanvasNodeData = CanvasNodeData>
-  extends Konva.LayerConfig {
+export type CanvasLevelEventType = "create" | "update" | "delete";
+
+export type CanvasLevelEventCallback = (
+  type: CanvasLevelEventType,
+  nodes: Konva.Node[],
+) => any;
+
+interface CanvasLevelBaseProps<TNode extends CanvasNodeData> {
   width: number;
   height: number;
+  padding: number;
   level: CanvasLevelNode<TNode>;
   /** The elements shown in this level, besides the background image */
   children: React.ReactNode;
   focused: boolean;
   onFocus: () => any;
   onBlur: () => any;
+  onEvent?: CanvasLevelEventCallback;
 }
+
+export type CanvasLevelProps<TNode extends CanvasNodeData = CanvasNodeData> =
+  Konva.LayerConfig & CanvasLevelBaseProps<TNode>;
 
 export const CanvasLevel = forwardRef<Konva.Layer, CanvasLevelProps>(
   function CanvasLevel(props, ref) {
     const {
       width,
       height,
+      padding,
       children,
       level,
       focused,
       onFocus,
       onBlur,
+      onEvent,
       ...restProps
     } = props;
     const [image, setImage] = useState<HTMLImageElement>();
@@ -43,7 +56,10 @@ export const CanvasLevel = forwardRef<Konva.Layer, CanvasLevelProps>(
     // The scale of the image, so that it fits in the level's dimensions
     const imageScale: Vector2d = useMemo(() => {
       if (!image) return { x: 0, y: 0 };
-      const scale = Math.min(width / image.width, height / image.height);
+      const scale = Math.min(
+        (width - 2 * padding) / image.width,
+        (height - 2 * padding) / image.height,
+      );
       return { x: scale, y: scale };
     }, [image, width, height]);
 
@@ -60,7 +76,11 @@ export const CanvasLevel = forwardRef<Konva.Layer, CanvasLevelProps>(
         {...restProps}
       >
         <CanvasLevelContextProvider
-          value={{ ...(level as any), ref: layerRef }}
+          value={{
+            ...(level as any),
+            ref: layerRef,
+            emit: onEvent,
+          }}
         >
           <Rect
             name={"background"}
@@ -77,6 +97,8 @@ export const CanvasLevel = forwardRef<Konva.Layer, CanvasLevelProps>(
             image={image}
             scale={imageScale}
             cornerRadius={2}
+            x={padding}
+            y={padding}
           />
           {children}
         </CanvasLevelContextProvider>

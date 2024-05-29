@@ -19,7 +19,7 @@ export const Line = forwardRef<
 >((props, ref) => {
   const {
     data,
-    modifiable,
+    editable: modifiable,
     useSingleTransformer,
     onChange,
     onDragMove,
@@ -49,8 +49,7 @@ export const Line = forwardRef<
         {...data.attrs}
         {...restProps}
         listening
-        lineJoin={"round"}
-        lineCap={"round"}
+        rotation={0 /* Disable rotation */}
         name={"Line"}
         onDragMove={(e) => {
           onDragMove?.(e);
@@ -79,6 +78,7 @@ export const Line = forwardRef<
         <LineTransformer
           ref={trRef}
           points={points}
+          tension={data.attrs.tension}
           position={shapePos}
           updatePoints={(newPoints) => shapeRef.current?.points(newPoints)}
           onDragComplete={() => {

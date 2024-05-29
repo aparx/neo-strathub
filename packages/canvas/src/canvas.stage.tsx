@@ -13,20 +13,23 @@ import { useCanvas } from "./canvas.context";
 import { DefaultTransformer } from "./transformers";
 import Vector2d = Konva.Vector2d;
 
-export interface CanvasStageBaseProps {
-  width: number;
-  height: number;
-  /** True if elements can be interacted with, thus edited */
-  editable?: boolean;
-  /** True if the canvas can be moved around, zoomed in, etc. */
-  movable?: boolean;
+export interface CanvasStageEvents {
   /** Called when the stage is moved (implicitly or explicitly) */
   onMove?: (newPos: Vector2d) => void;
   /** Called when the zoom changes of the stage (the scale) */
   onZoom?: (scale: number) => void;
 }
 
+export interface CanvasStageBaseProps extends CanvasStageEvents {
+  /** True if elements can be interacted with, thus edited */
+  editable?: boolean;
+  /** True if the canvas can be moved around, zoomed in, etc. */
+  movable?: boolean;
+}
+
 export interface CanvasStageProps extends CanvasStageBaseProps {
+  width: number;
+  height: number;
   children?: React.ReactNode;
 }
 
@@ -235,7 +238,7 @@ export const CanvasStage = forwardRef<Konva.Stage, CanvasStageProps>(
       >
         {children}
         <Layer>
-          <DefaultTransformer ref={multiTransformerRef} />
+          <DefaultTransformer ref={multiTransformerRef} rotateEnabled={false} />
           <Rect listening={false} ref={selectionRectRef} />
         </Layer>
       </Stage>

@@ -10,7 +10,7 @@ import { usePutNodesIntoTransformer } from "../canvasShapes";
 export const Circle = forwardRef<
   Konva.Circle,
   CanvasObjectProps<CanvasNodeConfig<Konva.CircleConfig>>
->(({ data, modifiable, useSingleTransformer, onChange, ...restProps }, ref) => {
+>(({ data, editable: modifiable, useSingleTransformer, onChange, ...restProps }, ref) => {
   const trRef = useRef<Konva.Transformer>(null);
   const shapeRef = useRef<Konva.Circle>(null);
   usePutNodesIntoTransformer(useSingleTransformer, trRef, shapeRef);

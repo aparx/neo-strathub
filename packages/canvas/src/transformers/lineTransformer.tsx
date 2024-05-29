@@ -5,16 +5,15 @@ import * as ReactKonva from "react-konva";
 import { KonvaNodeEvents } from "react-konva";
 import { useCanvas } from "../canvas.context.tsx";
 import { useSegmentCoordinates } from "../hooks";
-import Vector2d = Konva.Vector2d;
-import Line = Konva.Line;
 
 const ANCHOR_OUTLINE = "rgba(0, 155, 255)";
 
 export interface LineTransformerProps {
   points: number[];
-  position: Readonly<Vector2d>;
+  tension?: number;
+  position: Readonly<Konva.Vector2d>;
   updatePoints: (newPoints: number[]) => any;
-  onAnchorUpdate?: (index: number, position: Vector2d) => void;
+  onAnchorUpdate?: (index: number, position: Konva.Vector2d) => void;
   onDragComplete?: KonvaNodeEvents["onDragEnd"];
 }
 
@@ -29,6 +28,7 @@ export const LineTransformer = forwardRef<
 >(function LineTransformer(props, ref) {
   const {
     points,
+    tension,
     position,
     onAnchorUpdate,
     onDragComplete,
@@ -45,7 +45,7 @@ export const LineTransformer = forwardRef<
     coordinates
   }), [coordinates]);
 
-  function updatePoint(index: number, vector: Vector2d) {
+  function updatePoint(index: number, vector: Konva.Vector2d) {
     onAnchorUpdate?.(index, vector);
     const newPoints = [...points];
     const beginIndex = Math.max(2 * index, 0);
@@ -61,6 +61,7 @@ export const LineTransformer = forwardRef<
         ref={selectionRef}
         listening={false}
         points={points}
+        tension={tension}
         x={position.x}
         y={position.y}
         stroke={ANCHOR_OUTLINE}

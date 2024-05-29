@@ -13,7 +13,7 @@ export const Arrow = forwardRef<
 >((props, ref) => {
   const {
     data,
-    modifiable,
+    editable: modifiable,
     useSingleTransformer,
     onDragMove,
     onChange,
@@ -41,6 +41,7 @@ export const Arrow = forwardRef<
         draggable={modifiable}
         {...data.attrs}
         {...restProps}
+        rotation={0 /* Disable rotation */}
         onDragMove={(e) => {
           onDragMove?.(e);
           setShapePos(e.target.position());
@@ -68,6 +69,7 @@ export const Arrow = forwardRef<
         <LineTransformer
           ref={trRef}
           points={data.attrs.points}
+          tension={data.attrs.tension}
           position={shapePos}
           updatePoints={(newPoints) => shapeRef.current?.points(newPoints)}
           onDragComplete={() => {

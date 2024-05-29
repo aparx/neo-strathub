@@ -110,8 +110,8 @@ function pasteClipboard({ data, selected, focusedLevel }: CanvasRootContext) {
 }
 
 function deleteSelected({ data, selected, isSelected }: CanvasRootContext) {
-  data.update((_, old) =>
-    old.filter((x) => !x.attrs.id || !isSelected(x.attrs.id)),
+  data.update((_, o) =>
+    o.filter((x) => !x.attrs.id || !isSelected(x.attrs.id)),
   );
   selected.update((old) => old.filter((x) => !isSelected(x)));
 }
@@ -132,7 +132,7 @@ function deltaMoveSelected(
 }
 
 function duplicateSelected({ data, selected, isSelected }: CanvasRootContext) {
-  const selectIds = new Array<string>(selected.state.length);
+  const selectIds = new Array<string>();
   data.update((_, old) => {
     const filtered = old.filter((x) => x.attrs.id && isSelected(x.attrs.id));
     if (!filtered.length) return old;

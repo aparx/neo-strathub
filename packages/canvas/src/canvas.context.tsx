@@ -1,4 +1,5 @@
 import { SharedState } from "@repo/utils/hooks";
+import { CanvasLevelEventCallback } from "canvas.level";
 import Konva from "konva";
 import { createContext, CSSProperties, RefObject, useContext } from "react";
 import { CanvasData, CanvasLevelNode, CanvasNodeData } from "./canvas.data";
@@ -14,7 +15,7 @@ export interface CanvasRootContext<
   selected: SharedState<string[]>;
   snapping: SharedState<boolean>;
   position: SharedState<Vector2d>;
-  focusedLevel: SharedState<string | undefined>;
+  focusedLevel: SharedState<number | undefined>;
   data: CanvasData<TNode>;
   isSelected: (id: string) => boolean;
   stage: () => Konva.Stage;
@@ -38,6 +39,7 @@ export interface CanvasLevelContext<
   TNode extends CanvasNodeData = CanvasNodeData,
 > extends CanvasLevelNode<TNode> {
   ref: RefObject<Konva.Layer>;
+  emit: CanvasLevelEventCallback;
 }
 
 const canvasLevelContext = createContext<CanvasLevelContext<any> | null>(null);

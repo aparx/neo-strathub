@@ -39,7 +39,6 @@ export type Database = {
           created_at: string
           game_id: number
           id: number
-          metadata: Json
           name: string
           outdated: boolean | null
           updated_at: string
@@ -48,7 +47,6 @@ export type Database = {
           created_at?: string
           game_id: number
           id?: number
-          metadata?: Json
           name: string
           outdated?: boolean | null
           updated_at?: string
@@ -57,7 +55,6 @@ export type Database = {
           created_at?: string
           game_id?: number
           id?: number
-          metadata?: Json
           name?: string
           outdated?: boolean | null
           updated_at?: string
@@ -68,6 +65,38 @@ export type Database = {
             columns: ["game_id"]
             isOneToOne: false
             referencedRelation: "game"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      arena_level: {
+        Row: {
+          arena_id: number
+          created_at: string | null
+          id: number
+          image: string
+          index: number
+        }
+        Insert: {
+          arena_id: number
+          created_at?: string | null
+          id?: number
+          image: string
+          index?: number
+        }
+        Update: {
+          arena_id?: number
+          created_at?: string | null
+          id?: number
+          image?: string
+          index?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "arena_level_arena_id_fkey"
+            columns: ["arena_id"]
+            isOneToOne: false
+            referencedRelation: "arena"
             referencedColumns: ["id"]
           },
         ]
@@ -214,11 +243,72 @@ export type Database = {
           },
         ]
       }
+      blueprint_object: {
+        Row: {
+          attributes: Json
+          character_id: number | null
+          classname: string
+          created_at: string
+          id: string
+          level_id: number
+          object_id: number | null
+          stage_id: number
+        }
+        Insert: {
+          attributes?: Json
+          character_id?: number | null
+          classname: string
+          created_at?: string
+          id?: string
+          level_id: number
+          object_id?: number | null
+          stage_id: number
+        }
+        Update: {
+          attributes?: Json
+          character_id?: number | null
+          classname?: string
+          created_at?: string
+          id?: string
+          level_id?: number
+          object_id?: number | null
+          stage_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blueprint_object_character_id_fkey"
+            columns: ["character_id"]
+            isOneToOne: false
+            referencedRelation: "blueprint_character"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blueprint_object_level_id_fkey"
+            columns: ["level_id"]
+            isOneToOne: false
+            referencedRelation: "arena_level"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blueprint_object_object_id_fkey"
+            columns: ["object_id"]
+            isOneToOne: false
+            referencedRelation: "game_object"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blueprint_object_stage_id_fkey"
+            columns: ["stage_id"]
+            isOneToOne: false
+            referencedRelation: "blueprint_stage"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blueprint_stage: {
         Row: {
           blueprint_id: string
           created_at: string
-          data: Json
           id: number
           index: number
           updated_at: string
@@ -226,7 +316,6 @@ export type Database = {
         Insert: {
           blueprint_id: string
           created_at?: string
-          data: Json
           id?: number
           index: number
           updated_at?: string
@@ -234,7 +323,6 @@ export type Database = {
         Update: {
           blueprint_id?: string
           created_at?: string
-          data?: Json
           id?: number
           index?: number
           updated_at?: string
@@ -679,6 +767,12 @@ export type Database = {
         }
         Returns: undefined
       }
+      can_modify_blueprint_object: {
+        Args: {
+          obj: unknown
+        }
+        Returns: boolean
+      }
       can_select_audit_log: {
         Args: {
           entry: unknown
@@ -688,6 +782,12 @@ export type Database = {
       can_select_blueprint: {
         Args: {
           target: unknown
+        }
+        Returns: boolean
+      }
+      can_select_blueprint_object: {
+        Args: {
+          obj: unknown
         }
         Returns: boolean
       }

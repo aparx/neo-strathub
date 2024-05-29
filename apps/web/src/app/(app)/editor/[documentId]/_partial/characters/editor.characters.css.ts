@@ -1,4 +1,4 @@
-import { overlayBackground } from "@/app/(app)/editor/[documentId]/_partial/editor.css";
+import { overlayHeaderBackground } from "@/app/(app)/editor/[documentId]/_partial/editor.css";
 import { sprinkles, vars } from "@repo/theme";
 import { keyframes, style } from "@vanilla-extract/css";
 
@@ -6,7 +6,7 @@ export const CHARACTER_BOX_SIZE = 65;
 export const GADGET_BOX_SIZE = 30;
 
 export const list = style([
-  overlayBackground,
+  overlayHeaderBackground,
   sprinkles({ outline: "card" }),
   {
     position: "absolute",

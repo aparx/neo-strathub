@@ -10,7 +10,7 @@ import { usePutNodesIntoTransformer } from "../canvasShapes";
 export const Rect = forwardRef<
   Konva.Rect,
   CanvasObjectProps<CanvasNodeConfig<Konva.RectConfig>>
->(({ data, modifiable, useSingleTransformer, onChange, ...restProps }, ref) => {
+>(({ data, editable: modifiable, useSingleTransformer, onChange, ...restProps }, ref) => {
   const trRef = useRef<Konva.Transformer>(null);
   const shapeRef = useRef<Konva.Rect>(null);
   usePutNodesIntoTransformer(useSingleTransformer, trRef, shapeRef);
