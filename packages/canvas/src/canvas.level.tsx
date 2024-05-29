@@ -8,22 +8,25 @@ import Vector2d = Konva.Vector2d;
 
 export type CanvasLevelEventType = "create" | "update" | "delete";
 
-export type CanvasLevelEventCallback = (
+export type CanvasLevelEventCallback<
+  TNode extends CanvasNodeData = CanvasNodeData,
+> = (
   type: CanvasLevelEventType,
-  nodes: Konva.Node[],
+  level: CanvasLevelNode<TNode>,
+  node: CanvasNodeData,
 ) => any;
 
 interface CanvasLevelBaseProps<TNode extends CanvasNodeData> {
   width: number;
   height: number;
+  /** The whitespace between canvas border and actual level image */
   padding: number;
   level: CanvasLevelNode<TNode>;
   /** The elements shown in this level, besides the background image */
   children: React.ReactNode;
   focused: boolean;
   onFocus: () => any;
-  onBlur: () => any;
-  onEvent?: CanvasLevelEventCallback;
+  onEvent?: CanvasLevelEventCallback<TNode>;
 }
 
 export type CanvasLevelProps<TNode extends CanvasNodeData = CanvasNodeData> =
@@ -39,8 +42,6 @@ export const CanvasLevel = forwardRef<Konva.Layer, CanvasLevelProps>(
       level,
       focused,
       onFocus,
-      onBlur,
-      onEvent,
       ...restProps
     } = props;
     const [image, setImage] = useState<HTMLImageElement>();
@@ -61,7 +62,7 @@ export const CanvasLevel = forwardRef<Konva.Layer, CanvasLevelProps>(
         (height - 2 * padding) / image.height,
       );
       return { x: scale, y: scale };
-    }, [image, width, height]);
+    }, [image, width, height, padding]);
 
     return (
       <Layer
@@ -76,11 +77,7 @@ export const CanvasLevel = forwardRef<Konva.Layer, CanvasLevelProps>(
         {...restProps}
       >
         <CanvasLevelContextProvider
-          value={{
-            ...(level as any),
-            ref: layerRef,
-            emit: onEvent,
-          }}
+          value={{ ...(level as any), ref: layerRef }}
         >
           <Rect
             name={"background"}

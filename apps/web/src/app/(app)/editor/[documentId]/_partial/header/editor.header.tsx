@@ -1,6 +1,6 @@
 import { BackButton } from "@/app/(app)/editor/[documentId]/_partial/header/components";
 import { PopoverExpand } from "@/components";
-import { DefaultBlueprintData } from "@/modules/blueprint/actions/getBlueprint";
+import { BlueprintData } from "@/modules/blueprint/actions/getBlueprint";
 import {
   Breadcrumbs,
   Button,
@@ -16,7 +16,7 @@ import * as css from "./editor.header.css";
 export async function EditorHeader({
   blueprint,
 }: {
-  blueprint: DefaultBlueprintData;
+  blueprint: BlueprintData;
 }) {
   return (
     <Text asChild>
@@ -38,7 +38,7 @@ export async function EditorHeader({
   );
 }
 
-function BlueprintTitle({ blueprint }: { blueprint: DefaultBlueprintData }) {
+function BlueprintTitle({ blueprint }: { blueprint: BlueprintData }) {
   return (
     <Popover.Root>
       <Text asChild type={"body"}>

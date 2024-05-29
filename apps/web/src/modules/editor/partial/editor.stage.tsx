@@ -26,7 +26,7 @@ export interface EditorStageProps<
 > extends CanvasStageBaseProps,
     CanvasEvents<TNodeData> {
   preferences: EditorStagePreferences;
-  lookupTable: CanvasRendererLookupTable;
+  renderers: CanvasRendererLookupTable;
   stage: EditorStageData<TNodeData>;
 }
 
@@ -34,11 +34,15 @@ export interface EditorStageData<
   TNodeData extends CanvasNodeData = CanvasNodeData,
 > {
   id: number;
-  levels: Array<{
-    id: number;
-    image: string;
-    nodes: TNodeData[];
-  }>;
+  levels: EditorStageLevel<TNodeData>[];
+}
+
+export interface EditorStageLevel<
+  TNodeData extends CanvasNodeData = CanvasNodeData,
+> {
+  id: number;
+  image: string;
+  nodes: TNodeData[];
 }
 
 export interface EditorStagePreferences extends CanvasPreferences {
@@ -46,7 +50,7 @@ export interface EditorStagePreferences extends CanvasPreferences {
   levelPosMultipliers: [x: number, y: number];
 }
 
-type NodeLevelStateMap = Record<number, SharedState<CanvasNodeData[]>>;
+type LevelNodesStateRecord = Record<number, SharedState<CanvasNodeData[]>>;
 
 /**
  * Component abstraction of `Canvas`, that acts as a layer between the actual
@@ -56,8 +60,8 @@ type NodeLevelStateMap = Record<number, SharedState<CanvasNodeData[]>>;
  */
 export const EditorStage = forwardRef<CanvasRef, EditorStageProps>(
   function EditorStage(props, ref) {
-    const { stage, preferences, ...restProps } = props;
-    const state = useSharedState<NodeLevelStateMap>({});
+    const { stage, preferences, renderers, ...restProps } = props;
+    const state = useSharedState<LevelNodesStateRecord>({});
     const stateRef = useRef(state);
     stateRef.current = state;
 
@@ -80,7 +84,7 @@ export const EditorStage = forwardRef<CanvasRef, EditorStageProps>(
 
     // Update the initial (or update to the latest) levels of current stage
     useEffect(() => {
-      const newObject = {} as NodeLevelStateMap;
+      const newObject = {} as LevelNodesStateRecord;
       stage.levels.forEach((level) => {
         newObject[level.id] = {
           state: level.nodes,
@@ -90,7 +94,7 @@ export const EditorStage = forwardRef<CanvasRef, EditorStageProps>(
       stateRef.current?.update(newObject);
     }, [stage.levels]);
 
-    /** This function creates a position for a level, based on the given space */
+    /** This function creates a position for a level, based on given index */
     const createLevelPosition = useCallback(
       (index: number) => {
         const [dx, dy] = preferences.levelPosMultipliers;
@@ -123,7 +127,13 @@ export const EditorStage = forwardRef<CanvasRef, EditorStageProps>(
     );
 
     return (
-      <Canvas ref={ref} data={data} preferences={preferences} {...restProps} />
+      <Canvas
+        ref={ref}
+        data={data}
+        preferences={preferences}
+        lookupTable={renderers}
+        {...restProps}
+      />
     );
   },
 );

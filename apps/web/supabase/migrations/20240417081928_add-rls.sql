@@ -37,7 +37,8 @@ create policy "public read access" on public.team as permissive for
     to authenticated using (true);
 
 -- //////////////////////////////// book ////////////////////////////////
-create function can_select_book(book book) returns boolean as $$
+create function can_select_book(book book) returns boolean as
+$$
 begin
     -- only allow the book to be seen when the user is a actions of the team or there
     -- is any publicly accessible blueprint within that book.
@@ -79,7 +80,8 @@ create policy "public read access" on public.member_role as permissive for
     to authenticated using (true);
 
 -- //////////////////////////////// team_member ////////////////////////////////
-create function can_select_team_member(target team_member) returns boolean as $$
+create function can_select_team_member(target team_member) returns boolean as
+$$
 begin
     -- TODO exclude site admins from this function
     -- only allow select if authenticated user is in a team with target actions
@@ -93,7 +95,7 @@ $$ language plpgsql security definer;
 create policy "public read access" on public.team_member as permissive for
     select
     to authenticated using (
-            auth.uid() = team_member.profile_id
+    auth.uid() = team_member.profile_id
         or can_select_team_member(team_member)
     );
 
@@ -103,10 +105,10 @@ create policy "public read access" on public.team_member as permissive for
 create policy "public read access" on public.player_slot as permissive for
     select
     to authenticated using (
-        exists (select id
-                from team_member
-                where team_member.team_id = player_slot.team_id
-                  and profile_id = auth.uid())
+    exists (select id
+            from team_member
+            where team_member.team_id = player_slot.team_id
+              and profile_id = auth.uid())
         or exists (select id
                    from book
                    where book.team_id = player_slot.team_id)
@@ -122,7 +124,8 @@ create policy "public read access" on public.member_to_player_slot as permissive
     );
 
 -- //////////////////////////////// blueprint ////////////////////////////////
-create function can_select_blueprint(target blueprint) returns boolean as $$
+create function can_select_blueprint(target blueprint) returns boolean as
+$$
 declare
     _team_id uuid;
 begin
@@ -151,8 +154,18 @@ create policy "read access" on public.blueprint as permissive for
     select
     to authenticated using (can_select_blueprint(blueprint));
 
+-- //////////////////////////////// blueprint_stage ////////////////////////////////
+create policy "read access"
+    on public.blueprint_stage
+    as permissive for select
+    to authenticated
+    using (exists(select 1
+                  from public.blueprint
+                  where id = blueprint_stage.blueprint_id));
+
 -- //////////////////////////////// blueprint_object ////////////////////////////////
-create function can_select_blueprint_object(obj blueprint_object) returns boolean as $$
+create function can_select_blueprint_object(obj blueprint_object) returns boolean as
+$$
 declare
     _blueprint record;
 begin
@@ -177,7 +190,8 @@ create policy "read access"
     to authenticated
     using (can_select_blueprint_object(blueprint_object));
 
-create function can_modify_blueprint_object(obj blueprint_object) returns boolean as $$
+create function can_modify_blueprint_object(obj blueprint_object) returns boolean as
+$$
 declare
     _blueprint   record;
     _team_id     uuid;
@@ -233,6 +247,7 @@ create policy "update access"
     on public.blueprint_object
     as permissive for update
     to authenticated
+    using (true)
     with check (can_modify_blueprint_object(blueprint_object));
 
 create policy "delete access"
@@ -242,7 +257,8 @@ create policy "delete access"
     using (can_modify_blueprint_object(blueprint_object));
 
 -- //////////////////////////////// audit_log ////////////////////////////////
-create function can_select_audit_log(entry audit_log) returns boolean as $$
+create function can_select_audit_log(entry audit_log) returns boolean as
+$$
 declare
     _member_flags bigint;
 begin

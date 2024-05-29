@@ -3,14 +3,14 @@ import Konva from "konva";
 import { forwardRef, RefObject, useImperativeHandle, useRef } from "react";
 import * as ReactKonva from "react-konva";
 import { KonvaNodeEvents } from "react-konva";
-import { useCanvas } from "../canvas.context.tsx";
-import { useSegmentCoordinates } from "../hooks";
+import { useCanvas } from "../canvas.context";
+import { ShapePoints, useSegmentCoordinates } from "../hooks";
 
 const ANCHOR_OUTLINE = "rgba(0, 155, 255)";
 
 export interface LineTransformerProps {
-  points: number[];
-  tension?: number;
+  points: ShapePoints;
+  tension?: Konva.LineConfig["tension"];
   position: Readonly<Konva.Vector2d>;
   updatePoints: (newPoints: number[]) => any;
   onAnchorUpdate?: (index: number, position: Konva.Vector2d) => void;

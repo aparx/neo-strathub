@@ -8,6 +8,7 @@ import { KeyboardEvent, isPressed } from "./keyMap";
 
 export function CanvasKeyboardHandler(props: ComponentPropsWithoutRef<"div">) {
   const ctx = useCanvas();
+  
 
   function keyPress(e: KeyboardEvent) {
     e.preventDefault();
@@ -51,6 +52,9 @@ export function CanvasKeyboardHandler(props: ComponentPropsWithoutRef<"div">) {
       isPressed("moveBottom", e);
     if (!wasMovementKey) return;
     // Go through all nodes and check if any was moved
+    ctx.data.forEach((node, level, data) => {
+      
+    })
     ctx.data.update((_, dataNodes) =>
       dataNodes.map<CanvasNodeData>((data) => {
         const node = ctx.stage().findOne(`#${data.attrs.id}`)!;

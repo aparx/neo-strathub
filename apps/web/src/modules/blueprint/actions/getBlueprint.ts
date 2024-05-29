@@ -4,7 +4,7 @@ import { InferAsync } from "@repo/utils";
 import { cookies } from "next/headers";
 import { cache } from "react";
 
-export type DefaultBlueprintData = NonNullable<
+export type BlueprintData = NonNullable<
   InferAsync<ReturnType<typeof getBlueprint>>["data"]
 >;
 

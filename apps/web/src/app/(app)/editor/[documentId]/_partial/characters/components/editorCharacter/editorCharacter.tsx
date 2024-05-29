@@ -2,11 +2,11 @@
 import { useEditorContext } from "@/app/(app)/editor/[documentId]/_context";
 import { CharacterModal } from "@/app/(app)/editor/[documentId]/_partial/characters/components/characterModal";
 import { GadgetModal } from "@/app/(app)/editor/[documentId]/_partial/characters/components/gadgetModal";
-import { useRealtimeEditorHandle } from "@/app/(app)/editor/[documentId]/_utils";
 import {
   BlueprintCharacterData,
   CharacterGadgetSlotData,
 } from "@/modules/blueprint/characters/actions";
+import { useRealtimeEditorHandle } from "@/modules/editor/utils";
 import { GameObjectData } from "@/modules/gameObject/hooks";
 import { createClient } from "@/utils/supabase/client";
 import { Icon, Modal } from "@repo/ui/components";

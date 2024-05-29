@@ -3,15 +3,11 @@ import Konva from "konva";
 import { forwardRef, useEffect, useRef, useState } from "react";
 import * as ReactKonva from "react-konva";
 import { CanvasNodeConfig } from "../../canvas.data";
-import {
-  LineTransformer,
-  LineTransformerRef,
-} from "../../transformers/index.ts";
+import { LineTransformer, LineTransformerRef } from "../../transformers";
 import { CanvasObjectProps } from "../canvasObjectRenderer";
 import Vector2d = Konva.Vector2d;
 
 const ZERO_VECTOR_2D = { x: 0, y: 0 } as const satisfies Vector2d;
-const ANCHOR_OUTLINE = "rgba(0, 155, 255)";
 
 export const Line = forwardRef<
   Konva.Line,
@@ -33,9 +29,11 @@ export const Line = forwardRef<
   const [shapePos, setShapePos] = useState<Readonly<Vector2d>>(ZERO_VECTOR_2D);
 
   useEffect(() => {
-    const shape = shapeRef.current;
-    if (shape) setShapePos(shape.position());
-  }, []);
+    // Always sync position on each rerender, if they differ in any way
+    const pos = shapeRef.current?.position();
+    if (pos && pos != null && (shapePos.x !== pos.x || shapePos.y !== pos.y))
+      setShapePos(pos);
+  });
 
   function scalePoints(scaleX: number, scaleY: number, points: number[]) {
     return points.map((x, i) => x * (i % 2 === 0 ? scaleX : scaleY));
@@ -56,7 +54,7 @@ export const Line = forwardRef<
           setShapePos(e.target.position());
         }}
         onTransform={(e) => {
-          const node = e.target as Line;
+          const node = e.target as Konva.Line;
           const scaleX = node.scaleX();
           const scaleY = node.scaleY();
           node.scaleX(1);
@@ -65,7 +63,7 @@ export const Line = forwardRef<
           node.points(scalePoints(scaleX, scaleY, points));
         }}
         onTransformEnd={(e) => {
-          const node = e.target as Line;
+          const node = e.target as Konva.Line;
           onChange({
             ...node.attrs,
             points: node.points(),
@@ -77,7 +75,7 @@ export const Line = forwardRef<
       {useSingleTransformer && (
         <LineTransformer
           ref={trRef}
-          points={points}
+          points={points ?? []}
           tension={data.attrs.tension}
           position={shapePos}
           updatePoints={(newPoints) => shapeRef.current?.points(newPoints)}

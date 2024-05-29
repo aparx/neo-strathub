@@ -1,5 +1,5 @@
 import { EditorCharacter } from "@/app/(app)/editor/[documentId]/_partial/characters/components/editorCharacter";
-import { DefaultBlueprintData } from "@/modules/blueprint/actions/getBlueprint";
+import { BlueprintData } from "@/modules/blueprint/actions/getBlueprint";
 import {
   BlueprintCharacterData,
   getBlueprintCharacters,
@@ -10,7 +10,7 @@ import * as css from "./editor.characters.css";
 export async function EditorCharacters({
   blueprint,
 }: {
-  blueprint: DefaultBlueprintData;
+  blueprint: BlueprintData;
 }) {
   // fetch all characters
   const characters = await getBlueprintCharacters(blueprint.id);

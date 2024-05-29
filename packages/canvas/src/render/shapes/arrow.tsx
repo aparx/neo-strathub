@@ -26,9 +26,11 @@ export const Arrow = forwardRef<
   const [shapePos, setShapePos] = useState<Readonly<Vector2d>>({ x: 0, y: 0 });
 
   useEffect(() => {
-    const shape = shapeRef.current;
-    if (shape) setShapePos(shape.position());
-  }, []);
+    // Always sync position on each rerender, if they differ in any way
+    const pos = shapeRef.current?.position();
+    if (pos && pos != null && (shapePos.x !== pos.x || shapePos.y !== pos.y))
+      setShapePos(pos);
+  });
 
   function scalePoints(scaleX: number, scaleY: number, points: number[]) {
     return points.map((x, i) => x * (i % 2 === 0 ? scaleX : scaleY));
@@ -47,7 +49,7 @@ export const Arrow = forwardRef<
           setShapePos(e.target.position());
         }}
         onTransform={(e) => {
-          const node = e.target as Arrow;
+          const node = e.target as Konva.Arrow;
           const scaleX = node.scaleX();
           const scaleY = node.scaleY();
           node.scaleX(1);
@@ -56,7 +58,7 @@ export const Arrow = forwardRef<
           node.points(scalePoints(scaleX, scaleY, points));
         }}
         onTransformEnd={(e) => {
-          const node = e.target as Arrow;
+          const node = e.target as Konva.Arrow;
           onChange({
             ...node.attrs,
             points: node.points(),

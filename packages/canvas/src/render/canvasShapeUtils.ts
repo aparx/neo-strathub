@@ -9,7 +9,7 @@ export type CanvasShapeRenderer<
 > = ForwardRefExoticComponent<CanvasObjectProps<TConfig> & TExtraProps>;
 
 export interface CanvasRendererLookupTable<T extends CanvasNodeConfig = any> {
-  [key: string]: CanvasShapeRenderer<T>;
+  [className: string]: CanvasShapeRenderer<T>;
 }
 
 type ConfigFromProps<T> =
@@ -38,13 +38,13 @@ export function createShapeData<
 >(
   table: TLookupTable,
   className: TClassName,
-  config: CanvasNodeConfigFromClassName<TLookupTable, TClassName>,
+  config: Omit<CanvasNodeConfigFromClassName<TLookupTable, TClassName>, "id">,
 ): CanvasNodeData<CanvasNodeConfigFromClassName<TLookupTable, TClassName>> {
   return {
     attrs: {
-      id: ("id" in config && config.id) || uuidv4(),
       ...config,
-    },
+      id: config.id || uuidv4(),
+    } as CanvasNodeConfigFromClassName<TLookupTable, TClassName>,
     className: className as string,
   };
 }

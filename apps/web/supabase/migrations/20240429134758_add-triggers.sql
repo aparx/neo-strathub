@@ -3,7 +3,8 @@
 -- ---------------------------- profile ----------------------------
 
 create or replace function copy_avatar_from_user_update()
-    returns trigger as $$
+    returns trigger as
+$$
 begin
     update public.profile
     set avatar = new.raw_user_meta_data ->> 'avatar_url'
@@ -21,7 +22,8 @@ create trigger trigger_copy_avatar_from_user_update
 execute function copy_avatar_from_user_update();
 
 create or replace function get_avatar_on_profile_insert()
-    returns trigger as $$
+    returns trigger as
+$$
 declare
     _avatar_url varchar;
 begin
@@ -46,7 +48,8 @@ execute function get_avatar_on_profile_insert();
 -- ---------------------------- team_member ----------------------------
 
 create or replace function delete_team_if_empty()
-    returns trigger as $$
+    returns trigger as
+$$
 begin
     if (not exists(select profile_id
                    from public.team_member
@@ -105,7 +108,8 @@ execute function on_create_team_member();
 -- ---------------------------- player_slot ----------------------------
 
 create or replace function on_create_player_index()
-    returns trigger as $$
+    returns trigger as
+$$
 declare
     _max_index int;
 begin
@@ -132,7 +136,8 @@ execute function on_create_player_index();
 -- ---------------------------- member_to_player_slot ----------------------------
 
 create or replace function on_create_member_to_player_slot()
-    returns trigger as $$
+    returns trigger as
+$$
 declare
     _slot record;
     _name text;
@@ -166,7 +171,8 @@ execute function on_create_member_to_player_slot();
 -- ---------------------------- team ----------------------------
 
 create or replace function on_create_team()
-    returns trigger as $$
+    returns trigger as
+$$
 declare
     _game_player_count int;
 begin
@@ -181,10 +187,11 @@ begin
     where team.id = new.id;
 
     if (_game_player_count is not null) then
-        for i in 1.._game_player_count loop
-            insert into public.player_slot (team_id, color, index)
-            values (new.id, 'hsl(' || (((i - 1) * 60) % 360) || ', 75%, 75%)', i - 1);
-        end loop;
+        for i in 1.._game_player_count
+            loop
+                insert into public.player_slot (team_id, color, index)
+                values (new.id, 'hsl(' || (((i - 1) * 60) % 360) || ', 75%, 75%)', i - 1);
+            end loop;
     end if;
 
     insert into public.audit_log (team_id, performer_id, type, message)
@@ -205,7 +212,8 @@ execute function on_create_team();
 -- ---------------------------- arena ----------------------------
 
 create or replace function on_arena_create()
-    returns trigger as $$
+    returns trigger as
+$$
 declare
     _newest_date timestamptz;
 begin
@@ -249,7 +257,8 @@ execute function on_arena_create();
 -- ---------------------------- arena_level ----------------------------
 
 create or replace function on_create_arena_level()
-    returns trigger as $$
+    returns trigger as
+$$
 declare
     _max_index int;
 begin
@@ -273,7 +282,8 @@ execute function on_create_arena_level();
 -- ---------------------------- book ----------------------------
 
 create or replace function on_create_book()
-    returns trigger as $$
+    returns trigger as
+$$
 declare
     _max_index smallint;
 begin
@@ -301,7 +311,8 @@ execute function on_create_book();
 -- ---------------------------- blueprint ----------------------------
 
 create or replace function on_blueprint_create()
-    returns trigger as $$
+    returns trigger as
+$$
 declare
     _game_player_count int;
 begin
@@ -314,10 +325,11 @@ begin
                      from public.book
                      where book.id = new.book_id);
 
-    for i in 1..coalesce(_game_player_count, 1) loop
-        insert into public.blueprint_character (blueprint_id, index)
-        values (new.id, i - 1);
-    end loop;
+    for i in 1..coalesce(_game_player_count, 1)
+        loop
+            insert into public.blueprint_character (blueprint_id, index)
+            values (new.id, i - 1);
+        end loop;
 
     return new;
 end;
@@ -370,7 +382,8 @@ create trigger trigger_verify_blueprint_character_insert
 execute function verify_blueprint_character();
 
 create or replace function on_blueprint_character_create()
-    returns trigger as $$
+    returns trigger as
+$$
 declare
     _gadget_count int;
 begin
@@ -385,10 +398,11 @@ begin
                      where blueprint.id = new.blueprint_id);
 
     -- Automatically insert character_gadget slots for given blueprint_character
-    for _ in 1..coalesce(_gadget_count, 0) loop
-        insert into public.character_gadget (character_id)
-        values (new.id);
-    end loop;
+    for _ in 1..coalesce(_gadget_count, 0)
+        loop
+            insert into public.character_gadget (character_id)
+            values (new.id);
+        end loop;
 
     return new;
 end;
@@ -404,7 +418,8 @@ execute function on_blueprint_character_create();
 -- ---------------------------- blueprint_object ----------------------------
 
 create or replace function verify_blueprint_object()
-    returns trigger as $$
+    returns trigger as
+$$
 begin
 
 end;

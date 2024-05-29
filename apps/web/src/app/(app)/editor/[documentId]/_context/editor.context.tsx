@@ -1,11 +1,11 @@
 "use client";
-import type { DefaultBlueprintData } from "@/modules/blueprint/actions/getBlueprint";
+import type { BlueprintData } from "@/modules/blueprint/actions/getBlueprint";
 import { createClient } from "@/utils/supabase/client";
 import { createContext, useContext, useEffect, useMemo } from "react";
 import { EditorRealtimeChannel } from "@/modules/editor/utils";
 
 export interface EditorContext {
-  blueprint: DefaultBlueprintData;
+  blueprint: BlueprintData;
   channel: EditorRealtimeChannel;
 }
 

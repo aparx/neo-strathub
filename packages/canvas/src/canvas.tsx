@@ -1,7 +1,7 @@
 import { useSharedState } from "@repo/utils/hooks";
 import Konva from "konva";
 import React, { forwardRef, useImperativeHandle, useRef } from "react";
-import { CanvasRootContext, CanvasRootContextProvider } from "./canvas.context";
+import { CanvasLevelEventCallback, CanvasRootContext, CanvasRootContextProvider } from "./canvas.context";
 import { CanvasData, CanvasLevelNode, CanvasNodeData } from "./canvas.data";
 import { CanvasLevel, CanvasLevelEventType } from "./canvas.level";
 import {
@@ -13,17 +13,9 @@ import { CanvasKeyboardHandler } from "./keyboard";
 import { CanvasObjectRenderer, CanvasRendererLookupTable } from "./render";
 import Vector2d = Konva.Vector2d;
 
-export type CanvasEventHandler<
-  TNodeData extends CanvasNodeData = CanvasNodeData,
-> = (
-  level: CanvasLevelNode,
-  type: CanvasLevelEventType,
-  nodes: TNodeData[],
-) => any;
-
 export interface CanvasEvents<TNodeData extends CanvasNodeData = CanvasNodeData>
   extends CanvasStageEvents {
-  onLevelEvent?: CanvasEventHandler<TNodeData>;
+  onEvent: CanvasLevelEventCallback<TNodeData>;
 }
 
 export interface CanvasProps<TNodeData extends CanvasNodeData = CanvasNodeData>
@@ -57,7 +49,7 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps<any>>(
       data,
       children,
       lookupTable,
-      onLevelEvent,
+      onEvent,
       ...restProps
     } = props;
 
@@ -74,6 +66,7 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps<any>>(
       focusedLevel: useSharedState(),
       stage: () => stageRef.current!,
       isSelected: (id) => selected.state.includes(id),
+      emit: onEvent
     } satisfies CanvasRootContext;
 
     useImperativeHandle(ref, () => context, [data, selected]);
@@ -98,7 +91,6 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps<any>>(
                 padding={preferences.levelPadding}
                 focused={context.focusedLevel.state === level.id}
                 onFocus={() => context.focusedLevel.update(level.id)}
-                onEvent={(type, nodes) => onLevelEvent?.(level, type, nodes)}
               >
                 <CanvasObjectRenderer
                   editable={editable}

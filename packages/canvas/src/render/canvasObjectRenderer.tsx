@@ -109,7 +109,7 @@ function ObjectWrapper<TConfig extends CanvasNodeConfig>({
       ...node,
       attrs: newConfig,
     } satisfies CanvasNodeData;
-    level.emit("update", [newNode]);
+    ctx.emit("update", level, newNode);
     const newNodes = [...oldNodes];
     newNodes[index] = newNode;
     level.children.update(newNodes);

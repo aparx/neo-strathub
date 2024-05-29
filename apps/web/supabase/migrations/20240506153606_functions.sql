@@ -6,7 +6,8 @@
 
 create or replace function create_team(
     team_name varchar, target_plan_id int, target_game_id int, creator_id uuid
-) returns uuid as $$
+) returns uuid as
+$$
 declare
     _uid             uuid;
     _team_count      int;
@@ -79,7 +80,8 @@ revoke
 
 create or replace function create_book(
     book_name varchar, team_id uuid
-) returns uuid as $$
+) returns uuid as
+$$
 declare
     _book_id        varchar;
     _book_count     int;
@@ -131,7 +133,8 @@ revoke
     from public, anon;
 
 create or replace function rename_book(book_id uuid, name text)
-    returns void as $$
+    returns void as
+$$
 declare
     _team_id    uuid;
     _self_flags bigint;
@@ -173,7 +176,8 @@ revoke execute on function
     from public, anon;
 
 create or replace function delete_book(book_id uuid)
-    returns void as $$
+    returns void as
+$$
 declare
     _team_id     uuid;
     _self_member record;
@@ -216,7 +220,8 @@ revoke execute on function
 -- //////////////////////////////////////////////////////////////////////
 
 create or replace function kick_member(member_id bigint)
-    returns void as $$
+    returns void as
+$$
 declare
     _target_member record;
     _self_member   record;
@@ -277,7 +282,8 @@ revoke
 
 create or replace function update_member_role(
     team_id uuid, target_profile_id uuid, new_role_id bigint
-) returns void as $$
+) returns void as
+$$
 declare
     _self_member    record;
     _target_member  record;
@@ -344,7 +350,8 @@ revoke
 
 create or replace function assign_member_to_slot(
     member_id bigint, slot_id bigint, try_swap boolean
-) returns void as $$
+) returns void as
+$$
 declare
     _target_member  record;
     _self_member    record;
@@ -402,16 +409,18 @@ begin
         if (coalesce(array_length(_slots_before, 1), 0) > 0
             and coalesce(array_length(_target_members, 1), 0) > 0) then
             -- Move the current with `slot_id` associated members to `_slots_before`
-            foreach _l_slot in array _slots_before loop
-                foreach _l_mem in array _target_members loop
-                    delete
-                    from public.member_to_player_slot
-                    where member_to_player_slot.member_id = _l_mem;
+            foreach _l_slot in array _slots_before
+                loop
+                    foreach _l_mem in array _target_members
+                        loop
+                            delete
+                            from public.member_to_player_slot
+                            where member_to_player_slot.member_id = _l_mem;
 
-                    insert into public.member_to_player_slot (slot_id, member_id)
-                    values (_l_slot, _l_mem);
+                            insert into public.member_to_player_slot (slot_id, member_id)
+                            values (_l_slot, _l_mem);
+                        end loop;
                 end loop;
-            end loop;
         end if;
     end if;
 
@@ -451,7 +460,8 @@ revoke
 -- //////////////////////////////////////////////////////////////////////
 
 create or replace function get_perms_on_blueprint(blueprint_id uuid, user_id uuid)
-    returns bigint as $$
+    returns bigint as
+$$
 declare
     _flags   bigint;
     _team_id uuid;
@@ -497,7 +507,8 @@ revoke
 
 create or replace function update_character_object(
     character_id bigint, object_id bigint
-) returns boolean as $$
+) returns boolean as
+$$
 declare
     _blueprint_id uuid;
     _flags        bigint;
@@ -532,7 +543,8 @@ $$ volatile language plpgsql
 
 create or replace function update_gadget_object(
     gadget_id bigint, object_id bigint
-) returns boolean as $$
+) returns boolean as
+$$
 declare
     _blueprint_id uuid;
     _flags        bigint;

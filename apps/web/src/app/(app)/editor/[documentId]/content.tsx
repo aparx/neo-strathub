@@ -1,12 +1,23 @@
 "use client";
 import * as css from "@/app/(app)/editor/[documentId]/layout.css";
-import { EditorStage } from "@/modules/editor/partial/editor.stage";
-import { CanvasNodeData, CanvasRef, createShapeData } from "@repo/canvas";
+import { BlueprintData } from "@/modules/blueprint/actions/getBlueprint";
+import {
+  EditorStage,
+  EditorStageLevel,
+} from "@/modules/editor/partial/editor.stage";
+import { ArenaLevelData } from "@/modules/game/actions";
+import {
+  CanvasNodeConfig,
+  CanvasNodeData,
+  CanvasRef,
+  createShapeData,
+} from "@repo/canvas";
 import { PRIMITIVE_CANVAS_SHAPES } from "@repo/canvas/src/render/canvasShapes";
 import Konva from "konva";
 import { useEffect, useMemo, useRef } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { useLocalStorage, useWindowSize } from "usehooks-ts";
+import { useGetObjects } from "./_hooks";
 import Vector2d = Konva.Vector2d;
 
 const shapeRenderers = PRIMITIVE_CANVAS_SHAPES;
@@ -24,32 +35,18 @@ function createInitialNodes(): CanvasNodeData[] {
       x: 0,
       y: 0,
     }),
-    createShapeData(shapeRenderers, "Circle", {
-      width: 30,
-      height: 30,
-      x: 50,
-      y: 50,
-      fill: "yellow",
-    }),
-    createShapeData(shapeRenderers, "Arrow", {
-      width: 30,
-      height: 30,
-      x: 100,
-      y: 100,
-      strokeWidth: 5,
-      lineCap: "round",
-      lineJoin: "round",
-      tension: 0,
-      stroke: "green",
-      points: [100, 100, 180, 100],
-      pointerLength: 20,
-      pointerWidth: 20,
-      fill: "green",
-    }),
   ];
 }
 
-export function EditorContent() {
+export function EditorContent({
+  levels,
+  blueprint,
+  stageId,
+}: {
+  levels: ArenaLevelData[];
+  blueprint: BlueprintData;
+  stageId: number;
+}) {
   const windowSize = useWindowSize();
   const canvasRef = useRef<CanvasRef>(null);
   const [zoom, setZoom] = useLocalStorage<number | null>("canvas_zoom", null);
@@ -62,6 +59,33 @@ export function EditorContent() {
     if (pos) canvas?.position.update(pos);
   }, []);
 
+  const objectQuery = useGetObjects(
+    blueprint.id,
+    stageId,
+    useMemo(() => levels.map((level) => level.id), [levels]),
+  );
+
+  const finalLevels: EditorStageLevel[] = useMemo(() => {
+    const objectMap = objectQuery.data;
+    if (!objectMap) return [];
+    return levels.map((level) => ({
+      id: level.id,
+      image: level.image,
+      nodes:
+        objectMap.get(level.id)?.map((x) => ({
+          attrs: {
+            ...(x.attributes as Omit<CanvasNodeConfig, "id">),
+            id: x.id,
+          } satisfies CanvasNodeConfig,
+          className: x.classname,
+        })) ?? [],
+    }));
+  }, [objectQuery.data]);
+
+  // https://svgshare.com/i/161z.svg
+  // https://svgshare.com/i/162B.svg
+  // https://svgshare.com/i/1602.svg
+
   return (
     <main>
       <div className={css.fadeInRect} />
@@ -69,11 +93,12 @@ export function EditorContent() {
         ref={canvasRef}
         movable
         editable
-        lookupTable={PRIMITIVE_CANVAS_SHAPES}
+        renderers={PRIMITIVE_CANVAS_SHAPES}
         onMove={useDebouncedCallback(setPos, 250)}
         onZoom={useDebouncedCallback(setZoom, 250)}
-        onLevelEvent={(level, type, nodes) => {
-          console.log("push update", level, type, nodes.length);
+        onEvent={(type, level, node) => {
+          // TODO BATCH UPDATES
+          console.log("update", type, level.id, node);
         }}
         preferences={{
           canvasWidth: windowSize.width,
@@ -86,26 +111,7 @@ export function EditorContent() {
         }}
         stage={{
           id: 1,
-          levels: useMemo(
-            () => [
-              {
-                id: 300,
-                image: "https://svgshare.com/i/161z.svg",
-                nodes: createInitialNodes(),
-              },
-              {
-                id: 301,
-                image: "https://svgshare.com/i/162B.svg",
-                nodes: createInitialNodes(),
-              },
-              {
-                id: 302,
-                image: "https://svgshare.com/i/1602.svg",
-                nodes: createInitialNodes(),
-              },
-            ],
-            [],
-          ),
+          levels: finalLevels,
         }}
       />
     </main>
