@@ -1,7 +1,14 @@
+import Konva from "konva";
 import { useMemo } from "react";
 import * as ReactKonva from "react-konva";
 import { useImage } from "react-konva-utils";
-import { CanvasLevelBaseData, NodeTags } from "./utils";
+import { NodeTags } from "./utils";
+
+export interface CanvasLevelData {
+  readonly id: number;
+  readonly position: Readonly<Konva.Vector2d>;
+  readonly imageURL: string;
+}
 
 export interface CanvasLevelStyle {
   width: number;
@@ -11,13 +18,16 @@ export interface CanvasLevelStyle {
   background?: string;
 }
 
-export interface CanvasLevelProps extends CanvasLevelBaseData {
+export interface CanvasLevelProps extends CanvasLevelData {
   children?: React.ReactNode;
   style: CanvasLevelStyle;
 }
 
+export const LEVEL_OBJECT_ID_PREFIX = "level_";
+
 export function CanvasLevel({
   children,
+  id,
   position,
   imageURL,
   style,
@@ -33,31 +43,32 @@ export function CanvasLevel({
   }, [image, width, height, padding]);
 
   return (
-    <ReactKonva.Group
+    <ReactKonva.Layer
       name={"Level"}
+      id={`${LEVEL_OBJECT_ID_PREFIX}${id}`}
       x={position.x}
       y={position.y}
       clipWidth={width}
       clipHeight={height}
     >
-      <ReactKonva.Rect
-        name={NodeTags.NO_SELECT}
-        listening={false}
-        width={width}
-        height={height}
-        fill={background ?? "white"}
-        cornerRadius={10}
-      />
-      <ReactKonva.Image
-        name={NodeTags.NO_SELECT}
-        listening={false}
-        image={image}
-        x={padding}
-        y={padding}
-        scaleX={imageScale}
-        scaleY={imageScale}
-      />
+      <ReactKonva.Group listening={false}>
+        <ReactKonva.Rect
+          name={NodeTags.NO_SELECT}
+          width={width}
+          height={height}
+          fill={background ?? "white"}
+          cornerRadius={10}
+        />
+        <ReactKonva.Image
+          name={NodeTags.NO_SELECT}
+          image={image}
+          x={padding}
+          y={padding}
+          scaleX={imageScale}
+          scaleY={imageScale}
+        />
+      </ReactKonva.Group>
       {children}
-    </ReactKonva.Group>
+    </ReactKonva.Layer>
   );
 }
