@@ -3,7 +3,8 @@ import Konva from "konva";
 import { useRef } from "react";
 import * as ReactKonva from "react-konva";
 import { CanvasContext, CanvasContextProvider } from "./context/canvasContext";
-import { MouseButton, NodeTags } from "./utils";
+import { CanvasLevel } from "./level";
+import { CanvasData, MouseButton, NodeTags } from "./utils";
 
 // 1. Canvas
 //   1. Stage (Layer)
@@ -16,6 +17,7 @@ export interface CanvasPreferences {
 
 export interface CanvasProps {
   preferences: CanvasPreferences;
+  data: CanvasData;
 }
 
 interface SelectionArea {
@@ -39,7 +41,7 @@ const EMPTY_SELECTION_AREA = {
  * themselves are layers of the canvas. It is handling all specific
  * things, such as keyboard input, movement, selection, and more.
  */
-export function Canvas({ preferences }: CanvasProps) {
+export function Canvas({ preferences, data }: CanvasProps) {
   const context = {
     position: useSharedState({ x: 0, y: 0 }),
     scale: useSharedState(1),
@@ -102,7 +104,7 @@ export function Canvas({ preferences }: CanvasProps) {
         if (layer.hasName(NodeTags.NO_SELECT) || !selection) return;
         const box = selection.getClientRect();
         layer.children
-          .filter((x) => x.isVisible() && x.isListening() && x !== selection)
+          .filter((x) => isNodeSelectable(x) && x !== selection)
           .filter((x) => Konva.Util.haveIntersection(x.getClientRect(), box))
           .forEach((node) => selected.push(node.id()));
       });
@@ -110,6 +112,10 @@ export function Canvas({ preferences }: CanvasProps) {
       area.active = false;
       redrawSelection();
     }
+  }
+
+  function isNodeSelectable(node: Konva.Node) {
+    return node.isVisible() && !node.hasName(NodeTags.NO_SELECT);
   }
 
   function mouseDown(e: Konva.KonvaEventObject<MouseEvent>) {
@@ -134,8 +140,10 @@ export function Canvas({ preferences }: CanvasProps) {
         moveDragRef.current = true;
       // fallthrough
       default:
-        selectionAreaRef.current.active = false;
-        redrawSelection();
+        if (selectionAreaRef.current.active) {
+          selectionAreaRef.current.active = false;
+          redrawSelection();
+        }
     }
   }
 
@@ -181,16 +189,25 @@ export function Canvas({ preferences }: CanvasProps) {
           scaleX={context.scale.state}
           scaleY={context.scale.state}
           onMouseDown={mouseDown}
-          onPointerUp={(e) => console.log(e)}
           onMouseMove={mouseMove}
           onMouseUp={mouseUp}
           onMouseLeave={mouseUp}
           onWheel={wheelScroll}
         >
           <ReactKonva.Layer>
-            <ReactKonva.Group x={100}>
-              <ReactKonva.Rect width={100} height={100} fill="red" />
-            </ReactKonva.Group>
+            {data.map((level) => (
+              <CanvasLevel
+                {...level.data}
+                style={{
+                  width: 1200,
+                  height: 800,
+                  padding: 40,
+                  background: "rgb(230, 230, 230)",
+                }}
+              >
+                <ReactKonva.Rect x={0} width={100} height={100} fill="red" />
+              </CanvasLevel>
+            ))}
           </ReactKonva.Layer>
           <ReactKonva.Layer>
             <ReactKonva.Rect
