@@ -46,8 +46,6 @@ export function CanvasLevel({
       id={String(id)}
       x={position.x}
       y={position.y}
-      width={width}
-      height={height}
       clipWidth={width}
       clipHeight={height}
     >

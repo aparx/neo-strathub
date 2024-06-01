@@ -169,22 +169,20 @@ export function Canvas({
   }
 
   function click(e: Konva.KonvaEventObject<MouseEvent>) {
-    const stage = stageRef.current;
-    const area = selectionAreaRef.current;
-    if (!stage || !area) return;
+    if (moveDragRef.current) return; // Don't do anything on move
 
-    if (e.target === stage || e.target.hasName(NodeTags.NO_SELECT))
+    if (e.target === stageRef.current || e.target.hasName(NodeTags.NO_SELECT))
       return context.selected.update([]);
 
-    const targetId = e.target.id();
-    const altPressed = e.evt.metaKey || e.evt.shiftKey || e.evt.altKey;
-    const selected = context.selected.state.find((x) => x === targetId);
-    if (altPressed && !selected) {
-      context.selected.update((prev) => [...prev, targetId]);
-    } else if (altPressed) {
-      context.selected.update((prev) => prev.filter((x) => x !== targetId));
-    } else if (!selected) {
-      context.selected.update([targetId]);
+    const id = e.target.id();
+    const isAltPressed = e.evt.metaKey || e.evt.shiftKey || e.evt.altKey;
+    const isSelected = context.selected.state.find((x) => x === id);
+    if (isAltPressed && !isSelected) {
+      context.selected.update((prev) => [...prev, id]);
+    } else if (isAltPressed) {
+      context.selected.update((prev) => prev.filter((x) => x !== id));
+    } else if (!isSelected) {
+      context.selected.update([id]);
     }
   }
 
@@ -224,8 +222,8 @@ export function Canvas({
   }
 
   return (
-    <div style={{ cursor: context.cursor.state }}>
-      <CanvasContextProvider value={context}>
+    <CanvasContextProvider value={context}>
+      <div style={{ cursor: context.cursor.state }}>
         <ReactKonva.Stage
           ref={stageRef}
           width={style.width}
@@ -253,7 +251,7 @@ export function Canvas({
             />
           </ReactKonva.Layer>
         </ReactKonva.Stage>
-      </CanvasContextProvider>
-    </div>
+      </div>
+    </CanvasContextProvider>
   );
 }

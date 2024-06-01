@@ -1,17 +1,14 @@
 import { CanvasContext } from "context/canvasContext";
 import { SetStateAction } from "react";
 import { KonvaNodeEvents } from "react-konva";
-import { CanvasNode } from "utils/node";
-
-type InferConfig<TNode> =
-  TNode extends CanvasNode<infer TConfig> ? TConfig : never;
+import { CanvasNode, InferNodeConfig } from "utils/node";
 
 /** Props passed through the renderer wrapper to the actual renderer */
 export interface ObjectRendererDrillProps<TNode extends CanvasNode>
   extends KonvaNodeEvents {
   canvas: CanvasContext;
   /** Event hook called to save and push the node's changes */
-  onSave: (newConfig: SetStateAction<InferConfig<TNode>>) => any;
+  onSave: (newConfig: SetStateAction<InferNodeConfig<TNode>>) => any;
 }
 
 /** The receiving props for the internally used (actual) renderer */
@@ -43,7 +40,7 @@ export function ObjectRenderer<TNode extends CanvasNode>({
 }: ObjectRendererProps<TNode>) {
   const selected = canvas.selected.state;
   const isIndividualSelection =
-    selected.length === 1 && selected[0] === children.attrs.id;
+    selected.length === 1 && selected[0] === children.attrs?.id;
   const Renderer = renderers[children.className];
   if (Renderer == null)
     throw new Error(`Object '${children.className}' unsupported`);

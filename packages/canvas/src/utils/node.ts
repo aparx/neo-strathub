@@ -24,3 +24,6 @@ export interface CanvasNodeConfig extends Konva.NodeConfig {
 export interface CanvasNodeCharacterConfig extends CanvasNodeConfig {
   characterId?: Nullish | string;
 }
+
+export type InferNodeConfig<TNode> =
+  TNode extends CanvasNode<infer TConfig> ? TConfig : never;
