@@ -2,18 +2,15 @@ import Konva from "konva";
 import { ObjectRendererRenderProps } from "objects/objectRenderer";
 import { useRef } from "react";
 import * as ReactKonva from "react-konva";
-import { CanvasNode, CanvasNodeCharacterConfig } from "utils/node";
+import { CanvasNode, CanvasNodeConfig } from "utils/node";
 import { usePutIntoTransformer } from "../../hooks";
 import { DefaultTransformer } from "../../transformers";
 
-export type RectProps = ObjectRendererRenderProps<
-  CanvasNode<CanvasNodeCharacterConfig>
->;
+export type RectProps = ObjectRendererRenderProps<CanvasNode<CanvasNodeConfig>>;
 
 export function Rect({
   canvas,
   config,
-  onSave: onChange,
   showTransformer,
   ...restProps
 }: RectProps) {

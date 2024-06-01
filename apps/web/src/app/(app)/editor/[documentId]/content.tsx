@@ -34,7 +34,20 @@ export function EditorContent({
           selectionColor: "rgba(90, 90, 240, .5)",
         }}
       >
-        <EditorStage blueprint={blueprint} stageId={stageId} />
+        <EditorStage
+          blueprint={blueprint}
+          stageId={stageId}
+          position={{ x: 0, y: 0 }}
+          style={{
+            levelGap: 50,
+            levelDirection: [0, 1],
+            levelStyle: {
+              width: 1200,
+              height: 800,
+              padding: 20,
+            },
+          }}
+        />
       </EditorViewport>
     </main>
   );

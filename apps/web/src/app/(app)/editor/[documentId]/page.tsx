@@ -23,7 +23,7 @@ export default async function EditorPage({
   if (!blueprintQuery.data) throw new Error("Blueprint could not be found");
   const blueprint = blueprintQuery.data;
 
-  // Get the stage of the blueprint 
+  // Get the stage of the blueprint
   // TODO replace service with anon
   const stageQuery = await getServiceServer(cookies())
     .from("blueprint_stage")
@@ -35,16 +35,9 @@ export default async function EditorPage({
 
   // Check whether to display all stages at once
 
-  // Get the levels of the arena
-  const levels = await getLevels(blueprint.arena.id);
-
-  console.log("get levels", blueprint.arena.id)
-
-  // Get the data for each level
-
   return (
     <Content
-      levels={levels ?? []}
+      levels={(await getLevels(blueprint.arena.id)) ?? []}
       blueprint={blueprint}
       stageId={stageQuery.data.id}
     />

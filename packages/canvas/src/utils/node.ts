@@ -15,14 +15,7 @@ export interface CanvasNode<
 export interface CanvasNodeConfig extends Konva.NodeConfig {
   /** Represents the ID column in `blueprint_object` */
   id: string;
-}
-
-/**
- * Interface representing a node configuration, that adds the ability to assign
- * a blueprint's character to itself.
- */
-export interface CanvasNodeCharacterConfig extends CanvasNodeConfig {
-  characterId?: Nullish | string;
+  characterId?: Nullish | number;
 }
 
 export type InferNodeConfig<TNode> =

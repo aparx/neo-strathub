@@ -37,6 +37,7 @@ export function EditorLevel({
         className: object.classname,
         attrs: {
           ...(object.attributes as CanvasNodeConfig),
+          characterId: object.character_id,
           id: object.id,
         },
       })),
@@ -52,7 +53,8 @@ export function EditorLevel({
           key={index /** OK */}
           canvas={canvas}
           renderers={primitiveShapes}
-          onSave={(configValue) => {
+          onUpdate={(configValue) => {
+            // TODO determine, whether `node` lies outside the level
             const oldNodes = nodes;
             const newNodes = [...oldNodes];
             const oldConfig = newNodes[index]?.attrs;

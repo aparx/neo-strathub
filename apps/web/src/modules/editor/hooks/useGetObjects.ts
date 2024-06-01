@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 async function fetchObjects(stageId: number, levelId: number) {
   const { data } = await createClient()
     .from("blueprint_object")
-    .select("id, attributes, classname")
+    .select("id, attributes, classname, character_id")
     .eq("level_id", levelId)
     .eq("stage_id", stageId);
   return data ?? [];

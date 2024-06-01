@@ -8,7 +8,7 @@ export interface ObjectRendererDrillProps<TNode extends CanvasNode>
   extends KonvaNodeEvents {
   canvas: CanvasContext;
   /** Event hook called to save and push the node's changes */
-  onSave: (newConfig: SetStateAction<InferNodeConfig<TNode>>) => any;
+  onUpdate: (newConfig: SetStateAction<InferNodeConfig<TNode>>) => any;
 }
 
 /** The receiving props for the internally used (actual) renderer */
@@ -35,7 +35,7 @@ export function ObjectRenderer<TNode extends CanvasNode>({
   canvas,
   children,
   renderers,
-  onSave,
+  onUpdate,
   ...restProps
 }: ObjectRendererProps<TNode>) {
   const selected = canvas.selected.state;
@@ -51,7 +51,7 @@ export function ObjectRenderer<TNode extends CanvasNode>({
       showTransformer={isIndividualSelection}
       onTransformEnd={(e) =>
         // Default behaviour of `onTransformEnd`
-        onSave((oldConfig) => ({
+        onUpdate((oldConfig) => ({
           ...oldConfig,
           x: e.target.x(),
           y: e.target.y(),
@@ -62,13 +62,13 @@ export function ObjectRenderer<TNode extends CanvasNode>({
       }
       onDragEnd={(e) =>
         // Default behaviour of `onDragEnd`
-        onSave((oldConfig) => ({
+        onUpdate((oldConfig) => ({
           ...oldConfig,
           x: e.target.x(),
           y: e.target.y(),
         }))
       }
-      onSave={onSave}
+      onUpdate={onUpdate}
       {...restProps}
     />
   );

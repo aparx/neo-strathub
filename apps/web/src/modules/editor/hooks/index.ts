@@ -1,2 +1,2 @@
+export * from "./useGetLevels";
 export * from "./useGetObjects";
-export * from "./useGetLevels.ts";
