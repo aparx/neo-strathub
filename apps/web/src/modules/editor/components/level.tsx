@@ -9,6 +9,7 @@ import {
 } from "@repo/canvas";
 import { useCanvas } from "@repo/canvas/src/context/canvasContext";
 import { useEffect, useState } from "react";
+import { useEditorEvent } from "../features/events/hooks";
 import { useGetObjects } from "../hooks";
 
 export interface EditorLevelProps extends CanvasLevelData, EditorLevelEvents {
@@ -18,7 +19,7 @@ export interface EditorLevelProps extends CanvasLevelData, EditorLevelEvents {
 
 export interface EditorLevelEvents {
   /** Event called when a node is updated and should be applied remotely */
-  onNodeUpdate?: <T extends CanvasNode>(newNode: T, oldNode: T) => any;
+  onNodeUpdate: <T extends CanvasNode>(newNode: T, oldNode: T) => any;
 }
 
 export function EditorLevel({
@@ -45,6 +46,20 @@ export function EditorLevel({
   }, [data]);
 
   // TODO hook into canvas events, such as "move", "duplicate", etc.
+  useEditorEvent("elementMove", (e) => {
+    const { deltaX, deltaY } = e.event;
+    const selected = e.canvas?.selected.state;
+    setNodes((nodes) =>
+      nodes.map((node) => {
+        if (!selected?.find((x) => node.attrs.id === x)) return node;
+        const newNode = { ...node, attrs: { ...node.attrs } };
+        newNode.attrs.x = (node.attrs.x ?? 0) + deltaX;
+        newNode.attrs.y = (node.attrs.y ?? 0) + deltaY;
+        if (!e.event.transaction) onNodeUpdate(newNode, node);
+        return newNode;
+      }),
+    );
+  });
 
   return (
     <CanvasLevel id={id} {...restProps}>
@@ -54,7 +69,7 @@ export function EditorLevel({
           canvas={canvas}
           renderers={primitiveShapes}
           onUpdate={(configValue) => {
-            // TODO determine, whether `node` lies outside the level
+            // TODO delete the node if it lies outside the level
             const oldNodes = nodes;
             const newNodes = [...oldNodes];
             const oldConfig = newNodes[index]?.attrs;
@@ -66,7 +81,7 @@ export function EditorLevel({
               ...node,
               attrs: newConfig,
             };
-            onNodeUpdate?.(newNode, node);
+            onNodeUpdate(newNode, node);
             newNodes[index] = newNode;
             setNodes(newNodes);
           }}
