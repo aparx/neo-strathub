@@ -2,7 +2,14 @@ import { SharedState } from "@repo/utils/hooks";
 import { Vector2d } from "konva/lib/types";
 import { createContext, CSSProperties, useContext } from "react";
 
-export interface CanvasContext {
+export interface CanvasUserModifyStatus {
+  editable?: boolean;
+  zoomable?: boolean;
+  selectable?: boolean;
+  movable?: boolean;
+}
+
+export interface CanvasContext extends CanvasUserModifyStatus {
   scale: SharedState<number>;
   position: SharedState<Vector2d>;
   cursor: SharedState<CSSProperties["cursor"]>;

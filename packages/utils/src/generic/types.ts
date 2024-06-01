@@ -24,4 +24,4 @@ export type Nullish<T = never> = T | null | undefined;
 
 export type InferAsync<T> = T extends Promise<infer TInner> ? TInner : never;
 
-export type ExtractIterable<T> = T extends Iterable<any> ? never : T;
+export type ExcludeIterable<T> = T extends Iterable<any> ? never : T;

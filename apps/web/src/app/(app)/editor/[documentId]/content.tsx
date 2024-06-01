@@ -2,10 +2,15 @@
 import * as css from "@/app/(app)/editor/[documentId]/layout.css";
 import { BlueprintData } from "@/modules/blueprint/actions/getBlueprint";
 import { ArenaLevelData } from "@/modules/game/actions";
-import { Canvas, CanvasLevel } from "@repo/canvas";
-import { CanvasLevelNodeRecord } from "@repo/canvas/src/utils";
-import { useSharedState } from "@repo/utils/hooks";
-import { useRef } from "react";
+import {
+  Canvas,
+  CanvasLevel,
+  createCanvasObject,
+  ObjectRenderer,
+  primitiveShapes,
+} from "@repo/canvas";
+import { useCanvas } from "@repo/canvas/src/context/canvasContext";
+import { useState } from "react";
 import { useWindowSize } from "usehooks-ts";
 
 export function EditorContent({
@@ -22,10 +27,6 @@ export function EditorContent({
   // https://svgshare.com/i/1602.svg
 
   const windowSize = useWindowSize();
-
-  const state = useSharedState<CanvasLevelNodeRecord>({});
-  const stateRef = useRef(state);
-  stateRef.current = state;
 
   return (
     <main>
@@ -49,8 +50,32 @@ export function EditorContent({
             height: 800,
             padding: 20,
           }}
-        />
+        >
+          <Renderer />
+        </CanvasLevel>
       </Canvas>
     </main>
+  );
+}
+
+const obj = createCanvasObject(primitiveShapes, "Rect", {
+  fill: "red",
+  x: 0,
+  y: 100,
+  width: 50,
+  height: 50,
+});
+
+function Renderer() {
+  const [state, setState] = useState(obj);
+
+  return (
+    <ObjectRenderer
+      canvas={useCanvas()}
+      onSave={setState}
+      renderers={primitiveShapes}
+    >
+      {state}
+    </ObjectRenderer>
   );
 }

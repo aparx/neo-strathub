@@ -2,7 +2,11 @@ import { useSharedState } from "@repo/utils/hooks";
 import Konva from "konva";
 import { useRef } from "react";
 import * as ReactKonva from "react-konva";
-import { CanvasContext, CanvasContextProvider } from "./context/canvasContext";
+import {
+  CanvasContext,
+  CanvasContextProvider,
+  CanvasUserModifyStatus,
+} from "./context/canvasContext";
 import { MouseButton, NodeTags } from "./utils";
 
 export interface CanvasStyle {
@@ -16,12 +20,9 @@ export interface CanvasEvents {
   onZoom?: (scale: number) => void;
 }
 
-export interface CanvasProps extends CanvasEvents {
+export interface CanvasProps extends CanvasEvents, CanvasUserModifyStatus {
   children?: React.ReactNode;
   style: CanvasStyle;
-  movable?: boolean;
-  zoomable?: boolean;
-  editable?: boolean;
 }
 
 interface SelectionArea {
@@ -48,17 +49,22 @@ const EMPTY_SELECTION_AREA = {
 export function Canvas({
   style,
   children,
-  movable,
-  zoomable,
-  editable,
   onMove,
   onZoom,
+  editable,
+  movable,
+  selectable,
+  zoomable,
 }: CanvasProps) {
   const context = {
     position: useSharedState({ x: 0, y: 0 }),
     scale: useSharedState(1),
     cursor: useSharedState(),
-    selected: useSharedState(),
+    selected: useSharedState<string[]>([]),
+    editable,
+    movable,
+    selectable,
+    zoomable,
   } satisfies CanvasContext;
 
   const moveDragRef = useRef(false);
@@ -82,7 +88,6 @@ export function Canvas({
   }
 
   function mouseMove(e: Konva.KonvaEventObject<MouseEvent>) {
-    if (e.currentTarget !== stageRef.current) return;
     if (moveDragRef.current) {
       // Track mouse movement for canvas
       context.position.update((oldPos) => {
@@ -94,9 +99,9 @@ export function Canvas({
         return newPos;
       });
     } else if (selectionAreaRef.current.active) {
-      // Change size of selection
+      // Change size of selections
       const stage = stageRef.current;
-      const pointer = stage.getRelativePointerPosition();
+      const pointer = stage?.getRelativePointerPosition();
       if (!pointer) return;
       selectionAreaRef.current.x1 = pointer.x;
       selectionAreaRef.current.y1 = pointer.y;
@@ -109,21 +114,21 @@ export function Canvas({
       // Disable canvas movement
       context.cursor.update(undefined);
       moveDragRef.current = false;
-    }
-    if (selectionAreaRef.current.active) {
+    } else if (selectionAreaRef.current.active) {
       // Select elements
       const area = selectionAreaRef.current;
       const stage = stageRef.current;
       const selected = new Array<string>();
-      stage?.children.forEach((layer) => {
-        const selection = selectionRef.current;
-        if (layer.hasName(NodeTags.NO_SELECT) || !selection) return;
-        const box = selection.getClientRect();
-        layer.children
-          .filter((x) => isNodeSelectable(x) && x !== selection)
-          .filter((x) => Konva.Util.haveIntersection(x.getClientRect(), box))
-          .forEach((node) => selected.push(node.id()));
-      });
+      const selection = selectionRef.current;
+      selection &&
+        stage?.children.forEach((layer) => {
+          if (layer.hasName(NodeTags.NO_SELECT)) return;
+          const box = selection.getClientRect();
+          layer.children
+            .filter((x) => isNodeSelectable(x) && x !== selection)
+            .filter((x) => Konva.Util.haveIntersection(x.getClientRect(), box))
+            .forEach((node) => selected.push(node.id()));
+        });
       context.selected.update(selected);
       area.active = false;
       redrawSelection();
@@ -131,37 +136,55 @@ export function Canvas({
   }
 
   function isNodeSelectable(node: Konva.Node) {
-    return node.isVisible() && !node.hasName(NodeTags.NO_SELECT);
+    return node.isVisible() && !node.hasName(NodeTags.NO_SELECT) && !!node.id();
   }
 
   function mouseDown(e: Konva.KonvaEventObject<MouseEvent>) {
-    if (e.currentTarget !== stageRef.current) return;
     const stage = stageRef.current;
     const pointer = stage?.getRelativePointerPosition();
     if (!stage || !pointer) return;
     switch (e.evt.button) {
       /** Begin selection */
       case MouseButton.LEFT:
-        if (!editable) break;
+        if (e.target.findAncestor("Transformer") || !editable) break;
         e.evt.preventDefault();
         const area = selectionAreaRef.current;
         area.x0 = area.x1 = pointer.x;
         area.y0 = area.y1 = pointer.y;
-        area.active = true;
+        area.active = stage === e.target;
         redrawSelection();
         break;
       /** Enable canvas movement */
       case MouseButton.MIDDLE:
-        if (!movable) break;
+        if (!movable || e.target !== stageRef.current) break;
         e.evt.preventDefault();
         context.cursor.update("grabbing");
         moveDragRef.current = true;
       // fallthrough
       default:
-        if (selectionAreaRef.current.active) {
-          selectionAreaRef.current.active = false;
-          redrawSelection();
-        }
+        if (!selectionAreaRef.current.active) break;
+        selectionAreaRef.current.active = false;
+        redrawSelection();
+    }
+  }
+
+  function click(e: Konva.KonvaEventObject<MouseEvent>) {
+    const stage = stageRef.current;
+    const area = selectionAreaRef.current;
+    if (!stage || !area) return;
+
+    if (e.target === stage || e.target.hasName(NodeTags.NO_SELECT))
+      return context.selected.update([]);
+
+    const targetId = e.target.id();
+    const altPressed = e.evt.metaKey || e.evt.shiftKey || e.evt.altKey;
+    const selected = context.selected.state.find((x) => x === targetId);
+    if (altPressed && !selected) {
+      context.selected.update((prev) => [...prev, targetId]);
+    } else if (altPressed) {
+      context.selected.update((prev) => prev.filter((x) => x !== targetId));
+    } else if (!selected) {
+      context.selected.update([targetId]);
     }
   }
 
@@ -214,6 +237,7 @@ export function Canvas({
           onMouseDown={mouseDown}
           onMouseMove={mouseMove}
           onMouseUp={mouseUp}
+          onClick={click}
           onMouseLeave={mouseUp}
           onWheel={wheelScroll}
         >

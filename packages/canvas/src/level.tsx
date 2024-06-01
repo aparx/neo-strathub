@@ -23,8 +23,6 @@ export interface CanvasLevelProps extends CanvasLevelData {
   style: CanvasLevelStyle;
 }
 
-export const LEVEL_OBJECT_ID_PREFIX = "level_";
-
 export function CanvasLevel({
   children,
   id,
@@ -45,9 +43,11 @@ export function CanvasLevel({
   return (
     <ReactKonva.Layer
       name={"Level"}
-      id={`${LEVEL_OBJECT_ID_PREFIX}${id}`}
+      id={String(id)}
       x={position.x}
       y={position.y}
+      width={width}
+      height={height}
       clipWidth={width}
       clipHeight={height}
     >

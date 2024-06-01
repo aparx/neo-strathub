@@ -6,16 +6,21 @@ import Konva from "konva";
  * deserialized and rendered on the canvas.
  */
 export interface CanvasNode<
-  TConfig extends Konva.NodeConfig = Konva.NodeConfig,
+  TConfig extends CanvasNodeConfig = CanvasNodeConfig,
 > {
   attrs: TConfig;
   className: string;
+}
+
+export interface CanvasNodeConfig extends Konva.NodeConfig {
+  /** Represents the ID column in `blueprint_object` */
+  id: string;
 }
 
 /**
  * Interface representing a node configuration, that adds the ability to assign
  * a blueprint's character to itself.
  */
-export interface CanvasCharacterConfig extends Konva.NodeConfig {
+export interface CanvasNodeCharacterConfig extends CanvasNodeConfig {
   characterId?: Nullish | string;
 }
