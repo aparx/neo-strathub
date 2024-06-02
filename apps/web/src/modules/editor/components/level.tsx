@@ -20,12 +20,14 @@ export interface EditorLevelProps extends CanvasLevelData, EditorLevelEvents {
 export interface EditorLevelEvents {
   /** Event called when a node is updated and should be applied remotely */
   onNodeUpdate: <T extends CanvasNode>(newNode: T, oldNode: T) => any;
+  onNodeDelete: (node: CanvasNode) => any;
 }
 
 export function EditorLevel({
   id,
   stageId,
   onNodeUpdate,
+  onNodeDelete,
   ...restProps
 }: EditorLevelProps) {
   const canvas = useCanvas();
@@ -46,12 +48,12 @@ export function EditorLevel({
   }, [data]);
 
   // TODO hook into canvas events, such as "move", "duplicate", etc.
-  useEditorEvent("elementMove", (e) => {
+  useEditorEvent("canvasMove", (e) => {
     const { deltaX, deltaY } = e.event;
-    const selected = e.canvas?.selected.state;
+    const targets = e.event.targets;
     setNodes((nodes) =>
       nodes.map((node) => {
-        if (!selected?.find((x) => node.attrs.id === x)) return node;
+        if (!targets.includes(node.attrs.id)) return node;
         const newNode = { ...node, attrs: { ...node.attrs } };
         newNode.attrs.x = (node.attrs.x ?? 0) + deltaX;
         newNode.attrs.y = (node.attrs.y ?? 0) + deltaY;
@@ -59,6 +61,21 @@ export function EditorLevel({
         return newNode;
       }),
     );
+  });
+
+  useEditorEvent("canvasDelete", (e) => {
+    const targets = e.event.targets;
+    setNodes((nodes) => {
+      const newArray = new Array<CanvasNode>(nodes.length);
+      let insertionIndex = 0;
+      nodes.forEach((node) => {
+        if (targets.includes(node.attrs.id)) onNodeDelete(node);
+        else newArray[insertionIndex++] = node;
+      });
+      const overflow = newArray.length - insertionIndex;
+      if (overflow > 0) newArray.splice(insertionIndex, overflow);
+      return newArray;
+    });
   });
 
   return (

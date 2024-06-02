@@ -2,17 +2,8 @@ import { CanvasContext } from "@repo/canvas/src/context/canvasContext";
 import { Nullish } from "@repo/utils";
 
 export interface EditorEventMap {
-  elementMove: EditorMoveEvent;
-}
-
-export interface EditorMoveEvent {
-  deltaX: number;
-  deltaY: number;
-  /**
-   * If true, this event is in a transaction and should not be
-   * saved to the database yet.
-   */
-  transaction?: boolean;
+  canvasMove: EditorMoveEvent;
+  canvasDelete: EditorDeleteEvent;
 }
 
 export interface EditorEventObject<TEvent> {
@@ -60,3 +51,17 @@ export const EditorEventObject = function <TPayload>(
 } as EditorEventObjectConstructor;
 
 export type EditorEventType = keyof EditorEventMap;
+
+// Individual Events
+
+export interface EditorMoveEvent {
+  targets: string[];
+  deltaX: number;
+  deltaY: number;
+  /** If true, should not be committed to database directly */
+  transaction?: boolean;
+}
+
+export interface EditorDeleteEvent {
+  targets: string[];
+}

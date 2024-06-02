@@ -51,6 +51,7 @@ export function EditorStage({
           imageURL={level.image}
           position={createPosition(index)}
           onNodeUpdate={(newNode) => saveNode(newNode)}
+          onNodeDelete={(node) => console.log("delete node", node)}
           style={style.levelStyle}
         />
       ))}

@@ -1,4 +1,5 @@
 import { CanvasRef } from "@repo/canvas";
+import { CanvasContext } from "@repo/canvas/src/context/canvasContext";
 import React, { MutableRefObject, useMemo, useRef } from "react";
 import { useEditorEventHandler } from "../events";
 import { EditorKeyMapTree, isKeyPressed } from "./editorKeyMap";
@@ -20,15 +21,28 @@ export function EditorKeyboardHandler({
   function keyUp(e: React.KeyboardEvent<HTMLDivElement>) {
     if (moveTransaction.current) {
       // Commit move event
-      eventHandler.fire("elementMove", { deltaX: 0, deltaY: 0 });
+      eventHandler.fire("canvasMove", {
+        targets: canvas.current?.selected.state ?? [],
+        deltaX: 0,
+        deltaY: 0,
+      });
       moveTransaction.current = false;
     }
   }
 
-  const checkMove = useCheckElementMove(keyMap, moveTransaction);
+  const checkMove = useCheckElementMove(
+    keyMap,
+    moveTransaction,
+    canvas.current,
+  );
 
   function keyDown(e: React.KeyboardEvent<HTMLDivElement>) {
     if (checkMove(e)) return;
+    if (isKeyPressed(keyMap.canvas.delete, e)) {
+      return eventHandler.fire("canvasDelete", {
+        targets: canvas.current?.selected.state ?? [],
+      });
+    }
   }
 
   return (
@@ -57,6 +71,7 @@ export function EditorKeyboardHandler({
 function useCheckElementMove(
   keyMap: EditorKeyMapTree,
   moveTransaction: MutableRefObject<boolean>,
+  canvas: CanvasContext | null,
 ) {
   const eventHandler = useEditorEventHandler();
   return useMemo(() => {
@@ -70,10 +85,12 @@ function useCheckElementMove(
     return function _checkElementMove(e: React.KeyboardEvent) {
       const moveKey = deltaMatrix.find(([key]) => isKeyPressed(key, e));
       if (!moveKey) return false;
+      e.preventDefault();
       const deltaSpeed = e.shiftKey ? 10 : 5;
       moveTransaction.current = moveTransaction.current || e.repeat;
       const [deltaX, deltaY] = moveKey[1];
-      eventHandler.fire("elementMove", {
+      eventHandler.fire("canvasMove", {
+        targets: canvas?.selected.state ?? [],
         deltaX: deltaX * deltaSpeed,
         deltaY: deltaY * deltaSpeed,
         transaction: moveTransaction.current,
