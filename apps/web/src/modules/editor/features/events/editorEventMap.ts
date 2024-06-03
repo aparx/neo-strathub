@@ -1,12 +1,8 @@
+import { CanvasNode, CanvasNodeConfig } from "@repo/canvas";
 import { CanvasContext } from "@repo/canvas/src/context/canvasContext";
 import { Nullish } from "@repo/utils";
 
-export interface EditorEventMap {
-  canvasMove: EditorMoveEvent;
-  canvasDelete: EditorDeleteEvent;
-}
-
-export interface EditorEventObject<TEvent> {
+export interface EditorEventObject<TEvent extends EditorEvent> {
   event: TEvent;
   canvas: CanvasContext | Nullish;
   defaultPrevented: boolean;
@@ -16,13 +12,13 @@ export interface EditorEventObject<TEvent> {
 }
 
 interface EditorEventObjectConstructor {
-  new <TPayload>(
+  new <TPayload extends EditorEvent>(
     event: TPayload,
     canvas: CanvasContext | Nullish,
     defaultPrevented?: boolean,
     propagationStopped?: boolean,
   ): EditorEventObject<TPayload>;
-  <TPayload>(
+  <TPayload extends EditorEvent>(
     event: TPayload,
     canvas: CanvasContext | Nullish,
     defaultPrevented?: boolean,
@@ -30,7 +26,7 @@ interface EditorEventObjectConstructor {
   ): EditorEventObject<TPayload>;
 }
 
-export const EditorEventObject = function <TPayload>(
+export const EditorEventObject = function <TPayload extends EditorEvent>(
   event: TPayload,
   canvas: CanvasContext | Nullish,
   defaultPrevented: boolean = false,
@@ -50,18 +46,44 @@ export const EditorEventObject = function <TPayload>(
   };
 } as EditorEventObjectConstructor;
 
+// Event Map
+
+export interface EditorEventMap {
+  canvasMove: EditorMoveEvent;
+  canvasDelete: EditorEvent;
+  canvasDuplicate: EditorEvent;
+  canvasCreate: EditorCreateEvent;
+  canvasUpdate: EditorUpdateEvent;
+}
+
 export type EditorEventType = keyof EditorEventMap;
 
 // Individual Events
 
-export interface EditorMoveEvent {
+export type EditorEventOrigin = "self" | "foreign";
+
+export interface EditorEvent {
+  /** Array of object identifiers that define the event's targets */
   targets: string[];
+  /** The origin that invoked this event */
+  origin: EditorEventOrigin;
+}
+
+export interface EditorMoveEvent extends EditorEvent {
   deltaX: number;
   deltaY: number;
   /** If true, should not be committed to database directly */
   transaction?: boolean;
 }
 
-export interface EditorDeleteEvent {
-  targets: string[];
+export interface EditorCreateEvent extends EditorEvent {
+  node: CanvasNode;
+  /** If true, should not be committed to database directly */
+  transaction?: boolean;
+}
+
+export interface EditorUpdateEvent<
+  TConfig extends CanvasNodeConfig = CanvasNodeConfig,
+> extends EditorEvent {
+  fields: Record<string, Partial<TConfig>>;
 }

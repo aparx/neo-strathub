@@ -2,6 +2,7 @@ import { BlueprintData } from "@/modules/blueprint/actions/getBlueprint";
 import { CanvasLevelStyle } from "@repo/canvas";
 import type Konva from "konva";
 import { saveNode } from "../actions";
+import { createUpdateCommand } from "../features/actions/editorCommand";
 import { useGetLevels } from "../hooks";
 import { EditorLevel } from "./level";
 
@@ -50,8 +51,25 @@ export function EditorStage({
           stageId={stageId}
           imageURL={level.image}
           position={createPosition(index)}
-          onNodeUpdate={(newNode) => saveNode(newNode)}
-          onNodeDelete={(node) => console.log("delete node", node)}
+          onNodeUpdate={(newNode, oldNode) => {
+            console.log("create update");
+            const command = createUpdateCommand(oldNode, newNode);
+            console.log(
+              "this",
+              command.createEvent(),
+              "negate",
+              command.negate()?.createEvent(),
+            );
+            saveNode(newNode);
+          }}
+          onNodeDelete={(node) => {
+            // TODO batch deletion
+            console.log("delete node", node);
+          }}
+          onNodeCreate={(node) => {
+            // TODO batch creation
+            console.log("create node", node);
+          }}
           style={style.levelStyle}
         />
       ))}

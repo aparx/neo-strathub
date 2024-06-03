@@ -11,7 +11,7 @@ type ConfigFromComponent<TComponent> =
     ? TProps["config"]
     : never;
 
-export function createCanvasObject<
+export function createCanvasNode<
   const TLookupTable extends ObjectRendererLookupTable<any>,
   const TClassName extends keyof TLookupTable,
   const TConfig extends Omit<
@@ -26,8 +26,24 @@ export function createCanvasObject<
   return {
     className: String(className),
     attrs: {
-      ...config,
+      ...structuredClone(config),
       id: uuidv4(),
     },
   };
+}
+
+/**
+ * Deeply copies given `node` and reassigns it's identifier to given `newId`.
+ *
+ * @param node  the node to copy
+ * @param newId the new identifier of the node, by default it remains equal
+ * @returns the new deeply copied node
+ */
+export function copyCanvasNode<TNode extends CanvasNode>(
+  node: TNode,
+  newId: string = node.attrs.id,
+): TNode {
+  const newNode = structuredClone(node);
+  newNode.attrs.id = newId;
+  return newNode;
 }

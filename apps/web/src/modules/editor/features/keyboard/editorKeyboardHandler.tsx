@@ -1,6 +1,6 @@
 import { CanvasRef } from "@repo/canvas";
 import { CanvasContext } from "@repo/canvas/src/context/canvasContext";
-import React, { MutableRefObject, useMemo, useRef } from "react";
+import React, { MutableRefObject, RefObject, useMemo, useRef } from "react";
 import { useEditorEventHandler } from "../events";
 import { EditorKeyMapTree, isKeyPressed } from "./editorKeyMap";
 
@@ -23,6 +23,7 @@ export function EditorKeyboardHandler({
       // Commit move event
       eventHandler.fire("canvasMove", {
         targets: canvas.current?.selected.state ?? [],
+        origin: "self",
         deltaX: 0,
         deltaY: 0,
       });
@@ -30,17 +31,22 @@ export function EditorKeyboardHandler({
     }
   }
 
-  const checkMove = useCheckElementMove(
-    keyMap,
-    moveTransaction,
-    canvas.current,
-  );
+  const checkMove = useCheckElementMove(keyMap, moveTransaction, canvas);
 
   function keyDown(e: React.KeyboardEvent<HTMLDivElement>) {
+    e.preventDefault();
     if (checkMove(e)) return;
     if (isKeyPressed(keyMap.canvas.delete, e)) {
-      return eventHandler.fire("canvasDelete", {
+      eventHandler.fire("canvasDelete", {
         targets: canvas.current?.selected.state ?? [],
+        origin: "self",
+      });
+    } else if (isKeyPressed(keyMap.canvas.duplicate, e)) {
+      const targets = canvas.current?.selected.state ?? [];
+      canvas.current?.selected.update([]); // Clear selection
+      eventHandler.fire("canvasDuplicate", {
+        targets,
+        origin: "self",
       });
     }
   }
@@ -71,7 +77,7 @@ export function EditorKeyboardHandler({
 function useCheckElementMove(
   keyMap: EditorKeyMapTree,
   moveTransaction: MutableRefObject<boolean>,
-  canvas: CanvasContext | null,
+  canvas: RefObject<CanvasContext | null>,
 ) {
   const eventHandler = useEditorEventHandler();
   return useMemo(() => {
@@ -85,16 +91,16 @@ function useCheckElementMove(
     return function _checkElementMove(e: React.KeyboardEvent) {
       const moveKey = deltaMatrix.find(([key]) => isKeyPressed(key, e));
       if (!moveKey) return false;
-      e.preventDefault();
       const deltaSpeed = e.shiftKey ? 10 : 5;
       moveTransaction.current = moveTransaction.current || e.repeat;
       const [deltaX, deltaY] = moveKey[1];
       eventHandler.fire("canvasMove", {
-        targets: canvas?.selected.state ?? [],
+        targets: canvas.current?.selected.state ?? [],
+        origin: "self",
         deltaX: deltaX * deltaSpeed,
         deltaY: deltaY * deltaSpeed,
         transaction: moveTransaction.current,
       });
     };
-  }, [keyMap, eventHandler]);
+  }, [keyMap, eventHandler, canvas]);
 }
