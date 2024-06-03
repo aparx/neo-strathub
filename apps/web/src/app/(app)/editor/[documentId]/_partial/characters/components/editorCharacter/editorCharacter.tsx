@@ -1,5 +1,5 @@
 "use client";
-import { useEditorContext } from "@/app/(app)/editor/[documentId]/_context";
+import { useEditor } from "@/app/(app)/editor/[documentId]/_context";
 import { CharacterModal } from "@/app/(app)/editor/[documentId]/_partial/characters/components/characterModal";
 import { GadgetModal } from "@/app/(app)/editor/[documentId]/_partial/characters/components/gadgetModal";
 import {
@@ -26,7 +26,7 @@ interface GadgetSlotProps {
 }
 
 export function EditorCharacter({ data, slots }: EditorCharacterProps) {
-  const ctx = useEditorContext();
+  const ctx = useEditor();
   const character = useSharedState(data);
   const object = character.state.game_object;
   const active = object?.url != null;
@@ -84,7 +84,7 @@ export function EditorCharacter({ data, slots }: EditorCharacterProps) {
 }
 
 function GadgetSlot({ data }: GadgetSlotProps) {
-  const { channel } = useEditorContext();
+  const { channel } = useEditor();
   const gadget = useSharedState(data);
   const object = gadget.state.game_object;
   const active = object?.url != null;

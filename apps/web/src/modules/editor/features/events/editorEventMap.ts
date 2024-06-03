@@ -2,9 +2,12 @@ import { CanvasNode, CanvasNodeConfig } from "@repo/canvas";
 import { CanvasContext } from "@repo/canvas/src/context/canvasContext";
 import { Nullish } from "@repo/utils";
 
-export interface EditorEventObject<TEvent extends EditorEvent> {
-  event: TEvent;
+export type EditorEventOrigin = "user" | "history" | "foreign";
+
+export interface EditorEventObject<TPayload extends EditorEvent> {
+  event: TPayload;
   canvas: CanvasContext | Nullish;
+  origin: EditorEventOrigin;
   defaultPrevented: boolean;
   propagationStopped: boolean;
   preventDefault(): void;
@@ -15,12 +18,14 @@ interface EditorEventObjectConstructor {
   new <TPayload extends EditorEvent>(
     event: TPayload,
     canvas: CanvasContext | Nullish,
+    origin?: EditorEventOrigin,
     defaultPrevented?: boolean,
     propagationStopped?: boolean,
   ): EditorEventObject<TPayload>;
   <TPayload extends EditorEvent>(
     event: TPayload,
     canvas: CanvasContext | Nullish,
+    origin?: EditorEventOrigin,
     defaultPrevented?: boolean,
     propagationStopped?: boolean,
   ): EditorEventObject<TPayload>;
@@ -29,12 +34,14 @@ interface EditorEventObjectConstructor {
 export const EditorEventObject = function <TPayload extends EditorEvent>(
   event: TPayload,
   canvas: CanvasContext | Nullish,
+  origin: EditorEventOrigin = "user",
   defaultPrevented: boolean = false,
   propagationStopped: boolean = false,
 ): EditorEventObject<TPayload> {
   return {
     event,
     canvas,
+    origin,
     defaultPrevented,
     propagationStopped,
     preventDefault() {
@@ -50,33 +57,33 @@ export const EditorEventObject = function <TPayload extends EditorEvent>(
 
 export interface EditorEventMap {
   canvasMove: EditorMoveEvent;
-  canvasDelete: EditorEvent;
-  canvasDuplicate: EditorEvent;
+  canvasDelete: EditorTargetsEvent;
+  canvasDuplicate: EditorTargetsEvent;
   canvasCreate: EditorCreateEvent;
   canvasUpdate: EditorUpdateEvent;
+  editorUndo: EditorEvent;
+  editorRedo: EditorEvent;
 }
 
 export type EditorEventType = keyof EditorEventMap;
 
 // Individual Events
 
-export type EditorEventOrigin = "self" | "foreign";
+export interface EditorEvent {}
 
-export interface EditorEvent {
+export interface EditorTargetsEvent extends EditorEvent {
   /** Array of object identifiers that define the event's targets */
   targets: string[];
-  /** The origin that invoked this event */
-  origin: EditorEventOrigin;
 }
 
-export interface EditorMoveEvent extends EditorEvent {
+export interface EditorMoveEvent extends EditorTargetsEvent {
   deltaX: number;
   deltaY: number;
   /** If true, should not be committed to database directly */
   transaction?: boolean;
 }
 
-export interface EditorCreateEvent extends EditorEvent {
+export interface EditorCreateEvent extends EditorTargetsEvent {
   node: CanvasNode;
   /** If true, should not be committed to database directly */
   transaction?: boolean;

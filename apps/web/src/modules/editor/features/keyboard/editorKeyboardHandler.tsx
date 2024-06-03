@@ -21,9 +21,8 @@ export function EditorKeyboardHandler({
   function keyUp(e: React.KeyboardEvent<HTMLDivElement>) {
     if (moveTransaction.current) {
       // Commit move event
-      eventHandler.fire("canvasMove", {
+      eventHandler.fire("canvasMove", "user", {
         targets: canvas.current?.selected.state ?? [],
-        origin: "self",
         deltaX: 0,
         deltaY: 0,
       });
@@ -37,17 +36,17 @@ export function EditorKeyboardHandler({
     e.preventDefault();
     if (checkMove(e)) return;
     if (isKeyPressed(keyMap.canvas.delete, e)) {
-      eventHandler.fire("canvasDelete", {
+      eventHandler.fire("canvasDelete", "user", {
         targets: canvas.current?.selected.state ?? [],
-        origin: "self",
       });
     } else if (isKeyPressed(keyMap.canvas.duplicate, e)) {
       const targets = canvas.current?.selected.state ?? [];
       canvas.current?.selected.update([]); // Clear selection
-      eventHandler.fire("canvasDuplicate", {
-        targets,
-        origin: "self",
-      });
+      eventHandler.fire("canvasDuplicate", "user", { targets });
+    } else if (isKeyPressed(keyMap.editor.undo, e)) {
+      eventHandler.fire("editorUndo", "user", {});
+    } else if (isKeyPressed(keyMap.editor.redo, e)) {
+      eventHandler.fire("editorRedo", "user", {});
     }
   }
 
@@ -94,9 +93,8 @@ function useCheckElementMove(
       const deltaSpeed = e.shiftKey ? 10 : 5;
       moveTransaction.current = moveTransaction.current || e.repeat;
       const [deltaX, deltaY] = moveKey[1];
-      eventHandler.fire("canvasMove", {
+      eventHandler.fire("canvasMove", "user", {
         targets: canvas.current?.selected.state ?? [],
-        origin: "self",
         deltaX: deltaX * deltaSpeed,
         deltaY: deltaY * deltaSpeed,
         transaction: moveTransaction.current,

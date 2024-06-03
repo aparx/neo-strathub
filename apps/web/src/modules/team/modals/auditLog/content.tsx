@@ -31,8 +31,6 @@ function useGetLogEntries(teamId: string) {
       const deleted = results?.splice(LOG_PAGE_LIMIT, 1);
       if (deleted?.length) nextPageParam = deleted[0]!.id;
 
-      console.log(results, deleted);
-
       return {
         results: results ?? [],
         cursor: nextPageParam,

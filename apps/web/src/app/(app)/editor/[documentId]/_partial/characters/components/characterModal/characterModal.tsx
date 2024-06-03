@@ -1,5 +1,5 @@
 "use client";
-import { useEditorContext } from "@/app/(app)/editor/[documentId]/_context";
+import { useEditor } from "@/app/(app)/editor/[documentId]/_context";
 import { BlueprintCharacterData } from "@/modules/blueprint/characters/actions";
 import { GameObjectData } from "@/modules/gameObject/hooks";
 import { vars } from "@repo/theme";
@@ -14,7 +14,7 @@ export function CharacterModal({
   character: SharedState<BlueprintCharacterData>;
   onSave: (object: GameObjectData | null) => Promise<boolean>;
 }) {
-  const { blueprint, channel } = useEditorContext();
+  const { blueprint, channel } = useEditor();
 
   return (
     <Modal.Content minWidth={600}>

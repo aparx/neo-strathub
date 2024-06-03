@@ -3,12 +3,14 @@ import { createContext, RefObject, useContext, useMemo, useRef } from "react";
 import {
   EditorEventMap,
   EditorEventObject,
+  EditorEventOrigin,
   EditorEventType,
 } from "./editorEventMap";
 
 export interface EventHandlerContext {
   readonly fire: <const TEvent extends EditorEventType>(
     type: TEvent,
+    origin: EditorEventOrigin,
     payload: EditorEventMap[TEvent],
   ) => any;
 
@@ -52,8 +54,16 @@ export function EditorEventHandler({
 
   const context = useMemo<EventHandlerContext>(
     () => ({
-      fire<T extends EditorEventType>(type: T, payload: EditorEventMap[T]) {
-        const eventObject = new EditorEventObject(payload, canvas.current);
+      fire<T extends EditorEventType>(
+        type: T,
+        origin: EditorEventOrigin,
+        payload: EditorEventMap[T],
+      ) {
+        const eventObject = new EditorEventObject(
+          payload,
+          canvas.current,
+          origin,
+        );
         for (const callback of listenersRef.current[type] ?? []) {
           if (eventObject.propagationStopped) break;
           callback(eventObject);

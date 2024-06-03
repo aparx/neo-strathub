@@ -36,7 +36,6 @@ export function CreateTeamModal() {
   function submit(data: CreateTeamSchema) {
     startTransition(async () => {
       const newState = await createTeam(data);
-      console.log(newState);
       if (newState.state !== "success") return setState(newState);
       // Redirect user to the just created team, since success
       await router.replace(`/dashboard/${newState.createdId}`);

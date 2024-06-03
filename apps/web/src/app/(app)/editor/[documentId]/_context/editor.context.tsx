@@ -37,7 +37,7 @@ export function EditorContextProvider({
   );
 }
 
-export function useEditorContext() {
+export function useEditor() {
   const ctx = useContext(editorContext);
   if (!ctx) throw new Error("Missing EditorContext");
   return ctx;

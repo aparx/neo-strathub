@@ -11,6 +11,7 @@ import {
 import { useCanvas } from "@repo/canvas/src/context/canvasContext";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { EditorEventOrigin } from "../features/events";
 import { useEditorEvent } from "../features/events/hooks";
 import { useGetObjects } from "../hooks";
 
@@ -21,9 +22,13 @@ export interface EditorLevelProps extends CanvasLevelData, EditorLevelEvents {
 
 export interface EditorLevelEvents {
   /** Event called when a node is updated and should be applied remotely */
-  onNodeUpdate: <T extends CanvasNode>(newNode: T, oldNode: T) => any;
-  onNodeDelete: (node: CanvasNode) => any;
-  onNodeCreate: (node: CanvasNode) => any;
+  onNodeUpdate: <T extends CanvasNode>(
+    newNode: T,
+    oldNode: T,
+    origin: EditorEventOrigin,
+  ) => any;
+  onNodeDelete: (node: CanvasNode, origin: EditorEventOrigin) => any;
+  onNodeCreate: (node: CanvasNode, origin: EditorEventOrigin) => any;
 }
 
 export function EditorLevel({
@@ -51,14 +56,13 @@ export function EditorLevel({
     );
   }, [data]);
 
-  // Allow for movement of objects in the level
   useMoveEvent({ onNodeUpdate, setNodes });
 
-  // Allow for deletion of objects in the level
   useDeleteEvent({ onNodeDelete, setNodes });
 
-  // Allow for duplication of objects in the level
   useDuplicateEvent({ onNodeCreate, setNodes });
+
+  useUpdateEvent({ onNodeUpdate, setNodes });
 
   return (
     <CanvasLevel id={id} {...restProps}>
@@ -80,7 +84,7 @@ export function EditorLevel({
               ...node,
               attrs: newConfig,
             };
-            onNodeUpdate(newNode, node);
+            onNodeUpdate(newNode, node, "user");
             newNodes[index] = newNode;
             setNodes(newNodes);
           }}
@@ -108,19 +112,17 @@ function useMoveEvent<T extends CanvasNode>({
     const targets = e.event.targets;
     setNodes((nodes) => {
       if (e.defaultPrevented) return nodes;
-      if (e.event.origin === "self" && !moveStartRef.current && transaction)
-        moveStartRef.current = nodes;
-      const isCommit = e.event.origin === "self" && !transaction;
+      if (!moveStartRef.current && transaction) moveStartRef.current = nodes;
       const newNodes = nodes.map((node, index) => {
         if (!targets.includes(node.attrs.id)) return node;
         const newNode = copyCanvasNode(node);
         newNode.attrs.x = (node.attrs.x ?? 0) + deltaX;
         newNode.attrs.y = (node.attrs.y ?? 0) + deltaY;
         const oldNode = moveStartRef.current?.[index] || node;
-        if (isCommit) onNodeUpdate(newNode, oldNode);
+        if (!transaction) onNodeUpdate(newNode, oldNode, e.origin);
         return newNode;
       });
-      if (isCommit) moveStartRef.current = undefined;
+      if (!transaction) moveStartRef.current = undefined;
       return newNodes;
     });
   });
@@ -143,8 +145,8 @@ function useDeleteEvent<T extends CanvasNode>({
       nodes.forEach((node) => {
         if (!targets.includes(node.attrs.id)) {
           newArray[index++] = node;
-        } else if (e.event.origin === "self") {
-          onNodeDelete(node);
+        } else {
+          onNodeDelete(node, e.origin);
         }
       });
       const overflow = newArray.length - index;
@@ -175,14 +177,38 @@ function useDuplicateEvent<T extends CanvasNode>({
         const nodeCopy = copyCanvasNode(node, uuidv4());
         nodeCopy.attrs.x = (nodeCopy.attrs.x ?? 0) + 10;
         nodeCopy.attrs.y = (nodeCopy.attrs.y ?? 0) + 10;
-        if (e.event.origin === "self")
-          onNodeCreate((newArray[index++] = nodeCopy));
+        onNodeCreate((newArray[index++] = nodeCopy), e.origin);
         copied.push(nodeCopy.attrs.id);
       });
       e.canvas?.selected.update((prev) => [...prev, ...copied]);
       const overflow = newArray.length - index;
       if (overflow > 0) newArray.splice(index, overflow);
       return newArray;
+    });
+  });
+}
+
+function useUpdateEvent<T extends CanvasNode>({
+  onNodeUpdate,
+  setNodes,
+}: {
+  onNodeUpdate: EditorLevelEvents["onNodeUpdate"];
+  setNodes: Dispatch<SetStateAction<T[]>>;
+}) {
+  useEditorEvent("canvasUpdate", (e) => {
+    setNodes((nodes) => {
+      if (e.defaultPrevented) return nodes;
+      return nodes.map((node) => {
+        const fields = e.event.fields[node.attrs.id];
+        if (!fields) return node;
+        const newNode = copyCanvasNode(node);
+        const fieldsCopy = structuredClone(fields);
+        Object.keys(fields).forEach((key) => {
+          newNode.attrs[key as any] = fieldsCopy[key];
+        });
+        onNodeUpdate(newNode, node, e.origin);
+        return newNode;
+      });
     });
   });
 }

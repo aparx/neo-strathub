@@ -8,10 +8,17 @@ import {
 } from "@supabase/supabase-js";
 import { useEffect, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { EditorEventMap, EditorEventType } from "../features/events";
+
+interface EditorRealtimeEmitEvent<T extends EditorEventType> {
+  type: T;
+  event: EditorEventMap[T];
+}
 
 export interface EditorRealtimeEvents {
   updateCharacter: BlueprintCharacterData;
   updateGadget: CharacterGadgetSlotData;
+  emitEvent: EditorRealtimeEmitEvent<EditorEventType>;
 }
 
 export type EditorRealtimeEventType = keyof EditorRealtimeEvents;
