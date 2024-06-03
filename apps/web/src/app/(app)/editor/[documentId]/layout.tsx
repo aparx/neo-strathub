@@ -3,8 +3,9 @@ import {
   EditorCharacters,
   EditorHeader,
 } from "@/app/(app)/editor/[documentId]/_partial";
-import { FullPageEditorSpinner } from "@/app/(app)/editor/[documentId]/page.tsx";
+import { FullPageEditorSpinner } from "@/app/(app)/editor/[documentId]/page";
 import { getBlueprint } from "@/modules/blueprint/actions/getBlueprint";
+import { EditorEventHandler } from "@/modules/editor/features/events";
 import React, { Suspense } from "react";
 import * as css from "./layout.css";
 
@@ -36,12 +37,14 @@ async function Content({
 
   return (
     <EditorContextProvider blueprint={blueprint}>
-      <div className={css.content}>
-        <EditorHeader blueprint={blueprint} />
-        <EditorCharacters blueprint={blueprint} />
-        {/*<EditorInspector />*/}
-        <main>{children}</main>
-      </div>
+      <EditorEventHandler>
+        <div className={css.content}>
+          <EditorHeader blueprint={blueprint} />
+          <EditorCharacters blueprint={blueprint} />
+          {/*<EditorInspector />*/}
+          <main>{children}</main>
+        </div>
+      </EditorEventHandler>
     </EditorContextProvider>
   );
 }

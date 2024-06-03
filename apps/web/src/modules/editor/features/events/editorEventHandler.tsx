@@ -1,5 +1,5 @@
-import { CanvasRef } from "@repo/canvas";
-import { createContext, RefObject, useContext, useMemo, useRef } from "react";
+"use client";
+import { createContext, useContext, useMemo, useRef } from "react";
 import {
   EditorEventMap,
   EditorEventObject,
@@ -45,10 +45,8 @@ type EventHandlerListenerMap = {
 
 export function EditorEventHandler({
   children,
-  canvas,
 }: {
   children: React.ReactNode;
-  canvas: RefObject<CanvasRef>;
 }) {
   const listenersRef = useRef<EventHandlerListenerMap>({});
 
@@ -59,11 +57,7 @@ export function EditorEventHandler({
         origin: EditorEventOrigin,
         payload: EditorEventMap[T],
       ) {
-        const eventObject = new EditorEventObject(
-          payload,
-          canvas.current,
-          origin,
-        );
+        const eventObject = new EditorEventObject(payload, origin);
         for (const callback of listenersRef.current[type] ?? []) {
           if (eventObject.propagationStopped) break;
           callback(eventObject);
@@ -82,7 +76,7 @@ export function EditorEventHandler({
         return listenersRef.current[type]?.delete(callback) ?? false;
       },
     }),
-    [canvas],
+    [],
   );
 
   return (

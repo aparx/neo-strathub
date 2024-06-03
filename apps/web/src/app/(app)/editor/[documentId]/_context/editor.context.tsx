@@ -1,12 +1,15 @@
 "use client";
 import type { BlueprintData } from "@/modules/blueprint/actions/getBlueprint";
+import {
+  EditorRealtimeChannel,
+  EditorRealtimeChannelContract,
+} from "@/modules/editor/features/realtime";
 import { createClient } from "@/utils/supabase/client";
 import { createContext, useContext, useEffect, useMemo } from "react";
-import { EditorRealtimeChannel } from "@/modules/editor/utils";
 
 export interface EditorContext {
   blueprint: BlueprintData;
-  channel: EditorRealtimeChannel;
+  channel: EditorRealtimeChannelContract;
 }
 
 const editorContext = createContext<EditorContext | null>(null);

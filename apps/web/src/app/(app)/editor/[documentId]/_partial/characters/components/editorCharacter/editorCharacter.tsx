@@ -6,13 +6,12 @@ import {
   BlueprintCharacterData,
   CharacterGadgetSlotData,
 } from "@/modules/blueprint/characters/actions";
-import { useRealtimeEditorHandle } from "@/modules/editor/utils";
+import { useEditorEvent } from "@/modules/editor/features/events/hooks";
 import { GameObjectData } from "@/modules/gameObject/hooks";
 import { createClient } from "@/utils/supabase/client";
 import { Icon, Modal } from "@repo/ui/components";
 import { useSharedState } from "@repo/utils/hooks";
 import Image from "next/image";
-import { useEffect } from "react";
 import { RxQuestionMarkCircled } from "react-icons/rx";
 import * as css from "./editorCharacter.css";
 
@@ -32,9 +31,9 @@ export function EditorCharacter({ data, slots }: EditorCharacterProps) {
   const active = object?.url != null;
   const color = character.state.player_slot?.color ?? "transparent";
 
-  useRealtimeEditorHandle(ctx.channel, "updateCharacter", async (payload) => {
-    if (payload.id === data.id)
-      character.update((prev) => ({ ...prev, ...payload }));
+  useEditorEvent("updateCharacter", (e) => {
+    if (e.event.id === data.id)
+      character.update((prev) => ({ ...prev, ...e.event }));
   });
 
   function updateToObject(object: GameObjectData | null) {
@@ -84,16 +83,13 @@ export function EditorCharacter({ data, slots }: EditorCharacterProps) {
 }
 
 function GadgetSlot({ data }: GadgetSlotProps) {
-  const { channel } = useEditor();
   const gadget = useSharedState(data);
   const object = gadget.state.game_object;
   const active = object?.url != null;
 
-  useEffect(() => {
-    channel.register("updateGadget", (payload) => {
-      if (payload.id === data.id) gadget.update(payload);
-    });
-  }, []);
+  useEditorEvent("updateGadget", (e) => {
+    if (e.event.id === data.id) gadget.update(e.event);
+  });
 
   async function updateToObject(object: GameObjectData | null) {
     return createClient().rpc("update_gadget_object", {

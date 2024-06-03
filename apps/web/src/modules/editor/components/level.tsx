@@ -163,6 +163,8 @@ function useDuplicateEvent<T extends CanvasNode>({
   onNodeCreate: EditorLevelEvents["onNodeCreate"];
   setNodes: Dispatch<SetStateAction<T[]>>;
 }) {
+  const { selected } = useCanvas();
+
   // Allow for element duplication
   useEditorEvent("canvasDuplicate", (e) => {
     const targets = e.event.targets;
@@ -180,7 +182,7 @@ function useDuplicateEvent<T extends CanvasNode>({
         onNodeCreate((newArray[index++] = nodeCopy), e.origin);
         copied.push(nodeCopy.attrs.id);
       });
-      e.canvas?.selected.update((prev) => [...prev, ...copied]);
+      selected.update((prev) => [...prev, ...copied]);
       const overflow = newArray.length - index;
       if (overflow > 0) newArray.splice(index, overflow);
       return newArray;

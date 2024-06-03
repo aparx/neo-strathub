@@ -11,8 +11,8 @@ import {
 } from "../features/command";
 import { useEditorEventHandler } from "../features/events";
 import { useEditorEvent } from "../features/events/hooks";
+import { useSubscribeRealtimeEditor } from "../features/realtime";
 import { useGetLevels } from "../hooks";
-import { useRealtimeEditorHandle } from "../utils";
 import { EditorLevel } from "./level";
 
 export interface EditorStageStyle {
@@ -71,16 +71,15 @@ export function EditorStage({
     eventHandler.fire(nextCommand.eventType, "history", event);
   });
 
-  useRealtimeEditorHandle(editor.channel, "emitEvent", (data) => {
-    eventHandler.fire(data.type, "foreign", data.event);
+  useSubscribeRealtimeEditor(editor.channel, "*", (payload, type) => {
+    console.debug("Received foreign event", type, payload);
+    eventHandler.fire(type, "foreign", payload);
   });
 
   function pushCommand(command: EditorCommand) {
+    // TODO batch commands
     history.push(command);
-    editor.channel.broadcast("emitEvent", {
-      type: command.eventType,
-      event: command.createEvent(),
-    });
+    editor.channel.broadcast(command.eventType, command.createEvent());
   }
 
   return (

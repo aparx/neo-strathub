@@ -1,12 +1,13 @@
+import {
+  BlueprintCharacterData,
+  CharacterGadgetSlotData,
+} from "@/modules/blueprint/characters/actions";
 import { CanvasNode, CanvasNodeConfig } from "@repo/canvas";
-import { CanvasContext } from "@repo/canvas/src/context/canvasContext";
-import { Nullish } from "@repo/utils";
 
 export type EditorEventOrigin = "user" | "history" | "foreign";
 
 export interface EditorEventObject<TPayload extends EditorEvent> {
   event: TPayload;
-  canvas: CanvasContext | Nullish;
   origin: EditorEventOrigin;
   defaultPrevented: boolean;
   propagationStopped: boolean;
@@ -17,14 +18,12 @@ export interface EditorEventObject<TPayload extends EditorEvent> {
 interface EditorEventObjectConstructor {
   new <TPayload extends EditorEvent>(
     event: TPayload,
-    canvas: CanvasContext | Nullish,
     origin?: EditorEventOrigin,
     defaultPrevented?: boolean,
     propagationStopped?: boolean,
   ): EditorEventObject<TPayload>;
   <TPayload extends EditorEvent>(
     event: TPayload,
-    canvas: CanvasContext | Nullish,
     origin?: EditorEventOrigin,
     defaultPrevented?: boolean,
     propagationStopped?: boolean,
@@ -33,14 +32,12 @@ interface EditorEventObjectConstructor {
 
 export const EditorEventObject = function <TPayload extends EditorEvent>(
   event: TPayload,
-  canvas: CanvasContext | Nullish,
   origin: EditorEventOrigin = "user",
   defaultPrevented: boolean = false,
   propagationStopped: boolean = false,
 ): EditorEventObject<TPayload> {
   return {
     event,
-    canvas,
     origin,
     defaultPrevented,
     propagationStopped,
@@ -63,6 +60,8 @@ export interface EditorEventMap {
   canvasUpdate: EditorUpdateEvent;
   editorUndo: EditorEvent;
   editorRedo: EditorEvent;
+  updateCharacter: EditorUpdateCharacter;
+  updateGadget: EditorUpdateGadget;
 }
 
 export type EditorEventType = keyof EditorEventMap;
@@ -94,3 +93,7 @@ export interface EditorUpdateEvent<
 > extends EditorEvent {
   fields: Record<string, Partial<TConfig>>;
 }
+
+export type EditorUpdateCharacter = EditorEvent & BlueprintCharacterData;
+
+export type EditorUpdateGadget = EditorEvent & CharacterGadgetSlotData;

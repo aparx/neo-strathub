@@ -3,15 +3,12 @@ import * as css from "@/app/(app)/editor/[documentId]/layout.css";
 import { BlueprintData } from "@/modules/blueprint/actions/getBlueprint";
 import { EditorStage } from "@/modules/editor/components/stage";
 import { EditorViewport } from "@/modules/editor/components/viewport";
-import { ArenaLevelData } from "@/modules/game/actions";
 import { useWindowSize } from "usehooks-ts";
 
 export function EditorContent({
-  levels,
   blueprint,
   stageId,
 }: {
-  levels: ArenaLevelData[];
   blueprint: BlueprintData;
   stageId: number;
 }) {

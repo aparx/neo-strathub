@@ -1,5 +1,4 @@
 import { getBlueprint } from "@/modules/blueprint/actions/getBlueprint";
-import { getLevels } from "@/modules/game/actions";
 import { getServer, getServiceServer } from "@/utils/supabase/actions";
 import { Spinner } from "@repo/ui/components";
 import dynamic from "next/dynamic";
@@ -35,13 +34,7 @@ export default async function EditorPage({
 
   // Check whether to display all stages at once
 
-  return (
-    <Content
-      levels={(await getLevels(blueprint.arena.id)) ?? []}
-      blueprint={blueprint}
-      stageId={stageQuery.data.id}
-    />
-  );
+  return <Content blueprint={blueprint} stageId={stageQuery.data.id} />;
 }
 
 const Content = dynamic(async () => (await import("./content")).EditorContent, {
