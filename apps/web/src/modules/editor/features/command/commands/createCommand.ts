@@ -5,8 +5,7 @@ import { createDeleteCommand, EditorDeleteCommand } from "./deleteCommand";
 export type EditorCreateCommand<TNode extends CanvasNode> = EditorCommand<
   "create",
   "canvasCreate",
-  EditorDeleteCommand<TNode>,
-  undefined
+  EditorDeleteCommand<TNode>
 >;
 
 export function createCreateCommand<TNode extends CanvasNode>(
@@ -16,9 +15,12 @@ export function createCreateCommand<TNode extends CanvasNode>(
 ): EditorCreateCommand<TNode> {
   return createCommand({
     name: "create",
-    data: undefined,
     eventType: "canvasCreate",
-    createEvent: () => ({ nodes, levelId, stageId }),
-    negate: () => createDeleteCommand(nodes, levelId, stageId),
+    payload: {
+      nodes,
+      levelId,
+      stageId,
+    },
+    negate: async () => createDeleteCommand(nodes, levelId, stageId),
   });
 }

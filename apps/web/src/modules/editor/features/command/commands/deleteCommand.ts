@@ -5,8 +5,7 @@ import { createCreateCommand } from "./createCommand";
 export type EditorDeleteCommand<TNode extends CanvasNode> = EditorCommand<
   "delete",
   "canvasDelete",
-  any,
-  TNode[]
+  any
 >;
 
 export function createDeleteCommand<TNode extends CanvasNode>(
@@ -16,9 +15,8 @@ export function createDeleteCommand<TNode extends CanvasNode>(
 ): EditorDeleteCommand<TNode> {
   return createCommand({
     name: "delete",
-    data: nodes,
     eventType: "canvasDelete",
-    createEvent: () => ({ targets: nodes.map((node) => node.attrs.id) }),
-    negate: () => createCreateCommand(nodes, levelId, stageId),
+    payload: { targets: nodes.map((node) => node.attrs.id) },
+    negate: async () => createCreateCommand(nodes, levelId, stageId),
   });
 }

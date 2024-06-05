@@ -1,6 +1,6 @@
 import { useEditor } from "@/app/(app)/editor/[documentId]/_context";
 import { BlueprintData } from "@/modules/blueprint/actions/getBlueprint";
-import { CanvasLevelStyle } from "@repo/canvas";
+import { CanvasLevelStyle, CanvasNode } from "@repo/canvas";
 import type Konva from "konva";
 import { useMemo } from "react";
 import { deleteNodes, upsertNodes } from "../actions";
@@ -11,10 +11,11 @@ import {
 } from "../features/command";
 import { createCreateCommand } from "../features/command/commands/createCommand";
 import { createDeleteCommand } from "../features/command/commands/deleteCommand";
-import { useEditorEventHandler } from "../features/events";
+import { EditorEventOrigin, useEditorEventHandler } from "../features/events";
 import { useEditorEvent } from "../features/events/hooks";
 import { useSubscribeRealtimeEditor } from "../features/realtime";
-import { useGetLevels } from "../hooks";
+import { GetLevelData, useGetLevels } from "../hooks";
+import { useBatch } from "../hooks/useBatch";
 import { EditorLevel } from "./level";
 
 export interface EditorStageStyle {
@@ -57,18 +58,18 @@ export function EditorStage({
 
   const history = useMemo(() => new CommandHistory<EditorCommand>(5), []);
 
-  useEditorEvent("editorUndo", () => {
+  useEditorEvent("editorUndo", async () => {
     const lastCommand = history.moveBack();
-    const negate = lastCommand?.negate();
-    if (!negate) return;
-    const negateEvent = negate.createEvent();
-    eventHandler.fire(negate.eventType, "history", negateEvent);
-    editor.channel.broadcast(negate.eventType, negateEvent);
+    const negatePromise = lastCommand?.negate();
+    if (!negatePromise) return;
+    const negate = await negatePromise;
+    eventHandler.fire(negate.eventType, "history", negate.payload);
+    editor.channel.broadcast(negate.eventType, negate.payload);
   });
 
   useEditorEvent("editorRedo", () => {
     const nextCommand = history.moveForward();
-    const event = nextCommand?.createEvent();
+    const event = nextCommand?.payload;
     if (!event || !nextCommand) return;
     eventHandler.fire(nextCommand.eventType, "history", event);
     editor.channel.broadcast(nextCommand.eventType, event);
@@ -82,51 +83,115 @@ export function EditorStage({
   function pushCommand(command: EditorCommand) {
     // TODO batch commands
     history.push(command);
-    editor.channel.broadcast(command.eventType, command.createEvent());
+    editor.channel.broadcast(command.eventType, command.payload);
   }
 
   return (
     <>
       {data?.map((level, index) => (
-        <EditorLevel
+        <Level
           key={level.id}
-          id={level.id}
+          history={history}
           stageId={stageId}
-          imageURL={level.image}
           position={createPosition(index)}
-          onNodeUpdate={(newNode, oldNode, origin) => {
-            // TODO batch update
-            switch (origin) {
-              case "user":
-                pushCommand(createUpdateCommand(oldNode, newNode));
-              //fallthrough
-              case "history":
-                upsertNodes([newNode], level.id, stageId);
-            }
-          }}
-          onNodeDelete={(node, origin) => {
-            // TODO batch deletion
-            switch (origin) {
-              case "user":
-                pushCommand(createDeleteCommand([node], level.id, stageId));
-              //fallthrough
-              case "history":
-                deleteNodes([node.attrs.id]);
-            }
-          }}
-          onNodeCreate={(node, origin) => {
-            // TODO batch creation
-            switch (origin) {
-              case "user":
-                pushCommand(createCreateCommand([node], level.id, stageId));
-              //fallthrough
-              case "history":
-                upsertNodes([node], level.id, stageId);
-            }
-          }}
+          level={level}
           style={style.levelStyle}
         />
       ))}
     </>
+  );
+}
+
+function Level({
+  level,
+  history,
+  stageId,
+  position,
+  style,
+}: {
+  level: GetLevelData;
+  history: CommandHistory<EditorCommand>;
+  stageId: number;
+  position: Konva.Vector2d;
+  style: CanvasLevelStyle;
+}) {
+  const editor = useEditor();
+
+  function pushCommand(command: EditorCommand) {
+    console.log("push command", command);
+    history.push(command);
+    editor.channel.broadcast(command.eventType, command.payload);
+  }
+
+  const pushDelete = useBatch<{
+    origin: EditorEventOrigin;
+    node: CanvasNode;
+  }>({
+    commit: async (data) => {
+      const nodesByUser = new Array<CanvasNode>();
+      const nodesToDb = new Array<string>(data.length);
+      data.forEach((data, index) => {
+        if (data.origin === "user") nodesByUser.push(data.node);
+        nodesToDb[index] = data.node.attrs.id;
+      });
+      pushCommand(createDeleteCommand(nodesByUser, level.id, stageId));
+      deleteNodes(nodesToDb);
+    },
+  });
+
+  const pushInsert = useBatch<{
+    origin: EditorEventOrigin;
+    node: CanvasNode;
+  }>({
+    commit: async (data) => {
+      const nodesByUser = new Array<CanvasNode>();
+      const nodesToDb = new Array<CanvasNode>(data.length);
+      data.forEach((data, index) => {
+        if (data.origin === "user") nodesByUser.push(data.node);
+        nodesToDb[index] = data.node;
+      });
+      pushCommand(createCreateCommand(nodesByUser, level.id, stageId));
+      upsertNodes(nodesToDb, level.id, stageId);
+    },
+  });
+
+  const pushUpdate = useBatch<{
+    origin: EditorEventOrigin;
+    oldNode: CanvasNode;
+    newNode: CanvasNode;
+  }>({
+    commit: async (data) => {
+      console.log("perform update", data);
+      // TODO DATA RACE: create RPC that only updates the diffing fields
+      const nodesByUser = new Array<[CanvasNode, CanvasNode]>();
+      const nodesToDb = new Array<CanvasNode>(data.length);
+      data.forEach((data, index) => {
+        if (data.origin === "user")
+          nodesByUser.push([data.oldNode, data.newNode]);
+        nodesToDb[index] = data.newNode;
+      });
+      pushCommand(await createUpdateCommand(nodesByUser));
+      upsertNodes(nodesToDb, level.id, stageId);
+    },
+  });
+
+  return (
+    <EditorLevel
+      key={level.id}
+      id={level.id}
+      stageId={stageId}
+      imageURL={level.image}
+      position={position}
+      onNodeUpdate={async (newNode, oldNode, origin) => {
+        if (origin !== "foreign") pushUpdate({ origin, oldNode, newNode });
+      }}
+      onNodeDelete={(node, origin) => {
+        if (origin !== "foreign") pushDelete({ node, origin });
+      }}
+      onNodeCreate={(node, origin) => {
+        if (origin !== "foreign") pushInsert({ node, origin });
+      }}
+      style={style}
+    />
   );
 }

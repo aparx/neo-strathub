@@ -5,17 +5,13 @@ export interface EditorCommand<
   TName extends string = string,
   TEvent extends EditorEventType = any,
   TNegate extends EditorCommand = EditorCommand<string, any, any>,
-  TData = any,
 > {
   readonly name: TName;
   readonly eventType: TEvent;
-  readonly data: TData;
-
-  /** Turns this command into an editor event, that can be used locally */
-  createEvent(): EditorEventMap[TEvent];
+  readonly payload: EditorEventMap[TEvent];
 
   /** Negates this command into another command */
-  negate(): TNegate | Nullish;
+  negate(): Promise<TNegate> | Nullish;
 }
 
 /** Helper function to type safely allocate a new command */
@@ -24,6 +20,6 @@ export function createCommand<
   const TEvent extends EditorEventType,
   const TNegate extends EditorCommand,
   TData,
->(constructor: EditorCommand<TName, TEvent, TNegate, TData>) {
+>(constructor: EditorCommand<TName, TEvent, TNegate>) {
   return constructor;
 }
