@@ -1,12 +1,13 @@
 import { useSharedState } from "@repo/utils/hooks";
 import Konva from "konva";
-import { forwardRef, useImperativeHandle, useRef } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import * as ReactKonva from "react-konva";
 import {
   CanvasContext,
   CanvasContextProvider,
   CanvasUserModifyStatus,
 } from "./context/canvasContext";
+import { DefaultTransformer } from "./transformers";
 import { MouseButton, NodeTags } from "./utils";
 
 export interface CanvasStyle {
@@ -78,6 +79,7 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
     const selectionRef = useRef<Konva.Rect>(null);
     const selectionAreaRef = useRef<SelectionArea>(EMPTY_SELECTION_AREA);
     const stageRef = useRef<Konva.Stage>(null);
+    const trRef = useRef<Konva.Transformer>(null);
 
     function redrawSelection() {
       const area = selectionAreaRef.current;
@@ -233,6 +235,16 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
       });
     }
 
+    useEffect(() => {
+      const stage = stageRef.current;
+      const transformer = trRef.current;
+      if (!stage || !transformer) return;
+      const newArray = stage.children
+        .flatMap((layer) => layer.children)
+        .filter((node) => context.selected.state.includes(node.attrs.id));
+      transformer.nodes(newArray.length > 1 ? newArray : []);
+    }, [context.selected.state]);
+
     return (
       <CanvasContextProvider value={context}>
         <div style={{ cursor: context.cursor.state }}>
@@ -261,6 +273,7 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
                 strokeWidth={1}
                 strokeEnabled
               />
+              <DefaultTransformer ref={trRef} rotateEnabled={false} />
             </ReactKonva.Layer>
           </ReactKonva.Stage>
         </div>

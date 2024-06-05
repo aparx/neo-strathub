@@ -1,7 +1,6 @@
 import Konva from "konva";
 import { forwardRef } from "react";
 import * as ReactKonva from "react-konva";
-import { NodeTags } from "../utils";
 
 export const DefaultTransformer = forwardRef<
   Konva.Transformer,
