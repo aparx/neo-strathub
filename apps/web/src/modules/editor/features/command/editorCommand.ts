@@ -23,7 +23,7 @@ export function createCommand<
   const TName extends string,
   const TEvent extends EditorEventType,
   const TNegate extends EditorCommand,
-  TData extends object,
+  TData,
 >(constructor: EditorCommand<TName, TEvent, TNegate, TData>) {
   return constructor;
 }

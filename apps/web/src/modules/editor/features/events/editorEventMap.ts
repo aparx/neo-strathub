@@ -82,10 +82,10 @@ export interface EditorMoveEvent extends EditorTargetsEvent {
   transaction?: boolean;
 }
 
-export interface EditorCreateEvent extends EditorTargetsEvent {
-  node: CanvasNode;
-  /** If true, should not be committed to database directly */
-  transaction?: boolean;
+export interface EditorCreateEvent extends EditorEvent {
+  nodes: CanvasNode[];
+  levelId: number;
+  stageId: number;
 }
 
 export interface EditorUpdateEvent<

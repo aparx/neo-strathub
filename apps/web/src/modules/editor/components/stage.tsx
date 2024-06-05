@@ -3,12 +3,14 @@ import { BlueprintData } from "@/modules/blueprint/actions/getBlueprint";
 import { CanvasLevelStyle } from "@repo/canvas";
 import type Konva from "konva";
 import { useMemo } from "react";
-import { saveNode } from "../actions";
+import { deleteNodes, upsertNodes } from "../actions";
 import {
   CommandHistory,
-  createUpdateCommand,
   EditorCommand,
+  createUpdateCommand,
 } from "../features/command";
+import { createCreateCommand } from "../features/command/commands/createCommand";
+import { createDeleteCommand } from "../features/command/commands/deleteCommand";
 import { useEditorEventHandler } from "../features/events";
 import { useEditorEvent } from "../features/events/hooks";
 import { useSubscribeRealtimeEditor } from "../features/realtime";
@@ -59,16 +61,17 @@ export function EditorStage({
     const lastCommand = history.moveBack();
     const negate = lastCommand?.negate();
     if (!negate) return;
-    eventHandler.fire(negate.eventType, "history", negate.createEvent());
+    const negateEvent = negate.createEvent();
+    eventHandler.fire(negate.eventType, "history", negateEvent);
+    editor.channel.broadcast(negate.eventType, negateEvent);
   });
 
   useEditorEvent("editorRedo", () => {
-    console.log("try redo");
     const nextCommand = history.moveForward();
-    console.log("next", history.cursor(), nextCommand);
     const event = nextCommand?.createEvent();
     if (!event || !nextCommand) return;
     eventHandler.fire(nextCommand.eventType, "history", event);
+    editor.channel.broadcast(nextCommand.eventType, event);
   });
 
   useSubscribeRealtimeEditor(editor.channel, "*", (payload, type) => {
@@ -92,21 +95,34 @@ export function EditorStage({
           imageURL={level.image}
           position={createPosition(index)}
           onNodeUpdate={(newNode, oldNode, origin) => {
+            // TODO batch update
             switch (origin) {
               case "user":
                 pushCommand(createUpdateCommand(oldNode, newNode));
               //fallthrough
               case "history":
-                saveNode(newNode);
+                upsertNodes([newNode], level.id, stageId);
             }
           }}
-          onNodeDelete={(node) => {
+          onNodeDelete={(node, origin) => {
             // TODO batch deletion
-            console.log("delete node", node);
+            switch (origin) {
+              case "user":
+                pushCommand(createDeleteCommand([node], level.id, stageId));
+              //fallthrough
+              case "history":
+                deleteNodes([node.attrs.id]);
+            }
           }}
-          onNodeCreate={(node) => {
+          onNodeCreate={(node, origin) => {
             // TODO batch creation
-            console.log("create node", node);
+            switch (origin) {
+              case "user":
+                pushCommand(createCreateCommand([node], level.id, stageId));
+              //fallthrough
+              case "history":
+                upsertNodes([node], level.id, stageId);
+            }
           }}
           style={style.levelStyle}
         />

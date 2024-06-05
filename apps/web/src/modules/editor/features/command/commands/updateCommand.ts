@@ -1,5 +1,5 @@
 import { CanvasNode, CanvasNodeConfig, InferNodeConfig } from "@repo/canvas";
-import { EditorCommand, createCommand } from "./editorCommand";
+import { EditorCommand, createCommand } from "../editorCommand";
 
 export type EditorUpdateCommand<TNode extends CanvasNode> = EditorCommand<
   "update",

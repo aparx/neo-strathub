@@ -64,6 +64,8 @@ export function EditorLevel({
 
   useUpdateEvent({ onNodeUpdate, setNodes });
 
+  useCreateEvent({ onNodeCreate, setNodes, levelId: id, stageId });
+
   return (
     <CanvasLevel id={id} {...restProps}>
       {nodes?.map((node, index) => (
@@ -212,5 +214,23 @@ function useUpdateEvent<T extends CanvasNode>({
         return newNode;
       });
     });
+  });
+}
+
+function useCreateEvent<T extends CanvasNode>({
+  onNodeCreate,
+  setNodes,
+  levelId,
+  stageId,
+}: {
+  onNodeCreate: EditorLevelEvents["onNodeCreate"];
+  setNodes: Dispatch<SetStateAction<T[]>>;
+  levelId: number;
+  stageId: number;
+}) {
+  useEditorEvent("canvasCreate", (e) => {
+    if (e.event.levelId !== levelId || e.event.stageId !== stageId) return;
+    setNodes((oldNodes) => [...oldNodes, ...(e.event.nodes as T[])]);
+    e.event.nodes.forEach((node) => onNodeCreate(node, e.origin));
   });
 }

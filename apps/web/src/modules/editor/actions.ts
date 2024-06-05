@@ -1,13 +1,30 @@
 import { createClient } from "@/utils/supabase/client";
 import { CanvasNode } from "@repo/canvas";
 
-export async function saveNode(node: CanvasNode) {
+export async function upsertNodes(
+  nodes: CanvasNode[],
+  levelId: number,
+  stageId: number,
+) {
   // TODO broadcast node update
-  await createClient()
+  return createClient()
     .from("blueprint_object")
-    .update({
-      attributes: node.attrs,
-      classname: node.className,
-    })
-    .eq("id", node.attrs.id);
+    .upsert(
+      nodes.map((node) => ({
+        id: node.attrs.id,
+        classname: node.className,
+        attributes: node.attrs,
+        level_id: levelId,
+        stage_id: stageId,
+      })),
+    )
+    .throwOnError();
+}
+
+export async function deleteNodes(ids: string[]) {
+  return createClient()
+    .from("blueprint_object")
+    .delete()
+    .in("id", ids)
+    .throwOnError();
 }
