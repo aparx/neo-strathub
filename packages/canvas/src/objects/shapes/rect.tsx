@@ -12,6 +12,7 @@ export function Rect({
   canvas,
   config,
   showTransformer,
+  onUpdate,
   ...restProps
 }: RectProps) {
   const trRef = useRef<Konva.Transformer>(null);
@@ -24,6 +25,23 @@ export function Rect({
         draggable={canvas.editable}
         {...restProps}
         {...config}
+        onTransformEnd={(e) => {
+          const node = e.currentTarget;
+          // "Erase" scale and use width & height instead for rects
+          const newWidth = node.width() * node.scaleX();
+          const newHeight = node.height() * node.scaleY();
+          const newScale: Konva.Vector2d = { x: 1, y: 1 };
+          node.scale(newScale);
+          onUpdate((oldConfig) => ({
+            ...oldConfig,
+            x: node.x(),
+            y: node.y(),
+            scale: newScale,
+            width: newWidth,
+            height: newHeight,
+            rotation: node.rotation(),
+          }));
+        }}
       />
       <DefaultTransformer ref={trRef} />
     </>

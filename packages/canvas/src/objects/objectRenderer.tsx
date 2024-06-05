@@ -49,6 +49,15 @@ export function ObjectRenderer<TNode extends CanvasNode>({
       config={children.attrs}
       canvas={canvas}
       showTransformer={isIndividualSelection}
+      onDragStart={(e) => {
+        canvas.selected.update((current) => {
+          const targetId = e.target.attrs.id;
+          if (typeof targetId === "string" && !current.includes(targetId))
+            // TODO if shift/alt is pressed, include the previous selected ids
+            return [targetId];
+          return current;
+        });
+      }}
       onTransformEnd={(e) =>
         // Default behaviour of `onTransformEnd`
         onUpdate((oldConfig) => ({
