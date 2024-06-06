@@ -67,6 +67,10 @@ export function ObjectRenderer<TNode extends CanvasNode>({
           rotation: e.target.rotation(),
           scaleX: e.target.scaleX(),
           scaleY: e.target.scaleY(),
+          scale: {
+            x: e.target.scaleX(),
+            y: e.target.scaleY(),
+          },
         }))
       }
       onDragEnd={(e) =>

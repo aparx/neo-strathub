@@ -56,9 +56,10 @@ export function EditorStage({
     } as const satisfies Konva.Vector2d;
   }
 
-  const history = useMemo(() => new CommandHistory<EditorCommand>(5), []);
+  const history = useMemo(() => new CommandHistory<EditorCommand>(15), []);
 
-  useEditorEvent("editorUndo", async () => {
+  useEditorEvent("editorUndo", async (e) => {
+    if (e.origin !== "user") return;
     const lastCommand = history.moveBack();
     const negatePromise = lastCommand?.negate();
     if (!negatePromise) return;
@@ -67,7 +68,8 @@ export function EditorStage({
     editor.channel.broadcast(negate.eventType, negate.payload);
   });
 
-  useEditorEvent("editorRedo", () => {
+  useEditorEvent("editorRedo", (e) => {
+    if (e.origin !== "user") return;
     const nextCommand = history.moveForward();
     const event = nextCommand?.payload;
     if (!event || !nextCommand) return;
@@ -80,26 +82,16 @@ export function EditorStage({
     eventHandler.fire(type, "foreign", payload);
   });
 
-  function pushCommand(command: EditorCommand) {
-    // TODO batch commands
-    history.push(command);
-    editor.channel.broadcast(command.eventType, command.payload);
-  }
-
-  return (
-    <>
-      {data?.map((level, index) => (
-        <Level
-          key={level.id}
-          history={history}
-          stageId={stageId}
-          position={createPosition(index)}
-          level={level}
-          style={style.levelStyle}
-        />
-      ))}
-    </>
-  );
+  return data?.map((level, index) => (
+    <Level
+      key={level.id}
+      history={history}
+      stageId={stageId}
+      position={createPosition(index)}
+      level={level}
+      style={style.levelStyle}
+    />
+  ));
 }
 
 function Level({
@@ -118,7 +110,6 @@ function Level({
   const editor = useEditor();
 
   function pushCommand(command: EditorCommand) {
-    console.log("push command", command);
     history.push(command);
     editor.channel.broadcast(command.eventType, command.payload);
   }
@@ -134,8 +125,9 @@ function Level({
         if (data.origin === "user") nodesByUser.push(data.node);
         nodesToDb[index] = data.node.attrs.id;
       });
-      pushCommand(createDeleteCommand(nodesByUser, level.id, stageId));
-      deleteNodes(nodesToDb);
+      if (nodesByUser.length !== 0)
+        pushCommand(createDeleteCommand(nodesByUser, level.id, stageId));
+      if (nodesToDb.length !== 0) deleteNodes(nodesToDb);
     },
   });
 
@@ -150,8 +142,9 @@ function Level({
         if (data.origin === "user") nodesByUser.push(data.node);
         nodesToDb[index] = data.node;
       });
-      pushCommand(createCreateCommand(nodesByUser, level.id, stageId));
-      upsertNodes(nodesToDb, level.id, stageId);
+      if (nodesByUser.length !== 0)
+        pushCommand(createCreateCommand(nodesByUser, level.id, stageId));
+      if (nodesToDb.length !== 0) upsertNodes(nodesToDb, level.id, stageId);
     },
   });
 
@@ -161,17 +154,17 @@ function Level({
     newNode: CanvasNode;
   }>({
     commit: async (data) => {
-      console.log("perform update", data);
-      // TODO DATA RACE: create RPC that only updates the diffing fields
-      const nodesByUser = new Array<[CanvasNode, CanvasNode]>();
+      const nodesByUser = new Array<[old: CanvasNode, new: CanvasNode]>();
       const nodesToDb = new Array<CanvasNode>(data.length);
       data.forEach((data, index) => {
         if (data.origin === "user")
           nodesByUser.push([data.oldNode, data.newNode]);
         nodesToDb[index] = data.newNode;
       });
-      pushCommand(await createUpdateCommand(nodesByUser));
-      upsertNodes(nodesToDb, level.id, stageId);
+      if (nodesByUser.length !== 0)
+        pushCommand(await createUpdateCommand(nodesByUser));
+      // TODO DATA RACE: create RPC that only updates the diffing fields
+      if (nodesToDb.length !== 0) upsertNodes(nodesToDb, level.id, stageId);
     },
   });
 
@@ -182,7 +175,7 @@ function Level({
       stageId={stageId}
       imageURL={level.image}
       position={position}
-      onNodeUpdate={async (newNode, oldNode, origin) => {
+      onNodeUpdate={(newNode, oldNode, origin) => {
         if (origin !== "foreign") pushUpdate({ origin, oldNode, newNode });
       }}
       onNodeDelete={(node, origin) => {
