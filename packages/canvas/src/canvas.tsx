@@ -275,6 +275,7 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
               />
               <DefaultTransformer ref={trRef} rotateEnabled={false} />
             </ReactKonva.Layer>
+            <ReactKonva.Layer name="selection-layer" />
           </ReactKonva.Stage>
         </div>
       </CanvasContextProvider>
