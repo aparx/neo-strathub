@@ -11,6 +11,7 @@ import { createClient } from "@/utils/supabase/client";
 import { Icon, Modal } from "@repo/ui/components";
 import Image from "next/image";
 import { RxQuestionMarkCircled } from "react-icons/rx";
+import { useEditor } from "../../../../_context";
 import * as css from "./editorCharacter.css";
 
 export interface EditorCharacterProps {
@@ -26,10 +27,11 @@ export function EditorCharacter({
   data: character,
   slots,
 }: EditorCharacterProps) {
+  const { channel } = useEditor();
+  const eventHandler = useEditorEventHandler();
   const object = character.game_object;
   const active = object?.url != null;
   const color = character.player_slot?.color ?? "transparent";
-  const eventHandler = useEditorEventHandler();
 
   async function updateToObject(object: GameObjectData | null) {
     return await createClient()
@@ -72,12 +74,13 @@ export function EditorCharacter({
         character={character}
         onUpdate={(newObject, oldObject) => {
           //? use to subscribe to postgres instead to avoid race conditions?
-          const newData = { id: character.id, game_object: newObject };
-          eventHandler.fire("updateCharacter", "user", newData);
+          const eventData = { id: character.id, game_object: newObject };
+          eventHandler.fire("updateCharacter", "user", eventData);
+          channel.broadcast("updateCharacter", eventData);
           updateToObject(newObject).catch((e) => {
             console.error("Error updating character", e);
-            newData.game_object = oldObject; // Revert back
-            eventHandler.fire("updateCharacter", "foreign", newData);
+            eventData.game_object = oldObject; // Revert back
+            eventHandler.fire("updateCharacter", "foreign", eventData);
           });
         }}
       />
@@ -86,6 +89,7 @@ export function EditorCharacter({
 }
 
 function GadgetSlot({ data: gadget }: GadgetSlotProps) {
+  const { channel } = useEditor();
   const eventHandler = useEditorEventHandler();
   const object = gadget.game_object;
   const active = object?.url != null;
@@ -120,12 +124,13 @@ function GadgetSlot({ data: gadget }: GadgetSlotProps) {
         gadget={gadget}
         onUpdate={(newObject, oldObject) => {
           //? use to subscribe to postgres instead to avoid race conditions?
-          const newData = { id: gadget.id, game_object: newObject };
-          eventHandler.fire("updateGadget", "user", newData);
+          const eventData = { id: gadget.id, game_object: newObject };
+          eventHandler.fire("updateGadget", "user", eventData);
+          channel.broadcast("updateGadget", eventData);
           updateToObject(newObject).catch((e) => {
-            console.error("Error updating character", e);
-            newData.game_object = oldObject; // Revert back
-            eventHandler.fire("updateGadget", "foreign", newData);
+            console.error("Error updating gadget", e);
+            eventData.game_object = oldObject; // Revert back
+            eventHandler.fire("updateGadget", "foreign", eventData);
           });
         }}
       />
