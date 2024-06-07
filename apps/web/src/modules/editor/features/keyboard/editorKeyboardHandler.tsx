@@ -47,6 +47,8 @@ export function EditorKeyboardHandler({
       eventHandler.fire("editorUndo", "user", {});
     } else if (isKeyPressed(keyMap.editor.redo, e)) {
       eventHandler.fire("editorRedo", "user", {});
+    } else if (isKeyPressed(keyMap.editor.close, e)) {
+      canvas.current?.selected.update([]);
     }
   }
 

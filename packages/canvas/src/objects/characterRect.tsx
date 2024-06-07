@@ -31,7 +31,6 @@ export const CharacterRect = forwardRef<CharacterRectRef, CharacterRectProps>(
       // TODO add margin between the target and the origin node/config
       const target = rectRef.current;
       if (!target) return;
-      console.log("rotation", config);
       target.position({ x: config.x ?? 0, y: config.y ?? 0 });
       target.scale({ x: 1, y: 1 });
       target.rotation(config.rotation ?? 0);
@@ -52,7 +51,7 @@ export const CharacterRect = forwardRef<CharacterRectRef, CharacterRectProps>(
         stroke={finalColor}
         strokeWidth={3}
         strokeScaleEnabled={false}
-        shadowColor={finalColor}
+        shadowColor={"black"}
         shadowBlur={5}
         shadowForStrokeEnabled={true}
       />

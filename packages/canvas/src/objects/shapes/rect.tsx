@@ -34,12 +34,16 @@ export function Rect({
           node.scaleY(1);
           onUpdate((oldConfig) => ({
             ...oldConfig,
-            rotation: node.rotation(),
             width: newWidth,
             height: newHeight,
             scaleX: 1,
             scaleY: 1,
             scale: { x: 1, y: 1 },
+            x: node.x(),
+            y: node.y(),
+            rotation: node.rotation(),
+            skewX: node.skewX(),
+            skewY: node.skewY(),
           }));
         }}
       />

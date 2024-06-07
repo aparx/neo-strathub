@@ -134,9 +134,13 @@ function useDeleteEvent<T extends CanvasNode>({
   onNodeDelete: EditorLevelEvents["onNodeDelete"];
   setNodes: Dispatch<SetStateAction<T[]>>;
 }) {
+  const ctx = useCanvas();
+
   // Allow for deletion of level elements
   useEditorEvent("canvasDelete", (e) => {
     const targets = e.event.targets;
+    ctx.selected.update((ids) => ids.filter((x) => !targets.includes(x)));
+
     setNodes((nodes) => {
       if (e.defaultPrevented) return nodes;
       const newArray = new Array<T>(nodes.length);
