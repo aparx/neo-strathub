@@ -1,5 +1,5 @@
 import { CanvasContext } from "context/canvasContext";
-import { SetStateAction, useEffect, useMemo, useRef } from "react";
+import { SetStateAction, useEffect, useRef } from "react";
 import * as ReactKonva from "react-konva";
 import { CanvasNode, InferNodeConfig } from "../utils";
 import { CharacterRect, CharacterRectRef } from "./characterRect";
@@ -48,13 +48,13 @@ export function ObjectRenderer<TNode extends CanvasNode>({
   if (Renderer == null)
     throw new Error(`Object '${children.className}' unsupported`);
 
-  useEffect(() => characterRef.current?.sync(children.attrs), []);
-
   //* Gets the color from character (`children.characterId`)
-  const slot = useMemo(() => {
-    const id = children.characterId;
-    return id != null ? canvas.getCharacterSlot(id) : null;
-  }, [children.characterId]);
+  const characterSlot =
+    children.characterId != null
+      ? canvas.getCharacterSlot(children.characterId)
+      : null;
+
+  useEffect(() => characterRef.current?.sync(children.attrs), [children.attrs]);
 
   return (
     <>
@@ -99,7 +99,9 @@ export function ObjectRenderer<TNode extends CanvasNode>({
         onUpdate={onUpdate}
         {...restProps}
       />
-      {slot && <CharacterRect ref={characterRef} slot={slot} />}
+      {characterSlot && (
+        <CharacterRect ref={characterRef} slot={characterSlot} />
+      )}
     </>
   );
 }

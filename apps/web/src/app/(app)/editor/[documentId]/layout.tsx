@@ -39,6 +39,7 @@ async function Content({
   children: React.ReactNode;
   documentId: string;
 }) {
+  console.time("START");
   const [blueprintQuery, characters] = await Promise.all([
     getBlueprint(documentId),
     getBlueprintCharacters(documentId),

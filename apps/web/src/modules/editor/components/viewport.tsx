@@ -1,3 +1,4 @@
+import { useEditor } from "@/app/(app)/editor/[documentId]/_context";
 import { Canvas, CanvasRef, CanvasStyle } from "@repo/canvas";
 import { CanvasContextInteractStatus } from "@repo/canvas/src/context/canvasContext";
 import React, { useRef } from "react";
@@ -13,6 +14,7 @@ export function EditorViewport({
   children,
   ...restProps
 }: EditorViewportProps) {
+  const { characters } = useEditor();
   const canvasRef = useRef<CanvasRef>(null);
 
   return (
@@ -22,7 +24,13 @@ export function EditorViewport({
         style={style}
         functions={{
           getCharacterSlot(characterId) {
-            return null;
+            const slotData = characters.state[characterId]?.player_slot;
+            if (!slotData) return slotData; // undefined != null
+            
+            return {
+              color: slotData.color,
+              self: false /** TODO */,
+            };
           },
         }}
         {...restProps}

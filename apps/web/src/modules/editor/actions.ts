@@ -6,13 +6,13 @@ export async function upsertNodes(
   levelId: number,
   stageId: number,
 ) {
-  // TODO broadcast node update
   return createClient()
     .from("blueprint_object")
     .upsert(
       nodes.map((node) => ({
         id: node.attrs.id,
         classname: node.className,
+        character_id: node.characterId,
         attributes: node.attrs,
         level_id: levelId,
         stage_id: stageId,
