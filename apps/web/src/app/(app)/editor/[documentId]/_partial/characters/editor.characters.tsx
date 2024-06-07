@@ -1,32 +1,32 @@
+"use client";
 import { EditorCharacter } from "@/app/(app)/editor/[documentId]/_partial/characters/components/editorCharacter";
-import { BlueprintData } from "@/modules/blueprint/actions/getBlueprint";
-import {
-  BlueprintCharacterData,
-  getBlueprintCharacters,
-  getCharacterGadgetSlots,
-} from "@/modules/blueprint/characters/actions";
+import { BlueprintCharacterData } from "@/modules/blueprint/actions";
+import { useMemo } from "react";
+import { useEditor } from "../../_context";
 import * as css from "./editor.characters.css";
 
-export async function EditorCharacters({
-  blueprint,
-}: {
-  blueprint: BlueprintData;
-}) {
-  // fetch all characters
-  const characters = await getBlueprintCharacters(blueprint.id);
+export function EditorCharacters() {
+  const { characters: characterMap } = useEditor();
 
   return (
     <ol className={css.list} aria-label={"Picked Characters"}>
-      {characters.map((character) => (
-        <li key={character.id}>
-          <Character {...character} />
-        </li>
-      ))}
+      {useMemo(() => {
+        const characters = Object.values(characterMap.state);
+        if (!characters.length)
+          throw new Error("There should be at least one character");
+        return characters.map((character) => (
+          <li key={character.id}>
+            <Character {...character} />
+          </li>
+        ));
+      }, [characterMap])}
     </ol>
   );
 }
 
-async function Character(character: BlueprintCharacterData) {
-  const slots = await getCharacterGadgetSlots(character.id);
+function Character(character: BlueprintCharacterData) {
+  const { characters: characterMap } = useEditor();
+  const slotsMap = characterMap.state[character.id]?.gadgets ?? {};
+  const slots = useMemo(() => Object.values(slotsMap), [slotsMap]);
   return <EditorCharacter data={character} slots={slots} />;
 }

@@ -47,9 +47,9 @@ export function EditorLevel({
     setNodes(
       data?.map((object) => ({
         className: object.classname,
+        characterId: object.character_id,
         attrs: {
-          ...(object.attributes as CanvasNodeConfig),
-          characterId: object.character_id,
+          ...(object.attributes as Omit<CanvasNodeConfig, "id">),
           id: object.id,
         },
       })),
@@ -77,15 +77,12 @@ export function EditorLevel({
             // TODO delete the node if it lies outside the level
             const oldNodes = nodes;
             const newNodes = [...oldNodes];
-            const oldConfig = newNodes[index]?.attrs;
+            const oldConfig = newNodes[index]!.attrs;
             const newConfig =
               typeof configValue === "function"
                 ? configValue(oldConfig)
                 : configValue;
-            const newNode = {
-              ...node,
-              attrs: newConfig,
-            };
+            const newNode = { ...node, attrs: newConfig };
             onNodeUpdate(newNode, node, "user");
             newNodes[index] = newNode;
             setNodes(newNodes);

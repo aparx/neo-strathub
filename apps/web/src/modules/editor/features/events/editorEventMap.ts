@@ -1,7 +1,7 @@
-import {
+import type {
   BlueprintCharacterData,
   CharacterGadgetSlotData,
-} from "@/modules/blueprint/characters/actions";
+} from "@/modules/blueprint/actions";
 import { CanvasNode, CanvasNodeConfig } from "@repo/canvas";
 
 export type EditorEventOrigin = "user" | "history" | "foreign";
@@ -94,6 +94,12 @@ export interface EditorUpdateEvent<
   fields: Record<string, Partial<TConfig>>;
 }
 
-export type EditorUpdateCharacter = EditorEvent & BlueprintCharacterData;
+export type EditorUpdateCharacter = EditorEvent &
+  Partial<BlueprintCharacterData> & {
+    id: BlueprintCharacterData["id"];
+  };
 
-export type EditorUpdateGadget = EditorEvent & CharacterGadgetSlotData;
+export type EditorUpdateGadget = EditorEvent &
+  Partial<CharacterGadgetSlotData> & {
+    id: CharacterGadgetSlotData["id"];
+  };

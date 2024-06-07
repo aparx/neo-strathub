@@ -1,9 +1,9 @@
 import { Canvas, CanvasRef, CanvasStyle } from "@repo/canvas";
-import { CanvasUserModifyStatus } from "@repo/canvas/src/context/canvasContext";
+import { CanvasContextInteractStatus } from "@repo/canvas/src/context/canvasContext";
 import React, { useRef } from "react";
 import { DEFAULT_KEY_MAP, EditorKeyboardHandler } from "../features/keyboard";
 
-export interface EditorViewportProps extends CanvasUserModifyStatus {
+export interface EditorViewportProps extends CanvasContextInteractStatus {
   style: CanvasStyle;
   children?: React.ReactNode;
 }
@@ -17,7 +17,16 @@ export function EditorViewport({
 
   return (
     <EditorKeyboardHandler canvas={canvasRef} keyMap={DEFAULT_KEY_MAP}>
-      <Canvas ref={canvasRef} style={style} {...restProps}>
+      <Canvas
+        ref={canvasRef}
+        style={style}
+        functions={{
+          getCharacterSlot(characterId) {
+            return null;
+          },
+        }}
+        {...restProps}
+      >
         {children}
       </Canvas>
     </EditorKeyboardHandler>

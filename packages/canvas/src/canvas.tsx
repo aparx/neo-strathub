@@ -4,8 +4,9 @@ import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import * as ReactKonva from "react-konva";
 import {
   CanvasContext,
+  CanvasContextFunctions,
+  CanvasContextInteractStatus,
   CanvasContextProvider,
-  CanvasUserModifyStatus,
 } from "./context/canvasContext";
 import { DefaultTransformer } from "./transformers";
 import { MouseButton, NodeTags } from "./utils";
@@ -21,9 +22,10 @@ export interface CanvasEvents {
   onZoom?: (scale: number) => void;
 }
 
-export interface CanvasProps extends CanvasEvents, CanvasUserModifyStatus {
+export interface CanvasProps extends CanvasEvents, CanvasContextInteractStatus {
   children?: React.ReactNode;
   style: CanvasStyle;
+  functions: CanvasContextFunctions;
 }
 
 interface SelectionArea {
@@ -60,6 +62,7 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
       movable,
       selectable,
       zoomable,
+      functions,
     } = props;
 
     const context = {
@@ -71,9 +74,10 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
       movable,
       selectable,
       zoomable,
+      ...functions,
     } satisfies CanvasContext;
 
-    useImperativeHandle(ref, () => context, [context]);
+    useImperativeHandle(ref, () => context);
 
     const moveDragRef = useRef(false);
     const selectionRef = useRef<Konva.Rect>(null);
@@ -275,6 +279,7 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
               />
               <DefaultTransformer ref={trRef} rotateEnabled={false} />
             </ReactKonva.Layer>
+            {/** Layer used for selections (single- & multi-selections, ...) */}
             <ReactKonva.Layer name="selection-layer" />
           </ReactKonva.Stage>
         </div>

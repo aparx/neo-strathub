@@ -10,6 +10,8 @@ export interface UseFetchObjectsFilters {
   type?: "character" | "gadget";
 }
 
+export type GameObjectData = DeepInferUseQueryResult<typeof useFetchObjects>;
+
 async function fetchObjects(filters: UseFetchObjectsFilters) {
   const qb = createClient().from("game_object").select();
   if (filters.gameId) qb.eq("game_id", filters.gameId);
@@ -27,5 +29,3 @@ export function useFetchObjects(
     refetchInterval: false,
   });
 }
-
-export type GameObjectData = DeepInferUseQueryResult<typeof useFetchObjects>;

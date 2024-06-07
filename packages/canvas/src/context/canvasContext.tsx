@@ -1,15 +1,25 @@
+import { Nullish } from "@repo/utils";
 import { SharedState } from "@repo/utils/hooks";
 import { Vector2d } from "konva/lib/types";
 import { createContext, CSSProperties, useContext } from "react";
 
-export interface CanvasUserModifyStatus {
+export interface CanvasContextInteractStatus {
   editable?: boolean;
   zoomable?: boolean;
   selectable?: boolean;
   movable?: boolean;
 }
 
-export interface CanvasContext extends CanvasUserModifyStatus {
+export interface CanvasContextFunctions {
+  getCharacterSlot: (characterId: number) => Nullish<{
+    color: string;
+    self?: boolean;
+  }>;
+}
+
+export interface CanvasContext
+  extends CanvasContextInteractStatus,
+    CanvasContextFunctions {
   scale: SharedState<number>;
   position: SharedState<Vector2d>;
   cursor: SharedState<CSSProperties["cursor"]>;

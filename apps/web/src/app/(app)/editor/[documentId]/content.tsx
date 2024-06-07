@@ -1,23 +1,16 @@
 "use client";
 import * as css from "@/app/(app)/editor/[documentId]/layout.css";
-import { BlueprintData } from "@/modules/blueprint/actions/getBlueprint";
 import { EditorStage } from "@/modules/editor/components/stage";
 import { EditorViewport } from "@/modules/editor/components/viewport";
 import { useWindowSize } from "usehooks-ts";
+import { useEditor } from "./_context";
 
-export function EditorContent({
-  blueprint,
-  stageId,
-}: {
-  blueprint: BlueprintData;
-  stageId: number;
-}) {
+export function EditorContent({ stageId }: { stageId: number }) {
+  const windowSize = useWindowSize();
+  const context = useEditor();
   // https://svgshare.com/i/161z.svg
   // https://svgshare.com/i/162B.svg
   // https://svgshare.com/i/1602.svg
-
-  const windowSize = useWindowSize();
-
   return (
     <main>
       <div className={css.fadeInRect} />
@@ -32,7 +25,7 @@ export function EditorContent({
         }}
       >
         <EditorStage
-          blueprint={blueprint}
+          blueprint={context.blueprint}
           stageId={stageId}
           position={{ x: 0, y: 0 }}
           style={{

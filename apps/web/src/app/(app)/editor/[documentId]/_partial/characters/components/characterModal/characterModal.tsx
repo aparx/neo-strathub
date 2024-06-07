@@ -1,20 +1,22 @@
 "use client";
 import { useEditor } from "@/app/(app)/editor/[documentId]/_context";
-import { BlueprintCharacterData } from "@/modules/blueprint/characters/actions";
+import type { BlueprintCharacterData } from "@/modules/blueprint/actions";
 import { GameObjectData } from "@/modules/gameObject/hooks";
 import { vars } from "@repo/theme";
 import { Modal } from "@repo/ui/components";
-import { SharedState } from "@repo/utils/hooks";
 import { ObjectGrid } from "../objectGrid";
 
 export function CharacterModal({
   character,
-  onSave,
+  onUpdate,
 }: {
-  character: SharedState<BlueprintCharacterData>;
-  onSave: (object: GameObjectData | null) => Promise<boolean>;
+  character: BlueprintCharacterData;
+  onUpdate: (
+    newObject: GameObjectData | null,
+    oldObject: GameObjectData | null,
+  ) => any;
 }) {
-  const { blueprint, channel } = useEditor();
+  const { blueprint } = useEditor();
 
   return (
     <Modal.Content minWidth={600}>
@@ -22,23 +24,16 @@ export function CharacterModal({
         <span>
           Manage character{" "}
           <span style={{ color: vars.colors.emphasis.medium }}>
-            #{1 + character.state.index}
+            #{1 + character.index}
           </span>
         </span>
         <Modal.Exit />
       </Modal.Title>
       <ObjectGrid
         filters={{ type: "character", gameId: blueprint.arena.game_id }}
-        activeObjectId={character.state.game_object?.id}
+        activeObjectId={character.game_object?.id}
         setActiveObject={async (newObject) => {
-          const characterBefore = character.state;
-          const newChar = { ...character.state, game_object: newObject };
-          character.update(newChar);
-
-          const handleError = () => character.update(characterBefore);
-          const result = await onSave(newObject).catch(handleError);
-          if (result) channel.broadcast("updateCharacter", newChar);
-          else handleError();
+          onUpdate(newObject, character.game_object);
         }}
       />
     </Modal.Content>

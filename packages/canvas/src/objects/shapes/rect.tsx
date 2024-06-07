@@ -23,9 +23,9 @@ export function Rect({
     <>
       <ReactKonva.Rect
         ref={rectRef}
-        draggable={canvas.editable}
         {...restProps}
         {...config}
+        draggable={canvas.editable}
         onTransformEnd={(e) => {
           const node = e.target;
           const newWidth = node.scaleX() * node.width();

@@ -1,16 +1,14 @@
 "use client";
-import { useEditor } from "@/app/(app)/editor/[documentId]/_context";
 import { CharacterModal } from "@/app/(app)/editor/[documentId]/_partial/characters/components/characterModal";
 import { GadgetModal } from "@/app/(app)/editor/[documentId]/_partial/characters/components/gadgetModal";
-import {
+import type {
   BlueprintCharacterData,
   CharacterGadgetSlotData,
-} from "@/modules/blueprint/characters/actions";
-import { useEditorEvent } from "@/modules/editor/features/events/hooks";
+} from "@/modules/blueprint/actions";
+import { useEditorEventHandler } from "@/modules/editor/features/events";
 import { GameObjectData } from "@/modules/gameObject/hooks";
 import { createClient } from "@/utils/supabase/client";
 import { Icon, Modal } from "@repo/ui/components";
-import { useSharedState } from "@repo/utils/hooks";
 import Image from "next/image";
 import { RxQuestionMarkCircled } from "react-icons/rx";
 import * as css from "./editorCharacter.css";
@@ -24,31 +22,27 @@ interface GadgetSlotProps {
   data: CharacterGadgetSlotData;
 }
 
-export function EditorCharacter({ data, slots }: EditorCharacterProps) {
-  const ctx = useEditor();
-  const character = useSharedState(data);
-  const object = character.state.game_object;
+export function EditorCharacter({
+  data: character,
+  slots,
+}: EditorCharacterProps) {
+  const object = character.game_object;
   const active = object?.url != null;
-  const color = character.state.player_slot?.color ?? "transparent";
+  const color = character.player_slot?.color ?? "transparent";
+  const eventHandler = useEditorEventHandler();
 
-  useEditorEvent("updateCharacter", (e) => {
-    if (e.event.id === data.id)
-      character.update((prev) => ({ ...prev, ...e.event }));
-  });
-
-  function updateToObject(object: GameObjectData | null) {
-    return createClient().rpc("update_character_object", {
-      character_id: data.id,
-      object_id: object?.id ?? (null as any),
-    });
+  async function updateToObject(object: GameObjectData | null) {
+    return await createClient()
+      .rpc("update_character_object", {
+        character_id: character.id,
+        object_id: object?.id ?? (null as any),
+      })
+      .throwOnError();
   }
 
   return (
     <Modal.Root>
-      <article
-        data-character-id={character.state.id}
-        className={css.characterButton}
-      >
+      <article data-character-id={character.id} className={css.characterButton}>
         <Modal.Trigger asChild>
           <button
             className={css.characterBox({ active })}
@@ -76,24 +70,29 @@ export function EditorCharacter({ data, slots }: EditorCharacterProps) {
       </article>
       <CharacterModal
         character={character}
-        onSave={async (obj) => Boolean((await updateToObject(obj))?.data)}
+        onUpdate={(newObject, oldObject) => {
+          //? use to subscribe to postgres instead to avoid race conditions?
+          const newData = { id: character.id, game_object: newObject };
+          eventHandler.fire("updateCharacter", "user", newData);
+          updateToObject(newObject).catch((e) => {
+            console.error("Error updating character", e);
+            newData.game_object = oldObject; // Revert back
+            eventHandler.fire("updateCharacter", "foreign", newData);
+          });
+        }}
       />
     </Modal.Root>
   );
 }
 
-function GadgetSlot({ data }: GadgetSlotProps) {
-  const gadget = useSharedState(data);
-  const object = gadget.state.game_object;
+function GadgetSlot({ data: gadget }: GadgetSlotProps) {
+  const eventHandler = useEditorEventHandler();
+  const object = gadget.game_object;
   const active = object?.url != null;
-
-  useEditorEvent("updateGadget", (e) => {
-    if (e.event.id === data.id) gadget.update(e.event);
-  });
 
   async function updateToObject(object: GameObjectData | null) {
     return createClient().rpc("update_gadget_object", {
-      gadget_id: data.id,
+      gadget_id: gadget.id,
       object_id: object?.id ?? (null as any),
     });
   }
@@ -102,7 +101,7 @@ function GadgetSlot({ data }: GadgetSlotProps) {
     <Modal.Root>
       <Modal.Trigger asChild>
         <button
-          data-gadget-id={data.id}
+          data-gadget-id={gadget.id}
           className={css.gadgetBox({ active: false })}
         >
           {active ? (
@@ -119,7 +118,16 @@ function GadgetSlot({ data }: GadgetSlotProps) {
       </Modal.Trigger>
       <GadgetModal
         gadget={gadget}
-        onSave={async (obj) => Boolean((await updateToObject(obj))?.data)}
+        onUpdate={(newObject, oldObject) => {
+          //? use to subscribe to postgres instead to avoid race conditions?
+          const newData = { id: gadget.id, game_object: newObject };
+          eventHandler.fire("updateGadget", "user", newData);
+          updateToObject(newObject).catch((e) => {
+            console.error("Error updating character", e);
+            newData.game_object = oldObject; // Revert back
+            eventHandler.fire("updateGadget", "foreign", newData);
+          });
+        }}
       />
     </Modal.Root>
   );

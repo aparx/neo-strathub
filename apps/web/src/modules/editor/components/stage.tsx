@@ -16,7 +16,7 @@ import { useEditorEvent } from "../features/events/hooks";
 import { useSubscribeRealtimeEditor } from "../features/realtime";
 import { GetLevelData, useGetLevels } from "../hooks";
 import { useBatch } from "../hooks/useBatch";
-import { EditorLevel } from "./level";
+import { EditorLevel, EditorLevelProps } from "./level";
 
 export interface EditorStageStyle {
   levelStyle: CanvasLevelStyle;

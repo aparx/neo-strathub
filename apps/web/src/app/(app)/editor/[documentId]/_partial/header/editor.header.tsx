@@ -1,6 +1,6 @@
+"use client";
 import { BackButton } from "@/app/(app)/editor/[documentId]/_partial/header/components";
 import { PopoverExpand } from "@/components";
-import { BlueprintData } from "@/modules/blueprint/actions/getBlueprint";
 import {
   Breadcrumbs,
   Button,
@@ -11,13 +11,10 @@ import {
   Text,
 } from "@repo/ui/components";
 import Link from "next/link";
+import { useEditor } from "../../_context";
 import * as css from "./editor.header.css";
 
-export async function EditorHeader({
-  blueprint,
-}: {
-  blueprint: BlueprintData;
-}) {
+export async function EditorHeader() {
   return (
     <Text asChild>
       <header className={css.headerContainer}>
@@ -25,7 +22,7 @@ export async function EditorHeader({
           <BackButton />
         </div>
         <div className={css.headerItem({ side: "center" })}>
-          <BlueprintTitle blueprint={blueprint} />
+          <BlueprintTitle />
         </div>
         <div className={css.headerItem({ side: "right" })}>
           <Button appearance={"cta"} color={"cta"}>
@@ -38,7 +35,9 @@ export async function EditorHeader({
   );
 }
 
-function BlueprintTitle({ blueprint }: { blueprint: BlueprintData }) {
+function BlueprintTitle() {
+  const { blueprint } = useEditor();
+
   return (
     <Popover.Root>
       <Text asChild type={"body"}>

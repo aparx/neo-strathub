@@ -2,22 +2,21 @@
 import { getServiceServer } from "@/utils/supabase/actions";
 import { InferAsync } from "@repo/utils";
 import { cookies } from "next/headers";
-import { cache } from "react";
 
-export const getBlueprintCharacters = cache(async (blueprintId: string) => {
+export async function getBlueprintCharacters(blueprintId: string) {
   // TODO USE ANON SERVER INSTEAD
-  const { data, error } = await getServiceServer(cookies())
+  const { data } = await getServiceServer(cookies())
     .from("blueprint_character")
     .select(
       `id, index,
        player_slot(id, index, color), 
-       game_object(id, name, url)`,
+       game_object(*)`,
     )
     .order("index")
-    .eq("blueprint_id", blueprintId);
-  if (error) throw error;
-  return data;
-});
+    .eq("blueprint_id", blueprintId)
+    .throwOnError();
+  return data ?? [];
+}
 
 export type BlueprintCharacterData = NonNullable<
   InferAsync<ReturnType<typeof getBlueprintCharacters>>
