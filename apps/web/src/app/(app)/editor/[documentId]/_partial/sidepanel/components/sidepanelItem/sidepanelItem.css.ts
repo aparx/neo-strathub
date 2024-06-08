@@ -12,6 +12,8 @@ export const container = recipe({
       display: "flex",
       flexDirection: "column",
       borderRadius: vars.roundness.sm,
+      pointerEvents: "auto",
+      clipPath: "stroke-box",
     },
   ],
   variants: {

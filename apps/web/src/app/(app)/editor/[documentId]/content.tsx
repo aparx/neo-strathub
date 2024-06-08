@@ -15,9 +15,10 @@ export function EditorContent({ stageId }: { stageId: number }) {
     <main>
       <div className={css.fadeInRect} />
       <EditorViewport
-        zoomable
-        editable
-        movable
+        zoomable={context.zoomable}
+        editable={context.editable}
+        movable={context.movable}
+        selectable={context.selectable}
         style={{
           width: windowSize.width,
           height: windowSize.height,

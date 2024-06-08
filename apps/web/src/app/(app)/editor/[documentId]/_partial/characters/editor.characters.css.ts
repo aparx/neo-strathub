@@ -18,6 +18,7 @@ export const list = style([
     zIndex: 99,
     display: "flex",
     gap: vars.spacing.lg,
+    userSelect: "none",
     animation: `${keyframes({
       from: { opacity: 0, transform: "translate(-50%, 50%)" },
     })} .5s`,

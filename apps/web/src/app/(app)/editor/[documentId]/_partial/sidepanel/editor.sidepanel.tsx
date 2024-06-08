@@ -6,10 +6,10 @@ export function EditorSidepanel() {
   return (
     <section className={css.sidepanel}>
       <SidepanelItem title="Gadgets">
-        <SidepanelObjectList />
+        <SidepanelObjectList type="gadget" />
       </SidepanelItem>
       <SidepanelItem title="Characters">
-        <SidepanelObjectList />
+        <SidepanelObjectList type="character" />
       </SidepanelItem>
     </section>
   );

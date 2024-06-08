@@ -77,6 +77,10 @@ async function Content({
         blueprint={blueprint}
         characters={finalCharacters}
         slots={playerSlots ?? []}
+        editable
+        zoomable
+        movable
+        selectable
       >
         <div className={css.content}>
           <EditorHeader />

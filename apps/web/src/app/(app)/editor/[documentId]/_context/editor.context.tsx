@@ -11,6 +11,7 @@ import {
   EditorRealtimeChannelContract,
 } from "@/modules/editor/features/realtime";
 import { createClient } from "@/utils/supabase/client";
+import { CanvasContextInteractStatus } from "@repo/canvas/src/context/canvasContext";
 import { SharedState, useSharedState } from "@repo/utils/hooks";
 import { createContext, useContext, useEffect, useMemo } from "react";
 
@@ -18,13 +19,13 @@ export interface EditorCharacterData extends BlueprintCharacterData {
   gadgets: Record<number, CharacterGadgetSlotData>;
 }
 
-export interface EditorContextServer {
+export interface EditorContextServer extends CanvasContextInteractStatus {
   blueprint: BlueprintData;
   slots: EditorSlotsData;
   characters: EditorCharactersData;
 }
 
-export interface EditorContext {
+export interface EditorContext extends CanvasContextInteractStatus {
   channel: EditorRealtimeChannelContract;
   blueprint: EditorContextServer["blueprint"];
   slots: SharedState<EditorContextServer["slots"]>;

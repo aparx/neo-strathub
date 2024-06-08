@@ -16,5 +16,9 @@ export const sidepanel = style([
     padding: vars.spacing.md,
     overflowY: "auto",
     zIndex: 999,
+    pointerEvents: "none",
+    "::-webkit-scrollbar": {
+      display: "none",
+    },
   },
 ]);

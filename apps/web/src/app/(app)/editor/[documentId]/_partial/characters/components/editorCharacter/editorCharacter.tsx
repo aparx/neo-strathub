@@ -44,11 +44,12 @@ export function EditorCharacter({
 
   return (
     <Modal.Root>
-      <article data-character-id={character.id} className={css.characterButton}>
+      <div data-character-id={character.id} className={css.characterButton}>
         <Modal.Trigger asChild>
           <button
             className={css.characterBox({ active })}
             style={{ boxShadow: `inset 0 0 0 2px ${color}` }}
+            draggable={!!object}
           >
             {object ? (
               <Image
@@ -69,7 +70,7 @@ export function EditorCharacter({
             </li>
           ))}
         </ol>
-      </article>
+      </div>
       <CharacterModal
         character={character}
         onUpdate={(newObject, oldObject) => {

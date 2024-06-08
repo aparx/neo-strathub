@@ -1,5 +1,6 @@
-import { vars } from "@repo/theme";
+import { sprinkles, vars } from "@repo/theme";
 import { style } from "@vanilla-extract/css";
+import { recipe } from "@vanilla-extract/recipes";
 
 export const margin = style({
   margin: `0 ${vars.spacing.lg}`,
@@ -21,8 +22,38 @@ export const list = style([
   },
 ]);
 
-export const item = style({
-  aspectRatio: "1/1",
-  background: vars.colors.emphasis.low,
-  borderRadius: vars.roundness.sm,
+export const item = recipe({
+  base: [
+    sprinkles({ outline: "card" }),
+    {
+      aspectRatio: "1/1",
+      borderRadius: vars.roundness.sm,
+      position: "relative",
+      padding: vars.spacing.sm,
+    },
+  ],
+  variants: {
+    loaded: {
+      true: {
+        background: vars.colors.accents[4],
+        cursor: "pointer",
+        selectors: {
+          "&:hover::after": {
+            //* Applies overlay on image + forces drag of the entire item
+            content: "",
+            position: "absolute",
+            inset: 0,
+            borderRadius: "inherit",
+            background: vars.colors.state.hover.color,
+          },
+        },
+      },
+      false: {
+        background: vars.colors.emphasis.low,
+      },
+    },
+  },
+  defaultVariants: {
+    loaded: false,
+  },
 });

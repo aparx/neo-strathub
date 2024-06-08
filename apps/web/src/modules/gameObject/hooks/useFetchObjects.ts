@@ -16,7 +16,7 @@ async function fetchObjects(filters: UseFetchObjectsFilters) {
   const qb = createClient().from("game_object").select();
   if (filters.gameId) qb.eq("game_id", filters.gameId);
   if (filters.type) qb.eq("type", filters.type);
-  return qb;
+  return (await qb).data;
 }
 
 export function useFetchObjects(

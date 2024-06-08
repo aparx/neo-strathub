@@ -27,7 +27,7 @@ export function ObjectGrid({
   // Fetch game objects
   const { data, isLoading } = useFetchObjects(filters);
 
-  const [objects, setObjects] = useState(data?.data);
+  const [objects, setObjects] = useState(data);
   const [gridHeight, setGridHeight] = useState<number>();
 
   // Disable height limitation and allow for resize when data changes
@@ -36,7 +36,7 @@ export function ObjectGrid({
   // Apply the actual filter by updating the to-be-displayed objects
   useEffect(() => {
     const needle = filter?.toLowerCase();
-    const haystack = data?.data ?? [];
+    const haystack = data ?? [];
     if (!needle?.length) return setObjects(haystack);
     setGridHeight(gridShellRef.current?.clientHeight);
     setObjects(haystack.filter((x) => x.name?.toLowerCase().includes(needle)));
