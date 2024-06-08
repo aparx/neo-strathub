@@ -40,19 +40,17 @@ export const CharacterRect = forwardRef<CharacterRectRef, CharacterRectProps>(
 
     useImperativeHandle(ref, () => ({ sync }), [sync]);
 
-    const finalColor = useTranslateColor(slot?.color);
-
     return (
       <ReactKonva.Rect
         ref={rectRef}
         listening={false}
         name={NodeTags.NO_SELECT}
         strokeEnabled={!hidden}
-        stroke={finalColor}
+        stroke={useTranslateColor(slot?.color)}
         strokeWidth={3}
         strokeScaleEnabled={false}
         shadowColor={"black"}
-        shadowBlur={5}
+        shadowBlur={2}
         shadowForStrokeEnabled={true}
       />
     );
@@ -63,7 +61,7 @@ function useTranslateColor(color: string | undefined) {
   return useMemo(() => {
     // If color is HSL convert it to RGB
     if (!color?.startsWith("hsl")) return color;
-    const args = color.substring(4, color.length - 1).split(/\s*,\s+/);
+    const args = color.substring(4, color.length - 1).split(/\s*,\s*/);
     const h = Number(args[0]) / 360;
     const s = Number(args[1]!.substring(0, args[1]!.length - 1)) / 100;
     const l = Number(args[2]!.substring(0, args[2]!.length - 1)) / 100;
@@ -85,7 +83,11 @@ function hslToRgb(h: number, s: number, l: number) {
     b = hueToRgb(p, q, h - 1 / 3);
   }
 
-  return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+  return [
+    Math.round(r * 255),
+    Math.round(g * 255),
+    Math.round(b * 255),
+  ] as const;
 }
 
 function hueToRgb(p: number, q: number, t: number) {

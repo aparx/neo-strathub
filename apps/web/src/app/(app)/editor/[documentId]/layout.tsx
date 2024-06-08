@@ -16,6 +16,7 @@ import {
 import { getBlueprint } from "@/modules/blueprint/actions/getBlueprint";
 import { EditorEventHandler } from "@/modules/editor/features/events";
 import React, { Suspense } from "react";
+import { EditorSidepanel } from "./_partial/sidepanel";
 import * as css from "./layout.css";
 
 export default async function EditorLayout({
@@ -79,6 +80,7 @@ async function Content({
       >
         <div className={css.content}>
           <EditorHeader />
+          <EditorSidepanel />
           <EditorCharacters />
           {/*<EditorInspector />*/}
           <main>{children}</main>

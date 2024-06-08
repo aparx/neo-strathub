@@ -3,7 +3,7 @@ import { vars } from "@repo/theme";
 import { keyframes, style } from "@vanilla-extract/css";
 import { recipe } from "@vanilla-extract/recipes";
 
-export const HEADER_HEIGHT = 50;
+export const EDITOR_HEADER_HEIGHT = 50;
 
 export const headerContainer = style([
   overlayHeaderBackground,
@@ -13,7 +13,7 @@ export const headerContainer = style([
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    height: HEADER_HEIGHT,
+    height: EDITOR_HEADER_HEIGHT,
     zIndex: 99,
     width: "100%",
     paddingLeft: vars.spacing.lg,

@@ -8,6 +8,6 @@ export const overlayHeaderBackground = style({
 });
 
 export const overlayPartialBackground = style({
-  background: blendAlpha(vars.colors.accents[1], 0.9),
+  background: blendAlpha(vars.colors.accents[1], 0.95),
   backdropFilter: "blur(15px)",
 });

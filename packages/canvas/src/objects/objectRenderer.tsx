@@ -80,6 +80,8 @@ export function ObjectRenderer<TNode extends CanvasNode>({
             x: e.target.x(),
             y: e.target.y(),
             rotation: e.target.rotation(),
+            skewX: e.target.skewX(),
+            skewY: e.target.skewY(),
             scaleX: e.target.scaleX(),
             scaleY: e.target.scaleY(),
             scale: {
