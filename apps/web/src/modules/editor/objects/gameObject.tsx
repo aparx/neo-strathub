@@ -84,8 +84,8 @@ function ImageObject({
         draggable={canvas.editable}
         onTransform={(e) => {
           const node = e.target;
-          const newWidth = node.width() * node.scaleX();
-          const newHeight = node.height() * node.scaleY();
+          let newWidth = node.width() * node.scaleX();
+          let newHeight = node.height() * node.scaleY();
           node.scale({ x: 1, y: 1 });
 
           node.width(newWidth);

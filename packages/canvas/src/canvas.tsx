@@ -86,6 +86,14 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
 
     useImperativeHandle(ref, () => context);
 
+    function updatePosition(fn: (oldPos: Konva.Vector2d) => Konva.Vector2d) {
+      context.position.update((oldPos) => {
+        const newPos = fn(oldPos);
+        onMove?.(newPos);
+        return newPos;
+      });
+    }
+
     function redrawSelection() {
       const area = selectionAreaRef.current;
       const selection = selectionRef.current;
@@ -104,14 +112,10 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
     function mouseMove(e: Konva.KonvaEventObject<MouseEvent>) {
       if (moveDragRef.current) {
         // Track mouse movement for canvas
-        context.position.update((oldPos) => {
-          const newPos = {
-            x: oldPos.x + e.evt.movementX,
-            y: oldPos.y + e.evt.movementY,
-          };
-          onMove?.(newPos);
-          return newPos;
-        });
+        updatePosition((oldPos) => ({
+          x: oldPos.x + e.evt.movementX,
+          y: oldPos.y + e.evt.movementY,
+        }));
       } else if (selectionAreaRef.current.active) {
         // Change size of selections
         const stage = stageRef.current;
@@ -215,7 +219,7 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
         if (!movable) return;
         // Scroll in canvas
         const multiplier = context.scale.state * (e.evt.altKey ? 0.8 : 0.4);
-        context.position.update((oldPos) => ({
+        updatePosition((oldPos) => ({
           x: oldPos.x - e.evt.deltaX * multiplier,
           y: oldPos.y - e.evt.deltaY * multiplier,
         }));
@@ -233,12 +237,10 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
           e.evt.deltaY < 0 ? oldScale * scaleBy : oldScale / scaleBy;
         newScale = Math.min(10, Math.max(newScale, 0.1));
         onZoom?.(newScale);
-        const newPos = {
+        updatePosition(() => ({
           x: pointer.x - pointTo.x * newScale,
           y: pointer.y - pointTo.y * newScale,
-        };
-        onMove?.(newPos);
-        context.position.update(newPos);
+        }));
         return newScale;
       });
     }
@@ -284,7 +286,17 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
                 strokeWidth={1}
                 strokeEnabled
               />
-              <DefaultTransformer ref={trRef} rotateEnabled={false} />
+              <DefaultTransformer
+                ref={trRef}
+                rotateEnabled={false}
+                keepRatio
+                enabledAnchors={[
+                  "top-left",
+                  "top-right",
+                  "bottom-left",
+                  "bottom-right",
+                ]}
+              />
             </ReactKonva.Layer>
           </ReactKonva.Stage>
         </div>
