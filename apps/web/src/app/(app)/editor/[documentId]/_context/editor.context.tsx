@@ -11,7 +11,9 @@ import {
   EditorRealtimeChannelContract,
 } from "@/modules/editor/features/realtime";
 import { createClient } from "@/utils/supabase/client";
+import { CanvasNode } from "@repo/canvas";
 import { CanvasContextInteractStatus } from "@repo/canvas/src/context/canvasContext";
+import { Nullish } from "@repo/utils";
 import { SharedState, useSharedState } from "@repo/utils/hooks";
 import { createContext, useContext, useEffect, useMemo } from "react";
 
@@ -30,6 +32,9 @@ export interface EditorContext extends CanvasContextInteractStatus {
   blueprint: EditorContextServer["blueprint"];
   slots: SharedState<EditorContextServer["slots"]>;
   characters: SharedState<EditorContextServer["characters"]>;
+  focusedLevel: SharedState<number>;
+  /** Currently dragged node (used for drag'n'drop) */
+  dragged: SharedState<CanvasNode | Nullish>;
 }
 
 type EditorSlotsData = Record<number, PlayerSlotData>;
@@ -98,6 +103,8 @@ export function EditorContextProvider({
         channel,
         slots: finalSlots,
         characters: finalCharacters,
+        focusedLevel: useSharedState(),
+        dragged: useSharedState(),
         ...restContext,
       }}
     >

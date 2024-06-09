@@ -14,14 +14,18 @@ export interface CanvasLevelStyle {
   width: number;
   height: number;
   padding: number;
+  /** Padding applied to the clipping, useful for strokes */
+  clipPadding?: number;
   /** Canvas level background color. Defaults to "white" */
   background?: string;
 }
 
-export interface CanvasLevelProps extends CanvasLevelData {
-  children?: React.ReactNode;
-  style: CanvasLevelStyle;
-}
+export type CanvasLevelProps = ReactKonva.KonvaNodeEvents &
+  Omit<Konva.RectConfig, keyof CanvasLevelData> &
+  CanvasLevelData & {
+    children?: React.ReactNode;
+    style: CanvasLevelStyle;
+  };
 
 export function CanvasLevel({
   children,
@@ -29,8 +33,11 @@ export function CanvasLevel({
   position,
   imageURL,
   style,
+  ...restProps
 }: CanvasLevelProps) {
-  const { width, height, padding, background } = style;
+  const { width, height, padding, background, clipPadding } = style;
+  const finalClipPadding = clipPadding ?? 0;
+
   const [image] = useImage(imageURL);
   const imageScale = useMemo(() => {
     if (!image) return undefined;
@@ -42,30 +49,32 @@ export function CanvasLevel({
 
   return (
     <ReactKonva.Layer
-      name={"Level"}
+      name={NodeTags.LEVEL}
       id={String(id)}
       x={position.x}
       y={position.y}
-      clipWidth={width}
-      clipHeight={height}
+      clipX={-finalClipPadding}
+      clipY={-finalClipPadding}
+      clipWidth={width + 2 * finalClipPadding}
+      clipHeight={height + 2 * finalClipPadding}
     >
-      <ReactKonva.Group listening={false}>
-        <ReactKonva.Rect
-          name={NodeTags.NO_SELECT}
-          width={width}
-          height={height}
-          fill={background ?? "white"}
-          cornerRadius={10}
-        />
-        <ReactKonva.Image
-          name={NodeTags.NO_SELECT}
-          image={image}
-          x={padding}
-          y={padding}
-          scaleX={imageScale}
-          scaleY={imageScale}
-        />
-      </ReactKonva.Group>
+      <ReactKonva.Rect
+        name={NodeTags.NO_SELECT}
+        width={width}
+        height={height}
+        fill={background ?? "white"}
+        cornerRadius={10}
+        {...restProps}
+      />
+      <ReactKonva.Image
+        listening={false}
+        name={NodeTags.NO_SELECT}
+        image={image}
+        x={padding}
+        y={padding}
+        scaleX={imageScale}
+        scaleY={imageScale}
+      />
       {children}
     </ReactKonva.Layer>
   );

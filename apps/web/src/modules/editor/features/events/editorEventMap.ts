@@ -52,16 +52,20 @@ export const EditorEventObject = function <TPayload extends EditorEvent>(
 
 // Event Map
 
-export interface EditorEventMap {
-  canvasMove: EditorMoveEvent;
+export interface BroadcastableEditorEventMap {
   canvasDelete: EditorTargetsEvent;
   canvasDuplicate: EditorTargetsEvent;
   canvasCreate: EditorCreateEvent;
   canvasUpdate: EditorUpdateEvent;
-  editorUndo: EditorEvent;
-  editorRedo: EditorEvent;
   updateCharacter: EditorUpdateCharacter;
   updateGadget: EditorUpdateGadget;
+}
+
+export interface EditorEventMap extends BroadcastableEditorEventMap {
+  canvasMove: EditorMoveEvent;
+  canvasDrop: EditorCreateEvent;
+  editorUndo: EditorEvent;
+  editorRedo: EditorEvent;
 }
 
 export type EditorEventType = keyof EditorEventMap;

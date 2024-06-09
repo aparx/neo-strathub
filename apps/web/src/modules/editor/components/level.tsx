@@ -1,3 +1,4 @@
+import { useEditor } from "@/app/(app)/editor/[documentId]/_context";
 import {
   CanvasLevel,
   CanvasLevelData,
@@ -6,14 +7,18 @@ import {
   CanvasNodeConfig,
   copyCanvasNode,
   ObjectRenderer,
-  primitiveShapes,
 } from "@repo/canvas";
 import { useCanvas } from "@repo/canvas/src/context/canvasContext";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { EditorEventOrigin } from "../features/events";
+import {
+  EditorCreateEvent,
+  EditorEventObject,
+  EditorEventOrigin,
+} from "../features/events";
 import { useEditorEvent } from "../features/events/hooks";
 import { useGetObjects } from "../hooks";
+import { EDITOR_RENDERERS } from "./viewport";
 
 export interface EditorLevelProps extends CanvasLevelData, EditorLevelEvents {
   stageId: number; // TODO move to context?
@@ -40,6 +45,7 @@ export function EditorLevel({
   ...restProps
 }: EditorLevelProps) {
   const canvas = useCanvas();
+  const editor = useEditor();
   const [nodes, setNodes] = useState<CanvasNode[]>([]);
   const { data } = useGetObjects(stageId, id);
   useEffect(() => {
@@ -67,12 +73,20 @@ export function EditorLevel({
   useCreateEvent({ onNodeCreate, setNodes, levelId: id, stageId });
 
   return (
-    <CanvasLevel id={id} {...restProps}>
+    <CanvasLevel
+      id={id}
+      {...restProps}
+      onMouseEnter={() => editor.focusedLevel.update(id)}
+      strokeEnabled={editor.focusedLevel.state === id}
+      stroke={"blue"}
+      strokeWidth={3}
+      strokeScaleEnabled={false}
+    >
       {nodes?.map((node, index) => (
         <ObjectRenderer
           key={index /** OK */}
           canvas={canvas}
-          renderers={primitiveShapes}
+          renderers={EDITOR_RENDERERS}
           onUpdate={(configValue) => {
             // TODO delete the node if it lies outside the level
             const oldNodes = nodes;
@@ -229,9 +243,12 @@ function useCreateEvent<T extends CanvasNode>({
   levelId: number;
   stageId: number;
 }) {
-  useEditorEvent("canvasCreate", (e) => {
+  function handle(e: EditorEventObject<EditorCreateEvent>) {
     if (e.event.levelId !== levelId || e.event.stageId !== stageId) return;
     setNodes((oldNodes) => [...oldNodes, ...(e.event.nodes as T[])]);
     e.event.nodes.forEach((node) => onNodeCreate(node, e.origin));
-  });
+  }
+
+  useEditorEvent("canvasCreate", handle);
+  useEditorEvent("canvasDrop", handle);
 }

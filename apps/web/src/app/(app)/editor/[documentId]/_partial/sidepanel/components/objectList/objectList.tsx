@@ -1,8 +1,10 @@
+import { EDITOR_RENDERERS } from "@/modules/editor/components/viewport";
 import {
   GameObjectData,
   UseFetchObjectsFilters,
   useFetchObjects,
 } from "@/modules/gameObject/hooks";
+import { createCanvasNode } from "@repo/canvas";
 import { Icon, ScrollArea, TextField } from "@repo/ui/components";
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -73,11 +75,26 @@ export function SidepanelObjectList({ type }: SidepanelObjectListProps) {
 }
 
 function PanelGameObject({ id, url, name }: GameObjectData) {
-  const { editable } = useEditor();
+  const { editable, dragged } = useEditor();
   const [loaded, setLoaded] = useState(false);
 
+  function createNode() {
+    // TODO creates an actual game node object
+    return createCanvasNode(EDITOR_RENDERERS, "Rect", {
+      fill: "red",
+      width: 50,
+      height: 50,
+    });
+  }
+
   return (
-    <div data-obj-id={id} className={css.item({ loaded })} draggable={editable}>
+    <div
+      data-obj-id={id}
+      className={css.item({ loaded })}
+      draggable={editable}
+      onDragStart={() => dragged.update(createNode)}
+      onDragEnd={() => dragged.update(undefined)}
+    >
       <Image
         src={url}
         alt={name ?? "Object"}

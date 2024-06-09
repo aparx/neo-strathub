@@ -1,7 +1,8 @@
 import { Nullish } from "@repo/utils";
 import { SharedState } from "@repo/utils/hooks";
+import Konva from "konva";
 import { Vector2d } from "konva/lib/types";
-import { createContext, CSSProperties, useContext } from "react";
+import { createContext, CSSProperties, RefObject, useContext } from "react";
 
 export interface CanvasContextInteractStatus {
   editable?: boolean;
@@ -24,6 +25,7 @@ export interface CanvasContext
   position: SharedState<Vector2d>;
   cursor: SharedState<CSSProperties["cursor"]>;
   selected: SharedState<string[]>;
+  canvas: RefObject<Konva.Stage>;
 }
 
 const canvasContext = createContext<CanvasContext | null>(null);

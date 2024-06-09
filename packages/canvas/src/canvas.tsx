@@ -65,6 +65,12 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
       functions,
     } = props;
 
+    const moveDragRef = useRef(false);
+    const selectionRef = useRef<Konva.Rect>(null);
+    const selectionAreaRef = useRef<SelectionArea>(EMPTY_SELECTION_AREA);
+    const stageRef = useRef<Konva.Stage>(null);
+    const trRef = useRef<Konva.Transformer>(null);
+
     const context = {
       position: useSharedState({ x: 0, y: 0 }),
       scale: useSharedState(1),
@@ -74,16 +80,11 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
       movable,
       selectable,
       zoomable,
+      canvas: stageRef,
       ...functions,
     } satisfies CanvasContext;
 
     useImperativeHandle(ref, () => context);
-
-    const moveDragRef = useRef(false);
-    const selectionRef = useRef<Konva.Rect>(null);
-    const selectionAreaRef = useRef<SelectionArea>(EMPTY_SELECTION_AREA);
-    const stageRef = useRef<Konva.Stage>(null);
-    const trRef = useRef<Konva.Transformer>(null);
 
     function redrawSelection() {
       const area = selectionAreaRef.current;
@@ -168,12 +169,12 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
           const area = selectionAreaRef.current;
           area.x0 = area.x1 = pointer.x;
           area.y0 = area.y1 = pointer.y;
-          area.active = stage === e.target;
+          area.active = e.target.hasName(NodeTags.NO_SELECT);
           redrawSelection();
           break;
         /** Enable canvas movement */
         case MouseButton.MIDDLE:
-          if (!movable || e.target !== stageRef.current) break;
+          if (!movable || !e.target.hasName(NodeTags.NO_SELECT)) break;
           e.evt.preventDefault();
           context.cursor.update("grabbing");
           moveDragRef.current = true;
@@ -188,7 +189,12 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
     function click(e: Konva.KonvaEventObject<MouseEvent>) {
       if (moveDragRef.current) return; // Don't do anything on move
 
-      if (e.target === stageRef.current || e.target.hasName(NodeTags.NO_SELECT))
+      const area = selectionAreaRef.current;
+      if (area.x0 !== area.x1 || area.y0 !== area.y1)
+        // Don't do anything on selection rect
+        return;
+
+      if (e.target.hasName(NodeTags.NO_SELECT))
         return context.selected.update([]);
 
       const id = e.target.id();
@@ -254,6 +260,7 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
         <div style={{ cursor: context.cursor.state }}>
           <ReactKonva.Stage
             ref={stageRef}
+            name={NodeTags.NO_SELECT}
             width={style.width}
             height={style.height}
             x={context.position.state.x}
@@ -268,9 +275,11 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
             onWheel={wheelScroll}
           >
             {children}
-            <ReactKonva.Layer>
+            {/** Layer used for selections (single- & multi-selections, ...) */}
+            <ReactKonva.Layer name={`selection-layer ${NodeTags.NO_SELECT}`}>
               <ReactKonva.Rect
                 ref={selectionRef}
+                listening={false}
                 fill={style.selectionColor}
                 stroke="rgba(255, 255, 255, .3)"
                 strokeScaleEnabled={false}
@@ -279,8 +288,6 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
               />
               <DefaultTransformer ref={trRef} rotateEnabled={false} />
             </ReactKonva.Layer>
-            {/** Layer used for selections (single- & multi-selections, ...) */}
-            <ReactKonva.Layer name="selection-layer" />
           </ReactKonva.Stage>
         </div>
       </CanvasContextProvider>
