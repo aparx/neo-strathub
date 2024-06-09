@@ -6,7 +6,7 @@ import {
 } from "@/modules/editor/components/stage";
 import { EditorViewport } from "@/modules/editor/components/viewport";
 import { useEditorEventHandler } from "@/modules/editor/features/events";
-import { getLevelLayerAtCursor } from "@repo/canvas";
+import { NodeTags, getLevelLayerAtCursor } from "@repo/canvas";
 import { CanvasContext } from "@repo/canvas/src/context/canvasContext";
 import { useRef } from "react";
 import { useWindowSize } from "usehooks-ts";
@@ -14,13 +14,14 @@ import { useEditor } from "./_context";
 
 export function EditorContent({ stageId }: { stageId: number }) {
   const windowSize = useWindowSize();
-  const editor = useEditor();
+  const [editor, updateEditor] = useEditor();
   const eventHandler = useEditorEventHandler();
   // https://svgshare.com/i/161z.svg
   // https://svgshare.com/i/162B.svg
   // https://svgshare.com/i/1602.svg
 
   const canvasRef = useRef<CanvasContext>(null);
+  const focusColor = [66, 111, 230] as const;
   const stageStyle = {
     levelGap: 50,
     levelDirection: [0, 1],
@@ -29,6 +30,7 @@ export function EditorContent({ stageId }: { stageId: number }) {
       height: 800,
       padding: 20,
       clipPadding: 10,
+      focusStroke: `rgb(${focusColor.join(", ")})`,
     },
   } satisfies EditorStageStyle;
 
@@ -39,26 +41,28 @@ export function EditorContent({ stageId }: { stageId: number }) {
         const stage = canvasRef.current?.canvas.current;
         if (!stage) return;
         const level = getLevelLayerAtCursor(stage, e.clientX, e.clientY);
-        if (level) editor.focusedLevel.update(Number(level.id()));
+        if (level)
+          updateEditor((oldContext) => ({
+            ...oldContext,
+            focusedLevel: Number(level.id()),
+          }));
       }}
       onDrop={(e) => {
         const stage = canvasRef.current?.canvas.current;
-        const node = editor.dragged.state;
+        const node = editor.dragged;
         if (!stage || !node) return;
-        let targetLevelId = editor.focusedLevel.state;
-        if (!targetLevelId)
-          // TODO find the first or for that matter any level instead
-          return;
-
-        const layer = stage.children.find(
-          (layer) => layer.id() === String(targetLevelId),
+        let targetLevelId = editor.focusedLevel;
+        const layer = stage.children.find((layer) =>
+          targetLevelId
+            ? layer.id() === String(targetLevelId)
+            : layer.hasName(NodeTags.LEVEL_LAYER),
         );
         if (!layer) throw new Error("Could not find level layer");
         stage.setPointersPositions(e);
         const relPos = layer.getRelativePointerPosition();
         if (!relPos) throw new Error("Could not determine cursor position");
 
-        // Update the node's position to match the target level
+        // Update the node's position to be relative to the target level
         const config = node.attrs;
         const maxX = stageStyle.levelStyle.width - (config.width ?? 0);
         const maxY = stageStyle.levelStyle.height - (config.height ?? 0);
@@ -67,10 +71,10 @@ export function EditorContent({ stageId }: { stageId: number }) {
         config.x = Math.max(0, Math.min(config.x, maxX));
         config.y = Math.max(0, Math.min(config.y, maxY));
 
-        // Push nodes to event handler, that the target level processes
+        // Push node as event, that the target level processes further
         eventHandler.fire("canvasDrop", "user", {
           nodes: [node],
-          levelId: targetLevelId,
+          levelId: Number(layer.id()),
           stageId,
         });
       }}
@@ -85,7 +89,7 @@ export function EditorContent({ stageId }: { stageId: number }) {
         style={{
           width: windowSize.width,
           height: windowSize.height,
-          selectionColor: "rgba(90, 90, 240, .5)",
+          selectionColor: `rgba(${focusColor.join(", ")}, .5)`,
         }}
       >
         <EditorStage

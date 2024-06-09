@@ -44,14 +44,15 @@ export function ObjectRenderer<TNode extends CanvasNode>({
   const selected = canvas.selected.state;
   const isIndividualSelection =
     selected.length === 1 && selected[0] === children.attrs?.id;
+
   const Renderer = renderers[children.className];
   if (Renderer == null)
     throw new Error(`Object '${children.className}' unsupported`);
 
   //* Gets the color from character (`children.characterId`)
   const characterSlot =
-    children.characterId != null
-      ? canvas.getCharacterSlot(children.characterId)
+    children.attrs.characterId != null
+      ? canvas.getCharacterSlot(children.attrs.characterId)
       : null;
 
   useEffect(() => characterRef.current?.sync(children.attrs), [children.attrs]);

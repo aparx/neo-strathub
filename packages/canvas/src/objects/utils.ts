@@ -26,9 +26,9 @@ export function createCanvasNode<
 ): CanvasNode<TConfig & { id: string }> {
   return {
     className: String(className),
-    characterId,
     attrs: {
       ...structuredClone(config),
+      characterId,
       id: uuidv4(),
     },
   };

@@ -45,6 +45,8 @@ export const item = recipe({
             inset: 0,
             borderRadius: "inherit",
             background: vars.colors.state.hover.color,
+            pointerEvents: "none",
+            touchAction: "none",
           },
         },
       },

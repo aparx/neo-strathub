@@ -42,10 +42,11 @@ export function EditorLevel({
   onNodeUpdate,
   onNodeDelete,
   onNodeCreate,
+  style,
   ...restProps
 }: EditorLevelProps) {
   const canvas = useCanvas();
-  const editor = useEditor();
+  const [editor, updateEditor] = useEditor();
   const [nodes, setNodes] = useState<CanvasNode[]>([]);
   const { data } = useGetObjects(stageId, id);
   useEffect(() => {
@@ -75,10 +76,11 @@ export function EditorLevel({
   return (
     <CanvasLevel
       id={id}
+      style={style}
       {...restProps}
-      onMouseEnter={() => editor.focusedLevel.update(id)}
-      strokeEnabled={editor.focusedLevel.state === id}
-      stroke={"blue"}
+      onMouseEnter={() => updateEditor((o) => ({ ...o, focusedLevel: id }))}
+      strokeEnabled={editor.focusedLevel === id}
+      stroke={style.focusStroke}
       strokeWidth={3}
       strokeScaleEnabled={false}
     >
@@ -94,7 +96,7 @@ export function EditorLevel({
             const oldConfig = newNodes[index]!.attrs;
             const newConfig =
               typeof configValue === "function"
-                ? configValue(oldConfig)
+                ? configValue(oldConfig as any)
                 : configValue;
             const newNode = { ...node, attrs: newConfig };
             onNodeUpdate(newNode, node, "user");
@@ -102,7 +104,7 @@ export function EditorLevel({
             setNodes(newNodes);
           }}
         >
-          {node}
+          {node as CanvasNode<any>}
         </ObjectRenderer>
       ))}
     </CanvasLevel>

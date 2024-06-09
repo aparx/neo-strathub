@@ -8,7 +8,7 @@ export function getLevelLayerAtCursor(
   cursorY: number,
 ): Konva.Layer | undefined {
   return stage.children.find((layer) => {
-    if (!layer.hasName(NodeTags.LEVEL)) return false;
+    if (!layer.hasName(NodeTags.LEVEL_LAYER)) return false;
     const rect = layer.getClientRect();
     return (
       cursorX >= rect.x &&

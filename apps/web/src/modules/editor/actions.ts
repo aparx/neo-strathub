@@ -12,7 +12,7 @@ export async function upsertNodes(
       nodes.map((node) => ({
         id: node.attrs.id,
         classname: node.className,
-        character_id: node.characterId,
+        character_id: node.attrs.characterId,
         attributes: node.attrs,
         level_id: levelId,
         stage_id: stageId,

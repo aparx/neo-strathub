@@ -15,7 +15,7 @@ export function GadgetModal({
     oldObject: GameObjectData | null,
   ) => any;
 }) {
-  const { blueprint, channel } = useEditor();
+  const [{ blueprint, channel }] = useEditor();
 
   return (
     <Modal.Content minWidth={600}>

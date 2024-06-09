@@ -14,6 +14,8 @@ export interface CanvasLevelStyle {
   width: number;
   height: number;
   padding: number;
+  /** Color used for the outline of the level to indicate it being focused */
+  focusStroke: string;
   /** Padding applied to the clipping, useful for strokes */
   clipPadding?: number;
   /** Canvas level background color. Defaults to "white" */
@@ -49,7 +51,7 @@ export function CanvasLevel({
 
   return (
     <ReactKonva.Layer
-      name={NodeTags.LEVEL}
+      name={NodeTags.LEVEL_LAYER}
       id={String(id)}
       x={position.x}
       y={position.y}

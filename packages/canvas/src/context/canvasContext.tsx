@@ -12,8 +12,10 @@ export interface CanvasContextInteractStatus {
 }
 
 export interface CanvasContextFunctions {
+  getGameObjectURL: (id: number, type: string) => string | Nullish;
   getCharacterSlot: (characterId: number) => Nullish<{
     color: string;
+    objectId?: number;
     self?: boolean;
   }>;
 }

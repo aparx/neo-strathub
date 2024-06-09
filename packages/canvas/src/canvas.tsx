@@ -188,7 +188,6 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
 
     function click(e: Konva.KonvaEventObject<MouseEvent>) {
       if (moveDragRef.current) return; // Don't do anything on move
-
       const area = selectionAreaRef.current;
       if (area.x0 !== area.x1 || area.y0 !== area.y1)
         // Don't do anything on selection rect
@@ -196,7 +195,6 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
 
       if (e.target.hasName(NodeTags.NO_SELECT))
         return context.selected.update([]);
-
       const id = e.target.id();
       const isAltPressed = e.evt.metaKey || e.evt.shiftKey || e.evt.altKey;
       const isSelected = context.selected.state.find((x) => x === id);
@@ -281,7 +279,7 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
                 ref={selectionRef}
                 listening={false}
                 fill={style.selectionColor}
-                stroke="rgba(255, 255, 255, .3)"
+                stroke="rgba(0, 0, 0, .2)"
                 strokeScaleEnabled={false}
                 strokeWidth={1}
                 strokeEnabled

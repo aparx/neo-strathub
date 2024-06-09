@@ -16,7 +16,7 @@ export interface SidepanelObjectListProps {
 }
 
 export function SidepanelObjectList({ type }: SidepanelObjectListProps) {
-  const { blueprint } = useEditor();
+  const [{ blueprint }] = useEditor();
   const [filter, setFilter] = useState<string>();
   const [minHeight, setMinHeight] = useState<number>();
   const searchRef = useRef<HTMLInputElement>(null);
@@ -74,31 +74,39 @@ export function SidepanelObjectList({ type }: SidepanelObjectListProps) {
   );
 }
 
-function PanelGameObject({ id, url, name }: GameObjectData) {
-  const { editable, dragged } = useEditor();
+function PanelGameObject({ id, url, name, type }: GameObjectData) {
+  const [{ editable }, updateContext] = useEditor();
   const [loaded, setLoaded] = useState(false);
 
   function createNode() {
     // TODO creates an actual game node object
-    return createCanvasNode(EDITOR_RENDERERS, "Rect", {
-      fill: "red",
+    return createCanvasNode(EDITOR_RENDERERS, "GameObject", {
       width: 50,
       height: 50,
+      objectType: type,
+      objectId: id,
     });
   }
 
   return (
-    <div
-      data-obj-id={id}
-      className={css.item({ loaded })}
-      draggable={editable}
-      onDragStart={() => dragged.update(createNode)}
-      onDragEnd={() => dragged.update(undefined)}
-    >
+    <div data-obj-id={id} className={css.item({ loaded })}>
       <Image
         src={url}
         alt={name ?? "Object"}
         fill
+        draggable={editable}
+        onDragStart={() =>
+          updateContext((oldContext) => ({
+            ...oldContext,
+            dragged: createNode(),
+          }))
+        }
+        onDragEnd={() =>
+          updateContext((oldContext) => ({
+            ...oldContext,
+            dragged: undefined,
+          }))
+        }
         onLoad={() => setLoaded(true)}
         style={{ objectFit: "contain" }}
       />

@@ -16,7 +16,7 @@ export function CharacterModal({
     oldObject: GameObjectData | null,
   ) => any;
 }) {
-  const { blueprint } = useEditor();
+  const [{ blueprint }] = useEditor();
 
   return (
     <Modal.Content minWidth={600}>

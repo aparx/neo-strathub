@@ -36,7 +36,7 @@ export async function EditorHeader() {
 }
 
 function BlueprintTitle() {
-  const { blueprint } = useEditor();
+  const [{ blueprint }] = useEditor();
 
   return (
     <Popover.Root>

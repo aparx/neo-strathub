@@ -16,7 +16,7 @@ import { useEditorEvent } from "../features/events/hooks";
 import { useSubscribeRealtimeEditor } from "../features/realtime";
 import { GetLevelData, useGetLevels } from "../hooks";
 import { useBatch } from "../hooks/useBatch";
-import { EditorLevel, EditorLevelProps } from "./level";
+import { EditorLevel } from "./level";
 
 export interface EditorStageStyle {
   levelStyle: CanvasLevelStyle;
@@ -41,7 +41,7 @@ export function EditorStage({
   position,
 }: EditorStageProps) {
   const eventHandler = useEditorEventHandler();
-  const editor = useEditor();
+  const [editor] = useEditor();
   const { data } = useGetLevels(blueprint.arena.id);
 
   // TODO change history for UNDO & REDO
@@ -107,7 +107,7 @@ function Level({
   position: Konva.Vector2d;
   style: CanvasLevelStyle;
 }) {
-  const editor = useEditor();
+  const [editor] = useEditor();
 
   function pushCommand(command: EditorCommand) {
     history.push(command);

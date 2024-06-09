@@ -9,5 +9,5 @@ export enum MouseButton {
 /** Enumeration of canvas node names, that may define their behaviour */
 export enum NodeTags {
   NO_SELECT = "no-select",
-  LEVEL = "level",
+  LEVEL_LAYER = "level",
 }

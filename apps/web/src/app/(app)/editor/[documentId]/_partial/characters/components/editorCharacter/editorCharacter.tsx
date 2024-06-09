@@ -27,7 +27,7 @@ export function EditorCharacter({
   data: character,
   slots,
 }: EditorCharacterProps) {
-  const { channel } = useEditor();
+  const [{ channel }] = useEditor();
   const eventHandler = useEditorEventHandler();
   const object = character.game_object;
   const active = object?.url != null;
@@ -90,7 +90,7 @@ export function EditorCharacter({
 }
 
 function GadgetSlot({ data: gadget }: GadgetSlotProps) {
-  const { channel } = useEditor();
+  const [{ channel }] = useEditor();
   const eventHandler = useEditorEventHandler();
   const object = gadget.game_object;
   const active = object?.url != null;

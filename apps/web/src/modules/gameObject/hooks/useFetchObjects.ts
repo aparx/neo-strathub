@@ -5,9 +5,13 @@ import { createClient } from "@/utils/supabase/client";
 import { InferAsync } from "@repo/utils";
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
 
+export const GAME_OBJECT_TYPES = ["character", "gadget"] as const;
+
+export type GameObjectType = (typeof GAME_OBJECT_TYPES)[number];
+
 export interface UseFetchObjectsFilters {
   gameId?: number;
-  type?: "character" | "gadget";
+  type?: GameObjectType;
 }
 
 export type GameObjectData = DeepInferUseQueryResult<typeof useFetchObjects>;

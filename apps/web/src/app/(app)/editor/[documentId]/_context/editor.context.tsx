@@ -10,12 +10,20 @@ import {
   EditorRealtimeChannel,
   EditorRealtimeChannelContract,
 } from "@/modules/editor/features/realtime";
+import { GameObjectData } from "@/modules/gameObject/hooks";
 import { createClient } from "@/utils/supabase/client";
 import { CanvasNode } from "@repo/canvas";
 import { CanvasContextInteractStatus } from "@repo/canvas/src/context/canvasContext";
 import { Nullish } from "@repo/utils";
 import { SharedState, useSharedState } from "@repo/utils/hooks";
-import { createContext, useContext, useEffect, useMemo } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+} from "react";
 
 export interface EditorCharacterData extends BlueprintCharacterData {
   gadgets: Record<number, CharacterGadgetSlotData>;
@@ -27,30 +35,38 @@ export interface EditorContextServer extends CanvasContextInteractStatus {
   characters: EditorCharactersData;
 }
 
-export interface EditorContext extends CanvasContextInteractStatus {
+export interface EditorContext
+  extends CanvasContextInteractStatus,
+    EditorContextServer {
   channel: EditorRealtimeChannelContract;
-  blueprint: EditorContextServer["blueprint"];
-  slots: SharedState<EditorContextServer["slots"]>;
-  characters: SharedState<EditorContextServer["characters"]>;
-  focusedLevel: SharedState<number>;
+  objectCache: Partial<Record<string, Record<number, GameObjectData>>>;
+  focusedLevel: number | Nullish;
   /** Currently dragged node (used for drag'n'drop) */
-  dragged: SharedState<CanvasNode | Nullish>;
+  dragged: CanvasNode | Nullish;
 }
 
 type EditorSlotsData = Record<number, PlayerSlotData>;
 type EditorCharactersData = Record<number, EditorCharacterData>;
 
-const editorContext = createContext<EditorContext | null>(null);
+export type EditorContextState = SharedState<EditorContext>;
+
+const editorContext = createContext<EditorContextState | null>(null);
 
 export function EditorContextProvider({
   children,
-  slots,
-  characters,
   ...restContext
 }: EditorContextServer & {
   children: React.ReactNode;
 }) {
   const channel = useMemo(() => new EditorRealtimeChannel(), []);
+
+  const context = useSharedState<EditorContext>({
+    channel,
+    focusedLevel: undefined,
+    dragged: undefined,
+    objectCache: {},
+    ...restContext,
+  });
 
   // Setup a channel immediately
   useEffect(() => {
@@ -66,23 +82,23 @@ export function EditorContextProvider({
     };
   }, []);
 
-  const finalSlots = useSharedState(slots);
-  const finalCharacters = useSharedState(characters);
-
   useEditorEvent("updateCharacter", (e) => {
     // Locally update the character state (possibly reflected on the canvas)
-    finalCharacters.update((oldMap) => {
-      if (!(e.event.id in oldMap)) return oldMap;
-      const newMap = { ...oldMap };
-      newMap[e.event.id] = { ...oldMap[e.event.id]!, ...e.event };
-      return newMap;
+    context.update((oldContext) => {
+      const characters = oldContext.characters;
+      if (!(e.event.id in characters)) return oldContext;
+      const newMap = { ...characters };
+      newMap[e.event.id] = { ...characters[e.event.id]!, ...e.event };
+      return { ...oldContext, characters: newMap };
     });
   });
 
   useEditorEvent("updateGadget", (e) => {
     // Locally update the gadget state (possibly reflected on the canvas)
-    finalCharacters.update((oldMap) => {
-      const newMap = { ...oldMap };
+    context.update((oldContext) => {
+      const characters = oldContext.characters;
+      if (!(e.event.id in characters)) return oldContext;
+      const newMap = { ...characters };
       Object.values(newMap).forEach((character) => {
         const gadget = character.gadgets[e.event.id];
         if (gadget == null) return;
@@ -93,28 +109,22 @@ export function EditorContextProvider({
         newGadgets[e.event.id] = { ...gadget, ...e.event };
         character.gadgets = newGadgets;
       });
-      return newMap;
+      return { ...oldContext, characters: newMap };
     });
   });
 
   return (
-    <editorContext.Provider
-      value={{
-        channel,
-        slots: finalSlots,
-        characters: finalCharacters,
-        focusedLevel: useSharedState(),
-        dragged: useSharedState(),
-        ...restContext,
-      }}
-    >
-      {children}
-    </editorContext.Provider>
+    <editorContext.Provider value={context}>{children}</editorContext.Provider>
   );
 }
 
-export function useEditor() {
+export type UseEditorResult = readonly [
+  state: EditorContext,
+  update: Dispatch<SetStateAction<EditorContext>>,
+];
+
+export function useEditor(): UseEditorResult {
   const ctx = useContext(editorContext);
   if (!ctx) throw new Error("Missing EditorContext");
-  return ctx;
+  return [ctx.state, ctx.update] as const;
 }

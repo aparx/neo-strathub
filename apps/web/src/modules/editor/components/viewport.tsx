@@ -7,8 +7,12 @@ import {
 import { mergeRefs } from "@repo/utils";
 import React, { forwardRef, useRef } from "react";
 import { DEFAULT_KEY_MAP, EditorKeyboardHandler } from "../features/keyboard";
+import { GameObject } from "../objects/gameObject";
 
-export const EDITOR_RENDERERS = primitiveShapes;
+export const EDITOR_RENDERERS = {
+  ...primitiveShapes,
+  GameObject,
+} as const;
 
 export interface EditorViewportProps extends CanvasContextInteractStatus {
   style: CanvasStyle;
@@ -19,7 +23,7 @@ export const EditorViewport = forwardRef<CanvasContext, EditorViewportProps>(
   function EditorViewport(props, ref) {
     const { style, children, ...restProps } = props;
 
-    const { characters } = useEditor();
+    const [{ characters, objectCache }] = useEditor();
     const canvasRef = useRef<CanvasRef>(null);
 
     return (
@@ -28,8 +32,14 @@ export const EditorViewport = forwardRef<CanvasContext, EditorViewportProps>(
           ref={mergeRefs(canvasRef, ref)}
           style={style}
           functions={{
+            getGameObjectURL(id, type) {
+              const cache = objectCache;
+              // TODO remove fallback
+              if (!(type in cache)) return "https://svgshare.com/i/16EY.svg";
+              return cache[type as keyof typeof cache]?.[id]?.url;
+            },
             getCharacterSlot(characterId) {
-              const slotData = characters.state[characterId]?.player_slot;
+              const slotData = characters[characterId]?.player_slot;
               if (!slotData) return slotData; // undefined != null
 
               return {

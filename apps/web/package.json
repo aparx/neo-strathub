@@ -40,6 +40,7 @@
     "react-hook-form": "^7.51.4",
     "react-icons": "^5.0.1",
     "react-konva": "^18.2.10",
+    "react-konva-utils": "^1.0.6",
     "server-act": "^1.1.7",
     "server-only": "^0.0.1",
     "use-debounce": "^10.0.0",
