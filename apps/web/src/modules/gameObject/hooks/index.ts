@@ -1,1 +1,1 @@
-export * from "./useFetchObjects";
+export * from "./useGetGameObjects";

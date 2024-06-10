@@ -30,7 +30,8 @@ export function CharacterModal({
         <Modal.Exit />
       </Modal.Title>
       <ObjectGrid
-        filters={{ type: "character", gameId: blueprint.arena.game_id }}
+        gameId={blueprint.arena.game_id}
+        type="character"
         activeObjectId={character.game_object?.id}
         setActiveObject={async (newObject) => {
           onUpdate(newObject, character.game_object);

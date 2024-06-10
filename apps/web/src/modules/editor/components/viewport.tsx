@@ -32,12 +32,7 @@ export const EditorViewport = forwardRef<CanvasContext, EditorViewportProps>(
           ref={mergeRefs(canvasRef, ref)}
           style={style}
           functions={{
-            getGameObjectURL(id, type) {
-              const cache = objectCache;
-              // TODO remove fallback
-              if (!(type in cache)) return "https://svgshare.com/i/16EY.svg";
-              return cache[type as keyof typeof cache]?.[id]?.url;
-            },
+            getGameObjectURL: (id) => objectCache[id]?.url,
             getCharacterSlot(characterId) {
               const slotData = characters[characterId]?.player_slot;
               if (!slotData) return slotData; // undefined != null

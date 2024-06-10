@@ -10,7 +10,7 @@ import {
   EditorRealtimeChannel,
   EditorRealtimeChannelContract,
 } from "@/modules/editor/features/realtime";
-import { GameObjectData } from "@/modules/gameObject/hooks";
+import { GameObjectData, useGetGameObjects } from "@/modules/gameObject/hooks";
 import { createClient } from "@/utils/supabase/client";
 import { CanvasNode } from "@repo/canvas";
 import { CanvasContextInteractStatus } from "@repo/canvas/src/context/canvasContext";
@@ -39,7 +39,7 @@ export interface EditorContext
   extends CanvasContextInteractStatus,
     EditorContextServer {
   channel: EditorRealtimeChannelContract;
-  objectCache: Partial<Record<string, Record<number, GameObjectData>>>;
+  objectCache: Record<number, GameObjectData>;
   focusedLevel: number | Nullish;
   /** Currently dragged node (used for drag'n'drop) */
   dragged: CanvasNode | Nullish;
@@ -54,6 +54,7 @@ const editorContext = createContext<EditorContextState | null>(null);
 
 export function EditorContextProvider({
   children,
+  blueprint,
   ...restContext
 }: EditorContextServer & {
   children: React.ReactNode;
@@ -65,14 +66,13 @@ export function EditorContextProvider({
     focusedLevel: undefined,
     dragged: undefined,
     objectCache: {},
+    blueprint,
     ...restContext,
   });
 
   // Setup a channel immediately
   useEffect(() => {
-    const realtimeChannel = createClient().channel(
-      `bp_${restContext.blueprint.id}`,
-    );
+    const realtimeChannel = createClient().channel(`bp_${blueprint.id}`);
     channel.initialize(realtimeChannel);
     realtimeChannel.subscribe();
     return () => {
@@ -112,6 +112,16 @@ export function EditorContextProvider({
       return { ...oldContext, characters: newMap };
     });
   });
+
+  const { data } = useGetGameObjects(blueprint.arena.game_id);
+
+  useEffect(() => {
+    // Update the context's object cache
+    context.update((oldContext) => ({
+      ...oldContext,
+      objectCache: data ?? {},
+    }));
+  }, [data]);
 
   return (
     <editorContext.Provider value={context}>{children}</editorContext.Provider>

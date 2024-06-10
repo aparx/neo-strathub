@@ -2,6 +2,7 @@ import {
   CanvasContext,
   CanvasNode,
   CanvasNodeConfig,
+  NodeTags,
   ObjectRendererRenderProps,
   usePutIntoTransformer,
 } from "@repo/canvas";
@@ -55,17 +56,28 @@ function ImageObject({
   ...restProps
 }: GameObjectProps & { imageUrl: string }) {
   const [image] = useImage(imageUrl);
+  const backRef = useRef<Konva.Rect>(null);
   const imageRef = useRef<Konva.Image>(null);
   const trRef = useRef<Konva.Transformer>(null);
 
-  const calculateScale = useCallback(
-    (width: number, height: number) => {
-      return image
-        ? Math.min(width / image.width, height / image.height)
-        : undefined;
-    },
-    [image],
-  );
+  /** Calculates the scale of the image based on the given dimensions */
+  function calculateScale(width: number, height: number) {
+    if (!image) return undefined;
+    return Math.min(width / image.width, height / image.height);
+  }
+
+  /** Syncs some attributes of the background to the given `node` */
+  const syncBackground = useCallback((node: Konva.Node) => {
+    backRef.current?.setAttrs({
+      x: node.x(),
+      y: node.y(),
+      width: node.width(),
+      height: node.height(),
+      rotation: node.rotation(),
+      skewX: node.skewX(),
+      skewY: node.skewY(),
+    });
+  }, []);
 
   const imageScale = calculateScale(config.width ?? 1, config.height ?? 1);
 
@@ -74,38 +86,54 @@ function ImageObject({
   return (
     <>
       <ReactKonva.Rect
+        ref={backRef}
+        name={NodeTags.NO_SELECT}
+        listening={false}
+        fill="rgb(0, 0, 0, .5)"
+        x={config.x}
+        y={config.y}
+        width={config.width}
+        height={config.height}
+        rotation={config.rotation}
+        cornerRadius={5}
+      />
+      <ReactKonva.Rect
         ref={imageRef}
         image={image}
         {...config}
         {...restProps}
+        fillPatternRepeat="no-repeat"
         fillPatternImage={image}
         fillPatternScaleX={imageScale}
         fillPatternScaleY={imageScale}
         draggable={canvas.editable}
+        onDragMove={(e) => syncBackground(e.target)}
         onTransform={(e) => {
           const node = e.target;
-          let newWidth = node.width() * node.scaleX();
-          let newHeight = node.height() * node.scaleY();
-          node.scale({ x: 1, y: 1 });
-
-          node.width(newWidth);
-          node.height(newHeight);
+          const newWidth = node.width() * node.scaleX();
+          const newHeight = node.height() * node.scaleY();
           const imageScale = calculateScale(newWidth, newHeight);
           node.setAttrs({
+            scaleX: 1,
+            scaleY: 1,
+            width: newWidth,
+            height: newHeight,
             fillPatternScaleX: imageScale,
             fillPatternScaleY: imageScale,
           });
+          syncBackground(node);
         }}
         onTransformEnd={(e) => {
           // Disable scaling in return for using width and height
           const node = e.target;
           const newWidth = node.width() * node.scaleX();
           const newHeight = node.height() * node.scaleY();
-          node.scale({ x: 1, y: 1 });
-
-          node.width(newWidth);
-          node.height(newHeight);
-
+          node.setAttrs({
+            scaleX: 1,
+            scaleY: 1,
+            width: newWidth,
+            height: newHeight,
+          });
           onUpdate((oldConfig) => ({
             ...oldConfig,
             x: node.x(),

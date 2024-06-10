@@ -1,9 +1,5 @@
 import { EDITOR_RENDERERS } from "@/modules/editor/components/viewport";
-import {
-  GameObjectData,
-  UseFetchObjectsFilters,
-  useFetchObjects,
-} from "@/modules/gameObject/hooks";
+import { GameObjectData, GameObjectType } from "@/modules/gameObject/hooks";
 import { createCanvasNode } from "@repo/canvas";
 import { Icon, ScrollArea, TextField } from "@repo/ui/components";
 import Image from "next/image";
@@ -12,11 +8,11 @@ import { useEditor } from "../../../../_context";
 import * as css from "./objectList.css";
 
 export interface SidepanelObjectListProps {
-  type: UseFetchObjectsFilters["type"];
+  type: GameObjectType;
 }
 
 export function SidepanelObjectList({ type }: SidepanelObjectListProps) {
-  const [{ blueprint }] = useEditor();
+  const [{ objectCache }] = useEditor();
   const [filter, setFilter] = useState<string>();
   const [minHeight, setMinHeight] = useState<number>();
   const searchRef = useRef<HTMLInputElement>(null);
@@ -24,24 +20,19 @@ export function SidepanelObjectList({ type }: SidepanelObjectListProps) {
 
   useEffect(() => searchRef.current?.focus(), []);
 
-  const { data: haystack } = useFetchObjects({
-    gameId: blueprint.arena.game_id,
-    type,
-  });
-
   const objects = useMemo(() => {
-    const needle = filter?.trim()?.toLowerCase();
-    if (!needle?.length) return haystack;
-    return haystack?.filter((obj) => {
-      if (!obj.name) return true;
-      return obj.name.toLowerCase().includes(needle);
+    const needle = filter?.trim().toLowerCase();
+    return Object.values(objectCache).filter((obj) => {
+      if (obj.type !== type) return false;
+      if (!needle?.length) return true;
+      return obj.name?.toLowerCase().includes(needle);
     });
-  }, [haystack, filter]);
+  }, [objectCache, filter]);
 
   useEffect(() => {
     if (!containerRef.current) return;
     setMinHeight(containerRef.current.clientHeight);
-  }, [haystack]);
+  }, [objects]);
 
   return (
     <div
@@ -62,7 +53,7 @@ export function SidepanelObjectList({ type }: SidepanelObjectListProps) {
       <ScrollArea.Root style={{ maxHeight: 245, overflow: "hidden" }}>
         <ScrollArea.Content>
           <ul className={css.list}>
-            {objects?.map((object) => (
+            {objects.map((object) => (
               <li key={object.id}>
                 <PanelGameObject {...object} />
               </li>
@@ -78,16 +69,6 @@ function PanelGameObject({ id, url, name, type }: GameObjectData) {
   const [{ editable }, updateContext] = useEditor();
   const [loaded, setLoaded] = useState(false);
 
-  function createNode() {
-    // TODO creates an actual game node object
-    return createCanvasNode(EDITOR_RENDERERS, "GameObject", {
-      width: 50,
-      height: 50,
-      objectType: type,
-      objectId: id,
-    });
-  }
-
   return (
     <div data-obj-id={id} className={css.item({ loaded })}>
       <Image
@@ -95,12 +76,18 @@ function PanelGameObject({ id, url, name, type }: GameObjectData) {
         alt={name ?? "Object"}
         fill
         draggable={editable}
-        onDragStart={() =>
+        onDragStart={() => {
+          const defaultObjectSize = type === "gadget" ? 35 : 50;
           updateContext((oldContext) => ({
             ...oldContext,
-            dragged: createNode(),
-          }))
-        }
+            dragged: createCanvasNode(EDITOR_RENDERERS, "GameObject", {
+              width: defaultObjectSize,
+              height: defaultObjectSize,
+              objectType: type,
+              objectId: id,
+            }),
+          }));
+        }}
         onDragEnd={() =>
           updateContext((oldContext) => ({
             ...oldContext,

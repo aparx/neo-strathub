@@ -24,7 +24,8 @@ export function GadgetModal({
         <Modal.Exit />
       </Modal.Title>
       <ObjectGrid
-        filters={{ type: "gadget", gameId: blueprint.arena.game_id }}
+        gameId={blueprint.arena.game_id}
+        type="gadget"
         activeObjectId={gadget.game_object?.id}
         setActiveObject={(newObject) => {
           onUpdate(newObject, gadget.game_object);

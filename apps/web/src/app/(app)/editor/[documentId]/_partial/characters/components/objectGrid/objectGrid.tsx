@@ -1,46 +1,50 @@
 "use client";
-import {
-  GameObjectData,
-  useFetchObjects,
-  UseFetchObjectsFilters,
-} from "@/modules/gameObject/hooks";
+import { GameObjectData, GameObjectType } from "@/modules/gameObject/hooks";
 import { vars } from "@repo/theme";
 import { Icon, Modal, TextField } from "@repo/ui/components";
 import { Nullish } from "@repo/utils";
 import Image from "next/image";
-import { ComponentPropsWithoutRef, useEffect, useRef, useState } from "react";
+import {
+  ComponentPropsWithoutRef,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { useEditor } from "../../../../_context";
 import * as css from "./objectGrid.css";
 
 export function ObjectGrid({
   activeObjectId,
   setActiveObject,
-  filters,
+  type,
+  gameId,
 }: {
   activeObjectId: GameObjectData["id"] | Nullish;
   setActiveObject: (object: GameObjectData | null) => void;
-  filters: UseFetchObjectsFilters;
+  type: GameObjectType;
+  gameId: number;
 }) {
   const [filter, setFilter] = useState<string>();
   const gridShellRef = useRef<HTMLDivElement>(null);
   const searchFieldRef = useRef<HTMLInputElement>(null);
+  const [{ objectCache }] = useEditor();
 
   // Fetch game objects
-  const { data, isLoading } = useFetchObjects(filters);
+  const objects = useMemo(() => {
+    const needle = filter?.toLowerCase();
+    return Object.values(objectCache).filter((object) => {
+      if (object.type !== type) return false;
+      return !needle || object.name?.toLowerCase().includes(needle);
+    });
+  }, [objectCache]);
 
-  const [objects, setObjects] = useState(data);
   const [gridHeight, setGridHeight] = useState<number>();
 
-  // Disable height limitation and allow for resize when data changes
-  useEffect(() => setGridHeight(undefined), [data]);
-
-  // Apply the actual filter by updating the to-be-displayed objects
   useEffect(() => {
-    const needle = filter?.toLowerCase();
-    const haystack = data ?? [];
-    if (!needle?.length) return setObjects(haystack);
-    setGridHeight(gridShellRef.current?.clientHeight);
-    setObjects(haystack.filter((x) => x.name?.toLowerCase().includes(needle)));
-  }, [data, filter]);
+    const gridHeight = gridShellRef.current?.clientHeight;
+    setGridHeight((oldHeight) => Math.max(gridHeight ?? 0, oldHeight ?? 0));
+  }, [objects]);
 
   useEffect(() => searchFieldRef.current?.focus(), []);
 
