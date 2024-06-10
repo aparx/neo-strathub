@@ -22,13 +22,11 @@ export function createCanvasNode<
   renderers: TLookupTable,
   className: TClassName,
   config: TConfig,
-  characterId?: number,
 ): CanvasNode<TConfig & { id: string }> {
   return {
     className: String(className),
     attrs: {
       ...structuredClone(config),
-      characterId,
       id: uuidv4(),
     },
   };

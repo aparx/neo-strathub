@@ -20,7 +20,7 @@ export type GameObjectConfig = CanvasNodeConfig &
   (
     | {
         objectType: "character";
-        objectId: number;
+        objectId: number | undefined;
         /** If true, gets the object based on the `characterId` */
         linkToAssignee?: boolean;
       }
@@ -42,7 +42,7 @@ export function GameObject(props: GameObjectProps) {
 
   const imageUrl = finalObjectId
     ? context.getGameObjectURL(finalObjectId, objectType)
-    : undefined;
+    : "https://svgur.com/i/1711.svg"; // TODO other fallback
 
   return imageUrl && <ImageObject {...props} imageUrl={imageUrl} />;
 }
@@ -52,6 +52,7 @@ function ImageObject({
   config,
   showTransformer,
   onUpdate,
+  onDragMove,
   imageUrl,
   ...restProps
 }: GameObjectProps & { imageUrl: string }) {
@@ -89,13 +90,12 @@ function ImageObject({
         ref={backRef}
         name={NodeTags.NO_SELECT}
         listening={false}
-        fill="rgb(0, 0, 0, .5)"
+        fill="rgb(0, 0, 0, .6)"
         x={config.x}
         y={config.y}
         width={config.width}
         height={config.height}
         rotation={config.rotation}
-        cornerRadius={5}
       />
       <ReactKonva.Rect
         ref={imageRef}
@@ -107,7 +107,10 @@ function ImageObject({
         fillPatternScaleX={imageScale}
         fillPatternScaleY={imageScale}
         draggable={canvas.editable}
-        onDragMove={(e) => syncBackground(e.target)}
+        onDragMove={(e) => {
+          onDragMove?.(e);
+          syncBackground(e.target);
+        }}
         onTransform={(e) => {
           const node = e.target;
           const newWidth = node.width() * node.scaleX();

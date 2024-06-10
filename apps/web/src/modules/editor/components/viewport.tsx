@@ -36,10 +36,11 @@ export const EditorViewport = forwardRef<CanvasContext, EditorViewportProps>(
             getCharacterSlot(characterId) {
               const slotData = characters[characterId]?.player_slot;
               if (!slotData) return slotData; // undefined != null
-
+                
               return {
                 color: slotData.color,
                 self: false /** TODO */,
+                objectId: characters[characterId]?.game_object?.id,
               };
             },
           }}

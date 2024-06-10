@@ -49,9 +49,8 @@ export const CharacterRect = forwardRef<CharacterRectRef, CharacterRectProps>(
         stroke={useTranslateColor(slot?.color)}
         strokeWidth={3}
         strokeScaleEnabled={false}
-        shadowColor={"black"}
-        shadowBlur={2}
         shadowForStrokeEnabled={true}
+        perfectDrawEnabled={false}
       />
     );
   },

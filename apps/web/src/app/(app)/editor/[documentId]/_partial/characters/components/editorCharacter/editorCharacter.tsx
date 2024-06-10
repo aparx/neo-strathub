@@ -5,9 +5,11 @@ import type {
   BlueprintCharacterData,
   CharacterGadgetSlotData,
 } from "@/modules/blueprint/actions";
+import { EDITOR_RENDERERS } from "@/modules/editor/components/viewport";
 import { useEditorEventHandler } from "@/modules/editor/features/events";
 import { GameObjectData } from "@/modules/gameObject/hooks";
 import { createClient } from "@/utils/supabase/client";
+import { createCanvasNode } from "@repo/canvas";
 import { Icon, Modal } from "@repo/ui/components";
 import Image from "next/image";
 import { RxQuestionMarkCircled } from "react-icons/rx";
@@ -27,7 +29,7 @@ export function EditorCharacter({
   data: character,
   slots,
 }: EditorCharacterProps) {
-  const [{ channel }] = useEditor();
+  const [{ channel }, updateEditor] = useEditor();
   const eventHandler = useEditorEventHandler();
   const object = character.game_object;
   const active = object?.url != null;
@@ -50,6 +52,19 @@ export function EditorCharacter({
             className={css.characterBox({ active })}
             style={{ boxShadow: `inset 0 0 0 2px ${color}` }}
             draggable={!!object}
+            onDragStart={() => {
+              updateEditor((old) => ({
+                ...old,
+                dragged: createCanvasNode(EDITOR_RENDERERS, "GameObject", {
+                  width: 50,
+                  height: 50,
+                  objectId: object?.id,
+                  objectType: "character",
+                  linkToAssignee: true,
+                  characterId: character.id,
+                }),
+              }));
+            }}
           >
             {object ? (
               <Image
