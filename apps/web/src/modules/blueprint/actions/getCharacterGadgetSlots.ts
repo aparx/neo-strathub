@@ -7,7 +7,7 @@ export async function getCharacterGadgetSlots(characterId: number) {
   // TODO USE ANON SERVER INSTEAD
   const { data, error } = await getServiceServer(cookies())
     .from("character_gadget")
-    .select("id, game_object(*)")
+    .select("id, game_object(*), character_id")
     .order("id")
     .eq("character_id", characterId);
   if (error) throw error;

@@ -103,7 +103,4 @@ export type EditorUpdateCharacter = EditorEvent &
     id: BlueprintCharacterData["id"];
   };
 
-export type EditorUpdateGadget = EditorEvent &
-  Partial<CharacterGadgetSlotData> & {
-    id: CharacterGadgetSlotData["id"];
-  };
+export type EditorUpdateGadget = EditorEvent & CharacterGadgetSlotData;

@@ -1,3 +1,4 @@
+import { createClient } from "@/utils/supabase/client";
 import {
   CanvasContext,
   CanvasNode,
@@ -53,6 +54,7 @@ function ImageObject({
   showTransformer,
   onUpdate,
   onDragMove,
+  onTransform,
   imageUrl,
   ...restProps
 }: GameObjectProps & { imageUrl: string }) {
@@ -112,6 +114,7 @@ function ImageObject({
           syncBackground(e.target);
         }}
         onTransform={(e) => {
+          onTransform?.(e);
           const node = e.target;
           const newWidth = node.width() * node.scaleX();
           const newHeight = node.height() * node.scaleY();

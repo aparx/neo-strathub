@@ -87,9 +87,9 @@ export function EditorContextProvider({
     context.update((oldContext) => {
       const characters = oldContext.characters;
       if (!(e.event.id in characters)) return oldContext;
-      const newMap = { ...characters };
-      newMap[e.event.id] = { ...characters[e.event.id]!, ...e.event };
-      return { ...oldContext, characters: newMap };
+      const newCharacterMap = { ...characters };
+      newCharacterMap[e.event.id] = { ...characters[e.event.id]!, ...e.event };
+      return { ...oldContext, characters: newCharacterMap };
     });
   });
 
@@ -97,19 +97,18 @@ export function EditorContextProvider({
     // Locally update the gadget state (possibly reflected on the canvas)
     context.update((oldContext) => {
       const characters = oldContext.characters;
-      if (!(e.event.id in characters)) return oldContext;
-      const newMap = { ...characters };
-      Object.values(newMap).forEach((character) => {
-        const gadget = character.gadgets[e.event.id];
-        if (gadget == null) return;
-        const oldGadgets = newMap[character.id]?.gadgets;
-        if (!oldGadgets) return;
-        // Create copy of gadget object and point to it through character
-        const newGadgets = { ...oldGadgets };
-        newGadgets[e.event.id] = { ...gadget, ...e.event };
-        character.gadgets = newGadgets;
-      });
-      return { ...oldContext, characters: newMap };
+      const character = characters[e.event.character_id];
+      if (!character) return oldContext;
+      const gadget = character?.gadgets[e.event.id];
+      const newCharacterMap = { ...characters };
+      const oldGadgetMap = newCharacterMap[character.id]?.gadgets;
+      if (!oldGadgetMap) return oldContext;
+
+      // Create copy of gadget object and point to it through character
+      const newGadgetMap = { ...oldGadgetMap };
+      newGadgetMap[e.event.id] = { ...gadget, ...e.event };
+      character.gadgets = newGadgetMap;
+      return { ...oldContext, characters: newCharacterMap };
     });
   });
 

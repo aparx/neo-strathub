@@ -6,7 +6,10 @@ import type {
   CharacterGadgetSlotData,
 } from "@/modules/blueprint/actions";
 import { EDITOR_RENDERERS } from "@/modules/editor/components/viewport";
-import { useEditorEventHandler } from "@/modules/editor/features/events";
+import {
+  EditorEventMap,
+  useEditorEventHandler,
+} from "@/modules/editor/features/events";
 import { GameObjectData } from "@/modules/gameObject/hooks";
 import { createClient } from "@/utils/supabase/client";
 import { createCanvasNode } from "@repo/canvas";
@@ -23,6 +26,7 @@ export interface EditorCharacterProps {
 
 interface GadgetSlotProps {
   data: CharacterGadgetSlotData;
+  characterId: number;
 }
 
 export function EditorCharacter({
@@ -69,7 +73,7 @@ export function EditorCharacter({
             {object ? (
               <Image
                 src={object.url}
-                alt={object.name ?? "Game object"}
+                alt={object.name ?? String(object.id)}
                 fill
                 className={css.characterImage}
               />
@@ -81,7 +85,11 @@ export function EditorCharacter({
         <ol className={css.gadgetList}>
           {slots.map((gadget) => (
             <li key={gadget.id}>
-              <GadgetSlot key={gadget.id} data={gadget} />
+              <GadgetSlot
+                key={gadget.id}
+                data={gadget}
+                characterId={character.id}
+              />
             </li>
           ))}
         </ol>
@@ -104,7 +112,7 @@ export function EditorCharacter({
   );
 }
 
-function GadgetSlot({ data: gadget }: GadgetSlotProps) {
+function GadgetSlot({ data: gadget, characterId }: GadgetSlotProps) {
   const [{ channel }] = useEditor();
   const eventHandler = useEditorEventHandler();
   const object = gadget.game_object;
@@ -140,7 +148,11 @@ function GadgetSlot({ data: gadget }: GadgetSlotProps) {
         gadget={gadget}
         onUpdate={(newObject, oldObject) => {
           //? use to subscribe to postgres instead to avoid race conditions?
-          const eventData = { id: gadget.id, game_object: newObject };
+          const eventData = {
+            ...gadget,
+            game_object: newObject,
+            character_id: characterId,
+          } satisfies EditorEventMap["updateGadget"];
           eventHandler.fire("updateGadget", "user", eventData);
           channel.broadcast("updateGadget", eventData);
           updateToObject(newObject).catch((e) => {

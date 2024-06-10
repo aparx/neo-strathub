@@ -17,7 +17,7 @@ import {
   EditorEventOrigin,
 } from "../features/events";
 import { useEditorEvent } from "../features/events/hooks";
-import { useGetObjects } from "../hooks";
+import { useGetBlueprintObjects } from "../hooks";
 import { EDITOR_RENDERERS } from "./viewport";
 
 export interface EditorLevelProps extends CanvasLevelData, EditorLevelEvents {
@@ -48,15 +48,15 @@ export function EditorLevel({
   const canvas = useCanvas();
   const [editor, updateEditor] = useEditor();
   const [nodes, setNodes] = useState<CanvasNode[]>([]);
-  const { data } = useGetObjects(stageId, id);
+  const { data } = useGetBlueprintObjects(stageId, id);
   useEffect(() => {
     if (!data) return setNodes([]);
     setNodes(
       data?.map((object) => ({
         className: object.classname,
-        characterId: object.character_id,
         attrs: {
           ...(object.attributes as Omit<CanvasNodeConfig, "id">),
+          characterId: object.character_id,
           id: object.id,
         },
       })),

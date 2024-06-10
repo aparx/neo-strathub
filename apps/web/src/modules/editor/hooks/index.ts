@@ -1,2 +1,2 @@
+export * from "./useGetBlueprintObjects";
 export * from "./useGetLevels";
-export * from "./useGetObjects";
