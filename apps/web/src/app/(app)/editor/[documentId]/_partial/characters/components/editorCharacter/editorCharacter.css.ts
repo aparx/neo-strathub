@@ -85,29 +85,36 @@ export const gadgetBox = recipe({
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      cursor: "pointer",
-      selectors: {
-        "&:hover::after": {
-          content: "",
-          position: "absolute",
-          inset: 0,
-          background: vars.colors.state.hover.color,
-          borderRadius: "inherit",
-        },
-      },
     },
   ],
   variants: {
-    active: {
+    empty: {
       false: {
-        color: vars.colors.emphasis.low,
+        color: vars.colors.emphasis.medium,
       },
       true: {
-        color: vars.colors.emphasis.high,
+        opacity: vars.emphasis.low,
+        color: vars.colors.emphasis.medium,
+      },
+    },
+    editable: {
+      false: {},
+      true: {
+        cursor: "pointer",
+        selectors: {
+          "&:hover::after": {
+            content: "",
+            position: "absolute",
+            inset: 0,
+            background: vars.colors.state.hover.color,
+            borderRadius: "inherit",
+          },
+        },
       },
     },
   },
   defaultVariants: {
-    active: false,
+    empty: false,
+    editable: false,
   },
 });

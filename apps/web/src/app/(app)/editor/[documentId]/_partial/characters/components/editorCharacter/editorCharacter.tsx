@@ -16,6 +16,7 @@ import { createCanvasNode } from "@repo/canvas";
 import { Icon, Modal } from "@repo/ui/components";
 import Image from "next/image";
 import { useRef } from "react";
+import { PiSelectionSlashBold } from "react-icons/pi";
 import { RxQuestionMarkCircled } from "react-icons/rx";
 import { useEditor } from "../../../../_context";
 import * as css from "./editorCharacter.css";
@@ -87,13 +88,11 @@ export function EditorCharacter({
         <ol className={css.gadgetList}>
           {slots.map((gadget) => (
             <li key={gadget.id}>
-              {(gadget.game_object?.url != null || editable) && (
-                <GadgetSlot
-                  key={gadget.id}
-                  data={gadget}
-                  characterId={character.id}
-                />
-              )}
+              <GadgetSlot
+                key={gadget.id}
+                data={gadget}
+                characterId={character.id}
+              />
             </li>
           ))}
         </ol>
@@ -136,7 +135,7 @@ function GadgetSlot({ data: gadget, characterId }: GadgetSlotProps) {
         <button
           disabled={!editable}
           data-gadget-id={gadget.id}
-          className={css.gadgetBox({ active: false })}
+          className={css.gadgetBox({ empty: !active && !editable, editable })}
           draggable={editable && active}
           onDragStart={(e) =>
             updateEditor((o) => ({
@@ -160,8 +159,12 @@ function GadgetSlot({ data: gadget, characterId }: GadgetSlotProps) {
               fill
               style={{ objectFit: "contain" }}
             />
-          ) : (
+          ) : editable ? (
             <Icon.Mapped type={"add"} />
+          ) : (
+            <Icon.Custom>
+              <PiSelectionSlashBold />
+            </Icon.Custom>
           )}
         </button>
       </Modal.Trigger>

@@ -10,6 +10,7 @@ import {
 } from "@repo/canvas";
 import { useCanvas } from "@repo/canvas/src/context/canvasContext";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { Html } from "react-konva-utils";
 import { v4 as uuidv4 } from "uuid";
 import {
   EditorCreateEvent,
@@ -18,10 +19,12 @@ import {
 } from "../features/events";
 import { useEditorEvent } from "../features/events/hooks";
 import { useGetBlueprintObjects } from "../hooks";
+import { LevelIndicator } from "./levelIndicator";
 import { EDITOR_RENDERERS } from "./viewport";
 
 export interface EditorLevelProps extends CanvasLevelData, EditorLevelEvents {
   stageId: number; // TODO move to context?
+  index: number;
   style: CanvasLevelStyle;
 }
 
@@ -38,6 +41,7 @@ export interface EditorLevelEvents {
 
 export function EditorLevel({
   id,
+  index,
   stageId,
   onNodeUpdate,
   onNodeDelete,
@@ -91,6 +95,22 @@ export function EditorLevel({
       strokeWidth={3}
       strokeScaleEnabled={false}
     >
+      <Html
+        divProps={{
+          style: {
+            position: "absolute",
+            top: 0,
+            left: 0,
+            pointerEvents: "none",
+          },
+        }}
+      >
+        <LevelIndicator
+          levelNumber={1 + index}
+          canvas={canvas}
+          focused={editor.focusedLevel === id}
+        />
+      </Html>
       {nodes?.map((node, index) => (
         <ObjectRenderer
           key={index /** OK */}

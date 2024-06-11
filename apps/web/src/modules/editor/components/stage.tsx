@@ -172,6 +172,7 @@ function Level({
     <EditorLevel
       key={level.id}
       id={level.id}
+      index={level.index}
       stageId={stageId}
       imageURL={level.image}
       position={position}
