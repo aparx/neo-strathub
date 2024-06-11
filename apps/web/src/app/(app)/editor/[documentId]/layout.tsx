@@ -6,7 +6,7 @@ import {
   EditorCharacters,
   EditorHeader,
 } from "@/app/(app)/editor/[documentId]/_partial";
-import { FullPageEditorSpinner } from "@/app/(app)/editor/[documentId]/page";
+import { FullPageEditorSpinner } from "@/app/(app)/editor/[documentId]/edit/page";
 import {
   CharacterGadgetSlotData,
   getBlueprintCharacters,
@@ -16,7 +16,6 @@ import {
 import { getBlueprint } from "@/modules/blueprint/actions/getBlueprint";
 import { EditorEventHandler } from "@/modules/editor/features/events";
 import React, { Suspense } from "react";
-import { EditorSidepanel } from "./_partial/sidepanel";
 import * as css from "./layout.css";
 
 export default async function EditorLayout({
@@ -40,7 +39,6 @@ async function Content({
   children: React.ReactNode;
   documentId: string;
 }) {
-  console.time("START");
   const [blueprintQuery, characters] = await Promise.all([
     getBlueprint(documentId),
     getBlueprintCharacters(documentId),
@@ -84,10 +82,10 @@ async function Content({
       >
         <div className={css.content}>
           <EditorHeader />
-          <EditorSidepanel />
           <EditorCharacters />
           {/*<EditorInspector />*/}
-          <main>{children}</main>
+          <div className={css.fadeInRect} />
+          {children}
         </div>
       </EditorContextProvider>
     </EditorEventHandler>

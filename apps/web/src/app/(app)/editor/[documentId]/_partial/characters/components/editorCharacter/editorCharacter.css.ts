@@ -29,16 +29,6 @@ export const characterBox = recipe({
       justifyContent: "center",
       background: vars.colors.accents[3],
       fontSize: "2em",
-      cursor: "pointer",
-      selectors: {
-        "&:hover::after": {
-          content: "",
-          position: "absolute",
-          inset: 0,
-          background: vars.colors.state.hover.color,
-          borderRadius: "inherit",
-        },
-      },
     },
   ],
   variants: {
@@ -50,9 +40,25 @@ export const characterBox = recipe({
         color: vars.colors.emphasis.high,
       },
     },
+    editable: {
+      false: {},
+      true: {
+        selectors: {
+          "&:hover::after": {
+            content: "",
+            cursor: "pointer",
+            position: "absolute",
+            inset: 0,
+            background: vars.colors.state.hover.color,
+            borderRadius: "inherit",
+          },
+        },
+      },
+    },
   },
   defaultVariants: {
     active: false,
+    editable: false,
   },
 });
 

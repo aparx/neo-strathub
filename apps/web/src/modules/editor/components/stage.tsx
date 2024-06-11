@@ -2,7 +2,7 @@ import { useEditor } from "@/app/(app)/editor/[documentId]/_context";
 import { BlueprintData } from "@/modules/blueprint/actions/getBlueprint";
 import { CanvasLevelStyle, CanvasNode } from "@repo/canvas";
 import type Konva from "konva";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { deleteNodes, upsertNodes } from "../actions";
 import {
   CommandHistory,

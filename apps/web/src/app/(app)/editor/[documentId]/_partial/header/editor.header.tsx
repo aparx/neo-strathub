@@ -14,7 +14,9 @@ import Link from "next/link";
 import { useEditor } from "../../_context";
 import * as css from "./editor.header.css";
 
-export async function EditorHeader() {
+export function EditorHeader() {
+  const [{ blueprint }] = useEditor();
+
   return (
     <Text asChild>
       <header className={css.headerContainer}>
@@ -25,9 +27,11 @@ export async function EditorHeader() {
           <BlueprintTitle />
         </div>
         <div className={css.headerItem({ side: "right" })}>
-          <Button appearance={"cta"} color={"cta"}>
-            Preview
-            <Icon.Mapped type={"next"} />
+          <Button asChild appearance={"cta"} color={"cta"}>
+            <Link href={`/editor/${blueprint.id}/preview`}>
+              Preview
+              <Icon.Mapped type={"next"} />
+            </Link>
           </Button>
         </div>
       </header>

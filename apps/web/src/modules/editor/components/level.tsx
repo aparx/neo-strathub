@@ -48,7 +48,14 @@ export function EditorLevel({
   const canvas = useCanvas();
   const [editor, updateEditor] = useEditor();
   const [nodes, setNodes] = useState<CanvasNode[]>([]);
-  const { data } = useGetBlueprintObjects(stageId, id);
+  const { data, refetch, isRefetching } = useGetBlueprintObjects(stageId, id);
+
+  useEffect(() => {
+    // Force a complete refetch when the level component is initially mounted
+    // even tho data already exists (as in the case for soft navigation).
+    if (data && !isRefetching) refetch();
+  }, []);
+
   useEffect(() => {
     if (!data) return setNodes([]);
     setNodes(

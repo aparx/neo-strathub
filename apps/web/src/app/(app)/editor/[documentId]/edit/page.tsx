@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { cookies } from "next/headers";
 import * as css from "./page.css";
 
-export default async function EditorPage({
+export default async function EditorEditPage({
   params,
 }: {
   params: { documentId: string };
@@ -14,18 +14,22 @@ export default async function EditorPage({
     .from("blueprint_stage")
     .select("id")
     .eq("blueprint_id", params.documentId)
+    .limit(1)
     .single()
     .throwOnError();
 
   // Get the stage of the blueprint
   if (!stageQuery.data) throw new Error("Could not find stage");
-  return <Content stageId={stageQuery.data.id} />;
+  return <EditorWindow stageId={stageQuery.data.id} />;
 }
 
-const Content = dynamic(async () => (await import("./content")).EditorContent, {
-  loading: () => <FullPageEditorSpinner />,
-  ssr: false,
-});
+const EditorWindow = dynamic(
+  async () => (await import("./window")).EditorEditContent,
+  {
+    loading: () => <FullPageEditorSpinner />,
+    ssr: false,
+  },
+);
 
 // TODO this needs to be moved to a separate component, to be exported
 export function FullPageEditorSpinner() {

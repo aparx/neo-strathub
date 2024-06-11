@@ -18,6 +18,6 @@ export function useGetLevels(arenaId: number) {
     queryKey: ["levels", arenaId],
     queryFn: () => fetchLevels(arenaId),
     refetchOnWindowFocus: false,
-    staleTime: Infinity,
+    refetchInterval: false,
   });
 }

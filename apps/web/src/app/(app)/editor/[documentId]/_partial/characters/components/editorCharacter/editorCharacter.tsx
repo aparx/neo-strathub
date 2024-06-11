@@ -15,6 +15,7 @@ import { createClient } from "@/utils/supabase/client";
 import { createCanvasNode } from "@repo/canvas";
 import { Icon, Modal } from "@repo/ui/components";
 import Image from "next/image";
+import { useRef } from "react";
 import { RxQuestionMarkCircled } from "react-icons/rx";
 import { useEditor } from "../../../../_context";
 import * as css from "./editorCharacter.css";
@@ -33,7 +34,7 @@ export function EditorCharacter({
   data: character,
   slots,
 }: EditorCharacterProps) {
-  const [{ channel }, updateEditor] = useEditor();
+  const [{ channel, editable }, updateEditor] = useEditor();
   const eventHandler = useEditorEventHandler();
   const object = character.game_object;
   const active = object?.url != null;
@@ -53,8 +54,9 @@ export function EditorCharacter({
       <div data-character-id={character.id} className={css.characterButton}>
         <Modal.Trigger asChild>
           <button
-            className={css.characterBox({ active })}
+            className={css.characterBox({ active, editable })}
             style={{ boxShadow: `inset 0 0 0 2px ${color}` }}
+            disabled={!editable}
             draggable={!!object}
             onDragStart={() => {
               updateEditor((old) => ({
@@ -85,11 +87,13 @@ export function EditorCharacter({
         <ol className={css.gadgetList}>
           {slots.map((gadget) => (
             <li key={gadget.id}>
-              <GadgetSlot
-                key={gadget.id}
-                data={gadget}
-                characterId={character.id}
-              />
+              {(gadget.game_object?.url != null || editable) && (
+                <GadgetSlot
+                  key={gadget.id}
+                  data={gadget}
+                  characterId={character.id}
+                />
+              )}
             </li>
           ))}
         </ol>
@@ -113,10 +117,11 @@ export function EditorCharacter({
 }
 
 function GadgetSlot({ data: gadget, characterId }: GadgetSlotProps) {
-  const [{ channel }] = useEditor();
+  const [{ channel, editable }, updateEditor] = useEditor();
   const eventHandler = useEditorEventHandler();
   const object = gadget.game_object;
   const active = object?.url != null;
+  const imageRef = useRef<HTMLImageElement>(null);
 
   async function updateToObject(object: GameObjectData | null) {
     return createClient().rpc("update_gadget_object", {
@@ -129,11 +134,27 @@ function GadgetSlot({ data: gadget, characterId }: GadgetSlotProps) {
     <Modal.Root>
       <Modal.Trigger asChild>
         <button
+          disabled={!editable}
           data-gadget-id={gadget.id}
           className={css.gadgetBox({ active: false })}
+          draggable={editable && active}
+          onDragStart={(e) =>
+            updateEditor((o) => ({
+              ...o,
+              dragged: createCanvasNode(EDITOR_RENDERERS, "GameObject", {
+                objectId: gadget.game_object?.id,
+                objectType: "gadget",
+                width: imageRef.current?.clientWidth ?? 50,
+                height: imageRef.current?.clientHeight ?? 50,
+                characterId: characterId,
+              }),
+            }))
+          }
+          onDragEnd={() => updateEditor((o) => ({ ...o, dragged: undefined }))}
         >
           {active ? (
             <Image
+              ref={imageRef}
               src={object.url}
               alt={object.name ?? "Gadget"}
               fill

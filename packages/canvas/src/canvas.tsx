@@ -138,7 +138,7 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
         const stage = stageRef.current;
         const selected = new Array<string>();
         const selection = selectionRef.current;
-        selection &&
+        if (selection && selectable)
           stage?.children.forEach((layer) => {
             if (layer.hasName(NodeTags.NO_SELECT)) return;
             const box = selection.getClientRect();
@@ -191,7 +191,7 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
     }
 
     function click(e: Konva.KonvaEventObject<MouseEvent>) {
-      if (moveDragRef.current) return; // Don't do anything on move
+      if (moveDragRef.current || !selectable) return;
       const area = selectionAreaRef.current;
       if (area.x0 !== area.x1 || area.y0 !== area.y1)
         // Don't do anything on selection rect
