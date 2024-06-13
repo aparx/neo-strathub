@@ -1,7 +1,8 @@
 import { useEditor } from "@/app/(app)/editor/[documentId]/_context";
 import { BlueprintData } from "@/modules/blueprint/actions/getBlueprint";
-import { CanvasLevelStyle, CanvasNode } from "@repo/canvas";
+import { CanvasLevelStyle, CanvasNode, useCanvas } from "@repo/canvas";
 import type Konva from "konva";
+import { useEffect } from "react";
 import { deleteNodes, upsertNodes } from "../actions";
 import { EditorCommand, createUpdateCommand } from "../features/command";
 import { createCreateCommand } from "../features/command/commands/createCommand";
@@ -35,9 +36,8 @@ export function EditorStage({
   position,
   hidden,
 }: EditorStageProps) {
+  const canvas = useCanvas();
   const { data } = useGetLevels(blueprint.arena.id);
-
-  // TODO change history for UNDO & REDO
 
   function createPosition(index: number) {
     const [dx, dy] = style.levelDirection;
@@ -48,6 +48,9 @@ export function EditorStage({
       y: position.y + index * dy * (style.levelStyle.height + gap),
     } as const satisfies Konva.Vector2d;
   }
+
+  // Fixes https://github.com/aparx/neo-strathub/issues/32
+  useEffect(() => canvas.selected.update([]), [hidden]);
 
   return data?.map((level, index) => (
     <Level
