@@ -188,6 +188,13 @@ create unique index
     if not exists team_member__profile_team_uidx
     on public.team_member (profile_id, team_id);
 
+-- -------------------------- full_team_member --------------------------
+
+create view full_team_member as
+select public.team_member.*, public.member_role.flags
+from public.team_member
+         join public.member_role on team_member.role_id = member_role.id;
+
 -- -------------------------- blueprint --------------------------
 create table if not exists public.blueprint
 (
@@ -422,10 +429,10 @@ alter table public.config
 
 alter table public.config
     add constraint only_one_value check (
-                (boolean_value is not null)::integer +
-                (numeric_value is not null)::integer +
-                (date_value is not null)::integer +
-                (text_value is not null)::integer
+        (boolean_value is not null)::integer +
+        (numeric_value is not null)::integer +
+        (date_value is not null)::integer +
+        (text_value is not null)::integer
             = 1);
 
 -- default config values

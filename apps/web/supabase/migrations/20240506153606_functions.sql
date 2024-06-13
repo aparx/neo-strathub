@@ -463,7 +463,6 @@ create or replace function get_perms_on_blueprint(blueprint_id uuid, user_id uui
     returns bigint as
 $$
 declare
-    _flags   bigint;
     _team_id uuid;
 begin
     -- Determine the identifier of the team
@@ -478,19 +477,10 @@ begin
     end if;
 
     -- Determine the flags of the authenticated user
-    select public.member_role.flags
-    into _flags
-    from public.team_member
-             inner join public.member_role
-                        on team_member.role_id = member_role.id
-    where team_member.profile_id = user_id
-      and team_member.team_id = _team_id;
-
-    if (_flags is null) then
-        return null;
-    end if;
-
-    return _flags;
+    return (select public.full_team_member.flags
+            from public.full_team_member
+            where full_team_member.team_id = _team_id
+              and full_team_member.profile_id = user_id);
 end;
 $$
     language plpgsql

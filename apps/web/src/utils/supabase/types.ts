@@ -545,6 +545,13 @@ export type Database = {
             foreignKeyName: "member_to_player_slot_member_id_fkey"
             columns: ["member_id"]
             isOneToOne: false
+            referencedRelation: "full_team_member"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "member_to_player_slot_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
             referencedRelation: "team_member"
             referencedColumns: ["id"]
           },
@@ -756,7 +763,41 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      full_team_member: {
+        Row: {
+          created_at: string | null
+          flags: number | null
+          id: number | null
+          profile_id: string | null
+          protected: boolean | null
+          role_id: number | null
+          team_id: string | null
+          updated_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_member_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profile"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_member_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "member_role"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_member_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "team"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       assign_member_to_slot: {

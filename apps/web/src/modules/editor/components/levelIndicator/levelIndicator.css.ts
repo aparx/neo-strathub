@@ -4,7 +4,8 @@ import { recipe } from "@vanilla-extract/recipes";
 export const indicator = recipe({
   base: {
     position: "absolute",
-    width: 20,
+    width: "max-content",
+    minWidth: 20,
     height: 20,
     display: "grid",
     placeItems: "center",

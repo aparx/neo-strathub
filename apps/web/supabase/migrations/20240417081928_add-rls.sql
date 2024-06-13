@@ -218,22 +218,11 @@ begin
         return false;
     end if;
 
-    select public.member_role.flags
-    from public.team_member
-             inner join member_role on member_role.id = team_member.role_id
-    where team_member.profile_id = auth.uid()
-      and team_member.team_id = _team_id
-    into _self_member;
-
-    if (_self_member is null) then
-        return false;
-    end if;
-
-    if ((_self_member.flags & 2 /* MODIFY_DOCUMENTS */) = 0) then
-        return false;
-    end if;
-
-    return true;
+    return exists(select 1
+                  from public.full_team_member
+                  where full_team_member.team_id = _team_id
+                    and full_team_member.profile_id = auth.uid()
+                    and full_team_member.flags & 2 != 0);
 end;
 $$ language plpgsql;
 
@@ -259,27 +248,20 @@ create policy "delete access"
 -- //////////////////////////////// audit_log ////////////////////////////////
 create function can_select_audit_log(entry audit_log) returns boolean as
 $$
-declare
-    _member_flags bigint;
 begin
     -- Check if the performer is the authenticated user itself
     if (entry.performer_id is not null and entry.performer_id = auth.uid()) then
         return true;
     end if;
 
-    if (entry.team_id is not null) then
-        -- Authenticated user must be a actions of the team
-        select public.member_role.flags
-        into _member_flags
-        from team_member
-                 left join member_role on member_role.id = team_member.role_id
-        where team_id = entry.team_id
-          and profile_id = auth.uid();
-        -- Check if user is actions and their flags contains VIEW_AUDIT_LOG
-        return _member_flags is not null and (_member_flags & 256) != 0;
+    if (entry.team_id is null) then
+        return false;
     end if;
 
-    return false;
+    return exists(select 1
+                  where full_team_member.team_id = entry.team_id
+                    and full_team_member.profile_id = auth.uid()
+                    and full_team_member.flags & 256 != 0);
 end;
 $$ language plpgsql security definer;
 

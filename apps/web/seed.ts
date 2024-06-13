@@ -1,7 +1,13 @@
 import { TeamMemberFlags } from "@/modules/auth/flags";
 import { PlanConfig } from "@/utils/supabase/models";
 import { pascalCase } from "@repo/utils";
-import { createSeedClient } from "@snaplet/seed";
+import {
+  arenaChildInputs,
+  bookChildInputs,
+  createSeedClient,
+  gameChildInputs,
+  teamChildInputs,
+} from "@snaplet/seed";
 import { LoremIpsum } from "lorem-ipsum";
 
 type MinMaxRange = readonly [min: number, max: number];
@@ -68,7 +74,7 @@ async function main() {
 
   await seed.$resetDatabase();
 
-  function generateGameObjects(url: string, type: string) {
+  const generateGameObjects = (url: string, type: string) => {
     const nameContext = new Set<string>();
     const nameGenerator = createSentenceGenerator({
       words: [1, 3],
@@ -83,10 +89,10 @@ async function main() {
         type,
       }),
     });
-  }
+  };
 
   /** Generates an array of unique game names (wrapped) */
-  function generateGames() {
+  const generateGames: gameChildInputs = () => {
     const nameContext = new Set<string>();
     const nameGenerator = createSentenceGenerator({
       words: [1, 2],
@@ -109,10 +115,10 @@ async function main() {
         ],
       }),
     });
-  }
+  };
 
   /** Generates an array of unique book names including an icon string */
-  function generateBooks() {
+  const generateBooks: bookChildInputs = () => {
     const nameContext = new Set<string>();
     const nameGenerator = createSentenceGenerator({
       words: [1, 3],
@@ -126,9 +132,9 @@ async function main() {
         name: generateUnique(nameContext, nameGenerator),
       }),
     });
-  }
+  };
 
-  function generateTeams() {
+  const generateTeams: teamChildInputs = () => {
     const nameContext = new Set<string>();
     const nameGenerator = createSentenceGenerator({
       words: [2, 4],
@@ -140,10 +146,40 @@ async function main() {
       range: [2, 2],
       fillFn: () => ({
         name: generateUnique(nameContext, nameGenerator),
-        book: generateBooks(),
+        book: generateBooks,
       }),
     });
-  }
+  };
+
+  const generateArenas: arenaChildInputs = () => {
+    const nameContext = new Set<string>();
+    const nameGenerator = createSentenceGenerator({
+      words: [2, 3],
+      maxLength: 20,
+      casing: "PascalCase",
+    });
+
+    return generateArray({
+      range: [5, 8],
+      fillFn: () => ({
+        name: generateUnique(nameContext, nameGenerator),
+        arena_level: () => [
+          {
+            image: "https://svgshare.com/i/161z.svg",
+            index: 0,
+          },
+          {
+            image: "https://svgshare.com/i/162B.svg",
+            index: 1,
+          },
+          {
+            image: "https://svgshare.com/i/1602.svg",
+            index: 2,
+          },
+        ],
+      }),
+    });
+  };
 
   /** Generates an array of blueprint tags */
   function generateBlueprintTags() {
@@ -179,11 +215,20 @@ async function main() {
     { connect: { game } },
   );
 
-  const { arena } = await seed.arena((x) => x(10), { connect: { game } });
-
-  await seed.blueprint((x) => x(500, { tags: generateBlueprintTags }), {
-    connect: { book, plan, arena, game },
+  const { arena, arena_level } = await seed.arena(generateArenas, {
+    connect: { game },
   });
+
+  await seed.blueprint(
+    (x) =>
+      x(500, {
+        tags: generateBlueprintTags,
+        blueprint_stage: () => [{ index: 0 }, { index: 1 }, { index: 2 }],
+      }),
+    {
+      connect: { book, plan, game, arena, arena_level },
+    },
+  );
 
   await seed.member_role([
     {

@@ -24,6 +24,7 @@ import {
   useEffect,
   useMemo,
 } from "react";
+import { TeamMemberData } from "../actions";
 
 export interface EditorCharacterData extends BlueprintCharacterData {
   gadgets: Record<number, CharacterGadgetSlotData>;
@@ -33,6 +34,7 @@ export interface EditorContextServer extends CanvasContextInteractStatus {
   blueprint: BlueprintData;
   slots: EditorSlotsData;
   characters: EditorCharactersData;
+  member: TeamMemberData | null;
 }
 
 export interface EditorContext
