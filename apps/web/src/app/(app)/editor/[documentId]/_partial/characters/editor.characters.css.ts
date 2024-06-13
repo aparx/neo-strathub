@@ -9,6 +9,7 @@ export const list = style([
   overlayHeaderBackground,
   sprinkles({ outline: "card" }),
   {
+    gridArea: "center",
     position: "absolute",
     bottom: vars.spacing["2xl"],
     left: "50%",

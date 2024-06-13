@@ -1,3 +1,4 @@
+"use client";
 import { EDITOR_RENDERERS } from "@/modules/editor/components/viewport";
 import { GameObjectData, GameObjectType } from "@/modules/gameObject/hooks";
 import { createCanvasNode } from "@repo/canvas";

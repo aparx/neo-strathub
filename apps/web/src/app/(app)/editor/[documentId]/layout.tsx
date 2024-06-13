@@ -2,10 +2,6 @@ import {
   EditorCharacterData,
   EditorContextProvider,
 } from "@/app/(app)/editor/[documentId]/_context";
-import {
-  EditorCharacters,
-  EditorHeader,
-} from "@/app/(app)/editor/[documentId]/_partial";
 import { FullPageEditorSpinner } from "@/app/(app)/editor/[documentId]/edit/page";
 import {
   CharacterGadgetSlotData,
@@ -19,6 +15,7 @@ import { EditorEventHandler } from "@/modules/editor/features/events";
 import { getServer } from "@/utils/supabase/actions";
 import { cookies } from "next/headers";
 import React, { Suspense } from "react";
+import { EditorCharacters, EditorHeader } from "./_partial";
 import { getTeamMember } from "./actions";
 import * as css from "./layout.css";
 
@@ -93,7 +90,7 @@ async function Content({
         movable
         selectable
       >
-        <div className={css.content}>
+        <div className={css.grid}>
           <EditorHeader />
           <EditorCharacters />
           {/*<EditorInspector />*/}

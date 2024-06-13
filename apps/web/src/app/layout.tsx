@@ -30,6 +30,8 @@ export default function RootLayout({
           style={{
             background: vars.colors.accents[0],
             color: vars.colors.emphasis.high,
+            minWidth: "100dvw",
+            minHeight: "100dvh",
           }}
         >
           <TanstackQueryProvider>{children}</TanstackQueryProvider>

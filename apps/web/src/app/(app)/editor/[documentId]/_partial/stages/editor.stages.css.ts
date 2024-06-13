@@ -1,16 +1,15 @@
 import { sprinkles, vars } from "@repo/theme";
 import { keyframes, style } from "@vanilla-extract/css";
-import { calc } from "@vanilla-extract/css-utils";
 import { recipe } from "@vanilla-extract/recipes";
 import { overlayPartialBackground } from "../editor.css";
-import { EDITOR_HEADER_HEIGHT } from "../header/editor.header.css";
 
 export const container = style([
   overlayPartialBackground,
   sprinkles({ outline: "card" }),
   {
+    gridArea: "center",
     position: "absolute",
-    top: calc.add(`${EDITOR_HEADER_HEIGHT}px`, vars.spacing.md),
+    top: 0,
     left: "50%",
     transform: "translateX(-50%)",
     zIndex: 99,

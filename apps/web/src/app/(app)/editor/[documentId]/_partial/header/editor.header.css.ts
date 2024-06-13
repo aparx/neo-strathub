@@ -8,14 +8,12 @@ export const EDITOR_HEADER_HEIGHT = 50;
 export const headerContainer = style([
   overlayHeaderBackground,
   {
-    position: "absolute",
-    top: 0,
+    gridArea: "header",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     height: EDITOR_HEADER_HEIGHT,
     zIndex: 99,
-    width: "100%",
     paddingLeft: vars.spacing.lg,
     paddingRight: vars.spacing.lg,
     animation: `${keyframes({

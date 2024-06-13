@@ -55,6 +55,7 @@ export function EditorWindow({ stages }: EditorWindowProps) {
 
   return (
     <main
+      style={{ position: "absolute", left: 0, right: 0 }}
       onDragOver={(e) => {
         if (!editor.editable) return;
         e.preventDefault();
