@@ -1,5 +1,5 @@
 import { sprinkles, vars } from "@repo/theme";
-import { style } from "@vanilla-extract/css";
+import { keyframes, style } from "@vanilla-extract/css";
 import { calc } from "@vanilla-extract/css-utils";
 import { recipe } from "@vanilla-extract/recipes";
 import { overlayPartialBackground } from "../editor.css";
@@ -10,12 +10,13 @@ export const container = style([
   sprinkles({ outline: "card" }),
   {
     position: "absolute",
-    top: calc.add(`${EDITOR_HEADER_HEIGHT}px`, vars.spacing.lg),
+    top: calc.add(`${EDITOR_HEADER_HEIGHT}px`, vars.spacing.md),
     left: "50%",
     transform: "translateX(-50%)",
     zIndex: 99,
     padding: vars.spacing.sm,
     borderRadius: vars.roundness.full,
+    animation: `${keyframes({ from: { opacity: 0 } })} .5s`,
   },
 ]);
 
@@ -53,4 +54,16 @@ export const stageItem = recipe({
   defaultVariants: {
     active: false,
   },
+});
+
+export const stagePrefix = sprinkles({
+  display: {
+    desktop: "inline",
+    tablet: "none",
+    mobile: "none",
+  },
+});
+
+export const stageIconActive = style({
+  animation: `${keyframes({ from: { scale: 0.5 } })} .33s`,
 });

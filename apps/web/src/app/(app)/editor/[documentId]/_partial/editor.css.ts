@@ -3,7 +3,7 @@ import { blendAlpha } from "@repo/ui/utils";
 import { style } from "@vanilla-extract/css";
 
 export const overlayHeaderBackground = style({
-  background: blendAlpha(vars.colors.accents[2], 0.9),
+  background: blendAlpha(vars.colors.accents[2], 0.95),
   backdropFilter: "blur(15px)",
 });
 

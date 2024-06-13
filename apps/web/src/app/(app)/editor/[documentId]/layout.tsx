@@ -14,6 +14,7 @@ import {
   getPlayerSlots,
 } from "@/modules/blueprint/actions";
 import { getBlueprint } from "@/modules/blueprint/actions/getBlueprint";
+import { getBlueprintStages } from "@/modules/blueprint/actions/getBlueprintStages";
 import { EditorEventHandler } from "@/modules/editor/features/events";
 import { getServer } from "@/utils/supabase/actions";
 import { cookies } from "next/headers";
@@ -59,9 +60,10 @@ async function Content({
 
   // Query all player slots & gadget slots of all characters
   const playerSlots = await getPlayerSlots(blueprint.book.team.id);
-  const [gadgetSlots, member] = await Promise.all([
+  const [gadgetSlots, member, stages] = await Promise.all([
     getCharacterGadgetSlots(characters?.map((ch) => ch.id) ?? []),
     getTeamMember(user.data.user.id, blueprint?.id),
+    getBlueprintStages(blueprint.id),
   ]);
 
   // Accumulate and index all characters and their appropriate gadgets
@@ -84,6 +86,7 @@ async function Content({
         blueprint={blueprint}
         characters={finalCharacters}
         slots={playerSlots ?? []}
+        stages={stages ?? []}
         member={member}
         editable
         zoomable

@@ -1,33 +1,29 @@
-import { getServiceServer } from "@/utils/supabase/actions";
+"use client";
 import { Spinner } from "@repo/ui/components";
 import dynamic from "next/dynamic";
-import { cookies } from "next/headers";
+import { useSearchParams } from "next/navigation";
+import { useMemo } from "react";
+import { useEditor } from "../_context";
 import * as css from "./page.css";
 
-export default async function EditorEditPage({
-  params,
-  searchParams,
-}: {
-  params: { documentId: string };
-  searchParams: { stage?: number };
-}) {
-  // TODO replace with anon server & define what stage is to be seen
-  const qb = getServiceServer(cookies())
-    .from("blueprint_stage")
-    .select("id")
-    .eq("blueprint_id", params.documentId)
-    .order("index")
-    .limit(1);
-  if (searchParams.stage != null) qb.eq("index", searchParams.stage);
-  const stageQuery = await qb.single().throwOnError();
+export default function EditorEditPage() {
+  const [{ stages }] = useEditor();
+  const searchParams = useSearchParams();
+  const showIndex = Number(searchParams.get("stage")) || -1;
+  const stageData = useMemo(
+    () =>
+      stages.map((x, i) => ({
+        id: x.id,
+        shown: (i === 0 && showIndex < 0) || x.index === showIndex,
+      })),
+    [stages, showIndex],
+  );
 
-  // Get the stage of the blueprint
-  if (!stageQuery.data) throw new Error("Could not find stage");
-  return <EditorWindow stageId={stageQuery.data.id} />;
+  return <EditorWindow stages={stageData} />;
 }
 
 const EditorWindow = dynamic(
-  async () => (await import("./window")).EditorEditContent,
+  async () => (await import("../window")).EditorWindow,
   {
     loading: () => <FullPageEditorSpinner />,
     ssr: false,

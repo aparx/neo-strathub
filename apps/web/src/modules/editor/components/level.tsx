@@ -26,6 +26,7 @@ export interface EditorLevelProps extends CanvasLevelData, EditorLevelEvents {
   stageId: number; // TODO move to context?
   index: number;
   style: CanvasLevelStyle;
+  hidden?: boolean;
 }
 
 export interface EditorLevelEvents {
@@ -47,18 +48,13 @@ export function EditorLevel({
   onNodeDelete,
   onNodeCreate,
   style,
+  hidden,
   ...restProps
 }: EditorLevelProps) {
   const canvas = useCanvas();
   const [editor, updateEditor] = useEditor();
   const [nodes, setNodes] = useState<CanvasNode[]>([]);
-  const { data, refetch, isRefetching } = useGetBlueprintObjects(stageId, id);
-
-  useEffect(() => {
-    // Force a complete refetch when the level component is initially mounted
-    // even tho data already exists (as in the case for soft navigation).
-    if (data && !isRefetching) refetch();
-  }, []);
+  const { data } = useGetBlueprintObjects(stageId, id);
 
   useEffect(() => {
     if (!data) return setNodes([]);
@@ -84,10 +80,11 @@ export function EditorLevel({
 
   useCreateEvent({ onNodeCreate, setNodes, levelId: id, stageId });
 
-  return (
+  return hidden ? null : (
     <CanvasLevel
       id={id}
       style={style}
+      stageId={stageId}
       {...restProps}
       onMouseEnter={() => updateEditor((o) => ({ ...o, focusedLevel: id }))}
       strokeEnabled={editor.focusedLevel === id}

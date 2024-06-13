@@ -5,6 +5,11 @@ import {
   PlayerSlotData,
 } from "@/modules/blueprint/actions";
 import type { BlueprintData } from "@/modules/blueprint/actions/getBlueprint";
+import { BlueprintStageData } from "@/modules/blueprint/actions/getBlueprintStages";
+import {
+  CommandHistory,
+  EditorCommand,
+} from "@/modules/editor/features/command";
 import { useEditorEvent } from "@/modules/editor/features/events/hooks";
 import {
   EditorRealtimeChannel,
@@ -35,6 +40,7 @@ export interface EditorContextServer extends CanvasContextInteractStatus {
   slots: EditorSlotsData;
   characters: EditorCharactersData;
   member: TeamMemberData | null;
+  stages: BlueprintStageData[];
 }
 
 export interface EditorContext
@@ -45,6 +51,7 @@ export interface EditorContext
   focusedLevel: number | Nullish;
   /** Currently dragged node (used for drag'n'drop) */
   dragged: CanvasNode | Nullish;
+  history: CommandHistory<EditorCommand>;
 }
 
 type EditorSlotsData = Record<number, PlayerSlotData>;
@@ -63,14 +70,15 @@ export function EditorContextProvider({
 }) {
   const channel = useMemo(() => new EditorRealtimeChannel(), []);
 
-  const context = useSharedState<EditorContext>({
+  const context = useSharedState<EditorContext>(() => ({
     channel,
     focusedLevel: undefined,
     dragged: undefined,
     objectCache: {},
+    history: new CommandHistory(15),
     blueprint,
     ...restContext,
-  });
+  }));
 
   // Setup a channel immediately
   useEffect(() => {

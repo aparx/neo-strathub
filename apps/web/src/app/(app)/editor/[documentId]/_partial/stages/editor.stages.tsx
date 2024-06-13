@@ -2,17 +2,17 @@
 import { useURL } from "@/utils/hooks";
 import { Icon, Text } from "@repo/ui/components";
 import Link from "next/link";
-import { TbProgressBolt } from "react-icons/tb";
+import { useSearchParams } from "next/navigation";
+import { RiStackFill, RiStackLine } from "react-icons/ri";
 import * as css from "./editor.stages.css";
 
 export function EditorStages() {
-  const url = useURL();
-  const active = Number(url.searchParams.get("stage"));
+  const active = Number(useSearchParams().get("stage"));
 
   return (
     <section className={css.container}>
       <ol className={css.stageList}>
-        {Array.from({ length: 3 }, (_, i) => (
+        {Array.from({ length: 4 }, (_, i) => (
           <StageItem key={i} active={i === active} index={i} />
         ))}
       </ol>
@@ -25,12 +25,17 @@ function StageItem({ index, active }: { index: number; active?: boolean }) {
   url.searchParams.set("stage", String(index));
 
   return (
-    <Text asChild type="label" className={css.stageItem({ active })}>
+    <Text asChild type="label" size="lg" className={css.stageItem({ active })}>
       <Link href={url}>
         <Icon.Custom>
-          <TbProgressBolt />
+          {active ? (
+            <RiStackFill className={css.stageIconActive} />
+          ) : (
+            <RiStackLine />
+          )}
         </Icon.Custom>
-        Stage {1 + index}
+        <span className={css.stagePrefix}>Stage </span>
+        {1 + index}
       </Link>
     </Text>
   );

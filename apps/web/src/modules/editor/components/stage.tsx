@@ -1,19 +1,12 @@
 import { useEditor } from "@/app/(app)/editor/[documentId]/_context";
 import { BlueprintData } from "@/modules/blueprint/actions/getBlueprint";
-import { CanvasLevelStyle, CanvasNode, useCanvas } from "@repo/canvas";
+import { CanvasLevelStyle, CanvasNode } from "@repo/canvas";
 import type Konva from "konva";
-import { useMemo } from "react";
 import { deleteNodes, upsertNodes } from "../actions";
-import {
-  CommandHistory,
-  EditorCommand,
-  createUpdateCommand,
-} from "../features/command";
+import { EditorCommand, createUpdateCommand } from "../features/command";
 import { createCreateCommand } from "../features/command/commands/createCommand";
 import { createDeleteCommand } from "../features/command/commands/deleteCommand";
-import { EditorEventOrigin, useEditorEventHandler } from "../features/events";
-import { useEditorEvent } from "../features/events/hooks";
-import { useSubscribeRealtimeEditor } from "../features/realtime";
+import { EditorEventOrigin } from "../features/events";
 import { GetLevelData, useGetLevels } from "../hooks";
 import { useBatch } from "../hooks/useBatch";
 import { EditorLevel } from "./level";
@@ -31,6 +24,7 @@ export interface EditorStageProps {
   stageId: number;
   style: EditorStageStyle;
   position: Konva.Vector2d;
+  hidden?: boolean;
 }
 
 /** An editor stage is rendered within a canvas and represents a stage */
@@ -39,10 +33,8 @@ export function EditorStage({
   stageId,
   style,
   position,
+  hidden,
 }: EditorStageProps) {
-  const eventHandler = useEditorEventHandler();
-  const [editor] = useEditor();
-  const canvas = useCanvas();
   const { data } = useGetLevels(blueprint.arena.id);
 
   // TODO change history for UNDO & REDO
@@ -57,61 +49,35 @@ export function EditorStage({
     } as const satisfies Konva.Vector2d;
   }
 
-  const history = useMemo(() => new CommandHistory<EditorCommand>(15), []);
-
-  useEditorEvent("editorUndo", async (e) => {
-    if (e.origin !== "user") return;
-    const lastCommand = history.moveBack();
-    const negatePromise = lastCommand?.negate();
-    if (!negatePromise) return;
-    const negate = await negatePromise;
-    eventHandler.fire(negate.eventType, "history", negate.payload);
-    editor.channel.broadcast(negate.eventType, negate.payload);
-  });
-
-  useEditorEvent("editorRedo", (e) => {
-    if (e.origin !== "user") return;
-    const nextCommand = history.moveForward();
-    const event = nextCommand?.payload;
-    if (!event || !nextCommand) return;
-    eventHandler.fire(nextCommand.eventType, "history", event);
-    editor.channel.broadcast(nextCommand.eventType, event);
-  });
-
-  useSubscribeRealtimeEditor(editor.channel, "*", (payload, type) => {
-    console.debug("Received foreign event", type, payload);
-    eventHandler.fire(type, "foreign", payload);
-  });
-
   return data?.map((level, index) => (
     <Level
       key={level.id}
-      history={history}
       stageId={stageId}
       position={createPosition(index)}
       level={level}
       style={style.levelStyle}
+      hidden={hidden}
     />
   ));
 }
 
 function Level({
   level,
-  history,
   stageId,
   position,
   style,
+  hidden,
 }: {
   level: GetLevelData;
-  history: CommandHistory<EditorCommand>;
   stageId: number;
   position: Konva.Vector2d;
   style: CanvasLevelStyle;
+  hidden?: boolean;
 }) {
   const [editor] = useEditor();
 
   function pushCommand(command: EditorCommand) {
-    history.push(command);
+    editor.history.push(command);
     editor.channel.broadcast(command.eventType, command.payload);
   }
 
@@ -187,6 +153,7 @@ function Level({
         if (origin !== "foreign") pushInsert({ node, origin });
       }}
       style={style}
+      hidden={hidden}
     />
   );
 }
