@@ -1,5 +1,5 @@
 import Konva from "konva";
-import { useMemo } from "react";
+import { forwardRef, useMemo } from "react";
 import * as ReactKonva from "react-konva";
 import { useImage } from "react-konva-utils";
 import { NodeTags } from "./utils";
@@ -29,55 +29,51 @@ export type CanvasLevelProps = ReactKonva.KonvaNodeEvents &
     style: CanvasLevelStyle;
   };
 
-export function CanvasLevel({
-  children,
-  id,
-  position,
-  imageURL,
-  style,
-  ...restProps
-}: CanvasLevelProps) {
-  const { width, height, padding, background, clipPadding } = style;
-  const finalClipPadding = clipPadding ?? 0;
+export const CanvasLevel = forwardRef<Konva.Layer, CanvasLevelProps>(
+  ({ children, id, position, imageURL, style, ...restProps }, ref) => {
+    const { width, height, padding, background, clipPadding } = style;
+    const finalClipPadding = clipPadding ?? 0;
 
-  const [image] = useImage(imageURL);
-  const imageScale = useMemo(() => {
-    if (!image) return undefined;
-    return Math.min(
-      (width - 2 * padding) / image.width,
-      (height - 2 * padding) / image.height,
+    const [image] = useImage(imageURL);
+    const imageScale = useMemo(() => {
+      if (!image) return undefined;
+      return Math.min(
+        (width - 2 * padding) / image.width,
+        (height - 2 * padding) / image.height,
+      );
+    }, [image, width, height, padding]);
+
+    return (
+      <ReactKonva.Layer
+        ref={ref}
+        name={NodeTags.LEVEL_LAYER}
+        id={String(id)}
+        x={position.x}
+        y={position.y}
+        clipX={-finalClipPadding}
+        clipY={-finalClipPadding}
+        clipWidth={width + 2 * finalClipPadding}
+        clipHeight={height + 2 * finalClipPadding}
+      >
+        <ReactKonva.Rect
+          name={NodeTags.NO_SELECT}
+          width={width}
+          height={height}
+          fill={background ?? "white"}
+          cornerRadius={10}
+          {...restProps}
+        />
+        <ReactKonva.Image
+          listening={false}
+          name={NodeTags.NO_SELECT}
+          image={image}
+          x={padding}
+          y={padding}
+          scaleX={imageScale}
+          scaleY={imageScale}
+        />
+        {children}
+      </ReactKonva.Layer>
     );
-  }, [image, width, height, padding]);
-
-  return (
-    <ReactKonva.Layer
-      name={NodeTags.LEVEL_LAYER}
-      id={String(id)}
-      x={position.x}
-      y={position.y}
-      clipX={-finalClipPadding}
-      clipY={-finalClipPadding}
-      clipWidth={width + 2 * finalClipPadding}
-      clipHeight={height + 2 * finalClipPadding}
-    >
-      <ReactKonva.Rect
-        name={NodeTags.NO_SELECT}
-        width={width}
-        height={height}
-        fill={background ?? "white"}
-        cornerRadius={10}
-        {...restProps}
-      />
-      <ReactKonva.Image
-        listening={false}
-        name={NodeTags.NO_SELECT}
-        image={image}
-        x={padding}
-        y={padding}
-        scaleX={imageScale}
-        scaleY={imageScale}
-      />
-      {children}
-    </ReactKonva.Layer>
-  );
-}
+  },
+);

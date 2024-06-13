@@ -34,11 +34,12 @@ export const stageItem = recipe({
     listStyle: "none",
     padding: vars.spacing.md,
     borderRadius: vars.roundness.full,
+    border: "unset",
   },
   variants: {
     active: {
       false: {
-        color: vars.emphasis.medium,
+        color: vars.colors.emphasis.medium,
         ":hover": {
           background: vars.colors.state.hover.color,
           color: vars.colors.emphasis.high,

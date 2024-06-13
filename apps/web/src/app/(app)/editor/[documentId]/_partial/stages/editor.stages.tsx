@@ -4,16 +4,22 @@ import { Icon, Text } from "@repo/ui/components";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { RiStackFill, RiStackLine } from "react-icons/ri";
+import { useEditor } from "../../_context";
 import * as css from "./editor.stages.css";
 
 export function EditorStages() {
+  const [{ stages }] = useEditor();
   const active = Number(useSearchParams().get("stage"));
 
   return (
     <section className={css.container}>
       <ol className={css.stageList}>
-        {Array.from({ length: 4 }, (_, i) => (
-          <StageItem key={i} active={i === active} index={i} />
+        {stages.map((stage) => (
+          <StageItem
+            key={stage.id}
+            active={stage.index === active}
+            index={stage.index}
+          />
         ))}
       </ol>
     </section>

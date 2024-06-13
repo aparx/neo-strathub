@@ -9,6 +9,7 @@ import {
   ObjectRenderer,
 } from "@repo/canvas";
 import { useCanvas } from "@repo/canvas/src/context/canvasContext";
+import Konva from "konva";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { Html } from "react-konva-utils";
 import { v4 as uuidv4 } from "uuid";
@@ -55,6 +56,7 @@ export function EditorLevel({
   const [editor, updateEditor] = useEditor();
   const [nodes, setNodes] = useState<CanvasNode[]>([]);
   const { data } = useGetBlueprintObjects(stageId, id);
+  const layerRef = useRef<Konva.Layer>(null);
 
   useEffect(() => {
     if (!data) return setNodes([]);
@@ -80,8 +82,13 @@ export function EditorLevel({
 
   useCreateEvent({ onNodeCreate, setNodes, levelId: id, stageId });
 
+  useEffect(() => {
+    layerRef.current?.setAttr("stageId", stageId);
+  });
+
   return hidden ? null : (
     <CanvasLevel
+      ref={layerRef}
       id={id}
       style={style}
       stageId={stageId}
