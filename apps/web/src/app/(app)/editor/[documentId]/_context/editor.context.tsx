@@ -48,7 +48,10 @@ export interface EditorContext
     EditorContextServer {
   channel: EditorRealtimeChannelContract;
   objectCache: Record<number, GameObjectData>;
-  focusedLevel: number | Nullish;
+  focusedLevel: Nullish<{
+    levelId: number;
+    stageId: number;
+  }>;
   /** Currently dragged node (used for drag'n'drop) */
   dragged: CanvasNode | Nullish;
   history: CommandHistory<EditorCommand>;

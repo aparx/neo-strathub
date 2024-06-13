@@ -41,6 +41,9 @@ export interface EditorLevelEvents {
   onNodeCreate: (node: CanvasNode, origin: EditorEventOrigin) => any;
 }
 
+/** Attribute key used for a Konva-Layer to describe of what stage a level is */
+export const LAYER_STAGE_ATTR_KEY = "stageId";
+
 export function EditorLevel({
   id,
   index,
@@ -83,8 +86,12 @@ export function EditorLevel({
   useCreateEvent({ onNodeCreate, setNodes, levelId: id, stageId });
 
   useEffect(() => {
-    layerRef.current?.setAttr("stageId", stageId);
-  });
+    layerRef.current?.setAttr(LAYER_STAGE_ATTR_KEY, stageId);
+  }, [stageId, layerRef.current]);
+
+  const isActive =
+    editor.focusedLevel?.levelId === id &&
+    editor.focusedLevel?.stageId === stageId;
 
   return hidden ? null : (
     <CanvasLevel
@@ -93,8 +100,16 @@ export function EditorLevel({
       style={style}
       stageId={stageId}
       {...restProps}
-      onMouseEnter={() => updateEditor((o) => ({ ...o, focusedLevel: id }))}
-      strokeEnabled={editor.focusedLevel === id}
+      onMouseEnter={() =>
+        updateEditor((oldContext) => ({
+          ...oldContext,
+          focusedLevel: {
+            levelId: id,
+            stageId,
+          },
+        }))
+      }
+      strokeEnabled={isActive}
       stroke={style.focusStroke}
       strokeWidth={3}
       strokeScaleEnabled={false}
@@ -112,7 +127,7 @@ export function EditorLevel({
         <LevelIndicator
           levelNumber={1 + index}
           canvas={canvas}
-          focused={editor.focusedLevel === id}
+          focused={isActive}
         />
       </Html>
       {nodes?.map((node, index) => (

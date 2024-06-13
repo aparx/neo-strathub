@@ -1,4 +1,5 @@
 "use client";
+import { LAYER_STAGE_ATTR_KEY } from "@/modules/editor/components/level";
 import { EditorStage } from "@/modules/editor/components/stage";
 import { EditorViewport } from "@/modules/editor/components/viewport";
 import { useEditorEventHandler } from "@/modules/editor/features/events";
@@ -71,7 +72,10 @@ export function EditorWindow({ stages }: EditorWindowProps) {
         if (level)
           updateEditor((oldContext) => ({
             ...oldContext,
-            focusedLevel: Number(level.id()),
+            focusedLevel: {
+              levelId: Number(level.id()),
+              stageId: Number(level.getAttr(LAYER_STAGE_ATTR_KEY)),
+            },
           }));
       }}
       onDrop={(e) => {
@@ -79,15 +83,16 @@ export function EditorWindow({ stages }: EditorWindowProps) {
         const stage = canvasRef.current?.canvas.current;
         const node = editor.dragged;
         if (!stage || !node) return;
-        let targetLevelId = editor.focusedLevel;
+        const focused = editor.focusedLevel;
         const layer = stage.children.find((layer) =>
-          targetLevelId
-            ? layer.id() === String(targetLevelId)
+          focused
+            ? Number(layer.id()) === focused.levelId &&
+              Number(layer.getAttr(LAYER_STAGE_ATTR_KEY)) === focused.stageId
             : layer.hasName(NodeTags.LEVEL_LAYER),
         );
         if (!layer) throw new Error("Could not find level layer");
         stage.setPointersPositions(e);
-        const stageId = Number(layer.getAttr("stageId"));
+        const stageId = Number(layer.getAttr(LAYER_STAGE_ATTR_KEY));
         const relPos = layer.getRelativePointerPosition();
         if (!relPos) throw new Error("Could not determine cursor position");
 
