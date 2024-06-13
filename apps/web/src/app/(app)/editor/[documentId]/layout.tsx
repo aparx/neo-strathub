@@ -68,7 +68,6 @@ async function Content({
   const finalCharacters = {} as Record<number, EditorCharacterData>;
   characters.forEach((character) => {
     const finalGadgets = {} as Record<number, CharacterGadgetSlotData>;
-    console.log("gadget slots");
     gadgetSlots.forEach((gadget) => {
       if (gadget.character_id !== character.id) return;
       finalGadgets[gadget.id] = gadget;

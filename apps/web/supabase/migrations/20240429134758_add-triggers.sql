@@ -314,23 +314,28 @@ create or replace function on_blueprint_create()
     returns trigger as
 $$
 declare
-    _game_player_count int;
+    _team_id uuid;
+    _slot    record;
+    _i       int = 0;
 begin
-    -- Get the game off the book of this blueprint to get the player count
-    select (public.game.metadata ->> 'player_count')::int
-    into _game_player_count
-    from public.team
-             left join game on game.id = team.game_id
-    where team.id = (select team_id
-                     from public.book
-                     where book.id = new.book_id);
+    select public.book.team_id
+    into _team_id
+    from public.book
+    where book.id = new.book_id;
 
-    for i in 1..coalesce(_game_player_count, 1)
+    if (_team_id is null) then
+        raise exception 'Team could not be found';
+    end if;
+
+    for _slot in (select id
+                  from public.player_slot
+                  where team_id = _team_id
+                  order by index)
         loop
-            insert into public.blueprint_character (blueprint_id, index)
-            values (new.id, i - 1);
+            insert into public.blueprint_character (blueprint_id, index, slot_id)
+            values (new.id, _i, _slot.id);
+            _i := 1 + _i;
         end loop;
-
     return new;
 end;
 $$ volatile language plpgsql
@@ -344,23 +349,30 @@ execute function on_blueprint_create();
 
 -- ---------------------------- blueprint_character ----------------------------
 
-create or replace function verify_blueprint_character()
+create or replace function on_blueprint_character_upsert()
     returns trigger as
 $$
 declare
-    _slot_team_id uuid;
+    _slot_team_id      uuid;
+    _blueprint_team_id uuid;
 begin
     -- Verify the slot is in the same team as the character
-    select team_id
+    select public.player_slot.team_id
     into _slot_team_id
     from public.player_slot
     where id = new.slot_id;
 
-    if (_slot_team_id is null) then
+    select public.book.team_id
+    into _blueprint_team_id
+    from public.blueprint
+             inner join public.book on book.id = blueprint.book_id
+    where blueprint.id = new.blueprint_id;
+
+    if (_slot_team_id is null or _blueprint_team_id is null) then
         return new; -- Do nothing
     end if;
 
-    if (_slot_team_id != new.team_id) then
+    if (_slot_team_id != _blueprint_team_id) then
         raise exception 'Team ID of slot and character are mismatching';
     end if;
 
@@ -373,13 +385,13 @@ create trigger trigger_verify_blueprint_character_update
     before update of slot_id
     on public.blueprint_character
     for each row
-execute function verify_blueprint_character();
+execute function on_blueprint_character_upsert();
 
 create trigger trigger_verify_blueprint_character_insert
     before insert
     on public.blueprint_character
     for each row
-execute function verify_blueprint_character();
+execute function on_blueprint_character_upsert();
 
 create or replace function on_blueprint_character_create()
     returns trigger as
