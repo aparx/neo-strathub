@@ -32,7 +32,7 @@ function StageItem({ index, active }: { index: number; active?: boolean }) {
 
   return (
     <Text asChild type="label" size="lg" className={css.stageItem({ active })}>
-      <Link href={url} replace>
+      <Link href={url}>
         <Icon.Custom>
           {active ? (
             <RiStackFill className={css.stageIconActive} />

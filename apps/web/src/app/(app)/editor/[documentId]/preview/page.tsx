@@ -1,10 +1,10 @@
 "use client";
 import dynamic from "next/dynamic";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useEditor } from "../_context";
 
 export default function EditorPreviewPage() {
-  const [{ stages }] = useEditor();
+  const [{ stages }, updateEditor] = useEditor();
   const stageData = useMemo(
     () =>
       stages.map((x) => ({
@@ -13,6 +13,14 @@ export default function EditorPreviewPage() {
       })),
     [stages],
   );
+
+  useEffect(() => {
+    updateEditor((oldContext) => ({
+      ...oldContext,
+      selectable: false,
+      editable: false,
+    }));
+  }, []);
 
   return <EditorWindow stages={stageData} />;
 }

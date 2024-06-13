@@ -17,6 +17,7 @@ export const container = style([
     padding: vars.spacing.sm,
     borderRadius: vars.roundness.full,
     animation: `${keyframes({ from: { opacity: 0 } })} .5s`,
+    userSelect: "none",
   },
 ]);
 

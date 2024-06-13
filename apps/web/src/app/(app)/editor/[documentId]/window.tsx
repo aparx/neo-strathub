@@ -7,7 +7,7 @@ import { useEditorEvent } from "@/modules/editor/features/events/hooks";
 import { useSubscribeRealtimeEditor } from "@/modules/editor/features/realtime";
 import { NodeTags, getLevelLayerAtCursor } from "@repo/canvas";
 import { CanvasContext } from "@repo/canvas/src/context/canvasContext";
-import { useEffect, useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
 import { useWindowSize } from "usehooks-ts";
 import { useEditor } from "./_context";
 import { EditorConfig } from "./_utils";
@@ -28,14 +28,6 @@ export function EditorWindow({ stages }: EditorWindowProps) {
   // https://svgshare.com/i/1602.svg
 
   const canvasRef = useRef<CanvasContext>(null);
-
-  useEffect(() => {
-    updateEditor((old) => ({
-      ...old,
-      editable: true,
-      selectable: true,
-    }));
-  }, []);
 
   useEditorEvent("editorUndo", async (e) => {
     if (e.origin !== "user") return;

@@ -2,7 +2,7 @@ import { EditorStageStyle } from "@/modules/editor/components/stage";
 import { CanvasLevelStyle } from "@repo/canvas";
 
 export module EditorConfig {
-  export const FOCUS_COLOR = [66, 111, 230] as const;
+  export const FOCUS_COLOR = [107, 185, 242] as const;
 
   export const LEVEL_STYLE = {
     width: 1200,

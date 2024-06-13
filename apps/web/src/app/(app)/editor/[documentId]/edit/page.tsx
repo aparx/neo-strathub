@@ -2,12 +2,12 @@
 import { Spinner } from "@repo/ui/components";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useEditor } from "../_context";
 import * as css from "./page.css";
 
 export default function EditorEditPage() {
-  const [{ stages }] = useEditor();
+  const [{ stages }, updateEditor] = useEditor();
   const searchParams = useSearchParams();
   const showIndex = Number(searchParams.get("stage")) || -1;
   const stageData = useMemo(
@@ -18,6 +18,14 @@ export default function EditorEditPage() {
       })),
     [stages, showIndex],
   );
+
+  useEffect(() => {
+    updateEditor((oldContext) => ({
+      ...oldContext,
+      editable: true,
+      selectable: true,
+    }));
+  }, []);
 
   return <EditorWindow stages={stageData} />;
 }
