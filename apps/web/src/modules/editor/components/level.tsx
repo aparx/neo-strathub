@@ -1,4 +1,4 @@
-import { useEditor } from "@/app/(app)/editor/[documentId]/_context";
+import { useEditorContext } from "@/app/(app)/editor/[documentId]/_context";
 import {
   CanvasLevel,
   CanvasLevelData,
@@ -56,7 +56,7 @@ export function EditorLevel({
   ...restProps
 }: EditorLevelProps) {
   const canvas = useCanvas();
-  const [editor, updateEditor] = useEditor();
+  const [editor, updateEditor] = useEditorContext();
   const [nodes, setNodes] = useState<CanvasNode[]>([]);
   const { data } = useGetBlueprintObjects(stageId, id);
   const layerRef = useRef<Konva.Layer>(null);

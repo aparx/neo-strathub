@@ -11,11 +11,11 @@ import {
   Text,
 } from "@repo/ui/components";
 import Link from "next/link";
-import { useEditor } from "../../_context";
+import { useEditorContext } from "../../_context";
 import * as css from "./editor.header.css";
 
 export function EditorHeader() {
-  const [{ blueprint }] = useEditor();
+  const [{ blueprint }] = useEditorContext();
 
   return (
     <Text asChild>
@@ -40,7 +40,7 @@ export function EditorHeader() {
 }
 
 function BlueprintTitle() {
-  const [{ blueprint }] = useEditor();
+  const [{ blueprint }] = useEditorContext();
 
   return (
     <Popover.Root>

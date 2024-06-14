@@ -4,11 +4,11 @@ import { Icon, Text } from "@repo/ui/components";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { RiStackFill, RiStackLine } from "react-icons/ri";
-import { useEditor } from "../../_context";
+import { useEditorContext } from "../../_context";
 import * as css from "./editor.stages.css";
 
 export function EditorStages() {
-  const [{ stages }] = useEditor();
+  const [{ stages }] = useEditorContext();
   const active = Number(useSearchParams().get("stage"));
 
   return (

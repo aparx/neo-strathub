@@ -1,10 +1,12 @@
 "use client";
+import { useTeamContext } from "@/modules/team/context";
 import dynamic from "next/dynamic";
 import { useEffect, useMemo } from "react";
-import { useEditor } from "../_context";
+import { useEditorContext } from "../_context";
 
 export default function EditorPreviewPage() {
-  const [{ stages }, updateEditor] = useEditor();
+  const [{ stages, blueprint }, updateEditor] = useEditorContext();
+  const [{ updatePresence }] = useTeamContext();
   const stageData = useMemo(
     () =>
       stages.map((x) => ({
@@ -15,6 +17,7 @@ export default function EditorPreviewPage() {
   );
 
   useEffect(() => {
+    updatePresence({ documentId: blueprint.id, status: "online" });
     updateEditor((oldContext) => ({
       ...oldContext,
       selectable: false,

@@ -1,5 +1,5 @@
 "use client";
-import { useEditor } from "@/app/(app)/editor/[documentId]/_context";
+import { useEditorContext } from "@/app/(app)/editor/[documentId]/_context";
 import type { CharacterGadgetSlotData } from "@/modules/blueprint/actions";
 import { GameObjectData } from "@/modules/gameObject/hooks";
 import { Modal } from "@repo/ui/components";
@@ -15,7 +15,7 @@ export function GadgetModal({
     oldObject: GameObjectData | null,
   ) => any;
 }) {
-  const [{ blueprint, channel }] = useEditor();
+  const [{ blueprint, channel }] = useEditorContext();
 
   return (
     <Modal.Content minWidth={600}>

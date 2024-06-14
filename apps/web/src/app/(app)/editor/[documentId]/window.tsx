@@ -9,7 +9,7 @@ import { NodeTags, getLevelLayerAtCursor } from "@repo/canvas";
 import { CanvasContext } from "@repo/canvas/src/context/canvasContext";
 import { useMemo, useRef } from "react";
 import { useWindowSize } from "usehooks-ts";
-import { useEditor } from "./_context";
+import { useEditorContext } from "./_context";
 import { EditorConfig } from "./_utils";
 
 export interface EditorWindowProps {
@@ -21,7 +21,7 @@ export interface EditorWindowProps {
 
 export function EditorWindow({ stages }: EditorWindowProps) {
   const windowSize = useWindowSize();
-  const [editor, updateEditor] = useEditor();
+  const [editor, updateEditor] = useEditorContext();
   const eventHandler = useEditorEventHandler();
   // https://svgshare.com/i/161z.svg
   // https://svgshare.com/i/162B.svg
@@ -125,7 +125,7 @@ export function EditorWindow({ stages }: EditorWindowProps) {
 }
 
 function StageList({ stages }: { stages: EditorWindowProps["stages"] }) {
-  const [{ blueprint }] = useEditor();
+  const [{ blueprint }] = useEditorContext();
   return useMemo(() => {
     let showCounter = 0;
     const width = EditorConfig.LEVEL_STYLE.width;

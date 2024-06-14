@@ -1,4 +1,4 @@
-import { useEditor } from "@/app/(app)/editor/[documentId]/_context";
+import { useEditorContext } from "@/app/(app)/editor/[documentId]/_context";
 import { BlueprintData } from "@/modules/blueprint/actions/getBlueprint";
 import { CanvasLevelStyle, CanvasNode, useCanvas } from "@repo/canvas";
 import type Konva from "konva";
@@ -77,7 +77,7 @@ function Level({
   style: CanvasLevelStyle;
   hidden?: boolean;
 }) {
-  const [editor] = useEditor();
+  const [editor] = useEditorContext();
 
   function pushCommand(command: EditorCommand) {
     editor.history.push(command);

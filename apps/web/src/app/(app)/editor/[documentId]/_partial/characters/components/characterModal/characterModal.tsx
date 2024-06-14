@@ -1,5 +1,5 @@
 "use client";
-import { useEditor } from "@/app/(app)/editor/[documentId]/_context";
+import { useEditorContext } from "@/app/(app)/editor/[documentId]/_context";
 import type { BlueprintCharacterData } from "@/modules/blueprint/actions";
 import { GameObjectData } from "@/modules/gameObject/hooks";
 import { vars } from "@repo/theme";
@@ -16,7 +16,7 @@ export function CharacterModal({
     oldObject: GameObjectData | null,
   ) => any;
 }) {
-  const [{ blueprint }] = useEditor();
+  const [{ blueprint }] = useEditorContext();
 
   return (
     <Modal.Content minWidth={600}>

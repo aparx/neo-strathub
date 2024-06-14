@@ -2,11 +2,11 @@
 import { EditorCharacter } from "@/app/(app)/editor/[documentId]/_partial/characters/components/editorCharacter";
 import { BlueprintCharacterData } from "@/modules/blueprint/actions";
 import { useMemo } from "react";
-import { useEditor } from "../../_context";
+import { useEditorContext } from "../../_context";
 import * as css from "./editor.characters.css";
 
 export function EditorCharacters() {
-  const [{ characters: characterMap }] = useEditor();
+  const [{ characters: characterMap }] = useEditorContext();
 
   return (
     <ol className={css.list} aria-label={"Picked Characters"}>
@@ -25,7 +25,7 @@ export function EditorCharacters() {
 }
 
 function Character(character: BlueprintCharacterData) {
-  const [{ characters: characterMap }] = useEditor();
+  const [{ characters: characterMap }] = useEditorContext();
   const slotsMap = characterMap[character.id]?.gadgets ?? {};
   const slots = useMemo(() => Object.values(slotsMap), [slotsMap]);
   return <EditorCharacter data={character} slots={slots} />;

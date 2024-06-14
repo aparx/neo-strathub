@@ -12,6 +12,7 @@ import {
 import { getBlueprint } from "@/modules/blueprint/actions/getBlueprint";
 import { getBlueprintStages } from "@/modules/blueprint/actions/getBlueprintStages";
 import { EditorEventHandler } from "@/modules/editor/features/events";
+import { TeamContextProvider } from "@/modules/team/context";
 import { getServer } from "@/utils/supabase/actions";
 import { cookies } from "next/headers";
 import React, { Suspense } from "react";
@@ -98,17 +99,19 @@ async function Content({
         movable
         selectable
       >
-        <div className={css.grid}>
-          <EditorHeader />
-          <EditorCharacters />
-          <EditorSidepanelList side="right">
-            <SidepanelItem title="Members">
-              <SidepanelMemberList />
-            </SidepanelItem>
-          </EditorSidepanelList>
-          <div className={css.fadeInRect} />
-          {children}
-        </div>
+        <TeamContextProvider teamId={blueprint.book.team.id}>
+          <div className={css.grid}>
+            <EditorHeader />
+            <EditorCharacters />
+            <EditorSidepanelList side="right">
+              <SidepanelItem title="Members">
+                <SidepanelMemberList />
+              </SidepanelItem>
+            </EditorSidepanelList>
+            <div className={css.fadeInRect} />
+            {children}
+          </div>
+        </TeamContextProvider>
       </EditorContextProvider>
     </EditorEventHandler>
   );

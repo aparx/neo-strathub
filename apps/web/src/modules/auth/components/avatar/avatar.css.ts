@@ -33,10 +33,17 @@ export const avatar = recipe({
   variants: {
     presence: {
       none: {},
-      online: {
+      /** Present in the current environment (such as the same document) */
+      present: {
         "::after": {
           content: "",
           background: vars.colors.primary.lighter,
+        },
+      },
+      online: {
+        "::after": {
+          content: "",
+          background: "lightgreen",
         },
       },
       offline: {

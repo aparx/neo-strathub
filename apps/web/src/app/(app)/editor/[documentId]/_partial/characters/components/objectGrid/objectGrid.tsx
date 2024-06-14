@@ -11,7 +11,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { useEditor } from "../../../../_context";
+import { useEditorContext } from "../../../../_context";
 import * as css from "./objectGrid.css";
 
 export function ObjectGrid({
@@ -28,7 +28,7 @@ export function ObjectGrid({
   const [filter, setFilter] = useState<string>();
   const gridShellRef = useRef<HTMLDivElement>(null);
   const searchFieldRef = useRef<HTMLInputElement>(null);
-  const [{ objectCache }] = useEditor();
+  const [{ objectCache }] = useEditorContext();
 
   // Fetch game objects
   const objects = useMemo(() => {

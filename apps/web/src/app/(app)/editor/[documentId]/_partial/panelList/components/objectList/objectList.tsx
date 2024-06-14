@@ -5,7 +5,7 @@ import { createCanvasNode } from "@repo/canvas";
 import { Icon, ScrollArea, TextField } from "@repo/ui/components";
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useEditor } from "../../../../_context";
+import { useEditorContext } from "../../../../_context";
 import * as css from "./objectList.css";
 
 export interface SidepanelObjectListProps {
@@ -13,7 +13,7 @@ export interface SidepanelObjectListProps {
 }
 
 export function SidepanelObjectList({ type }: SidepanelObjectListProps) {
-  const [{ objectCache }] = useEditor();
+  const [{ objectCache }] = useEditorContext();
   const [filter, setFilter] = useState<string>();
   const [minHeight, setMinHeight] = useState<number>();
   const searchRef = useRef<HTMLInputElement>(null);
@@ -67,7 +67,7 @@ export function SidepanelObjectList({ type }: SidepanelObjectListProps) {
 }
 
 function PanelGameObject({ id, url, name, type }: GameObjectData) {
-  const [{ editable }, updateContext] = useEditor();
+  const [{ editable }, updateContext] = useEditorContext();
   const [loaded, setLoaded] = useState(false);
 
   return (

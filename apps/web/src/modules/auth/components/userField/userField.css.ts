@@ -18,6 +18,9 @@ export const field = recipe({
       online: {
         color: vars.colors.emphasis.high,
       },
+      present: {
+        color: vars.colors.emphasis.high,
+      },
     } satisfies Record<AvatarPresence & {}, CSSProperties>,
   },
   defaultVariants: {

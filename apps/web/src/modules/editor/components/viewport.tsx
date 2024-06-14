@@ -1,4 +1,4 @@
-import { useEditor } from "@/app/(app)/editor/[documentId]/_context";
+import { useEditorContext } from "@/app/(app)/editor/[documentId]/_context";
 import { Canvas, CanvasRef, CanvasStyle, primitiveShapes } from "@repo/canvas";
 import {
   CanvasContext,
@@ -25,7 +25,7 @@ export const EditorViewport = forwardRef<CanvasContext, EditorViewportProps>(
   function EditorViewport(props, ref) {
     const { style, children, ...restProps } = props;
 
-    const [{ characters, objectCache }] = useEditor();
+    const [{ characters, objectCache }] = useEditorContext();
     const canvasRef = useRef<CanvasRef>(null);
 
     const [savedPos, setSavedPos] = useLocalStorage("c_pos", { x: 0, y: 0 });
