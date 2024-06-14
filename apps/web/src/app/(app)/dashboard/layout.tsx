@@ -1,9 +1,6 @@
 import { Sidebar } from "@/app/(app)/dashboard/_partial/sidebar/sidebar";
-import { getUser } from "@/modules/auth/actions";
-import { UserContextProvider } from "@/modules/auth/context/userContext";
 import { ModalController } from "@/modules/modal/components";
 import { Spinner } from "@repo/ui/components";
-import { cookies } from "next/headers";
 import { Suspense } from "react";
 import { LayoutHeader } from "./_partial";
 import * as css from "./layout.css";
@@ -21,24 +18,19 @@ export default async function DashboardLayout({
   details: React.ReactNode;
   inspector: React.ReactNode;
 }) {
-  // Ensure user is fetched at root to ensure authorization
-  const user = await getUser(cookies());
-
   return (
-    <UserContextProvider user={user}>
-      <div className={css.rootLayout}>
-        <LayoutHeader />
-        <Suspense fallback={<PageFallback />}>
-          <div className={css.gridLayout}>
-            {selector}
-            {content}
-            <Sidebar inspector={inspector} details={details} />
-          </div>
-        </Suspense>
-        <ModalController />
-        {children}
-      </div>
-    </UserContextProvider>
+    <div className={css.rootLayout}>
+      <LayoutHeader />
+      <Suspense fallback={<PageFallback />}>
+        <div className={css.gridLayout}>
+          {selector}
+          {content}
+          <Sidebar inspector={inspector} details={details} />
+        </div>
+      </Suspense>
+      <ModalController />
+      {children}
+    </div>
   );
 }
 

@@ -2,9 +2,12 @@ import { vars } from "@repo/theme";
 import { Text } from "@repo/ui/components";
 import type { Metadata } from "next";
 
+import { getUser } from "@/modules/auth/actions";
+import { UserContextProvider } from "@/modules/auth/context";
 import { TanstackQueryProvider } from "@/modules/query/context/tanstackQueryProvider";
 import "@repo/theme/css";
 import { Viewport } from "next";
+import { cookies } from "next/headers";
 import "./global.css";
 import "./reset.css";
 
@@ -18,25 +21,30 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Ensure user is fetched at root to ensure authorization
+  const user = await getUser(cookies());
+
   return (
-    <html lang="en" style={{ fontSize: "0.875rem" }}>
-      <Text asChild>
-        <body
-          style={{
-            background: vars.colors.accents[0],
-            color: vars.colors.emphasis.high,
-            minWidth: "100dvw",
-            minHeight: "100dvh",
-          }}
-        >
-          <TanstackQueryProvider>{children}</TanstackQueryProvider>
-        </body>
-      </Text>
-    </html>
+    <UserContextProvider user={user}>
+      <html lang="en" style={{ fontSize: "0.875rem" }}>
+        <Text asChild>
+          <body
+            style={{
+              background: vars.colors.accents[0],
+              color: vars.colors.emphasis.high,
+              minWidth: "100dvw",
+              minHeight: "100dvh",
+            }}
+          >
+            <TanstackQueryProvider>{children}</TanstackQueryProvider>
+          </body>
+        </Text>
+      </html>
+    </UserContextProvider>
   );
 }

@@ -1,4 +1,4 @@
-import { Avatar } from "@/modules/auth/components";
+import { Avatar, AvatarPresence } from "@/modules/auth/components";
 import { Tables } from "@/utils/supabase/types";
 import { ComponentPropsWithoutRef } from "react";
 import * as css from "./userField.css";
@@ -9,6 +9,7 @@ export interface UserFieldProps extends UserFieldBaseProps {
   profile: Pick<Tables<"profile">, "id" | "name" | "avatar">;
   /** @default "1.3em" */
   avatarSize?: string;
+  presence?: AvatarPresence;
 }
 
 /**
@@ -24,12 +25,17 @@ export interface UserFieldProps extends UserFieldBaseProps {
 export function UserField({
   id,
   profile,
+  presence,
   avatarSize = "1.3em",
   ...restProps
 }: UserFieldProps) {
   return (
-    <figure data-user-id={id} className={css.field} {...restProps}>
-      <Avatar size={avatarSize} src={profile.avatar} />
+    <figure
+      data-user-id={id}
+      className={css.field({ presence })}
+      {...restProps}
+    >
+      <Avatar size={avatarSize} src={profile.avatar} presence={presence} />
       <figcaption>{profile.name ?? "(Deleted)"}</figcaption>
     </figure>
   );

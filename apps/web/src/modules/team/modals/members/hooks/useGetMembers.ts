@@ -19,7 +19,6 @@ export type TeamMemberData = NonNullable<FetchMembersResult["data"]>[number];
 
 export function useGetMembers(
   teamId: string,
-  forceRefetch?: boolean,
 ): UseQueryResult<FetchMembersResult> {
   return useQuery({
     queryKey: ["team", "members", teamId],

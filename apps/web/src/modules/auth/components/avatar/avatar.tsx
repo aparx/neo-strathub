@@ -7,6 +7,8 @@ import * as css from "./avatar.css";
 
 type AvatarBaseProps = Omit<ComponentPropsWithoutRef<"div">, "children">;
 
+export type AvatarPresence = AvatarProps["presence"];
+
 export interface AvatarProps extends AvatarBaseProps {
   size?: string | number;
   alt?: string;
@@ -20,6 +22,7 @@ export interface AvatarProps extends AvatarBaseProps {
    * self-hosted.
    */
   optimized?: boolean;
+  presence?: css.AvatarPresence;
 }
 
 export function Avatar({
@@ -29,13 +32,14 @@ export function Avatar({
   optimized,
   className,
   style,
+  presence,
   ...restProps
 }: AvatarProps) {
   const [loaded, setLoaded] = useState(false);
 
   return (
     <div
-      className={mergeClassNames(className, css.avatar)}
+      className={mergeClassNames(className, css.avatar({ presence }))}
       style={{ width: size, height: size, ...style }}
       {...restProps}
     >
@@ -47,7 +51,7 @@ export function Avatar({
           src={src}
           alt={alt}
           fill
-          style={{ opacity: loaded ? 1 : 0 }}
+          style={{ opacity: loaded ? 1 : 0, borderRadius: "100%" }}
           onLoad={() => setLoaded(true)}
         />
       )}

@@ -13,13 +13,11 @@ export function EditorStages() {
 
   return (
     <section className={css.container}>
-      <ol className={css.stageList}>
+      <ol className={css.stageList} aria-label="Stages">
         {stages.map((stage) => (
-          <StageItem
-            key={stage.id}
-            active={stage.index === active}
-            index={stage.index}
-          />
+          <li key={stage.id}>
+            <StageItem active={stage.index === active} index={stage.index} />
+          </li>
         ))}
       </ol>
     </section>

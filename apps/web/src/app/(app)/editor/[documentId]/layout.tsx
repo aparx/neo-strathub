@@ -15,7 +15,15 @@ import { EditorEventHandler } from "@/modules/editor/features/events";
 import { getServer } from "@/utils/supabase/actions";
 import { cookies } from "next/headers";
 import React, { Suspense } from "react";
-import { EditorCharacters, EditorHeader } from "./_partial";
+import {
+  EditorCharacters,
+  EditorHeader,
+  EditorSidepanelList,
+} from "./_partial";
+import {
+  SidepanelItem,
+  SidepanelMemberList,
+} from "./_partial/panelList/components";
 import { getTeamMember } from "./actions";
 import * as css from "./layout.css";
 
@@ -93,7 +101,11 @@ async function Content({
         <div className={css.grid}>
           <EditorHeader />
           <EditorCharacters />
-          {/*<EditorInspector />*/}
+          <EditorSidepanelList side="right">
+            <SidepanelItem title="Members">
+              <SidepanelMemberList />
+            </SidepanelItem>
+          </EditorSidepanelList>
           <div className={css.fadeInRect} />
           {children}
         </div>

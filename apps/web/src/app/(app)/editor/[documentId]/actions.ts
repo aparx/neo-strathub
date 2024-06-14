@@ -12,7 +12,7 @@ export const getTeamMember = cache(
   async (profileId: string, teamId: string) => {
     const { data } = await getServiceServer(cookies())
       .from("team_member")
-      .select("*")
+      .select("*, profile!inner(id, name, avatar)")
       .eq("profile_id", profileId)
       .eq("team_id", teamId)
       .maybeSingle()
