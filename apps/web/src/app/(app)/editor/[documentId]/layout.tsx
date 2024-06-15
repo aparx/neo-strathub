@@ -15,6 +15,7 @@ import { EditorEventHandler } from "@/modules/editor/features/events";
 import { TeamContextProvider } from "@/modules/team/context";
 import { SlotContextProvider } from "@/modules/team/modals/members/context";
 import { getServer } from "@/utils/supabase/actions";
+import { CanvasImageCacheProvider } from "@repo/canvas/context";
 import { cookies } from "next/headers";
 import React, { Suspense } from "react";
 import {
@@ -111,7 +112,7 @@ async function Content({
                 </SidepanelItem>
               </EditorSidepanelList>
               <div className={css.fadeInRect} />
-              {children}
+              <CanvasImageCacheProvider>{children}</CanvasImageCacheProvider>
             </div>
           </SlotContextProvider>
         </TeamContextProvider>

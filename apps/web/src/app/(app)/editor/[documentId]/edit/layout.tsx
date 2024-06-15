@@ -2,7 +2,6 @@ import React from "react";
 import { EditorSidepanelList, EditorStages } from "../_partial";
 import {
   SidepanelItem,
-  SidepanelMemberList,
   SidepanelObjectList,
 } from "../_partial/panelList/components";
 

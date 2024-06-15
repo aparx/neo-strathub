@@ -18,7 +18,7 @@ import {
 import { GameObjectData, useGetGameObjects } from "@/modules/gameObject/hooks";
 import { createClient } from "@/utils/supabase/client";
 import { CanvasNode } from "@repo/canvas";
-import { CanvasContextInteractStatus } from "@repo/canvas/src/context/canvasContext";
+import { CanvasContextInteractStatus } from "@repo/canvas/context";
 import { Nullish } from "@repo/utils";
 import { SharedState, useSharedState } from "@repo/utils/hooks";
 import {

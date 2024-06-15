@@ -1,7 +1,7 @@
 import Konva from "konva";
 import { forwardRef, useMemo } from "react";
 import * as ReactKonva from "react-konva";
-import { useImage } from "react-konva-utils";
+import { useCanvasImage } from "./context";
 import { NodeTags } from "./utils";
 
 export interface CanvasLevelData {
@@ -34,7 +34,8 @@ export const CanvasLevel = forwardRef<Konva.Layer, CanvasLevelProps>(
     const { width, height, padding, background, clipPadding } = style;
     const finalClipPadding = clipPadding ?? 0;
 
-    const [image] = useImage(imageURL);
+    const image = useCanvasImage(imageURL);
+
     const imageScale = useMemo(() => {
       if (!image) return undefined;
       return Math.min(
@@ -63,15 +64,17 @@ export const CanvasLevel = forwardRef<Konva.Layer, CanvasLevelProps>(
           cornerRadius={10}
           {...restProps}
         />
-        <ReactKonva.Image
-          listening={false}
-          name={NodeTags.NO_SELECT}
-          image={image}
-          x={padding}
-          y={padding}
-          scaleX={imageScale}
-          scaleY={imageScale}
-        />
+        {image && (
+          <ReactKonva.Image
+            listening={false}
+            name={NodeTags.NO_SELECT}
+            image={image}
+            x={padding}
+            y={padding}
+            scaleX={imageScale}
+            scaleY={imageScale}
+          />
+        )}
         {children}
       </ReactKonva.Layer>
     );

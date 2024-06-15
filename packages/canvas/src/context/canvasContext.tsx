@@ -1,3 +1,4 @@
+"use client";
 import { Nullish } from "@repo/utils";
 import { SharedState } from "@repo/utils/hooks";
 import Konva from "konva";

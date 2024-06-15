@@ -7,8 +7,8 @@ import {
   CanvasNodeConfig,
   copyCanvasNode,
   ObjectRenderer,
+  useCanvas,
 } from "@repo/canvas";
-import { useCanvas } from "@repo/canvas/src/context/canvasContext";
 import Konva from "konva";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { Html } from "react-konva-utils";

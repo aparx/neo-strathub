@@ -2,7 +2,10 @@
   "name": "@repo/canvas",
   "version": "0.0.0",
   "private": true,
-  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./context": "./src/context/index.ts"
+  },
   "dependencies": {
     "@radix-ui/react-slot": "^1.0.2",
     "@repo/theme": "workspace:^",
