@@ -13,6 +13,7 @@ import { getBlueprint } from "@/modules/blueprint/actions/getBlueprint";
 import { getBlueprintStages } from "@/modules/blueprint/actions/getBlueprintStages";
 import { EditorEventHandler } from "@/modules/editor/features/events";
 import { TeamContextProvider } from "@/modules/team/context";
+import { SlotContextProvider } from "@/modules/team/modals/members/context";
 import { getServer } from "@/utils/supabase/actions";
 import { cookies } from "next/headers";
 import React, { Suspense } from "react";
@@ -100,17 +101,19 @@ async function Content({
         selectable
       >
         <TeamContextProvider teamId={blueprint.book.team.id}>
-          <div className={css.grid}>
-            <EditorHeader />
-            <EditorCharacters />
-            <EditorSidepanelList side="right">
-              <SidepanelItem title="Members">
-                <SidepanelMemberList />
-              </SidepanelItem>
-            </EditorSidepanelList>
-            <div className={css.fadeInRect} />
-            {children}
-          </div>
+          <SlotContextProvider teamId={blueprint.book.team.id}>
+            <div className={css.grid}>
+              <EditorHeader />
+              <EditorCharacters />
+              <EditorSidepanelList side="right">
+                <SidepanelItem title="Members">
+                  <SidepanelMemberList />
+                </SidepanelItem>
+              </EditorSidepanelList>
+              <div className={css.fadeInRect} />
+              {children}
+            </div>
+          </SlotContextProvider>
         </TeamContextProvider>
       </EditorContextProvider>
     </EditorEventHandler>

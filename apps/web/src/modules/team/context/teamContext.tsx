@@ -15,7 +15,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { TeamMemberData, useGetMembers } from "../modals/members/hooks";
+import { TeamMemberData, useGetMembers } from "../hooks";
 
 export interface TeamMemberPresence {
   profileId?: string;
@@ -26,6 +26,7 @@ export interface TeamMemberPresence {
 
 export interface TeamMember extends TeamMemberData {
   presence: TeamMemberPresence;
+  slotId?: number;
 }
 
 export interface TeamContext {
@@ -49,18 +50,19 @@ export function TeamContextProvider({
   children?: React.ReactNode;
 }) {
   const { user } = useUserContext();
-  const { data } = useGetMembers(teamId);
+  const memberQuery = useGetMembers(teamId);
+
   const channelRef = useRef<RealtimeChannel>();
   const { presence, updatePresence } = useTeamChannel(
     teamId,
     channelRef,
-    !!data?.data?.find((x) => x.profile_id === user?.id),
+    !!memberQuery.data?.data?.find((x) => x.profile_id === user?.id),
   );
 
   // Remap members to include presence
   const members = useMemo(() => {
-    if (!data?.data) return [];
-    return data.data.map<TeamMember>((member) => ({
+    if (!memberQuery.data?.data) return [];
+    return memberQuery.data.data.map<TeamMember>((member) => ({
       ...member,
       presence: {
         profileId: member.profile_id,
@@ -68,7 +70,7 @@ export function TeamContextProvider({
         ...presence[member.profile_id],
       },
     }));
-  }, [data?.data, presence]);
+  }, [memberQuery.data?.data, presence]);
 
   const context = useSharedState<TeamContext>({
     state: "loading",
@@ -128,7 +130,6 @@ function useTeamChannel(
 
   // Subscribe to presence events
   useEffect(() => {
-    if (!isMember) return;
     const supabase = createClient();
     const channel = supabase.channel(`team_${teamId}`);
     channelOut.current = channel;
@@ -142,13 +143,12 @@ function useTeamChannel(
         setPresence(newState);
       })
       .subscribe(async (status) => {
-        if (status !== "SUBSCRIBED" || !user?.id) return;
+        if (status !== "SUBSCRIBED" || !user?.id || !isMember) return;
         const newState = queuedRef.current;
         queuedRef.current = undefined; // Free for GC
         flushedRef.current = true;
         await channel.track({
           profileId: user.id,
-          //* uncomment the below to show user is online at team level
           status: "online",
           ...newState,
         } satisfies TeamMemberPresence);

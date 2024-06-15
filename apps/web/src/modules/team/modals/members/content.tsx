@@ -31,13 +31,13 @@ import {
   useState,
   useTransition,
 } from "react";
+import { TeamMemberData, useGetMembers } from "../../hooks";
 import * as css from "./content.css";
 import {
   SlotContextProvider,
   SlotContextSlot,
   useSlotContext,
 } from "./context";
-import { TeamMemberData, useGetMembers } from "./hooks";
 import { SelectSlotModal, SlotSwapModal } from "./modals";
 
 function sortMembers(members: Nullish<TeamMemberData[]>) {
@@ -252,18 +252,18 @@ function MemberSlotButton({
   member: TeamMemberData;
   disabled?: boolean;
 }) {
-  const { data, isFetching, refetch } = useSlotContext();
+  const [{ data, isFetching, refetch }] = useSlotContext();
   const [isPending, startTransition] = useTransition();
   const [rootOpen, setRootOpen] = useState(false);
   const [swapOpen, setSwapOpen] = useState(false);
   const newSlotRef = useRef<SlotContextSlot | null>(null);
 
   const slot = useMemo(
-    () => data.state?.find((x) => x.members.find((y) => y.id === member.id)),
-    [data?.state],
+    () => data?.find((x) => x.members.find((y) => y.id === member.id)),
+    [data],
   );
 
-  if (isFetching) return <Skeleton width={100} height={24} outline />;
+  if (isFetching()) return <Skeleton width={100} height={24} outline />;
 
   function doChangeSlot(mode: "stack" | "swap") {
     const slot = newSlotRef.current;

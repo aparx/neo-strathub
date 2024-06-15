@@ -3,7 +3,7 @@ import {
   useGetTeamFromParams,
   UseGetTeamFromParamsResultData,
 } from "@/modules/modal/hooks";
-import { useGetMembers } from "@/modules/team/modals/members/hooks";
+import { useGetMembers } from "@/modules/team/hooks";
 import { createClient } from "@/utils/supabase/client";
 import {
   Button,

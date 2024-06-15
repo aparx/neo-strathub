@@ -1,5 +1,5 @@
 import { UserField } from "@/modules/auth/components/index.ts";
-import { TeamMemberData } from "@/modules/team/modals/members/hooks/index.ts";
+import { TeamMemberData } from "@/modules/team/hooks";
 import { vars } from "@repo/theme";
 import { Button, Flexbox, Modal } from "@repo/ui/components";
 import { RxExit } from "react-icons/rx";

@@ -5,7 +5,15 @@ import { Tables } from "@/utils/supabase/types";
 import { Nullish } from "@repo/utils";
 import { SharedState, useSharedState } from "@repo/utils/hooks";
 import { useQuery } from "@tanstack/react-query";
-import { createContext, useContext, useEffect, useMemo } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 
 export interface SlotContextMember extends Pick<Tables<"team_member">, "id"> {
   profile: Pick<Tables<"profile">, "id" | "name" | "avatar">;
@@ -19,12 +27,12 @@ export interface SlotContextSlot
 export type SlotContextData = Nullish | SlotContextSlot[];
 
 export interface SlotContext {
-  data: SharedState<SlotContextData>;
+  data: SlotContextData;
   refetch: () => Promise<any>;
-  isFetching: boolean;
+  isFetching: () => boolean;
 }
 
-const slotContext = createContext<SlotContext | null>(null);
+const slotContext = createContext<SharedState<SlotContext> | null>(null);
 
 async function fetchSlots(teamId: string) {
   return createClient().from("player_slot").select().eq("team_id", teamId);
@@ -54,11 +62,14 @@ export function SlotContextProvider({
 }) {
   // Get an array of all slots available for `teamId`
   const slotQuery = useQuery({
-    queryKey: ["memberSlots", teamId],
+    queryKey: ["team", "memberSlots", teamId],
     queryFn: async () => await fetchSlots(teamId),
     refetchOnWindowFocus: false,
     refetchInterval: false,
   });
+  const slotQueryRef = useRef(slotQuery);
+  slotQueryRef.current = slotQuery;
+
   const slotData = slotQuery.data?.data;
   const slotIds = useMemo(() => slotData?.map((x) => x.id), [slotData]);
 
@@ -69,6 +80,8 @@ export function SlotContextProvider({
     refetchOnWindowFocus: false,
     refetchInterval: false,
   });
+  const memberQueryRef = useRef(memberQuery);
+  memberQueryRef.current = memberQuery;
 
   // The resulting array being put into the data cache (`SharedState`)
   const dataValue = useMemo<SlotContextData>(
@@ -80,25 +93,27 @@ export function SlotContextProvider({
     [slotData, memberQuery.data?.data],
   );
 
-  const dataCache = useSharedState<SlotContextData>(dataValue);
-  useEffect(() => dataCache.update(dataValue), [dataValue]);
+  const context = useSharedState<SlotContext>({
+    data: dataValue,
+    isFetching: () =>
+      memberQueryRef.current?.isFetching || slotQueryRef.current?.isFetching,
+    refetch: async () => memberQueryRef.current?.refetch(),
+  });
 
-  const context = useMemo<SlotContext>(
-    () => ({
-      data: dataCache,
-      isFetching: memberQuery.isFetching || slotQuery.isFetching,
-      refetch: memberQuery.refetch,
-    }),
-    [dataCache, memberQuery, slotQuery],
-  );
+  useEffect(() => {
+    context.update((oldContext) => ({ ...oldContext, data: dataValue }));
+  }, [dataValue]);
 
   return (
     <slotContext.Provider value={context}>{children}</slotContext.Provider>
   );
 }
 
-export function useSlotContext(): NonNullable<SlotContext> {
+export function useSlotContext(): [
+  SlotContext,
+  Dispatch<SetStateAction<SlotContext>>,
+] {
   const ctx = useContext(slotContext);
   if (!ctx) throw new Error("Missing SlotContext");
-  return ctx;
+  return [ctx.state, ctx.update];
 }

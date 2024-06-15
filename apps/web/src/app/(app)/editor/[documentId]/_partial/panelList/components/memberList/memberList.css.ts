@@ -8,6 +8,7 @@ export const list = style({
   display: "flex",
   flexDirection: "column",
   margin: `0 ${vars.spacing.sm}`,
+  gap: vars.spacing.sm,
 });
 
 export const item = recipe({
@@ -16,6 +17,9 @@ export const item = recipe({
     justifyContent: "space-between",
     padding: vars.spacing.md,
     cursor: "pointer",
+    border: "unset",
+    width: "100%",
+    background: "transparent",
   },
   variants: {
     self: {
@@ -34,9 +38,12 @@ export const item = recipe({
   },
 });
 
-export const color = style({
-  width: "1em",
-  height: "1em",
-  borderRadius: "100%",
+export const slot = style({
+  display: "grid",
+  placeItems: "center",
+  width: "1.5em",
+  height: "1.5em",
+  borderRadius: vars.roundness.sm,
   border: `1px solid ${vars.colors.outline.card}`,
+  color: vars.colors.accents[0],
 });

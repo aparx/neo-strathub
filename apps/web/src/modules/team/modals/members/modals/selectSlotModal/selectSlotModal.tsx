@@ -1,10 +1,10 @@
 "use client";
 import { UserField } from "@/modules/auth/components";
+import { TeamMemberData } from "@/modules/team/hooks";
 import {
   SlotContextSlot,
   useSlotContext,
 } from "@/modules/team/modals/members/context/slotContext";
-import { TeamMemberData } from "@/modules/team/modals/members/hooks";
 import { vars } from "@repo/theme";
 import { DragScrollArea, Modal, Text } from "@repo/ui/components";
 import { blendColors } from "@repo/ui/utils";
@@ -19,7 +19,7 @@ export function SelectSlotModal({
   onSelect: (slot: SlotContextSlot | null) => any;
   isLoading?: boolean;
 }) {
-  const { data } = useSlotContext();
+  const [{ data }] = useSlotContext();
 
   return (
     <Modal.Content style={{ maxWidth: 450 }}>
@@ -37,7 +37,7 @@ export function SelectSlotModal({
         <li>
           <NoSlotRow onSelect={() => onSelect(null)} />
         </li>
-        {data.state?.map((slot) => (
+        {data?.map((slot) => (
           <li key={slot.id}>
             <SlotRow
               slot={slot}

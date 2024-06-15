@@ -31,7 +31,6 @@ export function Content({
         {...restProps}
       >
         {children}
-        <Primitive.Arrow className={css.arrow} />
       </Primitive.Content>
     </Primitive.Portal>
   );

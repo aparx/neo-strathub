@@ -140,12 +140,10 @@ export function EditorContextProvider({
   );
 }
 
-export type UseEditorResult = readonly [
+export function useEditorContext(): [
   state: EditorContext,
   update: Dispatch<SetStateAction<EditorContext>>,
-];
-
-export function useEditorContext(): UseEditorResult {
+] {
   const ctx = useContext(editorContext);
   if (!ctx) throw new Error("Missing EditorContext");
   return [ctx.state, ctx.update] as const;

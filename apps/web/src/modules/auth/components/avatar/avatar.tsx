@@ -7,8 +7,6 @@ import * as css from "./avatar.css";
 
 type AvatarBaseProps = Omit<ComponentPropsWithoutRef<"div">, "children">;
 
-export type AvatarPresence = AvatarProps["presence"];
-
 export interface AvatarProps extends AvatarBaseProps {
   size?: string | number;
   alt?: string;

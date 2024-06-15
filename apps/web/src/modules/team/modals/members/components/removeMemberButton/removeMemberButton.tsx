@@ -1,4 +1,4 @@
-import { TeamMemberData } from "@/modules/team/modals/members/hooks/index.ts";
+import { TeamMemberData } from "@/modules/team/hooks";
 import { KickMemberModal } from "@/modules/team/modals/members/modals/index.ts";
 import { Icon, IconButton, IconButtonProps, Modal } from "@repo/ui/components";
 import { RxExit } from "react-icons/rx";

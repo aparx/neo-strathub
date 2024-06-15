@@ -1,11 +1,17 @@
 import { vars } from "@repo/theme";
 import { blendColors } from "@repo/ui/utils";
-import { style } from "@vanilla-extract/css";
-import { recipe, RecipeVariants } from "@vanilla-extract/recipes";
+import { ComplexStyleRule, style } from "@vanilla-extract/css";
+import { RecipeVariants, recipe } from "@vanilla-extract/recipes";
 
 export type AvatarPresence = NonNullable<
   RecipeVariants<typeof avatar>
 >["presence"];
+
+export const AVATAR_PRESENCE_COLORS = {
+  present: vars.colors.primary.lighter,
+  online: "lightgreen",
+  offline: blendColors("black", "white"),
+} as const;
 
 export const avatar = recipe({
   base: {
@@ -37,22 +43,25 @@ export const avatar = recipe({
       present: {
         "::after": {
           content: "",
-          background: vars.colors.primary.lighter,
+          background: AVATAR_PRESENCE_COLORS["present"],
         },
       },
       online: {
         "::after": {
           content: "",
-          background: "lightgreen",
+          background: AVATAR_PRESENCE_COLORS["online"],
         },
       },
       offline: {
         "::after": {
           content: "",
-          background: blendColors("black", "white"),
+          background: AVATAR_PRESENCE_COLORS["offline"],
         },
       },
-    },
+    } satisfies Record<
+      keyof typeof AVATAR_PRESENCE_COLORS | "none",
+      ComplexStyleRule
+    >,
   },
   defaultVariants: {
     presence: "none",

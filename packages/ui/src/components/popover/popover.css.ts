@@ -120,12 +120,12 @@ globalStyle(`${popoverBase}[data-state='open'][data-side='bottom']`, {
 
 globalStyle(`${popoverBase}[data-state='open'][data-side='left']`, {
   animationName: `${keyframes({
-    from: { opacity: 0, transform: "translateX(-2%)", scale },
+    from: { opacity: 0, transform: "translateX(2%)", scale },
   })}`,
 });
 
 globalStyle(`${popoverBase}[data-state='open'][data-side='right']`, {
   animationName: `${keyframes({
-    from: { opacity: 0, transform: "translateX(2%)", scale },
+    from: { opacity: 0, transform: "translateX(-2%)", scale },
   })}`,
 });
