@@ -52,3 +52,7 @@ export const buttonIcon = recipe({
 globalStyle(`${buttonShellBase}[data-state='open'] ${buttonIconBase}`, {
   rotate: "-180deg",
 });
+
+globalStyle(`${buttonShellBase}[data-state='closed']:hover ${buttonIconBase}`, {
+  transform: "translateY(12.5%)",
+});

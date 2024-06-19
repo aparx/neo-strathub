@@ -10,6 +10,7 @@ export module EditorConfig {
     padding: 20,
     clipPadding: 10,
     focusStroke: `rgb(${FOCUS_COLOR.join(", ")})`,
+    background: "rgb(225, 225, 225)",
   } as const satisfies CanvasLevelStyle;
 
   export const STAGE_STYLE = {

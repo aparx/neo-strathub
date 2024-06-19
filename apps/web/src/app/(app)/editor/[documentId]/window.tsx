@@ -6,7 +6,7 @@ import { useEditorEventHandler } from "@/modules/editor/features/events";
 import { useEditorEvent } from "@/modules/editor/features/events/hooks";
 import { useSubscribeRealtimeEditor } from "@/modules/editor/features/realtime";
 import { NodeTags, getLevelLayerAtCursor } from "@repo/canvas";
-import { CanvasContext } from "@repo/canvas/src/context/canvasContext";
+import { CanvasContext } from "@repo/canvas/context";
 import { useMemo, useRef } from "react";
 import { useWindowSize } from "usehooks-ts";
 import { useEditorContext } from "./_context";

@@ -10,24 +10,26 @@ import { vars } from "@repo/theme";
 import { Text } from "@repo/ui/components";
 import { blendAlpha } from "@repo/ui/utils";
 import { Nullish } from "@repo/utils";
-import { useMemo } from "react";
+import { useEffect } from "react";
 import { useEditorContext } from "../../../../_context";
 import * as css from "./memberList.css";
 
 export function SidepanelMemberList() {
   const [{ blueprint }] = useEditorContext();
   const [{ members }] = useTeamContext();
-  const [{ data: slots, isFetching }] = useSlotContext();
+  const [{ data: slots }] = useSlotContext();
 
-  const memberData = useMemo(() => {
-    return members.sort(({ presence: a }) => {
-      return a.documentId === blueprint.id && a.status === "online" ? -1 : 1;
+  useEffect(() => {
+    members.sort(({ presence: a }, { presence: b }) => {
+      if (a.documentId !== blueprint.id) return 1;
+      if (a.status === b.status) return 0;
+      return a.status === "online" ? -1 : 1;
     });
   }, [members]);
 
   return (
     <ul className={css.list}>
-      {memberData.map((member) => {
+      {members.map((member) => {
         const slot = slots?.find((slot) =>
           slot.members.find((x) => x.id === member.id),
         );

@@ -47,18 +47,16 @@ export const EditorViewport = forwardRef<CanvasContext, EditorViewportProps>(
           style={style}
           onMove={savePos}
           onZoom={saveZoom}
-          functions={{
-            getGameObjectURL: (id) => objectCache[id]?.url,
-            getCharacterSlot(characterId) {
-              const slotData = characters[characterId]?.player_slot;
-              if (!slotData) return slotData; // undefined != null
+          onGetGameObjectURL={(id) => objectCache[id]?.url}
+          onGetCharacterSlot={(characterId) => {
+            const slotData = characters[characterId]?.player_slot;
+            if (!slotData) return slotData; // undefined != null
 
-              return {
-                color: slotData.color,
-                self: false /** TODO */,
-                objectId: characters[characterId]?.game_object?.id,
-              };
-            },
+            return {
+              color: slotData.color,
+              self: false /** TODO */,
+              objectId: characters[characterId]?.game_object?.id,
+            };
           }}
           {...restProps}
         >

@@ -16,6 +16,7 @@ export function EditorStages() {
   const active = Number(url.searchParams.get("stage"));
 
   useEditorEvent("keyPress", (e) => {
+    if (e.event.repeat) return;
     const keyMap = e.event.keyMap;
     const isBack = isKeyPressed(keyMap.editor.stageBack, e.event);
     const isNext = isKeyPressed(keyMap.editor.stageNext, e.event);

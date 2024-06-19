@@ -52,7 +52,7 @@ export function ObjectRenderer<TNode extends CanvasNode>({
   //* Gets the color from character (`children.characterId`)
   const characterSlot =
     children.attrs.characterId != null
-      ? canvas.getCharacterSlot(children.attrs.characterId)
+      ? canvas.onGetCharacterSlot(children.attrs.characterId)
       : null;
 
   useEffect(() => characterRef.current?.sync(children.attrs), [children.attrs]);

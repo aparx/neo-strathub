@@ -22,10 +22,12 @@ export interface CanvasEvents {
   onZoom?: (scale: number) => void;
 }
 
-export interface CanvasProps extends CanvasEvents, CanvasContextInteractStatus {
+export interface CanvasProps
+  extends CanvasEvents,
+    CanvasContextInteractStatus,
+    CanvasContextFunctions {
   children?: React.ReactNode;
   style: CanvasStyle;
-  functions: CanvasContextFunctions;
 }
 
 interface SelectionArea {
@@ -62,7 +64,8 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
       movable,
       selectable,
       zoomable,
-      functions,
+      onGetCharacterSlot,
+      onGetGameObjectURL,
     } = props;
 
     const moveDragRef = useRef(false);
@@ -81,7 +84,8 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
       selectable,
       zoomable,
       canvas: stageRef,
-      ...functions,
+      onGetCharacterSlot,
+      onGetGameObjectURL,
     } satisfies CanvasContext;
 
     useImperativeHandle(ref, () => context);

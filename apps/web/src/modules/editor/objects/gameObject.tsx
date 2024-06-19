@@ -1,13 +1,12 @@
-import { createClient } from "@/utils/supabase/client";
 import {
   CanvasContext,
   CanvasNode,
   CanvasNodeConfig,
+  DefaultTransformer,
   NodeTags,
   ObjectRendererRenderProps,
   usePutIntoTransformer,
 } from "@repo/canvas";
-import { DefaultTransformer } from "@repo/canvas/src/transformers";
 import Konva from "konva";
 import { useCallback, useRef } from "react";
 import * as ReactKonva from "react-konva";
@@ -38,11 +37,11 @@ export function GameObject(props: GameObjectProps) {
   const { objectType, objectId, linkToAssignee, characterId } = config;
   const finalObjectId =
     objectType === "character" && linkToAssignee && characterId
-      ? context.getCharacterSlot(characterId)?.objectId
+      ? context.onGetCharacterSlot(characterId)?.objectId
       : objectId;
 
   const imageUrl = finalObjectId
-    ? context.getGameObjectURL(finalObjectId, objectType)
+    ? context.onGetGameObjectURL(finalObjectId, objectType)
     : "https://svgur.com/i/1711.svg"; // TODO other fallback
 
   return imageUrl && <ImageObject {...props} imageUrl={imageUrl} />;

@@ -47,7 +47,6 @@ function BlueprintTitle() {
       <Text asChild type={"body"}>
         <h2>
           <Breadcrumbs>
-            {/* TODO only include this link if authorized actions is part of team */}
             <IconButton asChild>
               <Link href={`/dashboard/${blueprint.book.team.id}`}>
                 {blueprint.book.team.name}

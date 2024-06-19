@@ -12,7 +12,7 @@ import { CanvasNodeConfig, NodeTags } from "../utils";
 
 export interface CharacterRectProps {
   hidden?: boolean;
-  slot: ReturnType<CanvasContextFunctions["getCharacterSlot"]>;
+  slot: ReturnType<CanvasContextFunctions["onGetCharacterSlot"]>;
 }
 
 export interface CharacterRectRef<
