@@ -23,6 +23,8 @@ export type EditorKeyMapTree = DeepReadonly<{
     undo: KeyMappingValue;
     redo: KeyMappingValue;
     close: KeyMappingValue;
+    stageBack: KeyMappingValue;
+    stageNext: KeyMappingValue;
   };
 }>;
 
@@ -39,6 +41,8 @@ export const DEFAULT_KEY_MAP: EditorKeyMapTree = {
     undo: { code: "KeyY", ctrl: true },
     redo: { code: "KeyZ", ctrl: true },
     close: { code: "Escape" },
+    stageBack: { code: "KeyQ" },
+    stageNext: { code: "KeyE" },
   },
 } as const;
 

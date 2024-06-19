@@ -12,7 +12,7 @@ export interface EventHandlerContext {
     type: TEvent,
     origin: EditorEventOrigin,
     payload: EditorEventMap[TEvent],
-  ) => any;
+  ) => EditorEventObject<EditorEventMap[TEvent]>;
 
   readonly subscribe: <const TEvent extends EditorEventType>(
     type: TEvent,
@@ -62,6 +62,7 @@ export function EditorEventHandler({
           if (eventObject.propagationStopped) break;
           callback(eventObject);
         }
+        return eventObject;
       },
       subscribe<T extends EditorEventType>(
         type: T,

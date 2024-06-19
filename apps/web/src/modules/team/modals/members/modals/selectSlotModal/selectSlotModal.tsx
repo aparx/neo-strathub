@@ -104,7 +104,7 @@ function SlotRow({
         className={css.index({ mode: "number" })}
         style={{ color: background, background: color }}
       >
-        #{1 + (index ?? 0)}
+        {1 + (index ?? 0)}
       </Text>
       <DragScrollArea asChild>
         {members?.length === 0 ? (

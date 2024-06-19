@@ -1,5 +1,5 @@
 import { CanvasRef } from "@repo/canvas";
-import { CanvasContext } from "@repo/canvas/src/context/canvasContext";
+import { CanvasContext } from "@repo/canvas/context";
 import React, { MutableRefObject, RefObject, useMemo, useRef } from "react";
 import { useEditorEventHandler } from "../events";
 import { EditorKeyMapTree, isKeyPressed } from "./editorKeyMap";
@@ -34,6 +34,12 @@ export function EditorKeyboardHandler({
 
   function keyDown(e: React.KeyboardEvent<HTMLDivElement>) {
     e.preventDefault();
+
+    // Forward key press to subscribers
+    const keyPress = eventHandler.fire("keyPress", "user", { ...e, keyMap });
+    if (keyPress.defaultPrevented) return;
+
+    // Handle default behaviours of key press
     if (checkMove(e)) return;
     if (isKeyPressed(keyMap.canvas.delete, e)) {
       eventHandler.fire("canvasDelete", "user", {

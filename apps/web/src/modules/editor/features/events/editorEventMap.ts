@@ -3,6 +3,8 @@ import type {
   CharacterGadgetSlotData,
 } from "@/modules/blueprint/actions";
 import { CanvasNode, CanvasNodeConfig } from "@repo/canvas";
+import { KeyboardEvent } from "react";
+import { EditorKeyMapTree } from "../keyboard";
 
 export type EditorEventOrigin = "user" | "history" | "foreign";
 
@@ -66,6 +68,7 @@ export interface EditorEventMap extends BroadcastableEditorEventMap {
   canvasDrop: EditorCreateEvent;
   editorUndo: EditorEvent;
   editorRedo: EditorEvent;
+  keyPress: EditorKeyPressEvent;
 }
 
 export type EditorEventType = keyof EditorEventMap;
@@ -73,6 +76,10 @@ export type EditorEventType = keyof EditorEventMap;
 // Individual Events
 
 export interface EditorEvent {}
+
+export interface EditorKeyPressEvent extends KeyboardEvent {
+  keyMap: EditorKeyMapTree;
+}
 
 export interface EditorTargetsEvent extends EditorEvent {
   /** Array of object identifiers that define the event's targets */

@@ -1,15 +1,33 @@
 "use client";
+import { useEditorEvent } from "@/modules/editor/features/events/hooks";
+import { isKeyPressed } from "@/modules/editor/features/keyboard";
 import { useURL } from "@/utils/hooks";
 import { Icon, Text } from "@repo/ui/components";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { RiStackFill, RiStackLine } from "react-icons/ri";
 import { useEditorContext } from "../../_context";
 import * as css from "./editor.stages.css";
 
 export function EditorStages() {
+  const url = useURL();
+  const router = useRouter();
   const [{ stages }] = useEditorContext();
-  const active = Number(useSearchParams().get("stage"));
+  const active = Number(url.searchParams.get("stage"));
+
+  useEditorEvent("keyPress", (e) => {
+    const keyMap = e.event.keyMap;
+    const isBack = isKeyPressed(keyMap.editor.stageBack, e.event);
+    const isNext = isKeyPressed(keyMap.editor.stageNext, e.event);
+    if (!isBack && !isNext) return;
+    e.preventDefault();
+
+    let newIndex = active + (isNext ? 1 : -1);
+    if (0 > newIndex) newIndex = stages.length - 1;
+    else newIndex %= stages.length;
+    url.searchParams.set("stage", String(newIndex));
+    router.replace(url.href);
+  });
 
   return (
     <section className={css.container}>
