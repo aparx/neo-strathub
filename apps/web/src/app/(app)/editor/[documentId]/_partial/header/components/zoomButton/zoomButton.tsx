@@ -1,12 +1,13 @@
 import { vars } from "@repo/theme";
 import { Popover, PopoverItem } from "@repo/ui/components";
 import { useEffect, useRef } from "react";
-import { BiReset, BiZoomIn, BiZoomOut } from "react-icons/bi";
+import { BiZoomIn, BiZoomOut } from "react-icons/bi";
+import { TbZoomReset } from "react-icons/tb";
 import { useEditorContext } from "../../../../_context";
 import { EditorConfig } from "../../../../_utils";
 
 export function ZoomButton() {
-  const [{ scale, updateScale }, updateEditor] = useEditorContext();
+  const [{ scale, updateScale }] = useEditorContext();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const roundScale = Math.round(100 * scale);
@@ -52,7 +53,7 @@ export function ZoomButton() {
         </PopoverItem.Button>
         <PopoverItem.Divider />
         <PopoverItem.Button size="compact" onClick={() => updateScale(() => 1)}>
-          <BiReset />
+          <TbZoomReset />
           Reset Zoom
         </PopoverItem.Button>
       </Popover.Content>
