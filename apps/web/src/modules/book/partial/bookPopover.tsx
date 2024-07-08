@@ -38,10 +38,10 @@ function RenameButton({ id, name, update }: BookPopoverBaseProps) {
   return (
     <Modal.Root open={open} onOpenChange={setOpen}>
       <Modal.Trigger asChild>
-        <Popover.Item>
+        <PopoverItem.Button>
           <Icon.Mapped type={"rename"} size={"sm"} />
           Rename
-        </Popover.Item>
+        </PopoverItem.Button>
       </Modal.Trigger>
       {open && (
         <RenameBookModal
@@ -63,10 +63,10 @@ function DeleteButton({ id, name, update }: BookPopoverBaseProps) {
   return (
     <Modal.Root open={open} onOpenChange={setOpen}>
       <Modal.Trigger asChild>
-        <Popover.Item color={"destructive"}>
+        <PopoverItem.Button color={"destructive"}>
           <Icon.Mapped type={"delete"} size={"sm"} />
           Delete
-        </Popover.Item>
+        </PopoverItem.Button>
       </Modal.Trigger>
       {open && (
         <DeleteBookModal

@@ -3,12 +3,12 @@ import { Canvas, CanvasRef, CanvasStyle, primitiveShapes } from "@repo/canvas";
 import {
   CanvasContext,
   CanvasContextInteractStatus,
-} from "@repo/canvas/src/context/canvasContext";
+} from "@repo/canvas/context";
 import { mergeRefs } from "@repo/utils";
 import React, { forwardRef, useEffect, useRef } from "react";
 import { useDebouncedCallback } from "use-debounce";
-import { useLocalStorage } from "usehooks-ts";
 import { DEFAULT_KEY_MAP, EditorKeyboardHandler } from "../features/keyboard";
+import { useEditorLocalStorage } from "../hooks";
 import { GameObject } from "../objects/gameObject";
 
 export const EDITOR_RENDERERS = {
@@ -25,20 +25,21 @@ export const EditorViewport = forwardRef<CanvasContext, EditorViewportProps>(
   function EditorViewport(props, ref) {
     const { style, children, ...restProps } = props;
 
-    const [{ characters, objectCache }] = useEditorContext();
+    const [{ characters, objectCache, updateScale, scale }] =
+      useEditorContext();
     const canvasRef = useRef<CanvasRef>(null);
 
-    const [savedPos, setSavedPos] = useLocalStorage("c_pos", { x: 0, y: 0 });
-    const [savedZoom, setSavedZoom] = useLocalStorage("c_zoom", 0);
-
-    const savePos = useDebouncedCallback(setSavedPos, 100);
-    const saveZoom = useDebouncedCallback(setSavedZoom, 100);
+    const storage = useEditorLocalStorage();
+    const savePos = useDebouncedCallback(storage.position.save, 100);
 
     useEffect(() => {
       // Sync with position and zoom from local storage
-      canvasRef.current?.position.update(savedPos ?? { x: 0, y: 0 });
-      canvasRef.current?.scale.update(savedZoom || 1);
-    }, []);
+      canvasRef.current?.position.update(
+        storage.position.value ?? { x: 0, y: 0 },
+      );
+    }, [storage.position.value]);
+
+    useEffect(() => canvasRef.current?.scale.update(scale), [scale]);
 
     return (
       <EditorKeyboardHandler canvas={canvasRef} keyMap={DEFAULT_KEY_MAP}>
@@ -46,7 +47,7 @@ export const EditorViewport = forwardRef<CanvasContext, EditorViewportProps>(
           ref={mergeRefs(canvasRef, ref)}
           style={style}
           onMove={savePos}
-          onZoom={saveZoom}
+          onZoom={(value) => updateScale(() => value)}
           onGetGameObjectURL={(id) => objectCache[id]?.url}
           onGetCharacterSlot={(characterId) => {
             const slotData = characters[characterId]?.player_slot;

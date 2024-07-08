@@ -1,9 +1,10 @@
 "use client";
 import * as Primitive from "@radix-ui/react-popover";
-import { Slot } from "@radix-ui/react-slot";
 import { mergeClassNames } from "@repo/utils";
 import { ComponentPropsWithoutRef } from "react";
-import { Text } from "../text";
+import { MdExpandMore } from "react-icons/md";
+import { Icon } from "../icon";
+import { IconButton } from "../iconButton";
 import * as css from "./popover.css";
 
 export const Root = Primitive.Root;
@@ -18,6 +19,13 @@ export type PopoverContentProps = Omit<
   Primitive.PopoverContentProps,
   "asChild"
 >;
+
+type PopoverExpandBaseProps = Omit<PopoverTriggerProps, "asChild">;
+
+export interface PopoverExpandProps extends PopoverExpandBaseProps {
+  /** If true, the button will fade-in, in a specific way */
+  fadeIn?: boolean;
+}
 
 export function Content({
   children,
@@ -36,38 +44,17 @@ export function Content({
   );
 }
 
-export type ItemProps = ComponentPropsWithoutRef<"button"> &
-  css.ItemVariants & {
-    asChild?: boolean;
-  };
 
-export function Item({
-  className,
-  asChild,
-  color,
-  disabled,
-  ...restProps
-}: ItemProps) {
-  const Component = asChild ? Slot : "button";
+
+export function Expand({ children, fadeIn, ...restProps }: PopoverExpandProps) {
   return (
-    <Text asChild>
-      <Component
-        className={mergeClassNames(css.item({ color, disabled }), className)}
-        aria-disabled={disabled}
-        {...restProps}
-      />
-    </Text>
-  );
-}
-
-export type DividerProps = ComponentPropsWithoutRef<"div"> &
-  css.DividerVariants;
-
-export function Divider({ orient, className, ...restProps }: DividerProps) {
-  return (
-    <div
-      className={mergeClassNames(css.divider({ orient }), className)}
-      {...restProps}
-    />
+    <Trigger asChild {...restProps}>
+      <IconButton className={css.expandShell({ fadeIn })}>
+        {children}
+        <Icon.Custom className={css.expandIcon({ fadeIn })}>
+          <MdExpandMore />
+        </Icon.Custom>
+      </IconButton>
+    </Trigger>
   );
 }

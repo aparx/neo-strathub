@@ -23,12 +23,8 @@ export function EditorWindow({ stages }: EditorWindowProps) {
   const windowSize = useWindowSize();
   const [editor, updateEditor] = useEditorContext();
   const eventHandler = useEditorEventHandler();
-  // https://svgshare.com/i/161z.svg
-  // https://svgshare.com/i/162B.svg
-  // https://svgshare.com/i/1602.svg
-
   const canvasRef = useRef<CanvasContext>(null);
-
+  
   useEditorEvent("editorUndo", async (e) => {
     if (e.origin !== "user") return;
     const lastCommand = editor.history.moveBack();

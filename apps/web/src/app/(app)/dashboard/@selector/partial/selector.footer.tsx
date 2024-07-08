@@ -1,7 +1,13 @@
 "use server";
 import { getProfile } from "@/modules/auth/actions";
 import { AuthButton, UserField } from "@/modules/auth/components";
-import { Flexbox, Icon, IconButton, Popover } from "@repo/ui/components";
+import {
+  Flexbox,
+  Icon,
+  IconButton,
+  Popover,
+  PopoverItem,
+} from "@repo/ui/components";
 import { cookies } from "next/headers";
 
 export async function SelectorFooter() {
@@ -17,15 +23,15 @@ export async function SelectorFooter() {
           </IconButton>
         </Popover.Trigger>
         <Popover.Content>
-          <Popover.Item>
+          <PopoverItem.Button>
             <Icon.Mapped type={"settings"} />
             Preferences
-          </Popover.Item>
+          </PopoverItem.Button>
           <AuthButton.SignOut asChild>
-            <Popover.Item color={"destructive"}>
+            <PopoverItem.Button color={"destructive"}>
               <Icon.Mapped type={"leave"} />
               Sign out
-            </Popover.Item>
+            </PopoverItem.Button>
           </AuthButton.SignOut>
         </Popover.Content>
       </Popover.Root>

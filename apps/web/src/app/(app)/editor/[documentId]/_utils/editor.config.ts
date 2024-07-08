@@ -2,6 +2,9 @@ import { EditorStageStyle } from "@/modules/editor/components/stage";
 import { CanvasLevelStyle } from "@repo/canvas";
 
 export module EditorConfig {
+  export const MAX_ZOOM_SCALE = 10;
+  export const MIN_ZOOM_SCALE = 0.01;
+
   export const FOCUS_COLOR = [107, 185, 242] as const;
 
   export const LEVEL_STYLE = {

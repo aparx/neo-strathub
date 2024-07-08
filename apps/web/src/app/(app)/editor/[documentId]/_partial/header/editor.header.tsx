@@ -1,11 +1,11 @@
 "use client";
-import { BackButton } from "@/app/(app)/editor/[documentId]/_partial/header/components";
-import { PopoverExpand } from "@/components";
+import {
+  BackButton,
+  ZoomButton,
+} from "@/app/(app)/editor/[documentId]/_partial/header/components";
 import {
   Breadcrumbs,
-  Button,
   Flexbox,
-  Icon,
   IconButton,
   Popover,
   Text,
@@ -27,12 +27,13 @@ export function EditorHeader() {
           <BlueprintTitle />
         </div>
         <div className={css.headerItem({ side: "right" })}>
-          <Button asChild appearance={"cta"} color={"cta"}>
+          <ZoomButton />
+          {/*<Button asChild appearance={"cta"} color={"cta"}>
             <Link href={`/editor/${blueprint.id}/preview`}>
               Preview
               <Icon.Mapped type={"next"} />
             </Link>
-          </Button>
+          </Button>*/}
         </div>
       </header>
     </Text>
@@ -52,11 +53,11 @@ function BlueprintTitle() {
                 {blueprint.book.team.name}
               </Link>
             </IconButton>
-            <PopoverExpand>
+            <Popover.Expand>
               <Flexbox align={"center"} gap={"md"}>
                 {blueprint.name}
               </Flexbox>
-            </PopoverExpand>
+            </Popover.Expand>
           </Breadcrumbs>
         </h2>
       </Text>

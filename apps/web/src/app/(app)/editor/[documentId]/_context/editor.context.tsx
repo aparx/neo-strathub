@@ -15,6 +15,7 @@ import {
   EditorRealtimeChannel,
   EditorRealtimeChannelContract,
 } from "@/modules/editor/features/realtime";
+import { useEditorLocalStorage } from "@/modules/editor/hooks";
 import { GameObjectData, useGetGameObjects } from "@/modules/gameObject/hooks";
 import { createClient } from "@/utils/supabase/client";
 import { CanvasNode } from "@repo/canvas";
@@ -29,6 +30,8 @@ import {
   useEffect,
   useMemo,
 } from "react";
+import { useDebouncedCallback } from "use-debounce";
+import { EditorConfig } from "../_utils";
 import { TeamMemberData } from "../actions";
 
 export interface EditorCharacterData extends BlueprintCharacterData {
@@ -55,6 +58,8 @@ export interface EditorContext
   /** Currently dragged node (used for drag'n'drop) */
   dragged: CanvasNode | Nullish;
   history: CommandHistory<EditorCommand>;
+  scale: number;
+  updateScale: (arg: (oldScale: number) => number) => void;
 }
 
 type EditorSlotsData = Record<number, PlayerSlotData>;
@@ -71,7 +76,9 @@ export function EditorContextProvider({
 }: EditorContextServer & {
   children: React.ReactNode;
 }) {
+  const storage = useEditorLocalStorage();
   const channel = useMemo(() => new EditorRealtimeChannel(), []);
+  const saveZoom = useDebouncedCallback(storage.scale.save, 100);
 
   const context = useSharedState<EditorContext>(() => ({
     channel,
@@ -80,8 +87,24 @@ export function EditorContextProvider({
     objectCache: {},
     history: new CommandHistory(15),
     blueprint,
+    scale: storage.scale.value,
+    updateScale: (mapper) => {
+      context.update((old) => {
+        const newScale = Math.max(
+          Math.min(mapper(old.scale), EditorConfig.MAX_ZOOM_SCALE),
+          EditorConfig.MIN_ZOOM_SCALE,
+        );
+        saveZoom(newScale);
+        return { ...old, scale: newScale };
+      });
+    },
     ...restContext,
   }));
+
+  useEffect(() => {
+    if (storage.scale.value !== context.state.scale)
+      context.state.updateScale(() => storage.scale.value);
+  }, [storage.scale.value]);
 
   // Setup a channel immediately
   useEffect(() => {

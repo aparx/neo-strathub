@@ -1,5 +1,4 @@
 "use client";
-import { PopoverExpand } from "@/components";
 import { useTeam } from "@/modules/team/clientActions";
 import { TeamPopover } from "@/modules/team/partial";
 import { vars } from "@repo/theme";
@@ -47,7 +46,7 @@ function TeamButton({ teamId }: { teamId: string }) {
     );
   return (
     <Popover.Root>
-      <PopoverExpand>{name}</PopoverExpand>
+      <Popover.Expand>{name}</Popover.Expand>
       {data != null && (
         <TeamPopover teamId={data.id} style={{ minWidth: 250 }} />
       )}

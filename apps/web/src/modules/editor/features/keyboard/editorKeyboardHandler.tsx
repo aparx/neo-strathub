@@ -95,7 +95,7 @@ function useCheckElementMove(
       [keyMap.canvas.moveDown, [0, 1]],
     ] as const;
 
-    return function _checkElementMove(e: React.KeyboardEvent) {
+    return (e: React.KeyboardEvent) => {
       const moveKey = deltaMatrix.find(([key]) => isKeyPressed(key, e));
       if (!moveKey) return false;
       const deltaSpeed = e.shiftKey ? 10 : 5;
