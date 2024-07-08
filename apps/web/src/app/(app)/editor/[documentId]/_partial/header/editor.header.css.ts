@@ -14,8 +14,8 @@ export const headerContainer = style([
     alignItems: "center",
     height: EDITOR_HEADER_HEIGHT,
     zIndex: 99,
-    paddingLeft: vars.spacing.lg,
-    paddingRight: vars.spacing.lg,
+    paddingLeft: vars.spacing.md,
+    paddingRight: vars.spacing.md,
     animation: `${keyframes({
       from: { opacity: 0, transform: "translateY(-50%)" },
     })} .5s`,
@@ -44,4 +44,10 @@ export const headerItem = recipe({
       },
     },
   },
+});
+
+export const zoomButtonContainer = style({
+  minWidth: "8ch",
+  display: "flex",
+  justifyContent: "flex-end",
 });

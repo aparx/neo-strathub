@@ -31,7 +31,6 @@ export function ZoomButton() {
             placeholder={String(roundScale)}
             max={100 * EditorConfig.MAX_ZOOM_SCALE}
             min={100 * EditorConfig.MIN_ZOOM_SCALE}
-            style={{ minWidth: 20, justifyContent: "flex-end" }}
             onChange={(e) =>
               e.target.value && updateScale(() => Number(e.target.value) / 100)
             }

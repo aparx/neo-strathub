@@ -28,6 +28,9 @@ export function EditorHeader() {
           <BlueprintTitle />
         </div>
         <div className={css.headerItem({ side: "right" })}>
+          <div className={css.zoomButtonContainer}>
+            <ZoomButton />
+          </div>
           <Button asChild color={"cta"} size="compact" disabled={mode == null}>
             {mode === "edit" ? (
               <Link href={`/editor/${blueprint.id}/preview`}>Preview</Link>
@@ -35,7 +38,6 @@ export function EditorHeader() {
               <Link href={`/editor/${blueprint.id}/edit`}>Edit</Link>
             )}
           </Button>
-          <ZoomButton />
         </div>
       </header>
     </Text>
