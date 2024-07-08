@@ -1,24 +1,29 @@
 import { FontSize, FontType, vars } from "@repo/theme";
 import { DeepReadonly, Numberish } from "@repo/utils";
+import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
-import type { NextFont } from "next/dist/compiled/@next/font";
 import { createLetterSpace, createLineHeight } from "../../utils";
+
+export type TextFont = keyof typeof FONTS;
 
 export interface TextFontData {
   level?: number;
   size: string;
-  font: NextFont;
+  font: TextFont;
   weight: Numberish;
   letterSpacing: Numberish;
   lineHeight: Numberish;
 }
 
-// @formatter:off
 interface FontDataConstructor<T extends TextFontData> {
-  (size: string, font: NextFont, weight?: number, level?: number): T;
-  new (size: string, font: NextFont, weight?: number, level?: number): T;
+  (size: string, font: TextFont, weight?: number, level?: number): T;
+  new (size: string, font: TextFont, weight?: number, level?: number): T;
 }
-// @formatter:on
+
+export const FONTS = {
+  sans: GeistSans,
+  mono: GeistMono,
+} as const;
 
 const FontData = function (size, font, weight = 400, level) {
   const letterSpacing = createLetterSpace(size);
@@ -30,23 +35,23 @@ export const FONT_DATA_MAP: DeepReadonly<
   Record<FontType, Record<FontSize, TextFontData>>
 > = {
   display: {
-    lg: new FontData(vars.fontSizes.display.lg, GeistSans, 700, 1),
-    md: new FontData(vars.fontSizes.display.md, GeistSans, 700, 2),
-    sm: new FontData(vars.fontSizes.display.sm, GeistSans, 700, 3),
+    lg: new FontData(vars.fontSizes.display.lg, "sans", 700, 1),
+    md: new FontData(vars.fontSizes.display.md, "sans", 700, 2),
+    sm: new FontData(vars.fontSizes.display.sm, "sans", 700, 3),
   },
   title: {
-    lg: new FontData(vars.fontSizes.title.lg, GeistSans, 600, 4),
-    md: new FontData(vars.fontSizes.title.md, GeistSans, 600, 5),
-    sm: new FontData(vars.fontSizes.title.sm, GeistSans, 600, 6),
+    lg: new FontData(vars.fontSizes.title.lg, "sans", 600, 4),
+    md: new FontData(vars.fontSizes.title.md, "sans", 600, 5),
+    sm: new FontData(vars.fontSizes.title.sm, "sans", 600, 6),
   },
   body: {
-    lg: new FontData(vars.fontSizes.body.lg, GeistSans, 400),
-    md: new FontData(vars.fontSizes.body.md, GeistSans, 400),
-    sm: new FontData(vars.fontSizes.body.sm, GeistSans, 400),
+    lg: new FontData(vars.fontSizes.body.lg, "sans", 400),
+    md: new FontData(vars.fontSizes.body.md, "sans", 400),
+    sm: new FontData(vars.fontSizes.body.sm, "sans", 400),
   },
   label: {
-    lg: new FontData(vars.fontSizes.label.lg, GeistSans, 500),
-    md: new FontData(vars.fontSizes.label.md, GeistSans, 500),
-    sm: new FontData(vars.fontSizes.label.sm, GeistSans, 500),
+    lg: new FontData(vars.fontSizes.label.lg, "sans", 500),
+    md: new FontData(vars.fontSizes.label.md, "sans", 500),
+    sm: new FontData(vars.fontSizes.label.sm, "sans", 500),
   },
 } as const;

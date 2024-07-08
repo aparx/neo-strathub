@@ -39,6 +39,7 @@ export interface EditorCharacterData extends BlueprintCharacterData {
 }
 
 export interface EditorContextServer extends CanvasContextInteractStatus {
+  mode?: "edit" | "preview" | undefined;
   blueprint: BlueprintData;
   slots: EditorSlotsData;
   characters: EditorCharactersData;

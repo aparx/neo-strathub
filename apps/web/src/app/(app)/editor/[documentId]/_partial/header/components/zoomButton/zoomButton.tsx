@@ -1,5 +1,5 @@
 import { vars } from "@repo/theme";
-import { Popover, PopoverItem } from "@repo/ui/components";
+import { Popover, PopoverItem, Text } from "@repo/ui/components";
 import { useEffect, useRef } from "react";
 import { BiZoomIn, BiZoomOut } from "react-icons/bi";
 import { TbZoomReset } from "react-icons/tb";
@@ -19,7 +19,7 @@ export function ZoomButton() {
   return (
     <Popover.Root>
       <Popover.Expand style={{ color: vars.colors.emphasis.medium }}>
-        {roundScale}%
+        <Text data={{ font: "mono" }}>{roundScale}%</Text>
       </Popover.Expand>
       <Popover.Content>
         <PopoverItem.Field.Root size="compact">
@@ -31,6 +31,7 @@ export function ZoomButton() {
             placeholder={String(roundScale)}
             max={100 * EditorConfig.MAX_ZOOM_SCALE}
             min={100 * EditorConfig.MIN_ZOOM_SCALE}
+            style={{ minWidth: 20, justifyContent: "flex-end" }}
             onChange={(e) =>
               e.target.value && updateScale(() => Number(e.target.value) / 100)
             }

@@ -27,6 +27,7 @@ export const headerItem = recipe({
   base: {
     display: "flex",
     alignItems: "center",
+    gap: vars.spacing.lg,
   },
   variants: {
     side: {

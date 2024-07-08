@@ -21,6 +21,7 @@ export function Button({
   color,
   appearance,
   disabled,
+  size,
   ...restProps
 }: ButtonProps) {
   const Component = asChild ? Slot : "button";
@@ -29,7 +30,7 @@ export function Button({
       <Component
         className={mergeClassNames(
           className,
-          css.button({ color, appearance, disabled }),
+          css.button({ color, appearance, disabled, size }),
         )}
         aria-disabled={disabled}
         disabled={disabled}

@@ -2,7 +2,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { FontSize, FontType } from "@repo/theme";
 import { mergeClassNames } from "@repo/utils";
 import { HTMLProps, forwardRef, useCallback, useMemo } from "react";
-import { FONT_DATA_MAP, TextFontData } from "./text.font";
+import { FONTS, FONT_DATA_MAP, TextFontData } from "./text.font";
 
 interface TypographyProps {
   data?: Partial<TextFontData>;
@@ -32,12 +32,13 @@ export const Text = forwardRef<HTMLDivElement, TextProps>(
       ...restProps
     } = props;
 
-    // Most often `data` is not used, which is why memoization can provide a benefit
-    // prettier-ignore
-    const fontData = useMemo(() => ({
-      ...FONT_DATA_MAP[type][size],
-      ...data
-    }), [type, size, data]);
+    const fontData = useMemo(
+      () => ({
+        ...FONT_DATA_MAP[type][size],
+        ...data,
+      }),
+      [type, size, data],
+    );
 
     const defineComponent = useCallback(() => {
       if (!fontData.level) return "div";
@@ -50,7 +51,7 @@ export const Text = forwardRef<HTMLDivElement, TextProps>(
     return (
       <Component
         ref={ref}
-        className={mergeClassNames(className, fontData.font.className)}
+        className={mergeClassNames(className, FONTS[fontData.font].className)}
         role={(fontData.level ?? 0) > 6 ? "heading" : undefined}
         aria-level={fontData.level}
         style={{

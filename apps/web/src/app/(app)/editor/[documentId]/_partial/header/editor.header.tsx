@@ -5,6 +5,7 @@ import {
 } from "@/app/(app)/editor/[documentId]/_partial/header/components";
 import {
   Breadcrumbs,
+  Button,
   Flexbox,
   IconButton,
   Popover,
@@ -15,7 +16,7 @@ import { useEditorContext } from "../../_context";
 import * as css from "./editor.header.css";
 
 export function EditorHeader() {
-  const [{ blueprint }] = useEditorContext();
+  const [{ blueprint, mode }] = useEditorContext();
 
   return (
     <Text asChild>
@@ -27,13 +28,14 @@ export function EditorHeader() {
           <BlueprintTitle />
         </div>
         <div className={css.headerItem({ side: "right" })}>
+          <Button asChild color={"cta"} size="compact" disabled={mode == null}>
+            {mode === "edit" ? (
+              <Link href={`/editor/${blueprint.id}/preview`}>Preview</Link>
+            ) : (
+              <Link href={`/editor/${blueprint.id}/edit`}>Edit</Link>
+            )}
+          </Button>
           <ZoomButton />
-          {/*<Button asChild appearance={"cta"} color={"cta"}>
-            <Link href={`/editor/${blueprint.id}/preview`}>
-              Preview
-              <Icon.Mapped type={"next"} />
-            </Link>
-          </Button>*/}
         </div>
       </header>
     </Text>
@@ -54,7 +56,7 @@ function BlueprintTitle() {
               </Link>
             </IconButton>
             <Popover.Expand>
-              <Flexbox align={"center"} gap={"md"}>
+              <Flexbox align="center" gap="md">
                 {blueprint.name}
               </Flexbox>
             </Popover.Expand>

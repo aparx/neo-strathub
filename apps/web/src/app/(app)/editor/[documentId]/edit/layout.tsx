@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+import React, { useEffect } from "react";
+import { useEditorContext } from "../_context";
 import { EditorSidepanelList, EditorStages } from "../_partial";
 import {
   SidepanelItem,
@@ -10,6 +12,12 @@ export default function EditorEditLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const [, updateContext] = useEditorContext();
+
+  useEffect(() => {
+    updateContext((old) => ({ ...old, mode: "edit" }));
+  }, []);
+
   return (
     <>
       <EditorSidepanelList side="left">

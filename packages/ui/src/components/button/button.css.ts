@@ -18,9 +18,7 @@ const iconButtonSize = calc.add(
 export const button = recipe({
   base: [
     sprinkles({
-      paddingX: "lg",
-      paddingY: "md",
-      borderRadius: "md",
+      borderRadius: "sm",
       outline: "card",
     }),
     {
@@ -91,11 +89,20 @@ export const button = recipe({
         fontSize: `${ICON_SIZES.md} !important`,
       },
     },
+    size: {
+      default: {
+        padding: `${vars.spacing.md} ${vars.spacing.lg}`,
+      },
+      compact: {
+        padding: `${vars.spacing.sm} ${vars.spacing.md}`,
+      },
+    },
   },
   defaultVariants: {
     disabled: false,
     color: "default",
     appearance: "default",
+    size: "default",
   },
 });
 
