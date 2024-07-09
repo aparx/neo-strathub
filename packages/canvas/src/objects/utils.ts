@@ -1,3 +1,4 @@
+import merge from "deepmerge";
 import { FC } from "react";
 import { CanvasNode } from "utils/node";
 import { v4 as uuidv4 } from "uuid";
@@ -52,6 +53,5 @@ export function mergeCanvasNodes<TNode extends CanvasNode>(
   a: TNode,
   b: TNode,
 ): TNode {
-  // TODO implement deep object merge
-  return { ...a, ...b, attrs: { ...a.attrs, ...b.attrs } };
+  return merge(a, b) as TNode;
 }

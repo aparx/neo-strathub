@@ -246,6 +246,9 @@ importers:
       '@repo/utils':
         specifier: workspace:^
         version: link:../utils
+      deepmerge:
+        specifier: ^4.3.1
+        version: 4.3.1
       konva:
         specifier: ^9.3.6
         version: 9.3.6
