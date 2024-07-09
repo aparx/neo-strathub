@@ -19,7 +19,8 @@ export const indicator = recipe({
         color: vars.colors.emphasis.medium,
       },
       true: {
-        color: vars.colors.emphasis.high,
+        background: vars.colors.primary.darkest,
+        color: vars.colors.primary.lighter,
       },
     },
   },

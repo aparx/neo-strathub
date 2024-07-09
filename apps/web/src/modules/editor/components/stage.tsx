@@ -1,6 +1,11 @@
 import { useEditorContext } from "@/app/(app)/editor/[documentId]/_context";
 import { BlueprintData } from "@/modules/blueprint/actions/getBlueprint";
-import { CanvasLevelStyle, CanvasNode, useCanvas } from "@repo/canvas";
+import {
+  CanvasLevelStyle,
+  CanvasNode,
+  mergeCanvasNodes,
+  useCanvas,
+} from "@repo/canvas";
 import type Konva from "konva";
 import { useEffect } from "react";
 import { deleteNodes, upsertNodes } from "../actions";
@@ -124,15 +129,37 @@ function Level({
     newNode: CanvasNode;
   }>({
     commit: async (data) => {
-      const nodesByUser = new Array<[old: CanvasNode, new: CanvasNode]>();
-      const nodesToDb = new Array<CanvasNode>(data.length);
-      data.forEach((data, index) => {
-        if (data.origin === "user")
-          nodesByUser.push([data.oldNode, data.newNode]);
-        nodesToDb[index] = data.newNode;
+      const oldMap = new Map<string, CanvasNode>();
+      const newMap = new Map<string, CanvasNode>();
+
+      data.forEach(({ origin, oldNode, newNode }) => {
+        // Try put old node if not already set
+        if (origin === "user" && !oldMap.has(oldNode.attrs.id))
+          oldMap.set(oldNode.attrs.id, oldNode);
+        // Put new node and possibly merge with previous nodes
+        const foundNode = newMap.get(newNode.attrs.id);
+        if (!foundNode) return newMap.set(newNode.attrs.id, newNode);
+        // Node is duplicated, thus merge with existing node data
+        newMap.set(newNode.attrs.id, mergeCanvasNodes(foundNode, newNode));
       });
+
+      const nodesByUser = new Array<[old: CanvasNode, new: CanvasNode]>();
+      const nodesToDb = new Array<CanvasNode>(newMap.size);
+
+      let index = 0;
+      for (const key of newMap.keys()) {
+        const oldNode = oldMap.get(key);
+        const newNode = newMap.get(key);
+        if (newNode == null) continue;
+        if (oldNode != null)
+          // Since there's a previous node, it has the correct origin
+          nodesByUser.push([oldNode, newNode]);
+        nodesToDb[index++] = newNode;
+      }
+
       if (nodesByUser.length !== 0)
         pushCommand(await createUpdateCommand(nodesByUser));
+
       // TODO DATA RACE: create RPC that only updates the diffing fields
       if (nodesToDb.length !== 0) upsertNodes(nodesToDb, level.id, stageId);
     },

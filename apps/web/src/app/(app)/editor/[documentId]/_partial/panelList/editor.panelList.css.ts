@@ -14,7 +14,7 @@ export const panelList = recipe({
     overflowY: "auto",
     gap: vars.spacing.lg,
     padding: vars.spacing.md,
-    paddingTop: 0,
+    paddingTop: "unset",
     pointerEvents: "none",
     touchAction: "none",
     "::-webkit-scrollbar": {

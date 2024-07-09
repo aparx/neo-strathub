@@ -47,3 +47,11 @@ export function copyCanvasNode<TNode extends CanvasNode>(
   newNode.attrs.id = newId;
   return newNode;
 }
+
+export function mergeCanvasNodes<TNode extends CanvasNode>(
+  a: TNode,
+  b: TNode,
+): TNode {
+  // TODO implement deep object merge
+  return { ...a, ...b, attrs: { ...a.attrs, ...b.attrs } };
+}

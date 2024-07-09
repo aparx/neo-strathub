@@ -106,10 +106,12 @@ async function Content({
             <div className={css.grid}>
               <EditorHeader />
               <EditorCharacters />
-              <EditorSidepanelList side="right">
-                <SidepanelItem title="Members">
-                  <SidepanelMemberList />
-                </SidepanelItem>
+              <EditorSidepanelList asChild side="right">
+                <aside>
+                  <SidepanelItem title="Members">
+                    <SidepanelMemberList />
+                  </SidepanelItem>
+                </aside>
               </EditorSidepanelList>
               <div className={css.fadeInRect} />
               <CanvasImageCacheProvider>{children}</CanvasImageCacheProvider>

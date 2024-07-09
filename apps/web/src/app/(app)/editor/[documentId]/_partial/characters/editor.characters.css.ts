@@ -11,7 +11,7 @@ export const list = style([
   {
     gridArea: "center",
     position: "absolute",
-    bottom: vars.spacing["2xl"],
+    bottom: vars.spacing.xl,
     left: "50%",
     transform: "translateX(-50%)",
     padding: vars.spacing.sm,
