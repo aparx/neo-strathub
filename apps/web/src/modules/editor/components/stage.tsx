@@ -1,20 +1,14 @@
-import { useEditorContext } from "@/app/(app)/editor/[documentId]/_context";
 import { BlueprintData } from "@/modules/blueprint/actions/getBlueprint";
-import {
-  CanvasLevelStyle,
-  CanvasNode,
-  mergeCanvasNodes,
-  useCanvas,
-} from "@repo/canvas";
+import { CanvasLevelStyle, useCanvas } from "@repo/canvas";
 import type Konva from "konva";
 import { useEffect } from "react";
-import { deleteNodes, upsertNodes } from "../actions";
-import { EditorCommand, createUpdateCommand } from "../features/command";
-import { createCreateCommand } from "../features/command/commands/createCommand";
-import { createDeleteCommand } from "../features/command/commands/deleteCommand";
-import { EditorEventOrigin } from "../features/events";
-import { GetLevelData, useGetLevels } from "../hooks";
-import { useBatch } from "../hooks/useBatch";
+import {
+  GetLevelData,
+  useGetLevels,
+  usePushDelete,
+  usePushInsert,
+  usePushUpdate,
+} from "../hooks";
 import { EditorLevel } from "./level";
 
 export interface EditorStageStyle {
@@ -57,6 +51,10 @@ export function EditorStage({
   // Fixes https://github.com/aparx/neo-strathub/issues/32
   useEffect(() => canvas.selected.update([]), [hidden]);
 
+  const pushUpdate = usePushUpdate(stageId);
+  const pushDelete = usePushDelete(stageId);
+  const pushInsert = usePushInsert(stageId);
+
   return data?.map((level, index) => (
     <Level
       key={level.id}
@@ -65,6 +63,9 @@ export function EditorStage({
       level={level}
       style={style.levelStyle}
       hidden={hidden}
+      onUpdate={pushUpdate}
+      onDelete={pushDelete}
+      onInsert={pushInsert}
     />
   ));
 }
@@ -75,96 +76,19 @@ function Level({
   position,
   style,
   hidden,
+  onUpdate,
+  onDelete,
+  onInsert,
 }: {
   level: GetLevelData;
   stageId: number;
   position: Konva.Vector2d;
   style: CanvasLevelStyle;
   hidden?: boolean;
+  onUpdate: ReturnType<typeof usePushUpdate>;
+  onDelete: ReturnType<typeof usePushDelete>;
+  onInsert: ReturnType<typeof usePushInsert>;
 }) {
-  const [editor] = useEditorContext();
-
-  function pushCommand(command: EditorCommand) {
-    editor.history.push(command);
-    editor.channel.broadcast(command.eventType, command.payload);
-  }
-
-  const pushDelete = useBatch<{
-    origin: EditorEventOrigin;
-    node: CanvasNode;
-  }>({
-    commit: async (data) => {
-      const nodesByUser = new Array<CanvasNode>();
-      const nodesToDb = new Array<string>(data.length);
-      data.forEach((data, index) => {
-        if (data.origin === "user") nodesByUser.push(data.node);
-        nodesToDb[index] = data.node.attrs.id;
-      });
-      if (nodesByUser.length !== 0)
-        pushCommand(createDeleteCommand(nodesByUser, level.id, stageId));
-      if (nodesToDb.length !== 0) deleteNodes(nodesToDb);
-    },
-  });
-
-  const pushInsert = useBatch<{
-    origin: EditorEventOrigin;
-    node: CanvasNode;
-  }>({
-    commit: async (data) => {
-      const nodesByUser = new Array<CanvasNode>();
-      const nodesToDb = new Array<CanvasNode>(data.length);
-      data.forEach((data, index) => {
-        if (data.origin === "user") nodesByUser.push(data.node);
-        nodesToDb[index] = data.node;
-      });
-      if (nodesByUser.length !== 0)
-        pushCommand(createCreateCommand(nodesByUser, level.id, stageId));
-      if (nodesToDb.length !== 0) upsertNodes(nodesToDb, level.id, stageId);
-    },
-  });
-
-  const pushUpdate = useBatch<{
-    origin: EditorEventOrigin;
-    oldNode: CanvasNode;
-    newNode: CanvasNode;
-  }>({
-    commit: async (data) => {
-      const oldMap = new Map<string, CanvasNode>();
-      const newMap = new Map<string, CanvasNode>();
-
-      data.forEach(({ origin, oldNode, newNode }) => {
-        // Try put old node if not already set
-        if (origin === "user" && !oldMap.has(oldNode.attrs.id))
-          oldMap.set(oldNode.attrs.id, oldNode);
-        // Put new node and possibly merge with previous nodes
-        const foundNode = newMap.get(newNode.attrs.id);
-        if (!foundNode) return newMap.set(newNode.attrs.id, newNode);
-        // Node is duplicated, thus merge with existing node data
-        newMap.set(newNode.attrs.id, mergeCanvasNodes(foundNode, newNode));
-      });
-
-      const nodesByUser = new Array<[old: CanvasNode, new: CanvasNode]>();
-      const nodesToDb = new Array<CanvasNode>(newMap.size);
-
-      let index = 0;
-      for (const key of newMap.keys()) {
-        const oldNode = oldMap.get(key);
-        const newNode = newMap.get(key);
-        if (newNode == null) continue;
-        if (oldNode != null)
-          // Since there's a previous node, it has the correct origin
-          nodesByUser.push([oldNode, newNode]);
-        nodesToDb[index++] = newNode;
-      }
-
-      if (nodesByUser.length !== 0)
-        pushCommand(await createUpdateCommand(nodesByUser));
-
-      // TODO DATA RACE: create RPC that only updates the diffing fields
-      if (nodesToDb.length !== 0) upsertNodes(nodesToDb, level.id, stageId);
-    },
-  });
-
   return (
     <EditorLevel
       key={level.id}
@@ -173,15 +97,31 @@ function Level({
       stageId={stageId}
       imageURL={level.image}
       position={position}
-      onNodeUpdate={(newNode, oldNode, origin) => {
-        if (origin !== "foreign") pushUpdate({ origin, oldNode, newNode });
-      }}
-      onNodeDelete={(node, origin) => {
-        if (origin !== "foreign") pushDelete({ node, origin });
-      }}
-      onNodeCreate={(node, origin) => {
-        if (origin !== "foreign") pushInsert({ node, origin });
-      }}
+      onNodeUpdate={(newNode, oldNode, origin) =>
+        origin !== "foreign" &&
+        onUpdate({
+          origin,
+          oldNode,
+          newNode,
+          level: level.id,
+        })
+      }
+      onNodeDelete={(node, origin) =>
+        origin !== "foreign" &&
+        onDelete({
+          node,
+          origin,
+          level: level.id,
+        })
+      }
+      onNodeCreate={(node, origin) =>
+        origin !== "foreign" &&
+        onInsert({
+          node,
+          origin,
+          level: level.id,
+        })
+      }
       style={style}
       hidden={hidden}
     />
