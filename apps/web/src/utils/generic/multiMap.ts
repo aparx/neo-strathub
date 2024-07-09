@@ -1,17 +1,41 @@
-export function createMultiMap<K, V>() {
-  const map = new Map<K, V[]>();
+export class MultiMap<K, V> extends Map<K, V[]> {
+  private _map = new Map<K, V[]>();
 
-  return {
-    push: (key: K, value: V) => {
-      const array = map.get(key) ?? [];
-      map.set(key, [...array, value]);
-    },
-    get: (key: K) => map.get(key),
-    keys: () => map.keys(),
-    values: () => map.values(),
-    size: () => map.size,
-    forEach: (callbackFn: (key: K, value: V[] | undefined) => any) => {
-      for (const key of map.keys()) callbackFn(key, map.get(key));
-    },
-  } as const;
+  clear() {
+    this._map.clear();
+  }
+
+  delete(key: K) {
+    return this._map.delete(key);
+  }
+
+  forEach(
+    callbackfn: (value: V[], key: K, map: Map<K, V[]>) => void,
+    thisArg?: any,
+  ): void {
+    return this._map.forEach(callbackfn, thisArg);
+  }
+
+  get(key: K) {
+    return this._map.get(key);
+  }
+
+  has(key: K) {
+    return this._map.has(key);
+  }
+
+  set(key: K, value: V[]) {
+    this._map.set(key, value);
+    return this;
+  }
+
+  push(key: K, value: V) {
+    const array = this._map.get(key) ?? [];
+    this._map.set(key, [...array, value]);
+  }
+
+  retain(key: K, filterPredicate: (val: V) => boolean) {
+    const array = this._map.get(key) ?? [];
+    this._map.set(key, array.filter(filterPredicate));
+  }
 }

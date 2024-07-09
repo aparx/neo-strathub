@@ -1,4 +1,4 @@
-import { createMultiMap } from "@/utils/generic/multiMap";
+import { MultiMap } from "@/utils/generic/multiMap";
 import { CanvasNode, mergeCanvasNodes } from "@repo/canvas";
 import { useCallback } from "react";
 import { upsertNodes } from "../../actions";
@@ -35,7 +35,7 @@ export function usePushUpdate(stageId: number) {
         });
 
         const nodesByUser = new Array<[old: CanvasNode, new: CanvasNode]>();
-        const nodesToDb = createMultiMap<number, CanvasNode>();
+        const nodesToDb = new MultiMap<number, CanvasNode>();
 
         newMap.forEach((map, level) => {
           for (const key of map.keys()) {
@@ -55,7 +55,7 @@ export function usePushUpdate(stageId: number) {
           pushCommand(await createUpdateCommand(nodesByUser));
 
         // TODO DATA RACE: create RPC that only updates the diffing fields
-        nodesToDb.forEach((level, nodes) => {
+        nodesToDb.forEach((nodes, level) => {
           nodes && upsertNodes(nodes, level, stageId);
         });
       },

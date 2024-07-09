@@ -1,4 +1,4 @@
-import { createMultiMap } from "@/utils/generic/multiMap";
+import { MultiMap } from "@/utils/generic/multiMap";
 import { CanvasNode } from "@repo/canvas";
 import { useCallback } from "react";
 import { deleteNodes } from "../../actions";
@@ -17,18 +17,18 @@ export function usePushDelete(stageId: number) {
   }>({
     commit: useCallback(
       async (data) => {
-        const nodesByUser = createMultiMap<number, CanvasNode>();
-        const nodesToDb = createMultiMap<number, string>();
+        const nodesByUser = new MultiMap<number, CanvasNode>();
+        const nodesToDb = new MultiMap<number, string>();
 
         data.forEach((data) => {
           if (data.origin === "user") nodesByUser.push(data.level, data.node);
           nodesToDb.push(data.level, data.node.attrs.id);
         });
 
-        nodesByUser.forEach((level, nodes) => {
+        nodesByUser.forEach((nodes, level) => {
           nodes && pushCommand(createDeleteCommand(nodes, level, stageId));
         });
-        nodesToDb.forEach((_, nodes) => {
+        nodesToDb.forEach((nodes) => {
           nodes && deleteNodes(nodes);
         });
       },

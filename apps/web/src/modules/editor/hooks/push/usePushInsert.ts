@@ -1,4 +1,4 @@
-import { createMultiMap } from "@/utils/generic/multiMap";
+import { MultiMap } from "@/utils/generic/multiMap";
 import { CanvasNode } from "@repo/canvas";
 import { useCallback } from "react";
 import { upsertNodes } from "../../actions";
@@ -17,16 +17,16 @@ export function usePushInsert(stageId: number) {
   }>({
     commit: useCallback(
       async (data) => {
-        const nodesByUser = createMultiMap<number, CanvasNode>();
-        const nodesToDb = createMultiMap<number, CanvasNode>();
+        const nodesByUser = new MultiMap<number, CanvasNode>();
+        const nodesToDb = new MultiMap<number, CanvasNode>();
         data.forEach((data) => {
           if (data.origin === "user") nodesByUser.push(data.level, data.node);
           nodesToDb.push(data.level, data.node);
         });
-        nodesByUser.forEach((level, nodes) => {
+        nodesByUser.forEach((nodes, level) => {
           nodes && pushCommand(createCreateCommand(nodes, level, stageId));
         });
-        nodesToDb.forEach((level, nodes) => {
+        nodesToDb.forEach((nodes, level) => {
           nodes && upsertNodes(nodes, level, stageId);
         });
       },
