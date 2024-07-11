@@ -4,8 +4,8 @@ type PushFn<T> = (data: T) => any;
 
 export function useBatch<T>({
   commit,
-  batchTime = 25,
-  maxBatchSize = 20,
+  batchTime = 100,
+  maxBatchSize = 30,
 }: {
   commit: (data: T[]) => Promise<any>;
   /** Time in ms in which data is batched */

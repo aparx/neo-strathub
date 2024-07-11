@@ -1,15 +1,21 @@
 import { MultiMap } from "@/utils/generic/multiMap";
 import { CanvasNode } from "@repo/canvas";
-import { upsertNodes } from "../../actions";
-import { EditorCommand } from "../../features/command";
-import { createCreateCommand } from "../../features/command/commands/createCommand";
+import {
+  createCreateCommand,
+  EditorCreateCommand,
+} from "../../features/command/commands/createCommand";
 import { EditorEventOrigin } from "../../features/events";
 import { useBatch } from "./useBatch";
 
-export function usePushInsert(
-  stageId: number,
-  send: (command: EditorCommand) => void,
-) {
+export function usePushInsert({
+  stageId,
+  userPush,
+  commitToDb,
+}: {
+  stageId: number;
+  userPush: (command: EditorCreateCommand<CanvasNode>) => any;
+  commitToDb: (nodes: CanvasNode[], levelId: number) => any;
+}) {
   return useBatch<{
     origin: EditorEventOrigin;
     node: CanvasNode;
@@ -23,10 +29,10 @@ export function usePushInsert(
         nodesToDb.push(data.level, data.node);
       });
       nodesByUser.forEach((nodes, level) => {
-        nodes && send(createCreateCommand(nodes, level, stageId));
+        nodes && userPush(createCreateCommand(nodes, level, stageId));
       });
       nodesToDb.forEach((nodes, level) => {
-        nodes && upsertNodes(nodes, level, stageId);
+        nodes && commitToDb(nodes, level);
       });
     },
   });

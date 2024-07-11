@@ -24,7 +24,7 @@ export function EditorWindow({ stages }: EditorWindowProps) {
   const [editor, updateEditor] = useEditorContext();
   const eventHandler = useEditorEventHandler();
   const canvasRef = useRef<CanvasContext>(null);
-  
+
   useEditorEvent("editorUndo", async (e) => {
     if (e.origin !== "user") return;
     const lastCommand = editor.history.moveBack();
@@ -108,10 +108,12 @@ export function EditorWindow({ stages }: EditorWindowProps) {
         editable={editor.editable}
         movable={editor.movable}
         selectable={editor.selectable}
-        style={{
+        config={{
           width: windowSize.width,
           height: windowSize.height,
           selectionColor: `rgba(${EditorConfig.FOCUS_COLOR.join(", ")}, .5)`,
+          maxZoomScale: EditorConfig.MAX_ZOOM_SCALE,
+          minZoomScale: EditorConfig.MIN_ZOOM_SCALE,
         }}
       >
         <StageList stages={stages} />

@@ -1,5 +1,5 @@
 import { useEditorContext } from "@/app/(app)/editor/[documentId]/_context";
-import { Canvas, CanvasRef, CanvasStyle, primitiveShapes } from "@repo/canvas";
+import { Canvas, CanvasConfig, CanvasRef, primitiveShapes } from "@repo/canvas";
 import {
   CanvasContext,
   CanvasContextInteractStatus,
@@ -17,13 +17,13 @@ export const EDITOR_RENDERERS = {
 } as const;
 
 export interface EditorViewportProps extends CanvasContextInteractStatus {
-  style: CanvasStyle;
+  config: CanvasConfig;
   children?: React.ReactNode;
 }
 
 export const EditorViewport = forwardRef<CanvasContext, EditorViewportProps>(
   function EditorViewport(props, ref) {
-    const { style, children, ...restProps } = props;
+    const { config, children, ...restProps } = props;
 
     const [{ characters, objectCache, updateScale, scale }] =
       useEditorContext();
@@ -45,7 +45,7 @@ export const EditorViewport = forwardRef<CanvasContext, EditorViewportProps>(
       <EditorKeyboardHandler canvas={canvasRef} keyMap={DEFAULT_KEY_MAP}>
         <Canvas
           ref={mergeRefs(canvasRef, ref)}
-          style={style}
+          config={config}
           onMove={savePos}
           onZoom={(value) => updateScale(() => value)}
           onGetGameObjectURL={(id) => objectCache[id]?.url}

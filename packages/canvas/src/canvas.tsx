@@ -11,10 +11,12 @@ import {
 import { DefaultTransformer } from "./transformers";
 import { MouseButton, NodeTags } from "./utils";
 
-export interface CanvasStyle {
+export interface CanvasConfig {
   width: number;
   height: number;
   selectionColor: string;
+  minZoomScale: number;
+  maxZoomScale: number;
 }
 
 export interface CanvasEvents {
@@ -27,7 +29,7 @@ export interface CanvasProps
     CanvasContextInteractStatus,
     CanvasContextFunctions {
   children?: React.ReactNode;
-  style: CanvasStyle;
+  config: CanvasConfig;
 }
 
 interface SelectionArea {
@@ -56,7 +58,7 @@ export type CanvasRef = CanvasContext;
 export const Canvas = forwardRef<CanvasRef, CanvasProps>(
   function Canvas(props, ref) {
     const {
-      style,
+      config: style,
       children,
       onMove,
       onZoom,
@@ -239,7 +241,10 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
         } satisfies Konva.Vector2d;
         let newScale =
           e.evt.deltaY < 0 ? oldScale * scaleBy : oldScale / scaleBy;
-        newScale = Math.min(10, Math.max(newScale, 0.1));
+        newScale = Math.min(
+          style.maxZoomScale,
+          Math.max(newScale, style.minZoomScale),
+        );
         onZoom?.(newScale);
         updatePosition(() => ({
           x: pointer.x - pointTo.x * newScale,

@@ -3,6 +3,7 @@ import { BlueprintData } from "@/modules/blueprint/actions/getBlueprint";
 import { CanvasLevelStyle, useCanvas } from "@repo/canvas";
 import type Konva from "konva";
 import { useEffect } from "react";
+import { deleteNodes, upsertNodes } from "../actions";
 import { EditorCommand } from "../features/command";
 import {
   GetLevelData,
@@ -59,9 +60,22 @@ export function EditorStage({
     editor.channel.broadcast(command.eventType, command.payload);
   }
 
-  const pushUpdate = usePushUpdate(stageId, sendCommand);
-  const pushDelete = usePushDelete(stageId, sendCommand);
-  const pushInsert = usePushInsert(stageId, sendCommand);
+  const pushUpdate = usePushUpdate({
+    userPush: sendCommand,
+    commitToDb: (nodes, levelId) => upsertNodes(nodes, levelId, stageId),
+  });
+
+  const pushDelete = usePushDelete({
+    stageId,
+    userPush: sendCommand,
+    commitToDb: (nodes) => deleteNodes(nodes),
+  });
+
+  const pushInsert = usePushInsert({
+    stageId,
+    userPush: sendCommand,
+    commitToDb: (nodes, levelId) => upsertNodes(nodes, levelId, stageId),
+  });
 
   return data?.map((level, index) => (
     <Level

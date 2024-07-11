@@ -1,14 +1,19 @@
 import { MultiMap } from "@/utils/generic/multiMap";
 import { CanvasNode, mergeCanvasNodes } from "@repo/canvas";
-import { upsertNodes } from "../../actions";
-import { EditorCommand, createUpdateCommand } from "../../features/command";
+import {
+  EditorUpdateCommand,
+  createUpdateCommand,
+} from "../../features/command";
 import { EditorEventOrigin } from "../../features/events";
 import { useBatch } from "./useBatch";
 
-export function usePushUpdate(
-  stageId: number,
-  send: (command: EditorCommand) => void,
-) {
+export function usePushUpdate({
+  userPush,
+  commitToDb,
+}: {
+  userPush: (command: EditorUpdateCommand<CanvasNode>) => any;
+  commitToDb: (nodes: CanvasNode[], levelId: number) => any;
+}) {
   return useBatch<{
     origin: EditorEventOrigin;
     oldNode: CanvasNode;
@@ -50,11 +55,11 @@ export function usePushUpdate(
       });
 
       if (nodesByUser.length !== 0)
-        send(await createUpdateCommand(nodesByUser));
+        userPush(await createUpdateCommand(nodesByUser));
 
       // TODO DATA RACE: create RPC that only updates the diffing fields
       nodesToDb.forEach((nodes, level) => {
-        nodes && upsertNodes(nodes, level, stageId);
+        nodes && commitToDb(nodes, level);
       });
     },
   });

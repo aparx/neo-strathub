@@ -1,15 +1,21 @@
 import { MultiMap } from "@/utils/generic/multiMap";
 import { CanvasNode } from "@repo/canvas";
-import { deleteNodes } from "../../actions";
-import { EditorCommand } from "../../features/command";
-import { createDeleteCommand } from "../../features/command/commands/deleteCommand";
+import {
+  createDeleteCommand,
+  EditorDeleteCommand,
+} from "../../features/command/commands/deleteCommand";
 import { EditorEventOrigin } from "../../features/events";
 import { useBatch } from "./useBatch";
 
-export function usePushDelete(
-  stageId: number,
-  send: (command: EditorCommand) => void,
-) {
+export function usePushDelete({
+  stageId,
+  userPush,
+  commitToDb,
+}: {
+  stageId: number;
+  userPush: (command: EditorDeleteCommand<CanvasNode>) => any;
+  commitToDb: (nodes: string[]) => any;
+}) {
   return useBatch<{
     origin: EditorEventOrigin;
     node: CanvasNode;
@@ -25,10 +31,10 @@ export function usePushDelete(
       });
 
       nodesByUser.forEach((nodes, level) => {
-        nodes && send(createDeleteCommand(nodes, level, stageId));
+        nodes && userPush(createDeleteCommand(nodes, level, stageId));
       });
       nodesToDb.forEach((nodes) => {
-        nodes && deleteNodes(nodes);
+        nodes && commitToDb(nodes);
       });
     },
   });

@@ -95,6 +95,7 @@ export function EditorContextProvider({
           Math.min(mapper(old.scale), EditorConfig.MAX_ZOOM_SCALE),
           EditorConfig.MIN_ZOOM_SCALE,
         );
+        if (old.scale === newScale) return old;
         saveZoom(newScale);
         return { ...old, scale: newScale };
       });
@@ -103,8 +104,7 @@ export function EditorContextProvider({
   }));
 
   useEffect(() => {
-    if (storage.scale.value !== context.state.scale)
-      context.state.updateScale(() => storage.scale.value);
+    context.state.updateScale(() => storage.scale.value);
   }, [storage.scale.value]);
 
   // Setup a channel immediately
