@@ -1,15 +1,16 @@
-type ArrayFactory<K, V> = (key: K) => V[];
+// TODO MultiMap tests
+type ListFactory<K, V> = (key: K) => V[];
 
 export class MultiMap<K, V> extends Map<K, V[]> {
-  public static DEFAULT_ALLOCATOR: ArrayFactory<any, any> = () => [];
+  public static EMPTY_LIST_FACTORY: ListFactory<any, any> = () => [];
 
   private _map = new Map<K, V[]>();
-  private _factory: (key: K) => V[] = MultiMap.DEFAULT_ALLOCATOR;
+  private _factory: (key: K) => V[] = MultiMap.EMPTY_LIST_FACTORY;
 
   constructor();
-  constructor(initialSize: number);
-  constructor(factory: ArrayFactory<K, V>);
-  constructor(arg?: number | ArrayFactory<K, V>) {
+  constructor(arrayLength: number);
+  constructor(factory: ListFactory<K, V>);
+  constructor(arg?: number | ListFactory<K, V>) {
     super();
     if (typeof arg === "function") {
       this._factory = arg;
@@ -49,6 +50,13 @@ export class MultiMap<K, V> extends Map<K, V[]> {
   push(key: K, value: V) {
     const array = this._map.get(key) ?? this.createArray(key);
     this._map.set(key, [...array, value]);
+    return this;
+  }
+
+  pushAll(key: K, values: V[]) {
+    if (values.length === 0) return this;
+    const array = this._map.get(key) ?? this.createArray(key);
+    this._map.set(key, [...array, ...values]);
     return this;
   }
 

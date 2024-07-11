@@ -1,7 +1,9 @@
+import { useEditorContext } from "@/app/(app)/editor/[documentId]/_context";
 import { BlueprintData } from "@/modules/blueprint/actions/getBlueprint";
 import { CanvasLevelStyle, useCanvas } from "@repo/canvas";
 import type Konva from "konva";
 import { useEffect } from "react";
+import { EditorCommand } from "../features/command";
 import {
   GetLevelData,
   useGetLevels,
@@ -36,6 +38,7 @@ export function EditorStage({
   hidden,
 }: EditorStageProps) {
   const canvas = useCanvas();
+  const [editor] = useEditorContext();
   const { data } = useGetLevels(blueprint.arena.id);
 
   function createPosition(index: number) {
@@ -48,12 +51,17 @@ export function EditorStage({
     } as const satisfies Konva.Vector2d;
   }
 
-  // Fixes https://github.com/aparx/neo-strathub/issues/32
+  // Fix: https://github.com/aparx/neo-strathub/issues/32
   useEffect(() => canvas.selected.update([]), [hidden]);
 
-  const pushUpdate = usePushUpdate(stageId);
-  const pushDelete = usePushDelete(stageId);
-  const pushInsert = usePushInsert(stageId);
+  function sendCommand(command: EditorCommand) {
+    editor.history.push(command);
+    editor.channel.broadcast(command.eventType, command.payload);
+  }
+
+  const pushUpdate = usePushUpdate(stageId, sendCommand);
+  const pushDelete = usePushDelete(stageId, sendCommand);
+  const pushInsert = usePushInsert(stageId, sendCommand);
 
   return data?.map((level, index) => (
     <Level
