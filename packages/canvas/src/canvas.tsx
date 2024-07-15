@@ -198,6 +198,8 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
 
     function click(e: Konva.KonvaEventObject<MouseEvent>) {
       if (moveDragRef.current || !selectable) return;
+      if (e.evt.button === MouseButton.MIDDLE) return;
+
       const area = selectionAreaRef.current;
       if (area.x0 !== area.x1 || area.y0 !== area.y1)
         // Don't do anything on selection rect
