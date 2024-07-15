@@ -51,7 +51,7 @@ export const DefaultTransformer = forwardRef<
           <div
             className={css.overlay}
             style={{
-              left: `calc(${posX}px + ${linkRect.width / 2}px)`,
+              left: `max(calc(${posX}px + ${linkRect.width / 2}px), 0px)`,
               top: posY - (css.OVERLAY_HEIGHT + 5) * inverseScale,
               scale: inverseScale,
               transform: "translateX(-50%)",

@@ -75,9 +75,12 @@ export type EditorEventType = keyof EditorEventMap;
 
 // Individual Events
 
-export interface EditorEvent {}
+export interface EditorEvent {
+  /** If true, will ensure to NOT be pushed to local user history */
+  ignoreHistory?: boolean;
+}
 
-export interface EditorKeyPressEvent extends KeyboardEvent {
+export interface EditorKeyPressEvent extends KeyboardEvent, EditorEvent {
   keyMap: EditorKeyMapTree;
 }
 

@@ -6,6 +6,7 @@ import { Flexbox, Icon, IconButton } from "@repo/ui/components";
 import { Nullish } from "@repo/utils";
 import Konva from "konva";
 import { forwardRef } from "react";
+import { FaLink, FaLinkSlash } from "react-icons/fa6";
 import { HiExternalLink } from "react-icons/hi";
 import { TbReplace } from "react-icons/tb";
 import { useEditorEventHandler } from "../features/events";
@@ -33,6 +34,27 @@ export const GameObjectTransformer = forwardRef<
     <DefaultTransformer ref={ref} keepRatio link={link} shown={shown}>
       <Flexbox asChild gap="sm" style={{ marginLeft: vars.spacing.xs }}>
         <ul aria-label="Default Tools" style={{ listStyle: "none" }}>
+          {config.objectType === "character" && (
+            <li>
+              <IconButton
+                aria-label="linked"
+                color={config.linkToAssignee ? "primary" : "default"}
+                onClick={() =>
+                  eventHandler.fire("canvasUpdate", "user", {
+                    fields: {
+                      [config.id]: {
+                        linkToAssignee: !config.linkToAssignee,
+                      },
+                    },
+                  })
+                }
+              >
+                <Icon.Custom>
+                  {config.linkToAssignee ? <FaLink /> : <FaLinkSlash />}
+                </Icon.Custom>
+              </IconButton>
+            </li>
+          )}
           <li>
             <IconButton
               aria-label="Duplicate"
