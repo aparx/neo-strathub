@@ -1,5 +1,5 @@
 import Konva from "konva";
-import { forwardRef } from "react";
+import { forwardRef, useState } from "react";
 import { Html, Portal } from "react-konva-utils";
 import { useCanvas } from "../../context";
 import { BasicTransformer } from "../basicTransformer";
@@ -15,6 +15,7 @@ export const DefaultTransformer = forwardRef<
   Konva.Transformer,
   DefaultTransformerProps
 >(function DefaultTransformer({ shown, link, children, ...restProps }, ref) {
+  const [internalShow, setInternalShow] = useState(true);
   const canvas = useCanvas();
   const parent = link?.parent;
   if (!link || !parent) return null;
@@ -29,8 +30,15 @@ export const DefaultTransformer = forwardRef<
 
   return (
     <Portal selector=".selection-layer">
-      <BasicTransformer ref={ref} {...restProps} />
-      {shown && (
+      <BasicTransformer
+        ref={ref}
+        onDragStart={() => setInternalShow(false)}
+        onDragEnd={() => setInternalShow(true)}
+        onTransformStart={() => setInternalShow(false)}
+        onTransformEnd={() => setInternalShow(true)}
+        {...restProps}
+      />
+      {shown && internalShow && (
         <Html
           divProps={{
             style: {
@@ -43,9 +51,10 @@ export const DefaultTransformer = forwardRef<
           <div
             className={css.overlay}
             style={{
-              left: posX,
+              left: `calc(${posX}px + ${linkRect.width / 2}px)`,
               top: posY - (css.OVERLAY_HEIGHT + 5) * inverseScale,
               scale: inverseScale,
+              transform: "translateX(-50%)",
             }}
           >
             {children}

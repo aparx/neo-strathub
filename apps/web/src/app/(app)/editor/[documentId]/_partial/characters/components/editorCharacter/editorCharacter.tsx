@@ -13,7 +13,7 @@ import {
 import { GameObjectData } from "@/modules/gameObject/hooks";
 import { createClient } from "@/utils/supabase/client";
 import { createCanvasNode } from "@repo/canvas";
-import { Icon, Modal } from "@repo/ui/components";
+import { Icon, Modal, Text } from "@repo/ui/components";
 import Image from "next/image";
 import { useRef } from "react";
 import { PiSelectionSlashBold } from "react-icons/pi";
@@ -29,6 +29,10 @@ export interface EditorCharacterProps {
 interface GadgetSlotProps {
   data: CharacterGadgetSlotData;
   characterId: number;
+}
+
+export function createForegroundSlotColor(backdrop: string) {
+  return `color-mix(in srgb, black 90%, ${backdrop})`;
 }
 
 export function EditorCharacter({
@@ -73,6 +77,16 @@ export function EditorCharacter({
               }));
             }}
           >
+            <Text
+              className={css.characterIndex}
+              data={{ weight: 800 }}
+              style={{
+                background: color,
+                color: createForegroundSlotColor(color),
+              }}
+            >
+              {1 + character.index}
+            </Text>
             {object ? (
               <Image
                 src={object.url}

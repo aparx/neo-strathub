@@ -1,7 +1,7 @@
 import { vars } from "@repo/theme";
-import { style } from "@vanilla-extract/css";
+import { keyframes, style } from "@vanilla-extract/css";
 
-export const OVERLAY_HEIGHT = 40;
+export const OVERLAY_HEIGHT = 35;
 
 export const overlay = style({
   position: "absolute",
@@ -9,12 +9,15 @@ export const overlay = style({
   transformOrigin: "left top",
   width: "max-content",
   background: vars.colors.accents[2],
-  borderRadius: vars.roundness.sm,
-  padding: `${vars.spacing.sm} ${vars.spacing.sm}`,
+  borderRadius: `calc(${vars.roundness.sm} + ${vars.spacing.xs})`,
+  padding: vars.spacing.xs,
   display: "flex",
   alignItems: "center",
   gap: vars.spacing.md,
   color: vars.colors.emphasis.medium,
   border: `1px solid ${vars.colors.emphasis.low}`,
   contain: "paint",
+  animation: `${keyframes({
+    from: { opacity: 0, transform: "translate(-50%, 3px)" },
+  })} .15s`,
 });

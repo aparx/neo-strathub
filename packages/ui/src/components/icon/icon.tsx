@@ -1,5 +1,5 @@
 import { ComponentPropsWithoutRef } from "react";
-import { BiLogOut } from "react-icons/bi";
+import { BiDuplicate, BiLogOut } from "react-icons/bi";
 import { CgNotes } from "react-icons/cg";
 import { IoMdBook, IoMdEye } from "react-icons/io";
 import {
@@ -9,6 +9,7 @@ import {
   MdArrowForward,
   MdArrowUpward,
   MdClose,
+  MdContentCopy,
   MdDelete,
   MdEdit,
   MdMoreVert,
@@ -64,6 +65,8 @@ const iconMap = {
   next: <MdArrowForward />,
   expand: <RiExpandUpDownLine />,
   book: <IoMdBook />,
+  copy: <MdContentCopy />,
+  duplicate: <BiDuplicate />,
 } as const satisfies Record<string, React.ReactNode>;
 
 export function Mapped({

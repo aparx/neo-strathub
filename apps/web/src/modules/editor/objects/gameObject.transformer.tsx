@@ -1,9 +1,14 @@
 import { useEditorContext } from "@/app/(app)/editor/[documentId]/_context";
+import { createForegroundSlotColor } from "@/app/(app)/editor/[documentId]/_partial/characters/components";
 import { DefaultTransformer } from "@repo/canvas";
 import { vars } from "@repo/theme";
+import { Flexbox, Icon, IconButton } from "@repo/ui/components";
 import { Nullish } from "@repo/utils";
 import Konva from "konva";
 import { forwardRef } from "react";
+import { HiExternalLink } from "react-icons/hi";
+import { TbReplace } from "react-icons/tb";
+import { useEditorEventHandler } from "../features/events";
 import { GameObjectConfig } from "./gameObject";
 
 export interface GameObjectTransformerProps {
@@ -17,6 +22,7 @@ export const GameObjectTransformer = forwardRef<
   GameObjectTransformerProps
 >(function GameObjectTransformer({ shown, link, config }, ref) {
   const [editor] = useEditorContext();
+  const eventHandler = useEditorEventHandler();
   const character = config.characterId
     ? editor.characters[config.characterId]
     : null;
@@ -24,21 +30,66 @@ export const GameObjectTransformer = forwardRef<
 
   return (
     <DefaultTransformer ref={ref} keepRatio link={link} shown={shown}>
+      <Flexbox asChild gap="sm" style={{ marginLeft: vars.spacing.xs }}>
+        <ul aria-label="Default Tools" style={{ listStyle: "none" }}>
+          <li>
+            <IconButton
+              aria-label="Duplicate"
+              onClick={() =>
+                eventHandler.fire("canvasDuplicate", "user", {
+                  targets: [config.id],
+                })
+              }
+            >
+              <Icon.Mapped type="duplicate" />
+            </IconButton>
+          </li>
+          <li>
+            <IconButton aria-label="Copy">
+              <Icon.Mapped type="copy" />
+            </IconButton>
+          </li>
+          <li>
+            <IconButton aria-label="Replace">
+              <Icon.Custom>
+                <TbReplace />
+              </Icon.Custom>
+            </IconButton>
+          </li>
+          <li>
+            <IconButton
+              color="destructive"
+              aria-label="Delete"
+              onClick={() =>
+                eventHandler.fire("canvasDelete", "user", {
+                  targets: [config.id],
+                })
+              }
+            >
+              <Icon.Mapped type="delete" />
+            </IconButton>
+          </li>
+        </ul>
+      </Flexbox>
       <div
         style={{
           background: slotColor,
-          color: `color-mix(in srgb, black 90%, ${slotColor})`,
+          color: createForegroundSlotColor(slotColor),
           fontWeight: 700,
           height: `100%`,
-          aspectRatio: "1 / 1",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          gap: vars.spacing.sm,
+          padding: vars.spacing.sm,
           borderRadius: vars.roundness.sm,
           border: `1px solid ${vars.colors.outline.card}`,
         }}
       >
-        #{1 + (character?.player_slot?.index ?? 0)}
+        {character?.index != null ? 1 + character.index : "?"}
+        <Icon.Custom size="sm">
+          <HiExternalLink />
+        </Icon.Custom>
       </div>
     </DefaultTransformer>
   );
