@@ -5,10 +5,11 @@ import { vars } from "@repo/theme";
 import { Flexbox, Icon, IconButton } from "@repo/ui/components";
 import { Nullish } from "@repo/utils";
 import Konva from "konva";
-import { forwardRef } from "react";
+import { forwardRef, useEffect, useState } from "react";
 import { FaLink, FaLinkSlash } from "react-icons/fa6";
 import { HiExternalLink } from "react-icons/hi";
 import { TbReplace } from "react-icons/tb";
+import { useDebouncedCallback } from "use-debounce";
 import { useEditorEventHandler } from "../features/events";
 import { GameObjectConfig } from "./gameObject";
 
@@ -30,6 +31,16 @@ export const GameObjectTransformer = forwardRef<
   const slotColor =
     character?.player_slot?.color || vars.colors.emphasis.medium;
 
+  const [linked, setLinked] = useState<boolean | undefined>(false);
+  useEffect(() => setLinked(config.linkToAssignee), [config.linkToAssignee]);
+
+  // Link updates can be spammed; to avoid this debounce the event broadcast
+  const fireLinkUpdate = useDebouncedCallback((val: boolean) => {
+    eventHandler.fire("canvasUpdate", "user", {
+      fields: { [config.id]: { linkToAssignee: val } },
+    });
+  }, 200);
+
   return (
     <DefaultTransformer ref={ref} keepRatio link={link} shown={shown}>
       <Flexbox asChild gap="sm" style={{ marginLeft: vars.spacing.xs }}>
@@ -38,19 +49,17 @@ export const GameObjectTransformer = forwardRef<
             <li>
               <IconButton
                 aria-label="linked"
-                color={config.linkToAssignee ? "primary" : "default"}
+                color={linked ? "primary" : "default"}
                 onClick={() =>
-                  eventHandler.fire("canvasUpdate", "user", {
-                    fields: {
-                      [config.id]: {
-                        linkToAssignee: !config.linkToAssignee,
-                      },
-                    },
+                  setLinked((old) => {
+                    const newValue = !old;
+                    fireLinkUpdate(newValue);
+                    return newValue;
                   })
                 }
               >
                 <Icon.Custom>
-                  {config.linkToAssignee ? <FaLink /> : <FaLinkSlash />}
+                  {linked ? <FaLink /> : <FaLinkSlash />}
                 </Icon.Custom>
               </IconButton>
             </li>
