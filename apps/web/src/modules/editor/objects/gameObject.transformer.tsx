@@ -26,7 +26,8 @@ export const GameObjectTransformer = forwardRef<
   const character = config.characterId
     ? editor.characters[config.characterId]
     : null;
-  const slotColor = character?.player_slot?.color || vars.colors.foreground;
+  const slotColor =
+    character?.player_slot?.color || vars.colors.emphasis.medium;
 
   return (
     <DefaultTransformer ref={ref} keepRatio link={link} shown={shown}>

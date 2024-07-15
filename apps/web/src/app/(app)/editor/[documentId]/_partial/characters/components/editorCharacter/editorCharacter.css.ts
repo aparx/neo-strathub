@@ -64,20 +64,22 @@ export const characterBox = recipe({
   },
 });
 
-export const characterIndex = style({
-  position: "absolute",
-  zIndex: 99,
-  top: `calc(${CHARACTER_INDEX_SIZE} / -4)`,
-  left: `calc(${CHARACTER_INDEX_SIZE} / -4)`,
-  display: "grid",
-  placeItems: "center",
-  background: vars.colors.accents[5],
-  border: `1px solid ${vars.colors.emphasis.low}`,
-  width: CHARACTER_INDEX_SIZE,
-  height: CHARACTER_INDEX_SIZE,
-  borderRadius: "100%",
-  color: vars.colors.emphasis.medium,
-});
+export const characterIndex = style([
+  sprinkles({ outline: "card" }),
+  {
+    position: "absolute",
+    zIndex: 99,
+    top: `calc(${CHARACTER_INDEX_SIZE} / -4)`,
+    left: `calc(${CHARACTER_INDEX_SIZE} / -4)`,
+    display: "grid",
+    placeItems: "center",
+    background: vars.colors.accents[5],
+    width: CHARACTER_INDEX_SIZE,
+    height: CHARACTER_INDEX_SIZE,
+    borderRadius: "100%",
+    color: vars.colors.emphasis.medium,
+  },
+]);
 
 export const characterImage = style({
   objectFit: "contain",
