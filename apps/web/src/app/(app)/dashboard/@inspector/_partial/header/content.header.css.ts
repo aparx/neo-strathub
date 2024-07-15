@@ -19,7 +19,7 @@ export const game = style({
 export const exit = style({
   position: "absolute",
   marginLeft: "auto",
-  top: calc.negate(vars.spacing.sm),
+  bottom: calc.negate(vars.spacing.sm),
   right: calc.negate(vars.spacing.sm),
 });
 

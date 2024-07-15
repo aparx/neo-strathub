@@ -40,5 +40,5 @@ export const header = style({
 export const expand = style({
   position: "absolute",
   right: calc.subtract(vars.spacing.lg, vars.spacing.sm),
-  top: calc.subtract(vars.spacing.lg, vars.spacing.sm),
+  bottom: calc.subtract(vars.spacing.lg, vars.spacing.sm),
 });

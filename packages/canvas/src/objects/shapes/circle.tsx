@@ -4,7 +4,7 @@ import { useRef } from "react";
 import * as ReactKonva from "react-konva";
 import { Portal } from "react-konva-utils";
 import { usePutIntoTransformer } from "../../hooks";
-import { DefaultTransformer } from "../../transformers";
+import { BasicTransformer } from "../../transformers";
 import { CanvasNode, CanvasNodeConfig } from "../../utils";
 
 export type CircleProps = ObjectRendererRenderProps<
@@ -30,7 +30,7 @@ export function Circle({
         draggable={canvas.editable}
       />
       <Portal selector=".selection-layer">
-        <DefaultTransformer ref={trRef} />
+        <BasicTransformer ref={trRef} />
       </Portal>
     </>
   );

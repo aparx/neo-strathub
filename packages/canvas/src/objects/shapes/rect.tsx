@@ -4,7 +4,7 @@ import { useRef } from "react";
 import * as ReactKonva from "react-konva";
 import { Portal } from "react-konva-utils";
 import { usePutIntoTransformer } from "../../hooks";
-import { DefaultTransformer } from "../../transformers";
+import { BasicTransformer } from "../../transformers";
 import { CanvasNode, CanvasNodeConfig } from "../../utils";
 
 export type RectProps = ObjectRendererRenderProps<CanvasNode<CanvasNodeConfig>>;
@@ -48,7 +48,7 @@ export function Rect({
         }}
       />
       <Portal selector=".selection-layer">
-        <DefaultTransformer ref={trRef} />
+        <BasicTransformer ref={trRef} />
       </Portal>
     </>
   );

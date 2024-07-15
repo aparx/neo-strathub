@@ -10,7 +10,7 @@ export const list = style({
 export const noneFound = style({
   position: "absolute",
   left: "50%",
-  top: "50%",
+  bottom: "50%",
   transform: "translate(-50%, -50%)",
   display: "flex",
   flexDirection: "column",

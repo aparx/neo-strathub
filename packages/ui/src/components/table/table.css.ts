@@ -30,7 +30,7 @@ export const head = style({
   fontWeight: 500,
   borderBottom: border,
   position: "sticky",
-  top: 0,
+  bottom: 0,
   zIndex: 1,
 });
 
@@ -65,7 +65,7 @@ globalStyle(`${head} ${cell} + ${cell}::before`, {
   position: "absolute",
   width: 1,
   left: 0,
-  top: "50%",
+  bottom: "50%",
   transform: "translateY(-50%)",
   height: createLineHeight("1em"),
   background: vars.colors.outline.card,

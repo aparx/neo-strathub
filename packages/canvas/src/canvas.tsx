@@ -8,7 +8,7 @@ import {
   CanvasContextInteractStatus,
   CanvasContextProvider,
 } from "./context/canvasContext";
-import { DefaultTransformer } from "./transformers";
+import { BasicTransformer } from "./transformers";
 import { MouseButton, NodeTags } from "./utils";
 
 export interface CanvasConfig {
@@ -295,7 +295,7 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
                 strokeWidth={1}
                 strokeEnabled
               />
-              <DefaultTransformer
+              <BasicTransformer
                 ref={trRef}
                 rotateEnabled={false}
                 keepRatio

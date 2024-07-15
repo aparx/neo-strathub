@@ -2,7 +2,6 @@ import {
   CanvasContext,
   CanvasNode,
   CanvasNodeConfig,
-  DefaultTransformer,
   NodeTags,
   ObjectRendererRenderProps,
   usePutIntoTransformer,
@@ -10,7 +9,8 @@ import {
 import Konva from "konva";
 import { useCallback, useRef } from "react";
 import * as ReactKonva from "react-konva";
-import { Portal, useImage } from "react-konva-utils";
+import { useImage } from "react-konva-utils";
+import { GameObjectTransformer } from "./gameObject.transformer";
 
 export type GameObjectProps = ObjectRendererRenderProps<
   CanvasNode<GameObjectConfig>
@@ -153,18 +153,12 @@ function ImageObject({
           }));
         }}
       />
-      <Portal selector=".selection-layer">
-        <DefaultTransformer
-          ref={trRef}
-          keepRatio
-          enabledAnchors={[
-            "top-left",
-            "top-right",
-            "bottom-left",
-            "bottom-right",
-          ]}
-        />
-      </Portal>
+      <GameObjectTransformer
+        ref={trRef}
+        link={backRef.current}
+        shown={showTransformer}
+        config={config}
+      />
     </>
   );
 }

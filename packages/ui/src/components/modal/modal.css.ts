@@ -13,7 +13,7 @@ export const content = style([
     position: "absolute",
     zIndex: 9999,
     left: "50%",
-    top: "50%",
+    bottom: "50%",
     transform: "translate(-50%, -50%)",
     display: "flex",
     flexDirection: "column",

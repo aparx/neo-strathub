@@ -29,7 +29,7 @@ export const header = style([
   base,
   {
     position: "sticky",
-    top: 0,
+    bottom: 0,
     display: "flex",
     alignItems: "center",
     minHeight: HEADER_HEIGHT,

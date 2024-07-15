@@ -7,7 +7,7 @@ export const shell = style({
   gap: vars.spacing["2xl"],
   position: "absolute",
   left: "50%",
-  top: "50%",
+  bottom: "50%",
   transform: "translate(-50%, -50%)",
   maxWidth: 450,
 });
