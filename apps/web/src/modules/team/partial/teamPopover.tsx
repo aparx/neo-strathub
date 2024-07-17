@@ -41,7 +41,7 @@ export function TeamPopover({
           Audit Log
         </OpenModalLink>
       </PopoverItem.Button>
-      <Popover.Divider />
+      <PopoverItem.Divider />
       <PopoverItem.Button asChild color={"destructive"}>
         <OpenModalLink href={url} modal={"leave"}>
           <Icon.Mapped type={"leave"} size={"sm"} />

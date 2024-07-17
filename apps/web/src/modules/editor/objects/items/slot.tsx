@@ -1,4 +1,5 @@
 import { createForegroundSlotColor } from "@/app/(app)/editor/[documentId]/_partial/characters/components";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { TransformerContainer } from "@repo/canvas";
 import { vars } from "@repo/theme";
 import { Icon, Text } from "@repo/ui/components";
@@ -23,10 +24,15 @@ export function Slot({ onClick, disabled, style, ...restProps }: SlotProps) {
   const [opened, setOpened] = useState(false);
   const id = useId();
 
+  const slotNumber = character ? 1 + character.index : -1;
+
   return (
     <>
       <Text asChild data={{ weight: 800, font: "mono" }}>
         <button
+          aria-label={`Change Slot (Current: ${
+            slotNumber >= 0 ? slotNumber : "None"
+          })`}
           aria-controls={id}
           aria-checked={opened}
           className={css.button({ disabled })}
@@ -68,7 +74,7 @@ function SlotSelector({
   className,
   onSelectSlot,
   ...restProps
-}: ComponentPropsWithoutRef<"ol"> & {
+}: ComponentPropsWithoutRef<"fieldset"> & {
   onSelectSlot?: (id: number | undefined) => void;
 }) {
   const { editor } = useOverlayItemContext();
@@ -83,33 +89,42 @@ function SlotSelector({
   );
 
   return (
-    <ol className={mergeClassNames(css.selector, className)} {...restProps}>
+    <fieldset
+      className={mergeClassNames(css.selector, className)}
+      {...restProps}
+    >
       {[null, ...characters].map((character) => {
         const backColor =
           character?.player_slot?.color ?? vars.colors.foreground;
         const foreColor = createForegroundSlotColor(backColor);
-
         const isActive = config.characterId == character?.id;
-        //                                  ^ Loose Comparison wanted (nullish)
+        const slotNumber = character ? 1 + character.index : -1;
 
         return (
-          <li>
-            <Text asChild data={{ font: "mono", weight: isActive ? 800 : 500 }}>
-              <button
-                className={css.selectorItem({ active: isActive })}
-                onClick={() => onSelectSlot?.(character?.id)}
-                key={String(character?.id)}
-                style={{
-                  background: isActive ? backColor : undefined,
-                  color: isActive ? foreColor : backColor,
-                }}
-              >
-                {character ? 1 + character.index : <RxValueNone />}
-              </button>
-            </Text>
-          </li>
+          <Text asChild data={{ font: "mono", weight: isActive ? 800 : 500 }}>
+            <label
+              aria-label={slotNumber >= 0 ? `Slot ${slotNumber}` : `No Slot`}
+              className={css.selectorItem({ active: isActive })}
+              style={{
+                background: isActive ? backColor : undefined,
+                color: isActive ? foreColor : backColor,
+              }}
+            >
+              <VisuallyHidden>
+                <input
+                  type="radio"
+                  name="slot"
+                  checked={isActive}
+                  onChange={(e) =>
+                    e.target.checked && onSelectSlot?.(character?.id)
+                  }
+                />
+              </VisuallyHidden>
+              {slotNumber >= 0 ? slotNumber : <RxValueNone />}
+            </label>
+          </Text>
         );
       })}
-    </ol>
+    </fieldset>
   );
 }

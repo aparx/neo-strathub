@@ -6,7 +6,7 @@ import { sprinkles, vars } from "@repo/theme";
 import { style } from "@vanilla-extract/css";
 import { recipe } from "@vanilla-extract/recipes";
 
-export const CHARACTER_INDEX_SIZE = "1.6em";
+export const CHARACTER_INDEX_SIZE = "1.5em";
 
 export const characterButton = style({
   background: "unset",
@@ -78,6 +78,7 @@ export const characterIndex = style([
     height: CHARACTER_INDEX_SIZE,
     borderRadius: "100%",
     color: vars.colors.emphasis.medium,
+    outline: `2px solid ${vars.colors.accents[2]}`,
   },
 ]);
 

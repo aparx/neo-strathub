@@ -1,6 +1,6 @@
 "use client";
 import { DeleteBookModal, RenameBookModal } from "@/modules/book/modals";
-import { Icon, Modal, Popover } from "@repo/ui/components";
+import { Icon, Modal, Popover, PopoverItem } from "@repo/ui/components";
 import { useState } from "react";
 
 interface BookData {
@@ -26,7 +26,7 @@ export function BookPopover({
   return (
     <Popover.Content {...restProps}>
       <RenameButton id={id} name={name} update={update} />
-      <Popover.Divider />
+      <PopoverItem.Divider />
       <DeleteButton id={id} name={name} update={update} />
     </Popover.Content>
   );
