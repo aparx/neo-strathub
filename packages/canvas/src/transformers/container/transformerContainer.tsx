@@ -61,7 +61,7 @@ export function Overlay({
       }}
     >
       <div
-        className={css.overlay}
+        className={css.wrapper}
         style={{
           left: `max(calc(${posX}px + ${linkRect.width / 2}px), 0px)`,
           top: posY - (css.OVERLAY_HEIGHT + 7) * inverseScale,
@@ -69,9 +69,11 @@ export function Overlay({
           transform: "translateX(-50%)",
         }}
       >
-        <context.Provider value={container}>{children}</context.Provider>
+        <div className={css.overlay}>
+          <context.Provider value={container}>{children}</context.Provider>
+          <div className={css.arrow} />
+        </div>
       </div>
-      <div className={css.arrow} />
     </Html>
   );
 }

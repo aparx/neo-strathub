@@ -10,6 +10,13 @@ export interface OverlayItemContext {
 
 const context = createContext<OverlayItemContext | null>(null);
 
+/**
+ * Context provider for overlay items, redeclaring some previous context.
+ *
+ * Due to KonvaJS's implementation of their `Html` component, any past context
+ * being passed is entirely erased and forgotten. Thus, we have to redeclare
+ * some of the necessary dependencies for the overlay items.
+ */
 export function ContextProvider({
   children,
   ...restProps
