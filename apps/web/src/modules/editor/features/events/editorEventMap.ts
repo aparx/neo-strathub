@@ -68,7 +68,8 @@ export interface EditorEventMap extends BroadcastableEditorEventMap {
   canvasDrop: EditorCreateEvent;
   editorUndo: EditorEvent;
   editorRedo: EditorEvent;
-  keyPress: EditorKeyPressEvent;
+  keyPress: EditorKeyEvent;
+  keyRelease: EditorKeyEvent;
 }
 
 export type EditorEventType = keyof EditorEventMap;
@@ -80,7 +81,7 @@ export interface EditorEvent {
   ignoreHistory?: boolean;
 }
 
-export interface EditorKeyPressEvent extends KeyboardEvent, EditorEvent {
+export interface EditorKeyEvent extends KeyboardEvent, EditorEvent {
   keyMap: EditorKeyMapTree;
 }
 

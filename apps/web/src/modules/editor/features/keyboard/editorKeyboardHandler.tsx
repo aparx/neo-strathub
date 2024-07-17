@@ -19,6 +19,9 @@ export function EditorKeyboardHandler({
   const moveTransaction = useRef(false);
 
   function keyUp(e: React.KeyboardEvent<HTMLDivElement>) {
+    const event = eventHandler.fire("keyRelease", "user", { ...e, keyMap });
+    if (event.defaultPrevented) return;
+
     if (moveTransaction.current) {
       // Commit move event
       eventHandler.fire("canvasMove", "user", {
@@ -36,8 +39,8 @@ export function EditorKeyboardHandler({
     e.preventDefault();
 
     // Forward key press to subscribers
-    const keyPress = eventHandler.fire("keyPress", "user", { ...e, keyMap });
-    if (keyPress.defaultPrevented) return;
+    const event = eventHandler.fire("keyPress", "user", { ...e, keyMap });
+    if (event.defaultPrevented) return;
 
     // Handle default behaviours of key press
     if (checkMove(e)) return;

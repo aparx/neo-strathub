@@ -1,12 +1,12 @@
 import Konva from "konva";
 import { forwardRef, useState } from "react";
-import { Html, Portal } from "react-konva-utils";
-import { useCanvas } from "../../context";
+import { CanvasNodeConfig } from "utils";
+import { TransformerContainer } from "../../transformers/container";
 import { BasicTransformer } from "../basicTransformer";
-import * as css from "./defaultTransformer.css";
 
 export interface DefaultTransformerProps extends Konva.TransformerConfig {
   show: boolean;
+  config: CanvasNodeConfig;
   link: Konva.Node | undefined;
   children?: React.ReactNode;
 }
@@ -14,53 +14,27 @@ export interface DefaultTransformerProps extends Konva.TransformerConfig {
 export const DefaultTransformer = forwardRef<
   Konva.Transformer,
   DefaultTransformerProps
->(function DefaultTransformer({ shown, link, children, ...restProps }, ref) {
-  const [internalShow, setInternalShow] = useState(true);
-  const canvas = useCanvas();
+>(function DefaultTransformer(
+  { shown, link, children, config, ...restProps },
+  ref,
+) {
+  const [verifiedShown, setVerifiedShown] = useState(true);
   const parent = link?.parent;
   if (!link || !parent) return null;
 
-  const linkRect = link.getClientRect({
-    relativeTo: parent,
-  });
-
-  const posX = linkRect.x + parent.x();
-  const posY = linkRect.y + parent.y();
-  const inverseScale = 1 / canvas.scale.state;
-
   return (
-    <Portal selector=".selection-layer">
+    <TransformerContainer.Root config={config} linked={link}>
       <BasicTransformer
         ref={ref}
-        onDragStart={() => setInternalShow(false)}
-        onDragEnd={() => setInternalShow(true)}
-        onTransformStart={() => setInternalShow(false)}
-        onTransformEnd={() => setInternalShow(true)}
+        onDragStart={() => setVerifiedShown(false)}
+        onDragEnd={() => setVerifiedShown(true)}
+        onTransformStart={() => setVerifiedShown(false)}
+        onTransformEnd={() => setVerifiedShown(true)}
         {...restProps}
       />
-      {shown && internalShow && (
-        <Html
-          divProps={{
-            style: {
-              position: "absolute",
-              left: 0,
-              bottom: 0,
-            },
-          }}
-        >
-          <div
-            className={css.overlay}
-            style={{
-              left: `max(calc(${posX}px + ${linkRect.width / 2}px), 0px)`,
-              top: posY - (css.OVERLAY_HEIGHT + 5) * inverseScale,
-              scale: inverseScale,
-              transform: "translateX(-50%)",
-            }}
-          >
-            {children}
-          </div>
-        </Html>
+      {shown && verifiedShown && (
+        <TransformerContainer.Overlay>{children}</TransformerContainer.Overlay>
       )}
-    </Portal>
+    </TransformerContainer.Root>
   );
 });
