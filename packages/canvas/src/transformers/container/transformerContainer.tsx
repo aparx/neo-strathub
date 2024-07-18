@@ -31,7 +31,7 @@ export function Root({
   );
 }
 
-export function Overlay({
+export function Tooltip({
   children,
 }: Readonly<{
   children: React.ReactNode;

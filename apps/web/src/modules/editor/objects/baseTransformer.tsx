@@ -7,7 +7,7 @@ import {
 import Konva from "konva";
 import { forwardRef } from "react";
 import { useEditorEventHandler } from "../features/events";
-import * as OverlayItem from "./items";
+import * as TooltipItem from "./tooltipItems";
 
 export type BaseTransformerData<T extends CanvasNodeConfig> = Omit<
   DefaultTransformerProps<T>,
@@ -36,10 +36,10 @@ export const BaseTransformer = forwardRef<
       shown={shown}
       {...restProps}
     >
-      <OverlayItem.ContextProvider handler={eventHandler} editor={editor}>
+      <TooltipItem.ContextProvider handler={eventHandler} editor={editor}>
         {children}
-        <OverlayItem.Slot />
-      </OverlayItem.ContextProvider>
+        <TooltipItem.Slot />
+      </TooltipItem.ContextProvider>
     </DefaultTransformer>
   );
 });

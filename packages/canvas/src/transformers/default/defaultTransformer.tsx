@@ -40,7 +40,7 @@ export const DefaultTransformer = forwardRef<
         {...restProps}
       />
       {shown && verifiedShown && (
-        <TransformerContainer.Overlay>{children}</TransformerContainer.Overlay>
+        <TransformerContainer.Tooltip>{children}</TransformerContainer.Tooltip>
       )}
     </TransformerContainer.Root>
   );

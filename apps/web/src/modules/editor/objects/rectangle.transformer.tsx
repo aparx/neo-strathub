@@ -4,19 +4,16 @@ import { Flexbox } from "@repo/ui/components";
 import Konva from "konva";
 import { forwardRef } from "react";
 import { BaseTransformer, BaseTransformerData } from "./baseTransformer";
-import * as OverlayItem from "./items";
+import * as TooltipItem from "./tooltipItems";
 
 export const RectangleTransformer = forwardRef<
   Konva.Transformer,
   BaseTransformerData<CanvasNodeConfig>
->(function GameObjectTransformer(
-  { config, ...restProps },
-  ref,
-) {
+>(function GameObjectTransformer({ config, ...restProps }, ref) {
   const items = [
-    <OverlayItem.Duplicate key="duplicate" />,
-    <OverlayItem.Copy key="copy" />,
-    <OverlayItem.Delete key="delete" />,
+    <TooltipItem.Duplicate key="duplicate" />,
+    <TooltipItem.Copy key="copy" />,
+    <TooltipItem.Delete key="delete" />,
   ] as const;
 
   return (

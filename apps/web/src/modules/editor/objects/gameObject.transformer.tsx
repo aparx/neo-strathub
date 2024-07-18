@@ -8,7 +8,7 @@ import { FaLink, FaLinkSlash } from "react-icons/fa6";
 import { useDebouncedCallback } from "use-debounce";
 import { BaseTransformer, BaseTransformerData } from "./baseTransformer";
 import { GameObjectConfig } from "./gameObject";
-import * as OverlayItem from "./items";
+import * as TooltipItem from "./tooltipItems";
 
 export const GameObjectTransformer = forwardRef<
   Konva.Transformer,
@@ -28,9 +28,9 @@ function MainItemList({
 }>) {
   const items = [
     objectType === "character" && <LinkItem key="link" />,
-    <OverlayItem.Duplicate key="duplicate" />,
-    <OverlayItem.Copy key="copy" />,
-    <OverlayItem.Delete key="delete" />,
+    <TooltipItem.Duplicate key="duplicate" />,
+    <TooltipItem.Copy key="copy" />,
+    <TooltipItem.Delete key="delete" />,
   ] as const;
 
   return (
@@ -47,7 +47,7 @@ function MainItemList({
  * game object configuration. The saving is debounced to save resources.
  */
 function LinkItem() {
-  const { handler } = OverlayItem.useOverlayItemContext();
+  const { handler } = TooltipItem.useOverlayItemContext();
   const { config } = TransformerContainer.useTransformerContainer();
 
   const [linked, setLinked] = useState<boolean | undefined>(false);
