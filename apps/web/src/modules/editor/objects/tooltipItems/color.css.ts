@@ -1,4 +1,4 @@
-import { sprinkles, vars } from "@repo/theme";
+import { vars } from "@repo/theme";
 import { globalStyle, keyframes, style } from "@vanilla-extract/css";
 import { RecipeVariants, recipe } from "@vanilla-extract/recipes";
 
@@ -12,7 +12,9 @@ export const colorBox = recipe({
   },
   variants: {
     mode: {
-      fill: sprinkles({ outline: "card" }),
+      fill: {
+        border: `1px solid ${vars.colors.emphasis.medium}`,
+      },
       stroke: {
         border: "2px solid transparent",
         background: "transparent",

@@ -85,7 +85,7 @@ export function EditorCharacter({
                 color: createForegroundSlotColor(color),
               }}
             >
-              {1 + character.index}
+              {1 + (character.player_slot?.index ?? character.index)}
             </Text>
             {object ? (
               <Image

@@ -32,7 +32,7 @@ export function CharacterModal({
               color: foreColor,
             }}
           >
-            {1 + character.index}
+            {1 + (character.player_slot?.index ?? character.index)}
           </Text>
           Reassign character
         </span>

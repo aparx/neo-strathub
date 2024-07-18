@@ -40,7 +40,9 @@ export function Slot({ onClick, disabled, style, ...restProps }: SlotProps) {
   const portalRef = useRef<HTMLFieldSetElement>(null);
   useOnClickOutside(portalRef, () => setOpened(false));
 
-  const slotNumber = character ? 1 + character.index : -1;
+  const slotNumber = character
+    ? 1 + (character.player_slot?.index ?? character.index)
+    : -1;
 
   return (
     <>
@@ -65,7 +67,7 @@ export function Slot({ onClick, disabled, style, ...restProps }: SlotProps) {
           }}
           {...restProps}
         >
-          {character?.index != null ? 1 + character.index : "?"}
+          {slotNumber >= 0 ? slotNumber : "?"}
           <Icon.Custom size="sm">
             <HiExternalLink />
           </Icon.Custom>
@@ -113,7 +115,9 @@ const SlotSelector = forwardRef<HTMLFieldSetElement, SlotSelectorProps>(
             character?.player_slot?.color ?? vars.colors.foreground;
           const foreColor = createForegroundSlotColor(backColor);
           const isActive = config.characterId == character?.id;
-          const slotNumber = character ? 1 + character.index : -1;
+          const slotNumber = character
+            ? 1 + (character.player_slot?.index ?? character.index)
+            : -1;
 
           return (
             <Text asChild data={{ font: "mono", weight: isActive ? 800 : 500 }}>
