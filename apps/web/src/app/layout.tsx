@@ -35,6 +35,7 @@ export default async function RootLayout({
         <Text asChild>
           <body
             style={{
+              position: "relative",
               background: vars.colors.accents[0],
               color: vars.colors.emphasis.high,
               minWidth: "100dvw",

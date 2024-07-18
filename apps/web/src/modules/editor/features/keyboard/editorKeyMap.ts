@@ -18,6 +18,9 @@ export type EditorKeyMapTree = DeepReadonly<{
     moveUp: KeyMappingValue;
     moveDown: KeyMappingValue;
     duplicate: KeyMappingValue;
+    copy: KeyMappingValue;
+    paste: KeyMappingValue;
+    cut: KeyMappingValue;
   };
   editor: {
     undo: KeyMappingValue;
@@ -36,6 +39,9 @@ export const DEFAULT_KEY_MAP: EditorKeyMapTree = {
     moveUp: { code: "ArrowUp" },
     moveDown: { code: "ArrowDown" },
     duplicate: { code: "KeyD", ctrl: true },
+    copy: { code: "KeyC", ctrl: true },
+    cut: { code: "KeyX", ctrl: true },
+    paste: { code: "KeyV", ctrl: true },
   },
   editor: {
     undo: { code: "KeyY", ctrl: true },

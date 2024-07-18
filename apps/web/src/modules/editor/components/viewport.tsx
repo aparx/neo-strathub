@@ -39,6 +39,7 @@ export const EditorViewport = forwardRef<CanvasContext, EditorViewportProps>(
       );
     }, [storage.position.value]);
 
+    // TODO this causes scale + pos issues when zooming quickly
     useEffect(() => canvasRef.current?.scale.update(scale), [scale]);
 
     return (

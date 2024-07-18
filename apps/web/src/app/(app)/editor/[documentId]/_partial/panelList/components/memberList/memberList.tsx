@@ -10,7 +10,7 @@ import { vars } from "@repo/theme";
 import { Text } from "@repo/ui/components";
 import { blendAlpha } from "@repo/ui/utils";
 import { Nullish } from "@repo/utils";
-import { useEffect } from "react";
+import { useMemo } from "react";
 import { useEditorContext } from "../../../../_context";
 import * as css from "./memberList.css";
 
@@ -18,18 +18,24 @@ export function SidepanelMemberList() {
   const [{ blueprint }] = useEditorContext();
   const [{ members }] = useTeamContext();
   const [{ data: slots }] = useSlotContext();
+  const user = useUserContext();
 
-  useEffect(() => {
-    members.sort(({ presence: a }, { presence: b }) => {
-      if (a.documentId !== blueprint.id) return 1;
-      if (a.status === b.status) return 0;
-      return a.status === "online" ? -1 : 1;
-    });
-  }, [members]);
+  const sortedArray = useMemo(
+    () =>
+      [...members].sort(({ presence: a }, { presence: b }) => {
+        if (a.profileId === user.user?.id && b.profileId !== a.profileId)
+          return -1;
+        if (a.documentId !== b.documentId)
+          return a.documentId === blueprint.id ? -1 : 1;
+        if (a.status === b.status) return 0;
+        return a.status === "online" ? -1 : 1;
+      }),
+    [members],
+  );
 
   return (
     <ul className={css.list}>
-      {members.map((member) => {
+      {sortedArray.map((member) => {
         const slot = slots?.find((slot) =>
           slot.members.find((x) => x.id === member.id),
         );
@@ -80,7 +86,7 @@ function MemberItem({
       <Text
         type="label"
         size="lg"
-        data={{ weight: 600 }}
+        data={{ weight: 800, font: "mono" }}
         className={css.slot}
         style={{ background: slotColor }}
       >

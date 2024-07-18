@@ -16,7 +16,7 @@ export const Root = Primitive.Root;
 export function Exit({ disabled }: { disabled?: boolean }) {
   return (
     <Close asChild>
-      <IconButton aria-label={"Close characterModal"} disabled={disabled}>
+      <IconButton aria-label={"Close modal"} disabled={disabled}>
         <Icon.Mapped type={"close"} />
       </IconButton>
     </Close>

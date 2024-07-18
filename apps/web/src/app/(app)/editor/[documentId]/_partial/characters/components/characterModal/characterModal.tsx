@@ -1,10 +1,11 @@
 "use client";
-import { useEditorContext } from "@/app/(app)/editor/[documentId]/_context";
 import type { BlueprintCharacterData } from "@/modules/blueprint/actions";
 import { GameObjectData } from "@/modules/gameObject/hooks";
 import { vars } from "@repo/theme";
-import { Modal } from "@repo/ui/components";
+import { Modal, Text } from "@repo/ui/components";
+import { createForegroundSlotColor } from "../editorCharacter";
 import { ObjectGrid } from "../objectGrid";
+import * as css from "./characterModal.css";
 
 export function CharacterModal({
   character,
@@ -16,21 +17,28 @@ export function CharacterModal({
     oldObject: GameObjectData | null,
   ) => any;
 }) {
-  const [{ blueprint }] = useEditorContext();
+  const backColor = character.player_slot?.color ?? vars.colors.emphasis.high;
+  const foreColor = createForegroundSlotColor(backColor);
 
   return (
     <Modal.Content minWidth={600}>
       <Modal.Title>
-        <span>
-          Manage character{" "}
-          <span style={{ color: vars.colors.emphasis.medium }}>
-            #{1 + character.index}
-          </span>
+        <span className={css.title}>
+          <Text
+            className={css.index}
+            data={{ weight: 800, font: "mono" }}
+            style={{
+              background: backColor,
+              color: foreColor,
+            }}
+          >
+            {1 + character.index}
+          </Text>
+          Reassign character
         </span>
         <Modal.Exit />
       </Modal.Title>
       <ObjectGrid
-        gameId={blueprint.arena.game_id}
         type="character"
         activeObjectId={character.game_object?.id}
         setActiveObject={async (newObject) => {

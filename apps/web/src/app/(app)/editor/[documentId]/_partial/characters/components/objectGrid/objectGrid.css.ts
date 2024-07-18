@@ -37,6 +37,7 @@ export const gridHeader = style({
   background: vars.colors.accents[3],
   width: "100%",
   padding: vars.spacing.md,
+  borderBottom: `1px solid ${vars.colors.outline.card}`,
 });
 
 export const gridContent = style({

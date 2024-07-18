@@ -1,4 +1,5 @@
-import { CanvasRef } from "@repo/canvas";
+import { useEditorContext } from "@/app/(app)/editor/[documentId]/_context";
+import { CanvasNode, CanvasRef } from "@repo/canvas";
 import { CanvasContext } from "@repo/canvas/context";
 import React, { MutableRefObject, RefObject, useMemo, useRef } from "react";
 import { useEditorEventHandler } from "../events";
@@ -15,6 +16,7 @@ export function EditorKeyboardHandler({
   keyMap,
   canvas,
 }: KeyboardHandlerProps) {
+  const [editor] = useEditorContext();
   const eventHandler = useEditorEventHandler();
   const moveTransaction = useRef(false);
 
@@ -113,3 +115,8 @@ function useCheckElementMove(
     };
   }, [keyMap, eventHandler, canvas]);
 }
+
+type ClipboardData = {
+  arenaId: number;
+  nodes: Array<CanvasNode & { layerId: any }>;
+};

@@ -32,7 +32,7 @@ interface GadgetSlotProps {
 }
 
 export function createForegroundSlotColor(backdrop: string) {
-  return `color-mix(in srgb, black 80%, ${backdrop})`;
+  return `color-mix(in srgb, black 90%, ${backdrop})`;
 }
 
 export function EditorCharacter({

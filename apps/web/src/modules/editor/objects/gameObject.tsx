@@ -1,3 +1,4 @@
+import { GameObjectType } from "@/modules/gameObject/hooks";
 import {
   CanvasContext,
   CanvasNode,
@@ -25,7 +26,7 @@ export type GameObjectConfig = CanvasNodeConfig &
         linkToAssignee?: boolean;
       }
     | {
-        objectType: string;
+        objectType: GameObjectType;
         objectId: number;
         linkToAssignee: never;
       }
@@ -85,7 +86,7 @@ function ImageObject({
 
   usePutIntoTransformer(showTransformer, trRef.current, imageRef.current);
 
-  return (
+   return (
     <>
       <ReactKonva.Rect
         ref={backRef}

@@ -53,12 +53,11 @@ export const GameObjectTransformer = forwardRef<
   );
 });
 
-function MainItemList({ objectType }: GameObjectConfig) {
+function MainItemList({ objectType, objectId }: GameObjectConfig) {
   const items = [
     objectType === "character" && <LinkItem key="link" />,
     <OverlayItem.Duplicate key="duplicate" />,
     <OverlayItem.Copy key="copy" />,
-    <OverlayItem.Replace key="replace" />,
     <OverlayItem.Delete key="delete" />,
   ] as const;
 

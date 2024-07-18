@@ -236,6 +236,7 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
       if (!zoomable) return;
       // Zoom into the canvas
       context.scale.update((oldScale) => {
+        const pointer = stage.getPointerPosition()!;
         const scaleBy = e.evt.altKey ? 1.15 : 1.05;
         const pointTo = {
           x: (pointer.x - stage.x()) / oldScale,

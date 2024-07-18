@@ -18,12 +18,10 @@ export function ObjectGrid({
   activeObjectId,
   setActiveObject,
   type,
-  gameId,
 }: {
   activeObjectId: GameObjectData["id"] | Nullish;
   setActiveObject: (object: GameObjectData | null) => void;
   type: GameObjectType;
-  gameId: number;
 }) {
   const [filter, setFilter] = useState<string>();
   const gridShellRef = useRef<HTMLDivElement>(null);
