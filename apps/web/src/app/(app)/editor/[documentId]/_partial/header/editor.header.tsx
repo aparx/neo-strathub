@@ -1,8 +1,5 @@
 "use client";
-import {
-  BackButton,
-  ZoomButton,
-} from "@/app/(app)/editor/[documentId]/_partial/header/components";
+import { ZoomButton } from "@/app/(app)/editor/[documentId]/_partial/header/components";
 import {
   Breadcrumbs,
   Button,
@@ -16,14 +13,12 @@ import { useEditorContext } from "../../_context";
 import * as css from "./editor.header.css";
 
 export function EditorHeader() {
-  const [{ blueprint, mode }] = useEditorContext();
+  const [{ blueprint, mode }, updateEditor] = useEditorContext();
 
   return (
     <Text asChild>
       <header className={css.headerContainer}>
-        <div className={css.headerItem({ side: "left" })}>
-          <BackButton />
-        </div>
+        <div className={css.headerItem({ side: "left" })}>Toolbox</div>
         <div className={css.headerItem({ side: "center" })}>
           <BlueprintTitle />
         </div>

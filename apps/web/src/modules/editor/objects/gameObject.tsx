@@ -5,7 +5,6 @@ import {
   CanvasNodeConfig,
   NodeTags,
   ObjectRendererRenderProps,
-  usePutIntoTransformer,
 } from "@repo/canvas";
 import Konva from "konva";
 import { useCallback, useRef } from "react";
@@ -61,7 +60,6 @@ function ImageObject({
   const [image] = useImage(imageUrl);
   const backRef = useRef<Konva.Rect>(null);
   const imageRef = useRef<Konva.Image>(null);
-  const trRef = useRef<Konva.Transformer>(null);
 
   /** Calculates the scale of the image based on the given dimensions */
   function calculateScale(width: number, height: number) {
@@ -84,9 +82,7 @@ function ImageObject({
 
   const imageScale = calculateScale(config.width ?? 1, config.height ?? 1);
 
-  usePutIntoTransformer(showTransformer, trRef.current, imageRef.current);
-
-   return (
+  return (
     <>
       <ReactKonva.Rect
         ref={backRef}
@@ -155,8 +151,7 @@ function ImageObject({
         }}
       />
       <GameObjectTransformer
-        ref={trRef}
-        link={backRef.current}
+        link={imageRef.current}
         shown={showTransformer}
         config={config}
       />

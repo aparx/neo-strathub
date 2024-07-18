@@ -1,5 +1,5 @@
 import { useEditorContext } from "@/app/(app)/editor/[documentId]/_context";
-import { Canvas, CanvasConfig, CanvasRef, primitiveShapes } from "@repo/canvas";
+import { Canvas, CanvasConfig, CanvasRef } from "@repo/canvas";
 import {
   CanvasContext,
   CanvasContextInteractStatus,
@@ -9,10 +9,10 @@ import React, { forwardRef, useEffect, useRef } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { DEFAULT_KEY_MAP, EditorKeyboardHandler } from "../features/keyboard";
 import { useEditorLocalStorage } from "../hooks";
-import { GameObject } from "../objects/gameObject";
+import { GameObject, Rectangle } from "../objects";
 
 export const EDITOR_RENDERERS = {
-  ...primitiveShapes,
+  Rectangle,
   GameObject,
 } as const;
 

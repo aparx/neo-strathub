@@ -1,59 +1,31 @@
-import { useEditorContext } from "@/app/(app)/editor/[documentId]/_context";
-import { DefaultTransformer, TransformerContainer } from "@repo/canvas";
+import { GameObjectType } from "@/modules/gameObject/hooks";
+import { TransformerContainer } from "@repo/canvas";
 import { vars } from "@repo/theme";
 import { Flexbox, Icon, IconButton } from "@repo/ui/components";
-import { Nullish } from "@repo/utils";
 import Konva from "konva";
 import { forwardRef, useEffect, useState } from "react";
 import { FaLink, FaLinkSlash } from "react-icons/fa6";
 import { useDebouncedCallback } from "use-debounce";
-import { useEditorEventHandler } from "../features/events";
-import { useEditorEvent } from "../features/events/hooks";
+import { BaseTransformer, BaseTransformerData } from "./baseTransformer";
 import { GameObjectConfig } from "./gameObject";
 import * as OverlayItem from "./items";
 
-export interface GameObjectTransformerProps {
-  shown: boolean;
-  link: Konva.Node | Nullish;
-  config: GameObjectConfig;
-}
-
-const ROTATE_KEYS: string[] = ["AltLeft"] as const;
-
 export const GameObjectTransformer = forwardRef<
   Konva.Transformer,
-  GameObjectTransformerProps
->(function GameObjectTransformer({ shown, link, config }, ref) {
-  const [editor] = useEditorContext();
-  const eventHandler = useEditorEventHandler();
-  const [rotate, setRotate] = useState(false);
-
-  useEditorEvent("keyPress", (e) => {
-    if (ROTATE_KEYS.includes(e.event.code)) setRotate(true);
-  });
-
-  useEditorEvent("keyRelease", (e) => {
-    if (ROTATE_KEYS.includes(e.event.code)) setRotate(false);
-  });
-
+  BaseTransformerData<GameObjectConfig>
+>(function GameObjectTransformer({ config, ...restProps }, ref) {
   return (
-    <DefaultTransformer
-      ref={ref}
-      keepRatio
-      link={link}
-      config={config}
-      shown={!rotate && shown}
-      rotateEnabled={rotate}
-    >
-      <OverlayItem.ContextProvider handler={eventHandler} editor={editor}>
-        <MainItemList {...config} />
-        <OverlayItem.Slot />
-      </OverlayItem.ContextProvider>
-    </DefaultTransformer>
+    <BaseTransformer ref={ref} config={config} {...restProps}>
+      <MainItemList objectType={config.objectType} />
+    </BaseTransformer>
   );
 });
 
-function MainItemList({ objectType, objectId }: GameObjectConfig) {
+function MainItemList({
+  objectType,
+}: Readonly<{
+  objectType: GameObjectType;
+}>) {
   const items = [
     objectType === "character" && <LinkItem key="link" />,
     <OverlayItem.Duplicate key="duplicate" />,

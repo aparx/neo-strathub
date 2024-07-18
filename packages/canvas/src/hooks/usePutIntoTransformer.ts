@@ -1,11 +1,11 @@
-import { nonNull } from "@repo/utils";
+import { nonNull, Nullish } from "@repo/utils";
 import Konva from "konva";
 import { useEffect } from "react";
 
 export function usePutIntoTransformer(
   enabled: boolean,
-  transformer: Konva.Transformer | null,
-  ...nodes: Array<Konva.Node | null>
+  transformer: Konva.Transformer | Nullish,
+  ...nodes: Array<Konva.Node | Nullish>
 ) {
   useEffect(() => {
     if (!enabled) transformer?.nodes([]);

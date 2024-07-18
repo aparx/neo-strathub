@@ -1,12 +1,16 @@
+import { mergeRefs } from "@repo/utils";
 import Konva from "konva";
-import { forwardRef, useState } from "react";
+import { forwardRef, useRef, useState } from "react";
 import { CanvasNodeConfig } from "utils";
+import { usePutIntoTransformer } from "../../hooks";
 import { TransformerContainer } from "../../transformers/container";
-import { BasicTransformer } from "../basicTransformer";
+import { BasicTransformer, BasicTransformerProps } from "../basicTransformer";
 
-export interface DefaultTransformerProps extends Konva.TransformerConfig {
+export interface DefaultTransformerProps<
+  T extends CanvasNodeConfig = CanvasNodeConfig,
+> extends BasicTransformerProps {
   show: boolean;
-  config: CanvasNodeConfig;
+  config: T;
   link: Konva.Node | undefined;
   children?: React.ReactNode;
 }
@@ -18,6 +22,9 @@ export const DefaultTransformer = forwardRef<
   { shown, link, children, config, ...restProps },
   ref,
 ) {
+  const trRef = useRef<Konva.Transformer>(null);
+  usePutIntoTransformer(shown, trRef.current, link);
+
   const [verifiedShown, setVerifiedShown] = useState(true);
   const parent = link?.parent;
   if (!link || !parent) return null;
@@ -25,7 +32,7 @@ export const DefaultTransformer = forwardRef<
   return (
     <TransformerContainer.Root config={config} linked={link}>
       <BasicTransformer
-        ref={ref}
+        ref={mergeRefs(trRef, ref)}
         onDragStart={() => setVerifiedShown(false)}
         onDragEnd={() => setVerifiedShown(true)}
         onTransformStart={() => setVerifiedShown(false)}
