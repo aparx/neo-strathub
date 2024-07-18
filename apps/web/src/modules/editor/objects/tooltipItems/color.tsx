@@ -1,6 +1,6 @@
 import { IconButton } from "@repo/ui/components";
 import { useId, useRef, useState } from "react";
-import { HexColorPicker } from "react-colorful";
+import { RgbaStringColorPicker } from "react-colorful";
 import { useOnClickOutside } from "usehooks-ts";
 import * as css from "./color.css";
 
@@ -36,7 +36,8 @@ export function Color({
       </IconButton>
       {opened && (
         <div ref={portalRef} id={id} className={css.container}>
-          <HexColorPicker
+          <RgbaStringColorPicker
+            className={css.picker}
             color={color}
             onChange={onChange}
             style={{

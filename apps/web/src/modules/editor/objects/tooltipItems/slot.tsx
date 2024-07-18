@@ -77,7 +77,7 @@ export function Slot({ onClick, disabled, style, ...restProps }: SlotProps) {
           ref={portalRef}
           onSelectSlot={(characterId) => {
             handler.fire("canvasUpdate", "user", {
-              fields: { [config.id]: { characterId } },
+              fields: { [config.id]: { characterId: characterId ?? null } },
             });
             setOpened(false);
           }}
