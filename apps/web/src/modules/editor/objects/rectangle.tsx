@@ -4,8 +4,9 @@ import {
   ObjectRendererRenderProps,
 } from "@repo/canvas";
 import Konva from "konva";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as ReactKonva from "react-konva";
+import { useEditorEventHandler } from "../features/events";
 import { RectangleTransformer } from "./rectangle.transformer";
 
 export type RectangleConfig = CanvasNodeConfig;
@@ -19,17 +20,21 @@ export function Rectangle({
   ...restProps
 }: RectangleProps) {
   const rectRef = useRef<Konva.Rect>(null);
+  const eventHandler = useEditorEventHandler();
+  const [optimisticConfig, setOptimisticConfig] = useState(config);
+  useEffect(() => setOptimisticConfig(config), [config]);
 
   return (
     <>
       <ReactKonva.Rect
         ref={rectRef}
         draggable={canvas.editable}
-        {...config}
+        {...optimisticConfig}
         {...restProps}
       />
       <RectangleTransformer
-        config={config}
+        config={optimisticConfig}
+        onUpdateConfig={setOptimisticConfig}
         shown={showTransformer}
         link={rectRef.current}
         anchors="stereo"

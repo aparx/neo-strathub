@@ -1,3 +1,4 @@
+export * from "./color";
 export * from "./copy";
 export * from "./delete";
 export * from "./duplicate";

@@ -30,7 +30,7 @@ export function EditorHeader() {
                 dragged: createCanvasNode(EDITOR_RENDERERS, "Rectangle", {
                   width: 50,
                   height: 50,
-                  fill: "red",
+                  fill: "green",
                 }),
               }))
             }

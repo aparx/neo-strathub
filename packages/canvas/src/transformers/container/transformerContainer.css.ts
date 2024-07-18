@@ -33,7 +33,7 @@ export const overlay = style({
 
 export const arrow = style({
   position: "absolute",
-  zIndex: 99999,
+  zIndex: 9,
   top: "calc(100% - 2px)",
   left: "50%",
   transform: "translateX(-50%)",

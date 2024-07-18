@@ -4,17 +4,30 @@ import { TransformerContainer } from "@repo/canvas";
 import { vars } from "@repo/theme";
 import { Icon, Text } from "@repo/ui/components";
 import { mergeClassNames, nonNull } from "@repo/utils";
-import { ComponentPropsWithoutRef, useId, useMemo, useState } from "react";
+import {
+  ComponentPropsWithoutRef,
+  forwardRef,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { HiExternalLink } from "react-icons/hi";
 import { RxValueNone } from "react-icons/rx";
+import { useOnClickOutside } from "usehooks-ts";
 import { useOverlayItemContext } from "./provider";
 import * as css from "./slot.css";
 
 export type SlotProps = ComponentPropsWithoutRef<"button">;
 
+interface SlotSelectorProps extends ComponentPropsWithoutRef<"fieldset"> {
+  onSelectSlot?: (id: number | undefined) => void;
+}
+
 export function Slot({ onClick, disabled, style, ...restProps }: SlotProps) {
   const { editor, handler } = useOverlayItemContext();
   const { config } = TransformerContainer.useTransformerContainer();
+
   const character = config.characterId
     ? editor.characters[config.characterId]
     : null;
@@ -23,6 +36,9 @@ export function Slot({ onClick, disabled, style, ...restProps }: SlotProps) {
 
   const [opened, setOpened] = useState(false);
   const id = useId();
+
+  const portalRef = useRef<HTMLFieldSetElement>(null);
+  useOnClickOutside(portalRef, () => setOpened(false));
 
   const slotNumber = character ? 1 + character.index : -1;
 
@@ -58,6 +74,7 @@ export function Slot({ onClick, disabled, style, ...restProps }: SlotProps) {
       {opened && (
         <SlotSelector
           id={id}
+          ref={portalRef}
           onSelectSlot={(characterId) => {
             handler.fire("canvasUpdate", "user", {
               fields: { [config.id]: { characterId } },
@@ -70,61 +87,60 @@ export function Slot({ onClick, disabled, style, ...restProps }: SlotProps) {
   );
 }
 
-function SlotSelector({
-  className,
-  onSelectSlot,
-  ...restProps
-}: ComponentPropsWithoutRef<"fieldset"> & {
-  onSelectSlot?: (id: number | undefined) => void;
-}) {
-  const { editor } = useOverlayItemContext();
-  const { config } = TransformerContainer.useTransformerContainer();
+const SlotSelector = forwardRef<HTMLFieldSetElement, SlotSelectorProps>(
+  function SlotSelector(props, ref) {
+    const { className, onSelectSlot, ...restProps } = props;
 
-  const characters = useMemo(
-    () =>
-      Object.keys(editor.characters)
-        .map((key) => editor.characters[Number(key)])
-        .filter(nonNull),
-    [editor.characters],
-  );
+    const { editor } = useOverlayItemContext();
+    const { config } = TransformerContainer.useTransformerContainer();
 
-  return (
-    <fieldset
-      className={mergeClassNames(css.selector, className)}
-      {...restProps}
-    >
-      {[null, ...characters].map((character) => {
-        const backColor =
-          character?.player_slot?.color ?? vars.colors.foreground;
-        const foreColor = createForegroundSlotColor(backColor);
-        const isActive = config.characterId == character?.id;
-        const slotNumber = character ? 1 + character.index : -1;
+    const characters = useMemo(
+      () =>
+        Object.keys(editor.characters)
+          .map((key) => editor.characters[Number(key)])
+          .filter(nonNull),
+      [editor.characters],
+    );
 
-        return (
-          <Text asChild data={{ font: "mono", weight: isActive ? 800 : 500 }}>
-            <label
-              aria-label={slotNumber >= 0 ? `Slot ${slotNumber}` : `No Slot`}
-              className={css.selectorItem({ active: isActive })}
-              style={{
-                background: isActive ? backColor : undefined,
-                color: isActive ? foreColor : backColor,
-              }}
-            >
-              <VisuallyHidden>
-                <input
-                  type="radio"
-                  name="slot"
-                  checked={isActive}
-                  onChange={(e) =>
-                    e.target.checked && onSelectSlot?.(character?.id)
-                  }
-                />
-              </VisuallyHidden>
-              {slotNumber >= 0 ? slotNumber : <RxValueNone />}
-            </label>
-          </Text>
-        );
-      })}
-    </fieldset>
-  );
-}
+    return (
+      <fieldset
+        ref={ref}
+        className={mergeClassNames(css.selector, className)}
+        {...restProps}
+      >
+        {[null, ...characters].map((character) => {
+          const backColor =
+            character?.player_slot?.color ?? vars.colors.foreground;
+          const foreColor = createForegroundSlotColor(backColor);
+          const isActive = config.characterId == character?.id;
+          const slotNumber = character ? 1 + character.index : -1;
+
+          return (
+            <Text asChild data={{ font: "mono", weight: isActive ? 800 : 500 }}>
+              <label
+                aria-label={slotNumber >= 0 ? `Slot ${slotNumber}` : `No Slot`}
+                className={css.selectorItem({ active: isActive })}
+                style={{
+                  background: isActive ? backColor : undefined,
+                  color: isActive ? foreColor : backColor,
+                }}
+              >
+                <VisuallyHidden>
+                  <input
+                    type="radio"
+                    name="slot"
+                    checked={isActive}
+                    onChange={(e) =>
+                      e.target.checked && onSelectSlot?.(character?.id)
+                    }
+                  />
+                </VisuallyHidden>
+                {slotNumber >= 0 ? slotNumber : <RxValueNone />}
+              </label>
+            </Text>
+          );
+        })}
+      </fieldset>
+    );
+  },
+);
