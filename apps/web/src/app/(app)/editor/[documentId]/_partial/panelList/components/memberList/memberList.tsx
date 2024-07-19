@@ -78,9 +78,8 @@ function MemberItem({
         marginLeft: vars.spacing.md,
         marginRight: vars.spacing.md,
         background: self ? blendAlpha(slotColor, 0.2) : vars.colors.accents[3],
-        border: self
-          ? `1px solid ${slotColor}`
-          : `1px solid ${vars.colors.outline.card}`,
+        border: "1px solid transparent",
+        borderColor: self ? slotColor : vars.colors.outline.card,
         borderRadius: vars.roundness.sm,
       }}
     >

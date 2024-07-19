@@ -5,6 +5,7 @@ import { EditorSidepanelList, EditorStages } from "../_partial";
 import {
   SidepanelItem,
   SidepanelObjectList,
+  SidepanelShapeList,
 } from "../_partial/panelList/components";
 
 export default function EditorEditLayout({
@@ -21,6 +22,9 @@ export default function EditorEditLayout({
   return (
     <>
       <EditorSidepanelList side="left">
+        <SidepanelItem title="Shapes">
+          <SidepanelShapeList />
+        </SidepanelItem>
         <SidepanelItem title="Gadgets">
           <SidepanelObjectList type="gadget" />
         </SidepanelItem>

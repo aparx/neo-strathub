@@ -1,7 +1,5 @@
 "use client";
 import { ZoomButton } from "@/app/(app)/editor/[documentId]/_partial/header/components";
-import { EDITOR_RENDERERS } from "@/modules/editor/components/viewport";
-import { createCanvasNode } from "@repo/canvas";
 import {
   Breadcrumbs,
   Button,
@@ -20,24 +18,7 @@ export function EditorHeader() {
   return (
     <Text asChild>
       <header className={css.headerContainer}>
-        <div className={css.headerItem({ side: "left" })}>
-          <div
-            draggable
-            style={{ background: "red", width: 15, height: 15 }}
-            onDragStart={() =>
-              updateEditor((old) => ({
-                ...old,
-                dragged: createCanvasNode(EDITOR_RENDERERS, "Rectangle", {
-                  width: 50,
-                  height: 50,
-                  fill: "green",
-                }),
-              }))
-            }
-          >
-            Rect
-          </div>
-        </div>
+        <div className={css.headerItem({ side: "left" })}>Tools</div>
         <div className={css.headerItem({ side: "center" })}>
           <BlueprintTitle />
         </div>
