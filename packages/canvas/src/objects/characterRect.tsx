@@ -28,7 +28,6 @@ export const CharacterRect = forwardRef<CharacterRectRef, CharacterRectProps>(
     const rectRef = useRef<Konva.Rect>(null);
 
     const sync = useCallback<CharacterRectRef["sync"]>((config) => {
-      console.log("sync char", config);
       // TODO add margin between the target and the origin node/config
       const rect = rectRef.current;
       if (!rect) return;
