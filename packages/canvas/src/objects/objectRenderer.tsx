@@ -19,6 +19,9 @@ export interface ObjectRendererRenderProps<
   config: TNode["attrs"];
   /** If true, only a single selection transformer should be shown for node */
   showTransformer: boolean;
+
+  /** Called to synchronize the character outline with the node */
+  onSyncCharacter?: (config: InferNodeConfig<TNode>) => void;
 }
 
 /** Each object renderer associated to their identifying `className` */
@@ -63,6 +66,7 @@ export function ObjectRenderer<TNode extends CanvasNode>({
         config={children.attrs}
         canvas={canvas}
         showTransformer={isIndividualSelection}
+        onSyncCharacter={(config) => characterRef.current?.sync(config)}
         onTransform={(e) => characterRef.current?.sync(e.target.attrs)}
         onDragMove={(e) => characterRef.current?.sync(e.target.attrs)}
         onDragStart={(e) =>

@@ -4,13 +4,14 @@ import { Flexbox } from "@repo/ui/components";
 import Konva from "konva";
 import { Dispatch, forwardRef, SetStateAction } from "react";
 import { useDebouncedCallback } from "use-debounce";
-import { useEditorEventHandler } from "../features/events";
-import { BaseTransformer, BaseTransformerData } from "./baseTransformer";
-import * as TooltipItem from "./tooltipItems";
+import { useEditorEventHandler } from "../../features/events";
+import { BaseTransformer, BaseTransformerData } from "../baseTransformer";
+import * as TooltipItem from "../tooltipItems";
+import { RectangleConfig } from "./rectangle";
 
 export interface RectangleTransformerProps
-  extends BaseTransformerData<CanvasNodeConfig> {
-  onUpdateConfig: Dispatch<SetStateAction<CanvasNodeConfig>>;
+  extends BaseTransformerData<RectangleConfig> {
+  onUpdateConfig: Dispatch<SetStateAction<RectangleConfig>>;
 }
 
 /** The debounce time until a *specific* config field update is committed */

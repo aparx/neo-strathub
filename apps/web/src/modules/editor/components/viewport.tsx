@@ -9,9 +9,10 @@ import React, { forwardRef, useEffect, useRef } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { DEFAULT_KEY_MAP, EditorKeyboardHandler } from "../features/keyboard";
 import { useEditorLocalStorage } from "../hooks";
-import { GameObject, Rectangle } from "../objects";
+import { Circle, GameObject, Rectangle } from "../objects";
 
 export const EDITOR_RENDERERS = {
+  Circle,
   Rectangle,
   GameObject,
 } as const;

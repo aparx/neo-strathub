@@ -6,9 +6,9 @@ import Konva from "konva";
 import { forwardRef, useEffect, useState } from "react";
 import { FaLink, FaLinkSlash } from "react-icons/fa6";
 import { useDebouncedCallback } from "use-debounce";
-import { BaseTransformer, BaseTransformerData } from "./baseTransformer";
+import { BaseTransformer, BaseTransformerData } from "../baseTransformer";
+import * as TooltipItem from "../tooltipItems";
 import { GameObjectConfig } from "./gameObject";
-import * as TooltipItem from "./tooltipItems";
 
 export const GameObjectTransformer = forwardRef<
   Konva.Transformer,

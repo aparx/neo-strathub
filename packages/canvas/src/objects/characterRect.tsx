@@ -28,14 +28,15 @@ export const CharacterRect = forwardRef<CharacterRectRef, CharacterRectProps>(
     const rectRef = useRef<Konva.Rect>(null);
 
     const sync = useCallback<CharacterRectRef["sync"]>((config) => {
+      console.log("sync char", config);
       // TODO add margin between the target and the origin node/config
-      const target = rectRef.current;
-      if (!target) return;
-      target.position({ x: config.x ?? 0, y: config.y ?? 0 });
-      target.scale({ x: 1, y: 1 });
-      target.rotation(config.rotation ?? 0);
-      target.width((config.width ?? 0) * (config.scaleX ?? 1));
-      target.height((config.height ?? 0) * (config.scaleY ?? 1));
+      const rect = rectRef.current;
+      if (!rect) return;
+      rect.position({ x: config.x ?? 0, y: config.y ?? 0 });
+      rect.scale({ x: 1, y: 1 });
+      rect.rotation(config.rotation ?? 0);
+      rect.width((config.width ?? 0) * (config.scaleX ?? 1));
+      rect.height((config.height ?? 0) * (config.scaleY ?? 1));
     }, []);
 
     useImperativeHandle(ref, () => ({ sync }), [sync]);

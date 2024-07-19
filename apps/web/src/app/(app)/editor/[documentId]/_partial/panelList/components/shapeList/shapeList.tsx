@@ -26,7 +26,8 @@ const SHAPES = {
   circle: {
     symbol: (props) => <PiCircleFill {...props} />,
     create: () =>
-      createCanvasNode(EDITOR_RENDERERS, "Rectangle", {
+      createCanvasNode(EDITOR_RENDERERS, "Circle", {
+        radius: 30,
         width: 30,
         height: 30,
         fill: "rgba(100, 100, 100, 1)",

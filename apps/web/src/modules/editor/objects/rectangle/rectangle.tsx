@@ -6,7 +6,6 @@ import {
 import Konva from "konva";
 import { useEffect, useRef, useState } from "react";
 import * as ReactKonva from "react-konva";
-import { useEditorEventHandler } from "../features/events";
 import { RectangleTransformer } from "./rectangle.transformer";
 
 export type RectangleConfig = CanvasNodeConfig;
@@ -20,7 +19,6 @@ export function Rectangle({
   ...restProps
 }: RectangleProps) {
   const rectRef = useRef<Konva.Rect>(null);
-  const eventHandler = useEditorEventHandler();
   const [optimisticConfig, setOptimisticConfig] = useState(config);
   useEffect(() => setOptimisticConfig(config), [config]);
 
