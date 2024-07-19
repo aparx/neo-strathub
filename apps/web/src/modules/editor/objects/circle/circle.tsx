@@ -31,14 +31,17 @@ export function Circle({
     //* compensate it for the character outline (handled by the renderer).
     onSyncCharacter?.({
       ...config,
-      x: (x ?? 0) - (width ?? radius ?? 0) * (scaleX ?? 1) * 1,
-      y: (y ?? 0) - (height ?? radius ?? 0) * (scaleY ?? 1) * 1,
+      x: (x ?? 0) - (width ?? 2 * (radius ?? 0)) * (scaleX ?? 1) * 0.5,
+      y: (y ?? 0) - (height ?? 2 * (radius ?? 0)) * (scaleY ?? 1) * 0.5,
       width: 2 * (config.radius ?? 0),
       height: 2 * (config.radius ?? 0),
     });
   }
 
-  syncCharacter(optimisticConfig);
+  useEffect(() => {
+    // Additionally sync on mount
+    syncCharacter(optimisticConfig);
+  }, [optimisticConfig]);
 
   return (
     <>
@@ -55,6 +58,7 @@ export function Circle({
             x: e.target.x(),
             y: e.target.y(),
             rotation: e.target.rotation(),
+            radius: e.target.attrs.radius,
             skewX: e.target.skewX(),
             skewY: e.target.skewY(),
             scaleX: e.target.scaleX(),

@@ -49,13 +49,18 @@ globalStyle(`${picker} .react-colorful__saturation`, {
   borderBottomLeftRadius: `0 !important`,
 });
 
+globalStyle(`${picker} .react-colorful__saturation-pointer`, {
+  width: "1em",
+  height: "1em",
+});
+
 globalStyle(
-  `${picker} .react-colorful__saturation-pointer,
-   ${picker} .react-colorful__hue-pointer,
+  `${picker} .react-colorful__hue-pointer,
    ${picker} .react-colorful__alpha-pointer`,
   {
-    width: "1em",
-    height: "1em",
+    borderRadius: vars.roundness.xs,
+    width: ".8em",
+    height: "1.2em",
   },
 );
 

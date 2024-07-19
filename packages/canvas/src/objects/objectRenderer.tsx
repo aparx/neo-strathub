@@ -1,5 +1,5 @@
 import { CanvasContext } from "context/canvasContext";
-import { SetStateAction, useEffect, useRef } from "react";
+import { SetStateAction, useRef } from "react";
 import * as ReactKonva from "react-konva";
 import { CanvasNode, InferNodeConfig } from "../utils";
 import { CharacterRect, CharacterRectRef } from "./characterRect";
@@ -57,8 +57,6 @@ export function ObjectRenderer<TNode extends CanvasNode>({
     children.attrs.characterId != null
       ? canvas.onGetCharacterSlot(children.attrs.characterId)
       : null;
-
-  useEffect(() => characterRef.current?.sync(children.attrs), [children.attrs]);
 
   return (
     <>

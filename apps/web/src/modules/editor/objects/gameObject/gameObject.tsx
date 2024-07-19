@@ -7,7 +7,7 @@ import {
   ObjectRendererRenderProps,
 } from "@repo/canvas";
 import Konva from "konva";
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import * as ReactKonva from "react-konva";
 import { useImage } from "react-konva-utils";
 import { GameObjectTransformer } from "./gameObject.transformer";
@@ -32,7 +32,7 @@ export type GameObjectConfig = CanvasNodeConfig &
   );
 
 export function GameObject(props: GameObjectProps) {
-  const { canvas, config } = props;
+  const { canvas, config, onSyncCharacter } = props;
   const context = canvas as CanvasContext;
   const { objectType, objectId, linkToAssignee, characterId } = config;
   const finalObjectId =
@@ -43,6 +43,8 @@ export function GameObject(props: GameObjectProps) {
   const imageUrl = finalObjectId
     ? context.onGetGameObjectURL(finalObjectId, objectType)
     : "https://svgur.com/i/1711.svg"; // TODO other fallback
+
+  useEffect(() => onSyncCharacter?.(config), [config]);
 
   return imageUrl && <ImageObject {...props} imageUrl={imageUrl} />;
 }

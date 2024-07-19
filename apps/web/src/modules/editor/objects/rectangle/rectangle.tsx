@@ -16,11 +16,13 @@ export function Rectangle({
   config,
   canvas,
   showTransformer,
+  onSyncCharacter,
   ...restProps
 }: RectangleProps) {
   const rectRef = useRef<Konva.Rect>(null);
   const [optimisticConfig, setOptimisticConfig] = useState(config);
   useEffect(() => setOptimisticConfig(config), [config]);
+  useEffect(() => onSyncCharacter?.(optimisticConfig), [optimisticConfig]);
 
   return (
     <>
