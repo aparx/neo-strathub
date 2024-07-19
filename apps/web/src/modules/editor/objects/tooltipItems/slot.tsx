@@ -120,7 +120,11 @@ const SlotSelector = forwardRef<HTMLFieldSetElement, SlotSelectorProps>(
             : -1;
 
           return (
-            <Text asChild data={{ font: "mono", weight: isActive ? 800 : 500 }}>
+            <Text
+              asChild
+              key={character?.id}
+              data={{ font: "mono", weight: isActive ? 800 : 500 }}
+            >
               <label
                 aria-label={slotNumber >= 0 ? `Slot ${slotNumber}` : `No Slot`}
                 className={css.selectorItem({ active: isActive })}

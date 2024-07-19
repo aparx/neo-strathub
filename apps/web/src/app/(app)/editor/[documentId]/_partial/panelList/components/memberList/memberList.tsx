@@ -11,7 +11,9 @@ import { Text } from "@repo/ui/components";
 import { blendAlpha } from "@repo/ui/utils";
 import { Nullish } from "@repo/utils";
 import { useMemo } from "react";
+import { RxValueNone } from "react-icons/rx";
 import { useEditorContext } from "../../../../_context";
+import { createForegroundSlotColor } from "../../../characters/components";
 import * as css from "./memberList.css";
 
 export function SidepanelMemberList() {
@@ -63,7 +65,7 @@ function MemberItem({
     presence.status === "online" && presence.documentId === blueprint.id;
   const fieldPresence = isInDocument ? "present" : presence.status || "offline";
 
-  const slotColor = slot?.color || "grey";
+  const slotColor = slot?.color || vars.colors.emphasis.medium;
 
   return (
     <Text
@@ -88,9 +90,12 @@ function MemberItem({
         size="lg"
         data={{ weight: 800, font: "mono" }}
         className={css.slot}
-        style={{ background: slotColor }}
+        style={{
+          background: slotColor,
+          color: createForegroundSlotColor(slotColor),
+        }}
       >
-        {1 + (slot?.index ?? -1) || "/"}
+        {1 + (slot?.index ?? -1) || <RxValueNone />}
       </Text>
     </Text>
   );

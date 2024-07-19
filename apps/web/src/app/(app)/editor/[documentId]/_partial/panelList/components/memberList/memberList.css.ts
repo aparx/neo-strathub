@@ -45,5 +45,4 @@ export const slot = style({
   aspectRatio: "1 / 1",
   borderRadius: vars.roundness.sm,
   border: `1px solid ${vars.colors.outline.card}`,
-  color: vars.colors.accents[0],
 });

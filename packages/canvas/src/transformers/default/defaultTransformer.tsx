@@ -1,6 +1,6 @@
 import { mergeRefs } from "@repo/utils";
 import Konva from "konva";
-import { forwardRef, useRef, useState } from "react";
+import { forwardRef, useReducer, useRef } from "react";
 import { CanvasNodeConfig } from "utils";
 import { usePutIntoTransformer } from "../../hooks";
 import { TransformerContainer } from "../../transformers/container";
@@ -25,7 +25,10 @@ export const DefaultTransformer = forwardRef<
   const trRef = useRef<Konva.Transformer>(null);
   usePutIntoTransformer(shown, trRef.current, link);
 
-  const [verifiedShown, setVerifiedShown] = useState(true);
+  //* A call forces React to rerender this component which is wanted to
+  //* update the position of the tooltip implicitly. THIS IS ONLY TEMPORARY.
+  const [, forceUpdate] = useReducer((x) => 1 + x, 0);
+
   const parent = link?.parent;
   if (!link || !parent) return null;
 
@@ -33,13 +36,11 @@ export const DefaultTransformer = forwardRef<
     <TransformerContainer.Root config={config} linked={link}>
       <BasicTransformer
         ref={mergeRefs(trRef, ref)}
-        onDragStart={() => setVerifiedShown(false)}
-        onDragEnd={() => setVerifiedShown(true)}
-        onTransformStart={() => setVerifiedShown(false)}
-        onTransformEnd={() => setVerifiedShown(true)}
+        onDragMove={forceUpdate}
+        onTransform={forceUpdate}
         {...restProps}
       />
-      {shown && verifiedShown && (
+      {shown && (
         <TransformerContainer.Tooltip>{children}</TransformerContainer.Tooltip>
       )}
     </TransformerContainer.Root>
