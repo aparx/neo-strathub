@@ -291,10 +291,15 @@ function useCreateEvent<T extends CanvasNode>({
   levelId: number;
   stageId: number;
 }) {
+  const canvas = useCanvas();
+
   function handle(e: EditorEventObject<EditorCreateEvent>) {
     if (e.event.levelId !== levelId || e.event.stageId !== stageId) return;
     setNodes((oldNodes) => [...oldNodes, ...(e.event.nodes as T[])]);
     e.event.nodes.forEach((node) => onNodeCreate(node, e.origin));
+
+    if (e.origin === "user")
+      canvas.selected.update(e.event.nodes.map((x) => x.attrs.id));
   }
 
   useEditorEvent("canvasCreate", handle);

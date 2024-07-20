@@ -29,7 +29,7 @@ function MainItemList({
   const items = [
     objectType === "character" && <LinkItem key="link" />,
     <TooltipItem.Duplicate key="duplicate" />,
-    <TooltipItem.Copy key="copy" />,
+    <TooltipItem.Rotate key="rotate" />,
     <TooltipItem.Delete key="delete" />,
   ] as const;
 

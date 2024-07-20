@@ -1,24 +1,35 @@
 "use client";
-import { ZoomButton } from "@/app/(app)/editor/[documentId]/_partial/header/components";
+import {
+  Toolbar,
+  ZoomButton,
+} from "@/app/(app)/editor/[documentId]/_partial/header/components";
 import {
   Breadcrumbs,
   Button,
   Flexbox,
+  Icon,
   IconButton,
   Popover,
   Text,
 } from "@repo/ui/components";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEditorContext } from "../../_context";
 import * as css from "./editor.header.css";
 
 export function EditorHeader() {
-  const [{ blueprint, mode }, updateEditor] = useEditorContext();
+  const [{ blueprint, mode }] = useEditorContext();
+  const router = useRouter();
 
   return (
     <Text asChild>
       <header className={css.headerContainer}>
-        <div className={css.headerItem({ side: "left" })}>Tools</div>
+        <div className={css.headerItem({ side: "left" })}>
+          <IconButton aria-label="Back" onClick={router.back}>
+            <Icon.Mapped type="back" />
+          </IconButton>
+          {mode === "edit" && <Toolbar />}
+        </div>
         <div className={css.headerItem({ side: "center" })}>
           <BlueprintTitle />
         </div>

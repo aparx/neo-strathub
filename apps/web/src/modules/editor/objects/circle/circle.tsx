@@ -26,13 +26,17 @@ export function Circle({
 
   /** Synchronizes the renderer character to this node in a special way */
   function syncCharacter(config: CircleConfig) {
-    const { x, y, width, height, radius, scaleX, scaleY } = config;
+    const { x = 0, y = 0, width, height, radius, scaleX, scaleY } = config;
     //* Since the position origin of a circle is the center, we have to
     //* compensate it for the character outline (handled by the renderer).
+    const angleRad = Konva.Util.degToRad(config.rotation || 0);
+    const xWidth = (width ?? 2 * (radius ?? 0)) * (scaleX ?? 1) * 0.5;
+    const yHeight = (height ?? 2 * (radius ?? 0)) * (scaleY ?? 1) * 0.5;
+
     onSyncCharacter?.({
       ...config,
-      x: (x ?? 0) - (width ?? 2 * (radius ?? 0)) * (scaleX ?? 1) * 0.5,
-      y: (y ?? 0) - (height ?? 2 * (radius ?? 0)) * (scaleY ?? 1) * 0.5,
+      x: x - xWidth * Math.cos(angleRad) - yHeight * Math.sin(-angleRad),
+      y: y - yHeight * Math.cos(angleRad) - xWidth * Math.sin(angleRad),
       width: 2 * (config.radius ?? 0),
       height: 2 * (config.radius ?? 0),
     });
@@ -82,6 +86,7 @@ export function Circle({
         link={circleRef.current}
         anchors="stereo"
         keepRatio={false}
+        rotateEnabled={false /** TODO temporarily: issues with character */}
       />
     </>
   );

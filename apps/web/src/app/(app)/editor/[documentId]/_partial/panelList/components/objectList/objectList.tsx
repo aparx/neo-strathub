@@ -51,7 +51,7 @@ export function SidepanelObjectList({ type }: SidepanelObjectListProps) {
         leading={<Icon.Mapped type="search" />}
         onInput={(e) => setFilter(e.currentTarget.value)}
       />
-      <ScrollArea.Root style={{ maxHeight: 245, overflow: "hidden" }}>
+      <ScrollArea.Root style={{ maxHeight: 205, overflow: "hidden" }}>
         <ScrollArea.Content>
           <ul className={css.list}>
             {objects.map((object) => (

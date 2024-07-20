@@ -100,6 +100,7 @@ export function EditorWindow({ stages }: EditorWindowProps) {
           levelId: Number(layer.id()),
           stageId,
         });
+        canvasRef.current.focus();
       }}
     >
       <EditorViewport

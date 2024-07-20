@@ -71,6 +71,7 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
     } = props;
 
     const moveDragRef = useRef(false);
+    const containerRef = useRef<HTMLDivElement>(null);
     const selectionRef = useRef<Konva.Rect>(null);
     const selectionAreaRef = useRef<SelectionArea>(EMPTY_SELECTION_AREA);
     const stageRef = useRef<Konva.Stage>(null);
@@ -88,6 +89,8 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
       canvas: stageRef,
       onGetCharacterSlot,
       onGetGameObjectURL,
+      blur: () => containerRef.current?.blur(),
+      focus: () => containerRef.current?.focus(),
     } satisfies CanvasContext;
 
     useImperativeHandle(ref, () => context);
@@ -269,7 +272,11 @@ export const Canvas = forwardRef<CanvasRef, CanvasProps>(
 
     return (
       <CanvasContextProvider value={context}>
-        <div style={{ cursor: context.cursor.state }}>
+        <div
+          tabIndex={1}
+          ref={containerRef}
+          style={{ cursor: context.cursor.state }}
+        >
           <ReactKonva.Stage
             ref={stageRef}
             name={NodeTags.NO_SELECT}

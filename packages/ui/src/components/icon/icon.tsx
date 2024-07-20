@@ -1,6 +1,7 @@
 import { ComponentPropsWithoutRef } from "react";
 import { BiDuplicate, BiLogOut } from "react-icons/bi";
 import { CgNotes } from "react-icons/cg";
+import { GrRedo, GrUndo } from "react-icons/gr";
 import { IoMdBook, IoMdEye } from "react-icons/io";
 import {
   MdAdd,
@@ -67,6 +68,8 @@ const iconMap = {
   book: <IoMdBook />,
   copy: <MdContentCopy />,
   duplicate: <BiDuplicate />,
+  undo: <GrUndo />,
+  redo: <GrRedo />,
 } as const satisfies Record<string, React.ReactNode>;
 
 export function Mapped({

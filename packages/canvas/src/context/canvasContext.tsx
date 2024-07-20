@@ -29,6 +29,8 @@ export interface CanvasContext
   cursor: SharedState<CSSProperties["cursor"]>;
   selected: SharedState<string[]>;
   canvas: RefObject<Konva.Stage>;
+  focus: () => void;
+  blur: () => void;
 }
 
 const canvasContext = createContext<CanvasContext | null>(null);

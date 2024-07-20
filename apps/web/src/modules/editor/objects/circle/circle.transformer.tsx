@@ -43,7 +43,7 @@ export const CircleTransformer = forwardRef<
       }}
     />,
     <TooltipItem.Duplicate key="duplicate" />,
-    <TooltipItem.Copy key="copy" />,
+    <TooltipItem.Rotate key="rotate" />,
     <TooltipItem.Delete key="delete" />,
   ] as const;
 
