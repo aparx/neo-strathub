@@ -122,7 +122,7 @@ const SlotSelector = forwardRef<HTMLFieldSetElement, SlotSelectorProps>(
           return (
             <Text
               asChild
-              key={character?.id}
+              key={character?.id || -1}
               data={{ font: "mono", weight: isActive ? 800 : 500 }}
             >
               <label

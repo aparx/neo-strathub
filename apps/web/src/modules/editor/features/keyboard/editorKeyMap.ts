@@ -1,7 +1,5 @@
 import { DeepReadonly } from "@repo/utils";
 
-export type KeyboardKeyMap = typeof DEFAULT_KEY_MAP;
-
 export interface KeyMappingValue {
   ctrl?: boolean;
   alt?: boolean;
@@ -11,25 +9,23 @@ export interface KeyMappingValue {
 }
 
 export type EditorKeyMapTree = DeepReadonly<{
-  canvas: {
-    delete: KeyMappingValue;
-    moveLeft: KeyMappingValue;
-    moveRight: KeyMappingValue;
-    moveUp: KeyMappingValue;
-    moveDown: KeyMappingValue;
-    duplicate: KeyMappingValue;
-    copy: KeyMappingValue;
-    paste: KeyMappingValue;
-    cut: KeyMappingValue;
-  };
-  editor: {
-    undo: KeyMappingValue;
-    redo: KeyMappingValue;
-    close: KeyMappingValue;
-    stageBack: KeyMappingValue;
-    stageNext: KeyMappingValue;
-  };
+  canvas: KeybindMappings<
+    | "delete"
+    | "moveLeft"
+    | "moveRight"
+    | "moveUp"
+    | "moveDown"
+    | "duplicate"
+    | "copy"
+    | "paste"
+    | "cut"
+  >;
+  editor: KeybindMappings<
+    "undo" | "redo" | "close" | "stageBack" | "stageNext"
+  >;
 }>;
+
+type KeybindMappings<TName extends string> = Record<TName, KeyMappingValue>;
 
 export const DEFAULT_KEY_MAP: EditorKeyMapTree = {
   canvas: {
