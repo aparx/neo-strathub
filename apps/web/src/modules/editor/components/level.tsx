@@ -96,27 +96,6 @@ export function EditorLevel({
 
   useCreateEvent({ onNodeCreate, setNodes, levelId: id, stageId });
 
-  // TODO listen to canvasLayerChange
-  useEditorEvent("canvasLayerChange", (e) => {
-    if (e.origin !== "user") return;
-    console.log("LAYER CHANGE", e);
-    const nodeId = e.event.node.attrs.id;
-    if (e.event.from.id() === String(id)) {
-      // TODO remove node from this level
-      e.event.from.children.find((x) => x.attrs.id === nodeId)?.remove();
-      setTimeout(() => {
-        // Remove node next frame, due to required drag
-        setNodes((oldNodes) => oldNodes.filter((x) => x.attrs.id !== nodeId));
-      }, 1);
-    } else if (e.event.to.id() === String(id)) {
-      const nodeCopy = copyCanvasNode(e.event.node);
-      nodeCopy.attrs.x = (nodeCopy.attrs.x ?? 0) + e.event.posDelta.x;
-      nodeCopy.attrs.y = (nodeCopy.attrs.y ?? 0) + e.event.posDelta.y;
-      setNodes((oldNodes) => [...oldNodes, nodeCopy]);
-      e.event.to.children.find((x) => x.attrs.id === nodeId)?.startDrag();
-    }
-  });
-
   useEffect(() => {
     layerRef.current?.setAttr(LAYER_STAGE_ATTR_KEY, stageId);
   }, [stageId, layerRef.current]);
@@ -167,14 +146,6 @@ export function EditorLevel({
           key={index /** OK */}
           canvas={canvas}
           renderers={EDITOR_RENDERERS}
-          onLayerChange={(from, to, _, posDelta) => {
-            eventHandler.fire("canvasLayerChange", "user", {
-              node,
-              from,
-              to,
-              posDelta,
-            });
-          }}
           onUpdate={(configValue) => {
             // TODO delete the node if it lies outside the level
             const oldNodes = nodes;

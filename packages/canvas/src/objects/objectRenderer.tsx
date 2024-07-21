@@ -1,7 +1,4 @@
-import { Nullish } from "@repo/utils";
 import { CanvasContext } from "context/canvasContext";
-import Konva from "konva";
-import { Layer } from "konva/lib/Layer";
 import { SetStateAction, useRef } from "react";
 import * as ReactKonva from "react-konva";
 import { CanvasNode, InferNodeConfig } from "../utils";
@@ -36,12 +33,6 @@ export interface ObjectRendererProps<TNode extends CanvasNode = CanvasNode>
   extends ObjectRendererDrillProps<TNode> {
   children: TNode;
   renderers: ObjectRendererLookupTable<TNode>;
-  onLayerChange: (
-    fromLayer: Layer,
-    toLayer: Layer,
-    node: Konva.Node,
-    posDelta: Konva.Vector2d,
-  ) => void;
 }
 
 export function ObjectRenderer<TNode extends CanvasNode>({
@@ -54,7 +45,6 @@ export function ObjectRenderer<TNode extends CanvasNode>({
   onDragEnd,
   onTransform,
   onTransformEnd,
-  onLayerChange,
   ...restProps
 }: ObjectRendererProps<TNode>) {
   const characterRef = useRef<CharacterRectRef>(null);
@@ -73,8 +63,6 @@ export function ObjectRenderer<TNode extends CanvasNode>({
       ? canvas.onGetCharacterSlot(children.attrs.characterId)
       : null;
 
-  const lastLayerRef = useRef<Konva.Layer | Nullish>();
-
   return (
     <>
       <Renderer
@@ -89,28 +77,6 @@ export function ObjectRenderer<TNode extends CanvasNode>({
         onDragMove={(e) => {
           onDragMove?.(e);
           characterRef.current?.sync(e.target.attrs);
-          const node = e.target;
-          const root = canvas.canvas.current;
-          const nodeRect = node.getClientRect();
-          const nextLayer = root?.getChildren().find((layer) => {
-            return Konva.Util.haveIntersection(nodeRect, {
-              ...layer.getClientRect(),
-              width: canvas.scale.state * layer.clipWidth(),
-              height: canvas.scale.state * layer.clipHeight(),
-            });
-          });
-          const lastLayer = lastLayerRef.current;
-          if (nextLayer && lastLayer && lastLayer !== nextLayer) {
-            const posDelta = { x: 0, y: 0 };
-            const stage = lastLayer.getParent()!;
-            const lastRect = lastLayer.getClientRect({ relativeTo: stage });
-            const nextRect = nextLayer.getClientRect({ relativeTo: stage });
-            // TODO find the
-            const yDelta = lastRect.y - nextRect.y;
-            posDelta.y = yDelta;
-            onLayerChange(lastLayer, nextLayer, e.target, posDelta);
-          }
-          lastLayerRef.current = nextLayer;
         }}
         onDragStart={(e) => {
           onDragStart?.(e);
