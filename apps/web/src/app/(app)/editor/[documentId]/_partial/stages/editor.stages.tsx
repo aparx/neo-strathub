@@ -1,6 +1,5 @@
 "use client";
 import { useEditorEvent } from "@/modules/editor/features/events/hooks";
-import { isKeyPressed } from "@/modules/editor/features/keyboard";
 import { useURL } from "@/utils/hooks";
 import { Icon, Text } from "@repo/ui/components";
 import Link from "next/link";
@@ -16,16 +15,13 @@ export function EditorStages() {
   const active = Number(url.searchParams.get("stage"));
 
   useEditorEvent("keyPress", (e) => {
-    if (e.event.repeat) return;
-    const keyMap = e.event.keyMap;
-    const isBack = isKeyPressed(keyMap.editor.stageBack, e.event);
-    const isNext = isKeyPressed(keyMap.editor.stageNext, e.event);
-    if (!isBack && !isNext) return;
+    if (e.event.event.repeat) return;
+    const isBack = e.event.keys.includes("stageBack");
+    const isNext = e.event.keys.includes("stageNext");
+    const delta = isNext ? 1 : isBack ? -1 : 0;
+    if (delta === 0) return;
     e.preventDefault();
-
-    let newIndex = active + (isNext ? 1 : -1);
-    if (0 > newIndex) newIndex = stages.length - 1;
-    else newIndex %= stages.length;
+    const newIndex = Math.max(0, Math.min(active + delta, stages.length - 1));
     url.searchParams.set("stage", String(newIndex));
     router.replace(url.href);
   });

@@ -1,13 +1,12 @@
-import { useEditorContext } from "@/app/(app)/editor/[documentId]/_context";
-import { CanvasNode, CanvasRef } from "@repo/canvas";
+import { CanvasRef } from "@repo/canvas";
 import { CanvasContext } from "@repo/canvas/context";
 import React, { MutableRefObject, RefObject, useMemo, useRef } from "react";
 import { useEditorEventHandler } from "../events";
-import { EditorKeyMapTree, isKeyPressed } from "./editorKeyMap";
+import { EditorKeyMap, isKeyPressed } from "./editorKeyMap";
 
 export interface KeyboardHandlerProps {
   children: React.ReactNode;
-  keyMap: EditorKeyMapTree;
+  keyMap: EditorKeyMap;
   canvas: React.RefObject<CanvasRef>;
 }
 
@@ -16,14 +15,19 @@ export function EditorKeyboardHandler({
   keyMap,
   canvas,
 }: KeyboardHandlerProps) {
-  const [editor] = useEditorContext();
   const eventHandler = useEditorEventHandler();
   const moveTransaction = useRef(false);
 
-  function keyUp(e: React.KeyboardEvent<HTMLDivElement>) {
-    const event = eventHandler.fire("keyRelease", "user", { ...e, keyMap });
-    if (event.defaultPrevented) return;
+  const checkMove = useCheckElementMove(keyMap, moveTransaction, canvas);
 
+  function keyUp(e: React.KeyboardEvent<HTMLDivElement>) {
+    const keysReleased = keyMap.collectMatches(e);
+    if (!keysReleased.length) return;
+    eventHandler.fire("keyRelease", "user", {
+      event: e,
+      keyMap,
+      keys: keysReleased,
+    });
     if (moveTransaction.current) {
       // Commit move event
       eventHandler.fire("canvasMove", "user", {
@@ -35,32 +39,47 @@ export function EditorKeyboardHandler({
     }
   }
 
-  const checkMove = useCheckElementMove(keyMap, moveTransaction, canvas);
-
   function keyDown(e: React.KeyboardEvent<HTMLDivElement>) {
     e.preventDefault();
 
+    const keysPressed = keyMap.collectMatches(e);
+    if (!keysPressed.length) return;
+
     // Forward key press to subscribers
-    const event = eventHandler.fire("keyPress", "user", { ...e, keyMap });
+    const event = eventHandler.fire("keyPress", "user", {
+      event: e,
+      keyMap,
+      keys: keysPressed,
+    });
     if (event.defaultPrevented) return;
 
     // Handle default behaviours of key press
     if (checkMove(e)) return;
-    if (isKeyPressed(keyMap.canvas.delete, e)) {
-      eventHandler.fire("canvasDelete", "user", {
-        targets: canvas.current?.selected.state ?? [],
-      });
-    } else if (isKeyPressed(keyMap.canvas.duplicate, e)) {
-      const targets = canvas.current?.selected.state ?? [];
-      canvas.current?.selected.update([]); // Clear selection
-      eventHandler.fire("canvasDuplicate", "user", { targets });
-    } else if (isKeyPressed(keyMap.editor.undo, e)) {
-      eventHandler.fire("editorUndo", "user", {});
-    } else if (isKeyPressed(keyMap.editor.redo, e)) {
-      eventHandler.fire("editorRedo", "user", {});
-    } else if (isKeyPressed(keyMap.editor.close, e)) {
-      canvas.current?.selected.update([]);
-    }
+    keysPressed.find((key) => {
+      switch (key) {
+        case "delete":
+          eventHandler.fire("canvasDelete", "user", {
+            targets: canvas.current?.selected.state ?? [],
+          });
+          return true;
+        case "duplicate":
+          const targets = canvas.current?.selected.state ?? [];
+          canvas.current?.selected.update([]); // Clear selection
+          eventHandler.fire("canvasDuplicate", "user", { targets });
+          return true;
+        case "undo":
+          eventHandler.fire("editorUndo", "user", {});
+          return true;
+        case "redo":
+          eventHandler.fire("editorRedo", "user", {});
+          return true;
+        case "close":
+          canvas.current?.selected.update([]);
+          return true;
+        default:
+          return false;
+      }
+    });
   }
 
   return (
@@ -87,17 +106,17 @@ export function EditorKeyboardHandler({
  *                        outgoing bandwidth) to the database
  */
 function useCheckElementMove(
-  keyMap: EditorKeyMapTree,
+  keyMap: EditorKeyMap,
   moveTransaction: MutableRefObject<boolean>,
   canvas: RefObject<CanvasContext | null>,
 ) {
   const eventHandler = useEditorEventHandler();
   return useMemo(() => {
     const deltaMatrix = [
-      [keyMap.canvas.moveLeft, [-1, 0]],
-      [keyMap.canvas.moveRight, [1, 0]],
-      [keyMap.canvas.moveUp, [0, -1]],
-      [keyMap.canvas.moveDown, [0, 1]],
+      [keyMap.tree.moveLeft, [-1, 0]],
+      [keyMap.tree.moveRight, [1, 0]],
+      [keyMap.tree.moveUp, [0, -1]],
+      [keyMap.tree.moveDown, [0, 1]],
     ] as const;
 
     return (e: React.KeyboardEvent) => {
@@ -115,8 +134,3 @@ function useCheckElementMove(
     };
   }, [keyMap, eventHandler, canvas]);
 }
-
-type ClipboardData = {
-  arenaId: number;
-  nodes: Array<CanvasNode & { layerId: any }>;
-};

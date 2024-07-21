@@ -7,7 +7,7 @@ import {
 import { mergeRefs } from "@repo/utils";
 import React, { forwardRef, useEffect, useRef } from "react";
 import { useDebouncedCallback } from "use-debounce";
-import { DEFAULT_KEY_MAP, EditorKeyboardHandler } from "../features/keyboard";
+import { EditorKeyMap, EditorKeyboardHandler } from "../features/keyboard";
 import { useEditorLocalStorage } from "../hooks";
 import { Circle, GameObject, Rectangle } from "../objects";
 
@@ -44,7 +44,10 @@ export const EditorViewport = forwardRef<CanvasContext, EditorViewportProps>(
     useEffect(() => canvasRef.current?.scale.update(scale), [scale]);
 
     return (
-      <EditorKeyboardHandler canvas={canvasRef} keyMap={DEFAULT_KEY_MAP}>
+      <EditorKeyboardHandler
+        canvas={canvasRef}
+        keyMap={EditorKeyMap.DEFAULT_MAP}
+      >
         <Canvas
           ref={mergeRefs(canvasRef, ref)}
           config={config}
