@@ -13,6 +13,7 @@ import {
   usePushUpdate,
 } from "../hooks";
 import { EditorLevel } from "./level";
+import { useEditorEvent } from "../features/events/hooks";
 
 export interface EditorStageStyle {
   levelStyle: CanvasLevelStyle;

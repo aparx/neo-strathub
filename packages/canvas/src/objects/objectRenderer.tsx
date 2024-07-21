@@ -1,4 +1,7 @@
+import { Nullish } from "@repo/utils";
 import { CanvasContext } from "context/canvasContext";
+import Konva from "konva";
+import { Layer } from "konva/lib/Layer";
 import { SetStateAction, useRef } from "react";
 import * as ReactKonva from "react-konva";
 import { CanvasNode, InferNodeConfig } from "../utils";
@@ -33,6 +36,7 @@ export interface ObjectRendererProps<TNode extends CanvasNode = CanvasNode>
   extends ObjectRendererDrillProps<TNode> {
   children: TNode;
   renderers: ObjectRendererLookupTable<TNode>;
+  onLayerChange: (fromLayer: Layer, toLayer: Layer, node: Konva.Node) => void;
 }
 
 export function ObjectRenderer<TNode extends CanvasNode>({
@@ -40,6 +44,11 @@ export function ObjectRenderer<TNode extends CanvasNode>({
   children,
   renderers,
   onUpdate,
+  onDragMove,
+  onDragStart,
+  onDragEnd,
+  onTransform,
+  onTransformEnd,
   ...restProps
 }: ObjectRendererProps<TNode>) {
   const characterRef = useRef<CharacterRectRef>(null);
@@ -58,6 +67,8 @@ export function ObjectRenderer<TNode extends CanvasNode>({
       ? canvas.onGetCharacterSlot(children.attrs.characterId)
       : null;
 
+  const lastLayerRef = useRef<Konva.Layer | Nullish>();
+
   return (
     <>
       <Renderer
@@ -65,19 +76,39 @@ export function ObjectRenderer<TNode extends CanvasNode>({
         canvas={canvas}
         showTransformer={isIndividualSelection}
         onSyncCharacter={(config) => characterRef.current?.sync(config)}
-        onTransform={(e) => characterRef.current?.sync(e.target.attrs)}
-        onDragMove={(e) => characterRef.current?.sync(e.target.attrs)}
-        onDragStart={(e) =>
+        onTransform={(e) => {
+          onTransform?.(e);
+          characterRef.current?.sync(e.target.attrs);
+        }}
+        onDragMove={(e) => {
+          onDragMove?.(e);
+          characterRef.current?.sync(e.target.attrs);
+          const node = e.target;
+          const root = canvas.canvas.current;
+          const nodeRect = node.getClientRect();
+          const nextLayer = root
+            ?.getChildren()
+            .find((layer) =>
+              Konva.Util.haveIntersection(nodeRect, layer.getClientRect()),
+            );
+          const lastLayer = lastLayerRef.current;
+          if (nextLayer && lastLayer && lastLayer !== nextLayer)
+            onLayerChange(lastLayer, nextLayer, e.target);
+          lastLayerRef.current = nextLayer;
+        }}
+        onDragStart={(e) => {
+          onDragStart?.(e);
           canvas.selected.update((current) => {
             const targetId = e.target.attrs.id;
             if (typeof targetId === "string" && !current.includes(targetId))
               // TODO if shift/alt is pressed, include the previous selected ids
               return [targetId];
             return current;
-          })
-        }
-        onTransformEnd={(e) =>
+          });
+        }}
+        onTransformEnd={(e) => {
           // Default behaviour of `onTransformEnd`
+          onTransformEnd?.(e);
           onUpdate((oldConfig) => ({
             ...oldConfig,
             x: e.target.x(),
@@ -91,16 +122,17 @@ export function ObjectRenderer<TNode extends CanvasNode>({
               x: e.target.scaleX(),
               y: e.target.scaleY(),
             },
-          }))
-        }
-        onDragEnd={(e) =>
+          }));
+        }}
+        onDragEnd={(e) => {
           // Default behaviour of `onDragEnd`
+          onDragEnd?.(e);
           onUpdate((oldConfig) => ({
             ...oldConfig,
             x: e.target.x(),
             y: e.target.y(),
-          }))
-        }
+          }));
+        }}
         onUpdate={onUpdate}
         {...restProps}
       />

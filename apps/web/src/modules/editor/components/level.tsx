@@ -10,13 +10,21 @@ import {
   useCanvas,
 } from "@repo/canvas";
 import Konva from "konva";
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import { Html } from "react-konva-utils";
 import { v4 as uuidv4 } from "uuid";
 import {
   EditorCreateEvent,
   EditorEventObject,
   EditorEventOrigin,
+  useEditorEventHandler,
 } from "../features/events";
 import { useEditorEvent } from "../features/events/hooks";
 import { useGetBlueprintObjects } from "../hooks";
@@ -57,9 +65,12 @@ export function EditorLevel({
 }: EditorLevelProps) {
   const canvas = useCanvas();
   const [editor, updateEditor] = useEditorContext();
+  const eventHandler = useEditorEventHandler();
   const [nodes, setNodes] = useState<CanvasNode[]>([]);
   const { data } = useGetBlueprintObjects(stageId, id);
   const layerRef = useRef<Konva.Layer>(null);
+
+  const [, startTransition] = useTransition();
 
   useEffect(() => {
     if (!data) return setNodes([]);
@@ -84,6 +95,8 @@ export function EditorLevel({
   useUpdateEvent({ onNodeUpdate, setNodes });
 
   useCreateEvent({ onNodeCreate, setNodes, levelId: id, stageId });
+
+  // TODO listen to canvasLayerChange
 
   useEffect(() => {
     layerRef.current?.setAttr(LAYER_STAGE_ATTR_KEY, stageId);
@@ -135,6 +148,9 @@ export function EditorLevel({
           key={index /** OK */}
           canvas={canvas}
           renderers={EDITOR_RENDERERS}
+          onLayerChange={(from, to) => {
+            eventHandler.fire("canvasLayerChange", "user", { node, from, to });
+          }}
           onUpdate={(configValue) => {
             // TODO delete the node if it lies outside the level
             const oldNodes = nodes;

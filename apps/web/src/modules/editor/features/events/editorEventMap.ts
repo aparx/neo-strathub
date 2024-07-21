@@ -3,6 +3,7 @@ import type {
   CharacterGadgetSlotData,
 } from "@/modules/blueprint/actions";
 import { CanvasNode, CanvasNodeConfig } from "@repo/canvas";
+import { Layer } from "konva/lib/Layer";
 import { KeyboardEvent } from "react";
 import { EditorKeyMapTree } from "../keyboard";
 
@@ -59,6 +60,7 @@ export interface BroadcastableEditorEventMap {
   canvasDuplicate: EditorTargetsEvent;
   canvasCreate: EditorCreateEvent;
   canvasUpdate: EditorUpdateEvent;
+  canvasLayerChange: EditorLayerChangeEvent;
   updateCharacter: EditorUpdateCharacter;
   updateGadget: EditorUpdateGadget;
 }
@@ -115,3 +117,9 @@ export type EditorUpdateCharacter = EditorEvent &
   };
 
 export type EditorUpdateGadget = EditorEvent & CharacterGadgetSlotData;
+
+export interface EditorLayerChangeEvent extends EditorEvent {
+  node: CanvasNode;
+  from: Layer;
+  to: Layer;
+}

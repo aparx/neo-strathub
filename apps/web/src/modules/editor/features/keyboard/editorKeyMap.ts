@@ -21,7 +21,6 @@ export type EditorKeyMapTree = DeepReadonly<{
     copy: KeyMappingValue;
     paste: KeyMappingValue;
     cut: KeyMappingValue;
-    rotate: KeyMappingValue;
   };
   editor: {
     undo: KeyMappingValue;
@@ -43,7 +42,6 @@ export const DEFAULT_KEY_MAP: EditorKeyMapTree = {
     copy: { code: "KeyC", ctrl: true },
     cut: { code: "KeyX", ctrl: true },
     paste: { code: "KeyV", ctrl: true },
-    rotate: { code: "AltLeft" },
   },
   editor: {
     undo: { code: "KeyY", ctrl: true },
