@@ -49,6 +49,7 @@ export function ObjectRenderer<TNode extends CanvasNode>({
   onDragEnd,
   onTransform,
   onTransformEnd,
+  onLayerChange,
   ...restProps
 }: ObjectRendererProps<TNode>) {
   const characterRef = useRef<CharacterRectRef>(null);
