@@ -4,6 +4,7 @@ import type {
 } from "@/modules/blueprint/actions";
 import { CanvasNode, CanvasNodeConfig } from "@repo/canvas";
 import { Layer } from "konva/lib/Layer";
+import { Vector2d } from "konva/lib/types";
 import { KeyboardEvent } from "react";
 import { EditorKeyMapTree } from "../keyboard";
 
@@ -122,4 +123,5 @@ export interface EditorLayerChangeEvent extends EditorEvent {
   node: CanvasNode;
   from: Layer;
   to: Layer;
+  posDelta: Vector2d;
 }

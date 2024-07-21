@@ -36,7 +36,12 @@ export interface ObjectRendererProps<TNode extends CanvasNode = CanvasNode>
   extends ObjectRendererDrillProps<TNode> {
   children: TNode;
   renderers: ObjectRendererLookupTable<TNode>;
-  onLayerChange: (fromLayer: Layer, toLayer: Layer, node: Konva.Node) => void;
+  onLayerChange: (
+    fromLayer: Layer,
+    toLayer: Layer,
+    node: Konva.Node,
+    posDelta: Konva.Vector2d,
+  ) => void;
 }
 
 export function ObjectRenderer<TNode extends CanvasNode>({
@@ -87,14 +92,24 @@ export function ObjectRenderer<TNode extends CanvasNode>({
           const node = e.target;
           const root = canvas.canvas.current;
           const nodeRect = node.getClientRect();
-          const nextLayer = root
-            ?.getChildren()
-            .find((layer) =>
-              Konva.Util.haveIntersection(nodeRect, layer.getClientRect()),
-            );
+          const nextLayer = root?.getChildren().find((layer) => {
+            return Konva.Util.haveIntersection(nodeRect, {
+              ...layer.getClientRect(),
+              width: canvas.scale.state * layer.clipWidth(),
+              height: canvas.scale.state * layer.clipHeight(),
+            });
+          });
           const lastLayer = lastLayerRef.current;
-          if (nextLayer && lastLayer && lastLayer !== nextLayer)
-            onLayerChange(lastLayer, nextLayer, e.target);
+          if (nextLayer && lastLayer && lastLayer !== nextLayer) {
+            const posDelta = { x: 0, y: 0 };
+            const stage = lastLayer.getParent()!;
+            const lastRect = lastLayer.getClientRect({ relativeTo: stage });
+            const nextRect = nextLayer.getClientRect({ relativeTo: stage });
+            // TODO find the
+            const yDelta = lastRect.y - nextRect.y;
+            posDelta.y = yDelta;
+            onLayerChange(lastLayer, nextLayer, e.target, posDelta);
+          }
           lastLayerRef.current = nextLayer;
         }}
         onDragStart={(e) => {
