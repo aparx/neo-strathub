@@ -43,6 +43,10 @@ export function EditorKeyboardHandler({
     e.preventDefault();
 
     const keysPressed = keyMap.collectMatches(e);
+    keyMap.forEachMatching(e, function () {
+      console.log("matching", this);
+    });
+
     if (!keysPressed.length) return;
 
     // Forward key press to subscribers

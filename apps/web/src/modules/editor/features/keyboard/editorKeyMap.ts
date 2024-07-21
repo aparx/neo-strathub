@@ -1,59 +1,16 @@
 import { DeepReadonly } from "@repo/utils";
+import {
+  DEFAULT_KEY_TREE,
+  EditorKeybindTree,
+  KeyMappingValue,
+} from "./editorKeyTree";
 
-export interface KeyMappingValue {
-  ctrl?: boolean;
-  alt?: boolean;
-  shift?: boolean;
-  meta?: boolean;
-  code?: string;
-}
-
-export type EditorKeybindTree = DeepReadonly<
-  KeybindMappings<
-    | "delete"
-    | "moveLeft"
-    | "moveRight"
-    | "moveUp"
-    | "moveDown"
-    | "duplicate"
-    | "undo"
-    | "redo"
-    | "close"
-    | "stageBack"
-    | "stageNext"
-    | "copy"
-    | "paste"
-    | "cut"
-  >
->;
-
-type KeybindMappings<TName extends string> = Record<TName, KeyMappingValue>;
-
-export const DEFAULT_KEY_TREE: EditorKeybindTree = {
-  delete: { code: "Delete" },
-  moveLeft: { code: "ArrowLeft" },
-  moveRight: { code: "ArrowRight" },
-  moveUp: { code: "ArrowUp" },
-  moveDown: { code: "ArrowDown" },
-  duplicate: { code: "KeyD", ctrl: true },
-  undo: { code: "KeyY", ctrl: true },
-  redo: { code: "KeyZ", ctrl: true },
-  close: { code: "Escape" },
-  stageBack: { code: "KeyQ" },
-  stageNext: { code: "KeyE" },
-  copy: { code: "KeyC", ctrl: true },
-  cut: { code: "KeyX", ctrl: true },
-  paste: { code: "KeyV", ctrl: true },
-} as const;
-
-type KeyEvent = Partial<
+export type PartialKeyEvent = Partial<
   Pick<
     React.KeyboardEvent,
     "altKey" | "ctrlKey" | "metaKey" | "shiftKey" | "code"
   >
 >;
-
-type ReadonlyTree = DeepReadonly<EditorKeybindTree>;
 
 export type InferKeyMapKeys<T> =
   T extends EditorKeyMap<infer TTree>
@@ -61,6 +18,8 @@ export type InferKeyMapKeys<T> =
     : T extends EditorKeybindTree
       ? keyof T
       : "Cannot infer keyboard keys";
+
+type ReadonlyTree = DeepReadonly<EditorKeybindTree>;
 
 export class EditorKeyMap<TTree extends ReadonlyTree = ReadonlyTree> {
   public static DEFAULT_MAP = new EditorKeyMap(DEFAULT_KEY_TREE);
@@ -72,35 +31,34 @@ export class EditorKeyMap<TTree extends ReadonlyTree = ReadonlyTree> {
     this._keys = Object.keys(tree) as typeof this._keys;
   }
 
-  isMatching(key: keyof TTree, event: KeyEvent): boolean {
+  isMatching(key: keyof TTree, event: PartialKeyEvent): boolean {
     const mapping = this.tree[key];
     if (!mapping) throw new Error("Impossible: Key mapping does not exist");
     return isKeyPressed(mapping, event);
   }
 
-  findMatching(event: KeyEvent): keyof TTree | undefined {
+  findMatching(event: PartialKeyEvent): keyof TTree | undefined {
     return this._keys.find((key) => this.isMatching(key, event));
   }
 
   forEachMatching(
-    event: KeyEvent,
+    event: PartialKeyEvent,
     callback: (this: EditorKeyMap<TTree>, key: keyof TTree) => void,
   ): void {
-    const _callback = callback.bind(this);
     this._keys.forEach((key) => {
       if (!this.isMatching(key, event)) return;
-      _callback.call(this, key);
+      callback.call(this, key);
     });
   }
 
-  collectMatches(event: KeyEvent): Array<keyof TTree> {
+  collectMatches(event: PartialKeyEvent): Array<keyof TTree> {
     const keysPressed = new Array<keyof TTree>();
     this.forEachMatching(event, (key) => keysPressed.push(key));
     return keysPressed;
   }
 }
 
-export function isKeyPressed(map: KeyMappingValue, e: KeyEvent) {
+export function isKeyPressed(map: KeyMappingValue, e: PartialKeyEvent) {
   if (map.alt && !e.altKey) return false;
   if (map.ctrl && !e.ctrlKey) return false;
   if (map.meta && !e.metaKey) return false;
