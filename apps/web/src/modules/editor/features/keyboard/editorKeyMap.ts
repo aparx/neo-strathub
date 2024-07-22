@@ -66,10 +66,10 @@ export class EditorKeyMap<
   }
 }
 
-export function isKeyPressed(map: KeyMappingValue, event: PartialKeyEvent) {
-  if (Boolean(map.alt) !== Boolean(event.altKey)) return false;
-  if (Boolean(map.ctrl) !== Boolean(event.ctrlKey)) return false;
-  if (Boolean(map.meta) !== Boolean(event.metaKey)) return false;
-  if (Boolean(map.shift) !== Boolean(event.shiftKey)) return false;
-  return map.code === event.code;
+export function isKeyPressed(map: KeyMappingValue, e: PartialKeyEvent) {
+  if (map.alt && !e.altKey) return false;
+  if (map.ctrl && !e.ctrlKey) return false;
+  if (map.meta && !e.metaKey) return false;
+  if (map.shift && !e.shiftKey) return false;
+  return map.code === e.code;
 }

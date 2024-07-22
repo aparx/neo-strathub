@@ -32,7 +32,7 @@ describe("keyMap", () => {
     checkFalse(map.isMatching("ctrlA", { ctrlKey: true, code: " A" }));
     checkFalse(map.isMatching("ctrlA", { ctrlKey: false, code: "a" }));
     checkFalse(map.isMatching("ctrlA", { code: "A" }));
-    checkFalse(
+    checkTrue(
       map.isMatching("ctrlA", { ctrlKey: true, altKey: true, code: "A" }),
     );
     checkTrue(
@@ -66,7 +66,7 @@ describe("keyMap", () => {
     expect(map.findMatching({ metaKey: true, code: "E" })).toEqual("metaE");
     expect(
       map.findMatching({ ctrlKey: true, metaKey: true, code: "E" }),
-    ).toEqual("ctrlMetaE");
+    ).toEqual("metaE"); //* <- Order is important for #findMatching
   });
 
   test("collectMatches", () => {
@@ -74,8 +74,8 @@ describe("keyMap", () => {
     expect(map.collectMatches({ ctrlKey: true, code: "A" })).toEqual(["ctrlA"]);
     expect(map.collectMatches({ metaKey: true, code: "E" })).toEqual(["metaE"]);
     expect(
-      map.collectMatches({ metaKey: true, ctrlKey: true, code: "E" }),
-    ).toEqual(["ctrlMetaE"]);
+      map.collectMatches({ metaKey: true, ctrlKey: true, code: "E" }).sort(),
+    ).toEqual(["metaE", "ctrlMetaE"].sort());
     expect(map.collectMatches({})).toEqual([]);
     expect(map.collectMatches({ code: "A" })).toEqual([]);
     expect(map.collectMatches({ code: "D" })).toEqual(["codeD"]);
