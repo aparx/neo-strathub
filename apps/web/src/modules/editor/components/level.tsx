@@ -96,6 +96,12 @@ export function EditorLevel({
 
   useCreateEvent({ onNodeCreate, setNodes, levelId: id, stageId });
 
+  useEditorEvent("canvasCopy", (e) => {
+    if (e.origin !== "user") return;
+    const targets = nodes.filter((x) => e.event.targets.includes(x.attrs.id));
+    if (targets.length !== 0) e.event.copyNodes(stageId, id, targets);
+  });
+
   useEffect(() => {
     layerRef.current?.setAttr(LAYER_STAGE_ATTR_KEY, stageId);
   }, [stageId, layerRef.current]);

@@ -1,6 +1,7 @@
 import { CanvasRef } from "@repo/canvas";
 import { CanvasContext } from "@repo/canvas/context";
 import React, { MutableRefObject, RefObject, useMemo, useRef } from "react";
+import { useCopyNodes, usePasteNodes } from "../copyAndPaste";
 import { useEditorEventHandler } from "../events";
 import { EditorKeyMap, isKeyPressed } from "./editorKeyMap";
 
@@ -19,6 +20,8 @@ export function EditorKeyboardHandler({
   const moveTransaction = useRef(false);
 
   const checkMove = useCheckElementMove(keyMap, moveTransaction, canvas);
+  const copyNodes = useCopyNodes(canvas);
+  const pasteNodes = usePasteNodes(canvas);
 
   function keyUp(e: React.KeyboardEvent<HTMLDivElement>) {
     const keysReleased = keyMap.collectMatches(e);
@@ -76,8 +79,12 @@ export function EditorKeyboardHandler({
         case "close":
           canvas.current?.selected.update([]);
           return true;
-        default:
-          return false;
+        case "copy":
+          copyNodes();
+          return true;
+        case "paste":
+          pasteNodes();
+          return true;
       }
     });
   }

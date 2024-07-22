@@ -4,7 +4,11 @@ import type {
 } from "@/modules/blueprint/actions";
 import { CanvasNode, CanvasNodeConfig } from "@repo/canvas";
 import { KeyboardEvent } from "react";
-import { EditorKeyMap, DefaultEditorKeyTree, InferKeyMapKeys } from "../keyboard";
+import {
+  DefaultEditorKeyTree,
+  EditorKeyMap,
+  InferKeyMapKeys,
+} from "../keyboard";
 
 export type EditorEventOrigin = "user" | "history" | "foreign";
 
@@ -66,6 +70,7 @@ export interface BroadcastableEditorEventMap {
 export interface EditorEventMap extends BroadcastableEditorEventMap {
   canvasMove: EditorMoveEvent;
   canvasDrop: EditorCreateEvent;
+  canvasCopy: EditorCopyEvent;
   editorUndo: EditorEvent;
   editorRedo: EditorEvent;
   keyPress: EditorKeyEvent;
@@ -117,3 +122,10 @@ export type EditorUpdateCharacter = EditorEvent &
   };
 
 export type EditorUpdateGadget = EditorEvent & CharacterGadgetSlotData;
+
+export interface EditorCopyEvent extends EditorEvent {
+  /** Includes `nodes` into the copying process */
+  copyNodes(stage: number, level: number, nodes: CanvasNode[]): void;
+  /** The target node identifiers to be copied */
+  targets: string[];
+}
