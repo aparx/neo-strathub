@@ -39,16 +39,22 @@ export class EditorKeyMap<
     return this._tree;
   }
 
+  /** Returns true if `event` is matching the mapping for `key` in this tree */
   isMatching(key: keyof TTree, event: PartialKeyEvent): boolean {
     const mapping = this.tree[key];
     if (!mapping) throw new Error("Impossible: Key mapping does not exist");
     return isKeyPressed(mapping, event);
   }
 
+  /** Finds the first key mapping matching given `event` */
   findMatching(event: PartialKeyEvent): keyof TTree | undefined {
+    // TODO future implementations might want to focus on specificity, such
+    // TODO that the last key with most aspects of `event` matching is returned.
+    // TODO That is, `event` is fully fulfilling the key's obligatory fields.
     return this._keys.find((key) => this.isMatching(key, event));
   }
 
+  /** Calls `callback` for each key mapping `event` is matching */
   forEachMatching(
     event: PartialKeyEvent,
     callback: (this: EditorKeyMap<TTree>, key: keyof TTree) => void,
@@ -59,6 +65,7 @@ export class EditorKeyMap<
     });
   }
 
+  /** Collects and returns all key mappings `event` is matching */
   collectMatches(event: PartialKeyEvent): Array<keyof TTree> {
     const keysPressed = new Array<keyof TTree>();
     this.forEachMatching(event, (key) => keysPressed.push(key));
