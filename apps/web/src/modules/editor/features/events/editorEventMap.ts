@@ -4,7 +4,7 @@ import type {
 } from "@/modules/blueprint/actions";
 import { CanvasNode, CanvasNodeConfig } from "@repo/canvas";
 import { KeyboardEvent } from "react";
-import { EditorKeyMap, EditorKeybindTree, InferKeyMapKeys } from "../keyboard";
+import { EditorKeyMap, DefaultEditorKeyTree, InferKeyMapKeys } from "../keyboard";
 
 export type EditorEventOrigin = "user" | "history" | "foreign";
 
@@ -84,7 +84,7 @@ export interface EditorEvent {
 export interface EditorKeyEvent extends EditorEvent {
   keyMap: EditorKeyMap;
   event: KeyboardEvent;
-  keys: InferKeyMapKeys<EditorKeybindTree>[];
+  keys: InferKeyMapKeys<DefaultEditorKeyTree>[];
 }
 
 export interface EditorTargetsEvent extends EditorEvent {

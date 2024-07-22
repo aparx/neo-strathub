@@ -1,7 +1,7 @@
-import { DeepReadonly } from "@repo/utils";
 import {
   DEFAULT_KEY_TREE,
-  EditorKeybindTree,
+  DefaultEditorKeyTree,
+  EditorKeyTreeContract,
   KeyMappingValue,
 } from "./editorKeyTree";
 
@@ -15,20 +15,28 @@ export type PartialKeyEvent = Partial<
 export type InferKeyMapKeys<T> =
   T extends EditorKeyMap<infer TTree>
     ? keyof TTree
-    : T extends EditorKeybindTree
+    : T extends DefaultEditorKeyTree
       ? keyof T
       : "Cannot infer keyboard keys";
 
-type ReadonlyTree = DeepReadonly<EditorKeybindTree>;
-
-export class EditorKeyMap<TTree extends ReadonlyTree = ReadonlyTree> {
-  public static DEFAULT_MAP = new EditorKeyMap(DEFAULT_KEY_TREE);
+export class EditorKeyMap<
+  TTree extends EditorKeyTreeContract = DefaultEditorKeyTree,
+> {
+  public static DEFAULT_MAP = new EditorKeyMap<DefaultEditorKeyTree>(
+    DEFAULT_KEY_TREE,
+  );
 
   private readonly _keys: Array<keyof TTree>;
+  private readonly _tree: TTree;
 
-  constructor(public readonly tree: TTree) {
-    // Get keys on initial construction, to avoid constant O(n)
-    this._keys = Object.keys(tree) as typeof this._keys;
+  constructor(tree: TTree) {
+    this._tree = structuredClone(tree); // Ensure immutability at runtime
+    // Get keys on initial construction, to avoid more than one O(n)
+    this._keys = Object.keys(this._tree) as typeof this._keys;
+  }
+
+  get tree(): TTree {
+    return this._tree;
   }
 
   isMatching(key: keyof TTree, event: PartialKeyEvent): boolean {
@@ -58,10 +66,10 @@ export class EditorKeyMap<TTree extends ReadonlyTree = ReadonlyTree> {
   }
 }
 
-export function isKeyPressed(map: KeyMappingValue, e: PartialKeyEvent) {
-  if (map.alt && !e.altKey) return false;
-  if (map.ctrl && !e.ctrlKey) return false;
-  if (map.meta && !e.metaKey) return false;
-  if (map.shift && !e.shiftKey) return false;
-  return map.code === e.code;
+export function isKeyPressed(map: KeyMappingValue, event: PartialKeyEvent) {
+  if (Boolean(map.alt) !== Boolean(event.altKey)) return false;
+  if (Boolean(map.ctrl) !== Boolean(event.ctrlKey)) return false;
+  if (Boolean(map.meta) !== Boolean(event.metaKey)) return false;
+  if (Boolean(map.shift) !== Boolean(event.shiftKey)) return false;
+  return map.code === event.code;
 }

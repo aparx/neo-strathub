@@ -8,28 +8,14 @@ export interface KeyMappingValue {
   code?: string;
 }
 
-export type EditorKeybindTree = DeepReadonly<
-  KeybindMappings<
-    | "delete"
-    | "moveLeft"
-    | "moveRight"
-    | "moveUp"
-    | "moveDown"
-    | "duplicate"
-    | "undo"
-    | "redo"
-    | "close"
-    | "stageBack"
-    | "stageNext"
-    | "copy"
-    | "paste"
-    | "cut"
-  >
+export type EditorKeyTreeContract<TTreeKeys extends string = string> =
+  DeepReadonly<Record<TTreeKeys, KeyMappingValue>>;
+
+export type DefaultEditorKeyTree = EditorKeyTreeContract<
+  keyof typeof DEFAULT_KEY_TREE
 >;
 
-type KeybindMappings<TName extends string> = Record<TName, KeyMappingValue>;
-
-export const DEFAULT_KEY_TREE: EditorKeybindTree = {
+export const DEFAULT_KEY_TREE = {
   delete: { code: "Delete" },
   moveLeft: { code: "ArrowLeft" },
   moveRight: { code: "ArrowRight" },
@@ -44,4 +30,4 @@ export const DEFAULT_KEY_TREE: EditorKeybindTree = {
   copy: { code: "KeyC", ctrl: true },
   cut: { code: "KeyX", ctrl: true },
   paste: { code: "KeyV", ctrl: true },
-} as const;
+} as const satisfies EditorKeyTreeContract;
